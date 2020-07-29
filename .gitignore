@@ -1,4 +1,9 @@
-*.class
+# Generated products that are not included in the repo.
+# They can all be built from tracked resources under src/
+/bin
+/tmp
+/test
+/html
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
