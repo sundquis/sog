@@ -1,0 +1,20 @@
+<!ELEMENT system (class)* >
+<!ATTLIST system
+	description	CDATA	#REQUIRED
+>
+
+<!ELEMENT class (property | text)* >
+<!ATTLIST class
+	fullname	CDATA	#REQUIRED
+>
+
+<!ELEMENT property EMPTY >
+<!ATTLIST property
+	name	CDATA	#REQUIRED
+	value	CDATA	#REQUIRED
+>
+
+<!ELEMENT text (#PCDATA) >
+<!ATTLIST text
+	name	CDATA	#REQUIRED
+>

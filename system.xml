@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE system SYSTEM "system.dtd" >
+<system description="Developmental demonstration version.">
+
+    <!-- Properties for App -->
+    <class fullname="sog.core.App">
+        <property name="description" value="Developmental version of applicatoin framework" />
+        <property name="root" value="/home/sundquis/book/Dropbox/java/projects/DEV" />
+        <property name="source.dirs" 
+            value="/home/sundquis/book/Dropbox/java/projects/DEV/devsrc" />
+    </class>
+
+    <!-- Tracing properties -->
+    <class fullname="sog.core.Trace">
+        <property name="dir.name" value="trace" />
+        <property name="warn.limit" value="1000000" />
+        <property name="fail.limit" value="100000000" />
+        <property name="max.buffer.size" value="100" />
+    </class>
+
+	<!--  ByteFile properties on sizes -->
+	<class fullname="sog.core.ByteFile">
+		<property name="maxLength" value="1000000000" />
+		<property name="warnLimit" value="2000000000" />
+		<property name="failLimit" value="5000000000" />
+	</class>
+    
+	<class fullname="sog.core.SoftString">
+		<property name="threshold" value="50" />
+	</class>
+
+    <class fullname="sog.core.test.Result">
+        <property name="show.global.results" value="true" />
+        <property name="show.class.results" value="true" />
+        <property name="show.member.results" value="true" />
+        <property name="show.case.results" value="true" />
+        <property name="show.fail.cases" value="true" />
+        <property name="show.pass.cases" value="true" />
+        <property name="show.unexecuted.cases" value="true" />
+        <property name="warn.untested.class" value="false" />
+        <property name="warn.untested.constructor" value="false" />
+        <property name="warn.untested.method" value="true" />
+        <property name="warn.untested.field" value="true" />
+        <property name="warn.untested.nonpublic.members" value="false" />
+        <property name="warn.untested.public.members" value="true" />
+    </class>
+
+    <!-- For testing -->
+	<class fullname="test.core.PropertyTest">
+		<property name="nested.test" value="true" />
+		<property name="duplicate" value="false" />
+		<property name="duplicate" value="true" />
+		<property name="malformed" value="XXXX" />
+		<text name="empty"></text>
+		<text name="nested">Nested</text>
+		<text name="duplicate">Duplicate</text>
+		<text name="repeated">Bogus</text>
+		<text name="repeated">Repeated</text>
+	</class>
+
+    <!-- For testing -->
+	<class fullname="test.core.PropertyTest$Inner">
+		<property name="double.nested.test" value="true" />
+		<text name="innertest">Text value</text>
+	</class>
+
+	<class fullname="sog.core.xml.XML">
+		<text name="declaration"><![CDATA[<?xml version="1.0" encoding="utf-8"?>]]></text>
+	</class>
+		
+	<class fullname="sog.persist.model.sql.Names">
+		<property name="max.tablename.length" value="100" />
+		<property name="max.columnname.length" value="50" />
+	</class>
+	
+	<class fullname="sog.util.Macro">
+		<property name="maxIterations" value="100" />
+	</class>
+
+</system>
