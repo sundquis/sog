@@ -13,7 +13,7 @@ import java.util.function.Function;
 import sog.core.AppException;
 import sog.core.Procedure;
 import sog.core.Switch;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -50,7 +50,7 @@ public class SwitchTest implements TestContainer {
 	
 	
 	// apply
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Object Switch.apply(Object, Object)", 
 		desc = "Throws App exception when handler raises exception" )
 	public void apply_ThrowsAppExceptionWhenHandlerRaisesException( TestCase tc ) {
@@ -60,7 +60,7 @@ public class SwitchTest implements TestContainer {
 	}
 		
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Object Switch.apply(Object, Object)", 
 		desc = "Throws App exception when no handler found" )
 	public void apply_ThrowsAppExceptionWhenNoHandlerFound( TestCase tc ) {
@@ -71,7 +71,7 @@ public class SwitchTest implements TestContainer {
 		this.sw.apply( State.MURKY, "Foo" );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Object Switch.apply(Object, Object)", 
 		desc = "Throws assertion error for null key" )
 	public void apply_ThrowsAssertionErrorForNullKey( TestCase tc ) {
@@ -82,21 +82,21 @@ public class SwitchTest implements TestContainer {
 
 	
 	// addCase
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addCase(Object, Function)", 
 		desc = "Returns non null" )
 	public void addCase_ReturnsNonNull( TestCase tc ) {
 		tc.notNull( this.sw.addCase( State.OPEN, ID ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addCase(Object, Function)", 
 		desc = "Returns this Switch instance" )
 	public void addCase_ReturnsThisSwitchInstance( TestCase tc ) {
 		tc.assertEqual( this.sw, this.sw.addCase( State.OPEN, ID ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addCase(Object, Function)", 
 		desc = "Throws assertion error for null handler" )
 	public void addCase_ThrowsAssertionErrorForNullHandler( TestCase tc ) {
@@ -104,7 +104,7 @@ public class SwitchTest implements TestContainer {
 		this.sw.addCase( State.OPEN, null );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addCase(Object, Function)", 
 		desc = "Throws assertion error for null key" )
 	public void addCase_ThrowsAssertionErrorForNullKey( TestCase tc ) {
@@ -114,21 +114,21 @@ public class SwitchTest implements TestContainer {
 
 	
 	// addDefault
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addDefault(Function)", 
 		desc = "Returns non null" )
 	public void addDefault_ReturnsNonNull( TestCase tc ) {
 		tc.notNull( this.sw.addDefault( ID ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addDefault(Function)", 
 		desc = "Returns this Switch instance" )
 	public void addDefault_ReturnsThisSwitchInstance( TestCase tc ) {
 		tc.assertEqual( this.sw, this.sw.addDefault( ID ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public Switch Switch.addDefault(Function)", 
 		desc = "Throws assertion error for null handler" )
 	public void addDefault_ThrowsAssertionErrorForNullHandler( TestCase tc ) {
@@ -142,8 +142,8 @@ public class SwitchTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(SwitchTest.class);
-		Test.printResults();
+		new TestOrig(SwitchTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

@@ -24,7 +24,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * contain all the information needed by the builder
 	 * to create the object. A Builder must never make null objects.
 	 */
-	@Test.Skip
+	@TestOrig.Skip
 	@FunctionalInterface
 	public interface Builder<K, V> {
 		public V make( K key ) throws AppException;
@@ -55,7 +55,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	private boolean collected;
 	
 	/** Construct */
-	@Test.Decl( "Null Builder throws Assertion Error" )
+	@TestOrig.Decl( "Null Builder throws Assertion Error" )
 	public Cache( Builder<K, V> builder ) {
 		this.builder = Assert.nonNull( builder );
 		this.rq = new ReferenceQueue<V>();
@@ -69,7 +69,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * 
 	 * @return
 	 */
-	@Test.Decl( "False at creation" )
+	@TestOrig.Decl( "False at creation" )
 	public boolean collected() {
 		return collected;
 	}
@@ -82,12 +82,12 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * @return
 	 * @throws AppException		If the builder is unable to construct the value.
 	 */
-	@Test.Decl( "Null key throws Assertion Error" )
-	@Test.Decl( "Values are not null" )
-	@Test.Decl( "From empty cache returns valid object" )
-	@Test.Decl( "Stored uncolllectable object returns same object" )
-	@Test.Decl( "Get stress test" )
-	@Test.Decl( "Multi thread stress test" )
+	@TestOrig.Decl( "Null key throws Assertion Error" )
+	@TestOrig.Decl( "Values are not null" )
+	@TestOrig.Decl( "From empty cache returns valid object" )
+	@TestOrig.Decl( "Stored uncolllectable object returns same object" )
+	@TestOrig.Decl( "Get stress test" )
+	@TestOrig.Decl( "Multi thread stress test" )
 	public V get( K key ) throws AppException {
 		Assert.nonNull( key );
 		V value = null;
@@ -110,9 +110,9 @@ public final class Cache<K extends Comparable<K>, V> {
 	/**
 	 * Remove all associations.
 	 */
-	@Test.Decl( "Then get() retrieves distinct instance" )
-	@Test.Decl( "Then get() retrieves equivalent value" )
-	@Test.Decl( "Cache empty after" )
+	@TestOrig.Decl( "Then get() retrieves distinct instance" )
+	@TestOrig.Decl( "Then get() retrieves equivalent value" )
+	@TestOrig.Decl( "Cache empty after" )
 	public void flush() {
 		synchronized ( this.map ) {
 			this.map.clear();
@@ -140,15 +140,15 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * 
 	 * @return
 	 */
-	@Test.Decl( "Created empty" )
-	@Test.Decl( "Not empty after get" )
+	@TestOrig.Decl( "Created empty" )
+	@TestOrig.Decl( "Not empty after get" )
 	public int size() {
 		return this.map.size();
 	}
 
 	@Override
-	@Test.Decl( "Result is not null" )
-	@Test.Decl( "Result is not empty" )
+	@TestOrig.Decl( "Result is not null" )
+	@TestOrig.Decl( "Result is not empty" )
 	public String toString() {
 		return "Cache(" + this.size() + " keys)";
 	}

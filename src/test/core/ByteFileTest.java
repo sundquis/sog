@@ -10,7 +10,7 @@ package test.core;
 import sog.core.AppException;
 import sog.core.ByteFile;
 import sog.core.Procedure;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -80,19 +80,19 @@ public class ByteFileTest implements TestContainer {
 
 	
 	
-	@Test.Impl( src = "public ByteFile()", desc = "Creates empty file" )
+	@TestOrig.Impl( src = "public ByteFile()", desc = "Creates empty file" )
 	public void ByteFile_CreatesEmptyFile( TestCase tc ) {
 		tc.assertEqual( 0, bf.length() );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "At fail limit throws AppException" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "At fail limit throws AppException" )
 	public void write_AtFailLimitThrowsAppexception( TestCase tc ) {
 		this.setFailLimit( 200L );
 		tc.expectError( AppException.class );
 		bf.write( 190,  BYTES, 0, 20 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "At warn limit issues warning" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "At warn limit issues warning" )
 	public void write_AtWarnLimitIssuesWarning( TestCase tc ) {
 		// TOGGLE
 		/* */	tc.addMessage( "Manually tested" ).pass();	/*
@@ -103,38 +103,38 @@ public class ByteFileTest implements TestContainer {
 		// */
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Beyond max length throws AssertionError" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Beyond max length throws AssertionError" )
 	public void write_BeyondMaxLengthThrowsAssertionerror( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.write( (int) this.maxLength - 10,  BYTES, 0, 20 );
 	}
 	
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Increases length" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Increases length" )
 	public void write_IncreasesLength( TestCase tc ) {
 		int len = bf.length();
 		bf.write( len + 10,  BYTES, 0, 20 );
 		tc.assertEqual( bf.length(), len + 30 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for illegal count" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for illegal count" )
 	public void write_ThrowsAssertionerrorForIllegalCount( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.write( 10,  BYTES, 0, 100);
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for negative offset" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for negative offset" )
 	public void write_ThrowsAssertionerrorForNegativeOffset( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.write( 0,  BYTES, -1, 5 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for offset too big" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for offset too big" )
 	public void write_ThrowsAssertionerrorForOffsetTooBig( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.write( 0,  BYTES, 0, 100 );
 	}
 	
-	@Test.Impl( src = "public int ByteFile.append(byte[], int, int)", desc = "Increases length by count" )
+	@TestOrig.Impl( src = "public int ByteFile.append(byte[], int, int)", desc = "Increases length by count" )
 	public void add_IncreasesLengthByCount( TestCase tc ) {
 		bf.write( 42,  BYTES );
 		int len = bf.length();
@@ -142,7 +142,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( bf.length(), len + 10 );
 	}
 	
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Is consistent with write" , weight = 5 )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Is consistent with write" , weight = 5 )
 	public void read_IsConsistentWithWrite( TestCase tc ) {
 		String[] args = {
 			"The first string.",
@@ -163,38 +163,38 @@ public class ByteFileTest implements TestContainer {
 		tc.assertTrue( pass );
 	}
 	
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for count too big" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for count too big" )
 	public void read_ThrowsAssertionerrorForCountTooBig( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( 0, BUF, 0, 100 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative count" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative count" )
 	public void read_ThrowsAssertionerrorForNegativeCount( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( 0, BUF, 0, -1 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative offset" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative offset" )
 	public void read_ThrowsAssertionerrorForNegativeOffset( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( 0, BUF, -1, 100 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for offset too big" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for offset too big" )
 	public void read_ThrowsAssertionerrorForOffsetTooBig( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( 0, BUF, 100, 1 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError on read past EOF" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError on read past EOF" )
 	public void read_ThrowsAssertionerrorOnReadPastEof( TestCase tc ) {
 		bf.append( BYTES );
 		tc.expectError( AssertionError.class );
 		bf.read( BYTES.length - 5, BUF, 0, 6 );
 	}
 				
-	@Test.Impl( src = "public byte[] ByteFile.read(int, int)", desc = "Is consistent with write", weight = 5 )
+	@TestOrig.Impl( src = "public byte[] ByteFile.read(int, int)", desc = "Is consistent with write", weight = 5 )
 	public void read2_IsConsistentWithWrite( TestCase tc ) {
 		String[] args = {
 			"The first string.",
@@ -216,13 +216,13 @@ public class ByteFileTest implements TestContainer {
 		tc.assertTrue( pass );
 	}
 
-	@Test.Impl( src = "public String ByteFile.toString()", desc = "Indicates length" )
+	@TestOrig.Impl( src = "public String ByteFile.toString()", desc = "Indicates length" )
 	public void toString_IndicatesLength( TestCase tc ) {
 		bf.append( "12345".getBytes() );
 		tc.assertEqual( 5, bf.length() );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "False for large count", weight = 2 )
+	@TestOrig.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "False for large count", weight = 2 )
 	public void canAppend_FalseForLargeCount( TestCase tc ) {
 		this.setMaxLength( 1000L );
 		tc.assertFalse( bf.canAppend( 1001) );
@@ -230,25 +230,25 @@ public class ByteFileTest implements TestContainer {
 		tc.assertFalse( bf.canAppend( 1001) );
 	}
 	
-	@Test.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "True for small count", weight = 2 )
+	@TestOrig.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "True for small count", weight = 2 )
 	public void canAppend_TrueForSmallCount( TestCase tc ) {
 		this.setMaxLength( 1000L );
 		tc.assertTrue( bf.canAppend( 1000 ) );
 		tc.assertTrue( bf.canAppend( 800 ) );
 	}
 	
-	@Test.Impl( src = "public boolean ByteFile.isOpen()", desc = "False after dispose" )
+	@TestOrig.Impl( src = "public boolean ByteFile.isOpen()", desc = "False after dispose" )
 	public void isOpen_FalseAfterDispose( TestCase tc ) {
 		bf.dispose();
 		tc.assertFalse( bf.isOpen() );
 	}
 	
-	@Test.Impl( src = "public boolean ByteFile.isOpen()", desc = "True for new" )
+	@TestOrig.Impl( src = "public boolean ByteFile.isOpen()", desc = "True for new" )
 	public void isOpen_TrueForNew( TestCase tc ) {
 		tc.assertTrue( bf.isOpen() );
 	}
 
-	@Test.Impl( src = "public void ByteFile.dispose()", desc = "Releases resources" )
+	@TestOrig.Impl( src = "public void ByteFile.dispose()", desc = "Releases resources" )
 	public void dispose_ReleasesResources( TestCase tc ) {
 		ByteFile other = new ByteFile();
 		other.append( BYTES );
@@ -261,14 +261,14 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( total1, total3 );
 	}
 				
-	@Test.Impl( src = "public int ByteFile.append(byte[])", desc = "Increases length by src length" )
+	@TestOrig.Impl( src = "public int ByteFile.append(byte[])", desc = "Increases length by src length" )
 	public void add_IncreasesLengthBySrcLength( TestCase tc ) {
 		int len = bf.length();
 		bf.append( BYTES );
 		tc.assertEqual( len + BYTES.length, bf.length() );
 	}
 				
-	@Test.Impl( src = "public int ByteFile.append(byte[])", desc = "Increases total bytes by count" )
+	@TestOrig.Impl( src = "public int ByteFile.append(byte[])", desc = "Increases total bytes by count" )
 	public void add_IncreasesTotalBytesByCount( TestCase tc ) {
 		long total1 = this.getTotalBytes();
 		bf.append( BYTES );
@@ -277,7 +277,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( total1 + 2 * BYTES.length, total2 );
 	}
 	
-	@Test.Impl( src = "public int ByteFile.append(byte[], int, int)", desc = "Increases total bytes by count" )
+	@TestOrig.Impl( src = "public int ByteFile.append(byte[], int, int)", desc = "Increases total bytes by count" )
 	public void add2_IncreasesTotalBytesByCount( TestCase tc ) {
 		long total1 = this.getTotalBytes();
 		bf.append( BYTES,  0, 12 );
@@ -287,7 +287,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( total1 + 42, total2 );
 	}
 	
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Increases total bytes" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Increases total bytes" )
 	public void write_IncreasesTotalBytes( TestCase tc ) {
 		long total1 = this.getTotalBytes();
 		bf.write( 110, BYTES, 0, 20 );
@@ -295,12 +295,12 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( total1 + 130, total2 );
 	}
 	
-	@Test.Impl( src = "public ByteFile()", desc = "Creates open file" )
+	@TestOrig.Impl( src = "public ByteFile()", desc = "Creates open file" )
 	public void ByteFile_CreatesOpenFile( TestCase tc ) {
 		tc.assertTrue( bf.isOpen() );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "False for disposed" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canAppend(int)", desc = "False for disposed" )
 	public void canAppend_FalseForDisposed( TestCase tc ) {
 		bf.append( BYTES );
 		tc.assertTrue( bf.canAppend( 10 ) );
@@ -308,7 +308,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertFalse( bf.canAppend( 10 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for disposed" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for disposed" )
 	public void canRead_FalseForDisposed( TestCase tc ) {
 		bf.append( BYTES );
 		tc.assertTrue( bf.canRead( 10, 10 ) );
@@ -316,25 +316,25 @@ public class ByteFileTest implements TestContainer {
 		tc.assertFalse( bf.canRead( 10, 10 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for large count" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for large count" )
 	public void canRead_FalseForLargeCount( TestCase tc ) {
 		bf.append( BYTES );
 		tc.assertFalse( bf.canRead( 0,  100 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for large position" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "False for large position" )
 	public void canRead_FalseForLargePosition( TestCase tc ) {
 		bf.append( BYTES );
 		tc.assertFalse( bf.canRead( 100,  0 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "True for small count" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canRead(int, int)", desc = "True for small count" )
 	public void canRead_TrueForSmallCount( TestCase tc ) {
 		bf.append( BYTES );
 		tc.assertTrue( bf.canRead( 10,  10 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for disposed" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for disposed" )
 	public void canWrite_FalseForDisposed( TestCase tc ) {
 		bf.write( 10,  BYTES );
 		tc.assertTrue( bf.canWrite( 20,  20 ) );
@@ -342,23 +342,23 @@ public class ByteFileTest implements TestContainer {
 		tc.assertFalse( bf.canWrite( 20,  20 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for large count" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for large count" )
 	public void canWrite_FalseForLargeCount( TestCase tc ) {
 		tc.assertFalse( bf.canWrite( 0,  (int) this.maxLength + 1 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for large position" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "False for large position" )
 	public void canWrite_FalseForLargePosition( TestCase tc ) {
 		tc.assertTrue( bf.canWrite( (int) this.maxLength, 0 ) );
 		tc.assertFalse( bf.canWrite( (int) this.maxLength + 1, 0 ) );
 	}
 
-	@Test.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "True for small count" )
+	@TestOrig.Impl( src = "public boolean ByteFile.canWrite(int, int)", desc = "True for small count" )
 	public void canWrite_TrueForSmallCount( TestCase tc ) {
 		tc.assertTrue( bf.canWrite( 0,  (int) this.maxLength ) );
 	}
 
-	@Test.Impl( src = "public int ByteFile.length()", desc = "Length increases" )
+	@TestOrig.Impl( src = "public int ByteFile.length()", desc = "Length increases" )
 	public void length_LengthIncreases( TestCase tc ) {
 		bf.write( 20, BYTES, 2, 10 );
 		int length = bf.length();
@@ -366,7 +366,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertTrue( bf.length() > length );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for disposed" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for disposed" )
 	public void read_ThrowsAssertionerrorForDisposed( TestCase tc ) {
 		bf.append( BYTES );
 		bf.read( 0,  BYTES, 0, 10 );
@@ -375,19 +375,19 @@ public class ByteFileTest implements TestContainer {
 		bf.read( 0,  BYTES, 0, 10 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative position" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for negative position" )
 	public void read_ThrowsAssertionerrorForNegativePosition( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( -2,  BYTES, 0, 10 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for null destination" )
+	@TestOrig.Impl( src = "public void ByteFile.read(int, byte[], int, int)", desc = "Throws AssertionError for null destination" )
 	public void read_ThrowsAssertionerrorForNullDestination( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.read( 0,  null, 0, 10 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Same length for small write" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Same length for small write" )
 	public void write_SameLengthForSmallWrite( TestCase tc ) {
 		bf.append( BYTES );
 		bf.append( BYTES );
@@ -396,7 +396,7 @@ public class ByteFileTest implements TestContainer {
 		tc.assertEqual( length,  bf.length() );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for disposed" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for disposed" )
 	public void write_ThrowsAssertionerrorForDisposed( TestCase tc ) {
 		bf.write( 0,  BYTES, 0, 10 );
 		tc.expectError( AssertionError.class );
@@ -404,7 +404,7 @@ public class ByteFileTest implements TestContainer {
 		bf.write( 0,  BYTES, 0, 10 );
 	}
 
-	@Test.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for null source" )
+	@TestOrig.Impl( src = "public void ByteFile.write(int, byte[], int, int)", desc = "Throws AssertionError for null source" )
 	public void write_ThrowsAssertionerrorForNullSource( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		bf.write( 0,  null, 0, 10 );
@@ -418,8 +418,8 @@ public class ByteFileTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(ByteFileTest.class);
-		Test.printResults();
+		new TestOrig(ByteFileTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

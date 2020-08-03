@@ -27,7 +27,7 @@ public class App implements Runnable {
 	private static App instance = null;
 	
 	/** Retrieve the singleton instance */
-	@Test.Decl( "Is not null" )
+	@TestOrig.Decl( "Is not null" )
 	public static App get() {
 		if ( App.instance == null ) {
 			synchronized ( App.class ) {
@@ -65,37 +65,37 @@ public class App implements Runnable {
 	}
 
 	/** Root directory for all application resources */
-	@Test.Decl( "Is not null" )
-	@Test.Decl( "Is readable" )
-	@Test.Decl( "Is wrieable" )
+	@TestOrig.Decl( "Is not null" )
+	@TestOrig.Decl( "Is readable" )
+	@TestOrig.Decl( "Is wrieable" )
 	public Path root() {
 		return this.root;
 	}
 
-	@Test.Decl( "Is not empty" )
-	@Test.Decl( "Is not null" )
+	@TestOrig.Decl( "Is not empty" )
+	@TestOrig.Decl( "Is not null" )
 	public String description() {
 		return this.description;
 	}
 	
-	@Test.Decl( "Is not empty" )
-	@Test.Decl( "Is not null" )
+	@TestOrig.Decl( "Is not empty" )
+	@TestOrig.Decl( "Is not null" )
 	public List<Path> sourceDirs() {
 		return this.sourceDirs;
 	}
 	
-	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws App Excetion for missing source dir" )
-	@Test.Decl( "Returns non null" )
-	@Test.Decl( "Returns readable" )
-	@Test.Decl( "Returns writeable" )
-	@Test.Decl( "Returns directory" )
-	@Test.Decl( "Returns container for nested class" )
-	@Test.Decl( "Returns container for nested nested class" )
-	@Test.Decl( "Returns container for local class" )
-	@Test.Decl( "Returns container for anonymous class" )
-	@Test.Decl( "Returns container for nested local class" )
-	@Test.Decl( "Returns container for nested anonymous class" )
+	@TestOrig.Decl( "Throws assertion error for null class" )
+	@TestOrig.Decl( "Throws App Excetion for missing source dir" )
+	@TestOrig.Decl( "Returns non null" )
+	@TestOrig.Decl( "Returns readable" )
+	@TestOrig.Decl( "Returns writeable" )
+	@TestOrig.Decl( "Returns directory" )
+	@TestOrig.Decl( "Returns container for nested class" )
+	@TestOrig.Decl( "Returns container for nested nested class" )
+	@TestOrig.Decl( "Returns container for local class" )
+	@TestOrig.Decl( "Returns container for anonymous class" )
+	@TestOrig.Decl( "Returns container for nested local class" )
+	@TestOrig.Decl( "Returns container for nested anonymous class" )
 	public Path sourceDir( Class<?> clazz ) {
 		Assert.nonNull( clazz );
 
@@ -114,16 +114,16 @@ public class App implements Runnable {
 			.orElseGet( () -> { Fatal.error( "No source directory for " + clazz ); return null; } );
 	}
 	
-	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws App Excetion for missing source file" )
-	@Test.Decl( "Returns non null" )
-	@Test.Decl( "Returns readable" )
-	@Test.Decl( "Returns container for nested class" )
-	@Test.Decl( "Returns container for nested nested class" )
-	@Test.Decl( "Returns container for local class" )
-	@Test.Decl( "Returns container for anonymous class" )
-	@Test.Decl( "Returns container for nested local class" )
-	@Test.Decl( "Returns container for nested anonymous class" )
+	@TestOrig.Decl( "Throws assertion error for null class" )
+	@TestOrig.Decl( "Throws App Excetion for missing source file" )
+	@TestOrig.Decl( "Returns non null" )
+	@TestOrig.Decl( "Returns readable" )
+	@TestOrig.Decl( "Returns container for nested class" )
+	@TestOrig.Decl( "Returns container for nested nested class" )
+	@TestOrig.Decl( "Returns container for local class" )
+	@TestOrig.Decl( "Returns container for anonymous class" )
+	@TestOrig.Decl( "Returns container for nested local class" )
+	@TestOrig.Decl( "Returns container for nested anonymous class" )
 	public Path sourceFile( Class<?> clazz ) {
 		Assert.nonNull( clazz );
 
@@ -144,21 +144,21 @@ public class App implements Runnable {
 	}
 	
 	/** For objects that require clean-up before shutdown. */
-	@Test.Skip
+	@TestOrig.Skip
 	public static interface OnShutdown {
 		public void terminate();
 	}
 
 	/** Register for shutdown termination */
-	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Registers hook" )
+	@TestOrig.Decl( "Throws assertion error for null" )
+	@TestOrig.Decl( "Registers hook" )
 	public void terminateOnShutdown( OnShutdown os ) {
 		this.objectsForShutdown.add( Assert.nonNull( os ) );
 	}
 
 	/** @see java.lang.Runnable#run() */
 	@Override
-	@Test.Decl( "Calls terminate on shutdown" )
+	@TestOrig.Decl( "Calls terminate on shutdown" )
 	public void run() {
 		for ( OnShutdown os : this.objectsForShutdown ) {
 			try {
@@ -169,6 +169,23 @@ public class App implements Runnable {
 			}
 		}
 	}
-	
+
+	/**
+	 * Return a file name and line number pointer to the calling location of an executing program.
+	 * If the calling stack does not have the requested depth, an AppException is thrown.
+	 * 
+	 * @param offset, the position on the calling stack. The call to getLocation has offset 0
+	 * @return (fileName:lineNo) link to calling location
+	 */
+	public String getLocation( int offset ) {
+		Exception e = new Exception();
+		StackTraceElement[] stes = e.getStackTrace();
+		Assert.isTrue( stes.length > offset );
+		StackTraceElement ste = stes[offset];
+		String fileName = ste.getFileName();
+		int lineNo = ste.getLineNumber();
+		return fileName == null ? "(unknown)" : "(" + fileName + ":" + lineNo + ")";
+	}
+
 	
 }

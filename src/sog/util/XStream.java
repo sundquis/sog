@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * If Stream had been parameterized over its implementing type, as BaseStream is, then
@@ -33,7 +33,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-@Test.Skip("FIXME")
+@TestOrig.Skip("FIXME")
 public interface XStream<T> {
 	
 	/*

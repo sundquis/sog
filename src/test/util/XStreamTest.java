@@ -7,7 +7,7 @@
 
 package test.util;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestContainer;
 import sog.util.XStream;
 
@@ -30,9 +30,9 @@ public class XStreamTest implements TestContainer {
 
 		System.out.println();
 
-		Test.verbose();
-		new Test(XStreamTest.class);
-		Test.printResults();
+		TestOrig.verbose();
+		new TestOrig(XStreamTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

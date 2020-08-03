@@ -7,13 +7,13 @@
 
 package sog.util;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 @FunctionalInterface
 public interface Printable {
 

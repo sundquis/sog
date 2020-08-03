@@ -9,7 +9,7 @@ package sog.util;
 
 
 import sog.core.Assert;
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
@@ -34,12 +34,12 @@ public class IDProvider {
 	 * @return
 	 * 		Integer encoding of name. 
 	 */
-	@Test.Decl( "Throws assertion error for empty name" )
-	@Test.Decl( "Short names distinct" )
-	@Test.Decl( "Case sensitive" )
-	@Test.Decl( "No collision dict test" )
-	@Test.Decl( "Qualified name stress test" )
-	@Test.Decl( "Long strings have id" )
+	@TestOrig.Decl( "Throws assertion error for empty name" )
+	@TestOrig.Decl( "Short names distinct" )
+	@TestOrig.Decl( "Case sensitive" )
+	@TestOrig.Decl( "No collision dict test" )
+	@TestOrig.Decl( "Qualified name stress test" )
+	@TestOrig.Decl( "Long strings have id" )
 	public static int get( String name ) {
 		Assert.nonEmpty( name ) ;
 		

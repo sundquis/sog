@@ -9,13 +9,13 @@ package sog.util;
 
 import java.util.function.Function;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 @FunctionalInterface
 public interface Operator<T> extends Function<T, T> {
 	

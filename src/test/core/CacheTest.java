@@ -18,7 +18,7 @@ import sog.core.AppException;
 import sog.core.Cache;
 import sog.core.Procedure;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 import sog.core.Cache.Builder;
@@ -117,13 +117,13 @@ public class CacheTest implements TestContainer {
 		};
 	}
 	
-	@Test.Impl( src = "public Cache(Cache.Builder)", desc = "Null Builder throws Assertion Error" )
+	@TestOrig.Impl( src = "public Cache(Cache.Builder)", desc = "Null Builder throws Assertion Error" )
 	public void Cache_NullBuilderThrowsAssertionError( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		new Cache<String, String>( null );
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "From empty cache returns valid object" )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "From empty cache returns valid object" )
 	public void get_FromEmptyCacheReturnsValidObject( TestCase tc ) {
 		tc.assertTrue( cache.size() == 0 );
 		Value v1 = this.builder.make(0);
@@ -132,7 +132,7 @@ public class CacheTest implements TestContainer {
 		tc.assertFalse( v1.getId() == v2.getId() );
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "Multi thread stress test", weight = 10 )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Multi thread stress test", weight = 10 )
 	public void get_MultiThreadStressTest( TestCase tc ) {
 		tc.afterThis( () -> Agent.dispose() );
 		ArrayList<Agent> agents = new ArrayList<>();
@@ -150,13 +150,13 @@ public class CacheTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "Null key throws Assertion Error" )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Null key throws Assertion Error" )
 	public void get_NullKeyThrowsAssertionError( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		this.cache.get( null );
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "Get stress test", weight = 10 )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Get stress test", weight = 10 )
 	public void get_GetStressTest( TestCase tc ) {
 		boolean consistent = true;
 		Set<Integer> codes = new HashSet<>();
@@ -172,7 +172,7 @@ public class CacheTest implements TestContainer {
 		tc.assertTrue( consistent );
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "Stored uncolllectable object returns same object", weight = 10 )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Stored uncolllectable object returns same object", weight = 10 )
 	public void get_StoredUncolllectableObjectReturnsSameObject( TestCase tc ) {
 		int curSize = this.cache.size();
 		tc.assertTrue( curSize == 0 );
@@ -190,12 +190,12 @@ public class CacheTest implements TestContainer {
 		tc.assertEqual( strongReference.getId(), this.cache.get( 42 ).getId() );
 	}
 
-	@Test.Impl( src = "public Object Cache.get(Comparable)", desc = "Values are not null" )
+	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Values are not null" )
 	public void get_ValuesAreNotNull( TestCase tc ) {
 		tc.assertTrue( this.cache.get(42) != null );
 	}
 
-	@Test.Impl( src = "public void Cache.flush()", desc = "Cache empty after" )
+	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Cache empty after" )
 	public void flush_CacheEmptyAfter( TestCase tc ) {
 		for ( int i = 0; i < 1000; i++ ) {
 			this.cache.get(i);
@@ -205,14 +205,14 @@ public class CacheTest implements TestContainer {
 		tc.assertEqual( this.cache.size(), 0 );
 	}
 
-	@Test.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves equivalent value" )
+	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves equivalent value" )
 	public void flush_ThenGetRetrievesEquivalentValue( TestCase tc ) {
 		Value orig = cache.get( 42 );
 		cache.flush();
 		tc.assertEqual( orig.toString() , this.cache.get(42).toString() );
 	}
 
-	@Test.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves distinct instance" )
+	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves distinct instance" )
 	public void flush_ThenGetRetrievesDistinctInstance( TestCase tc ) {
 		Value orig = cache.get( 42 );
 		int id  = orig.getId();
@@ -220,28 +220,28 @@ public class CacheTest implements TestContainer {
 		tc.assertFalse( id == this.cache.get(42).getId() );
 	}
 	
-	@Test.Impl( src = "public String Cache.toString()", desc = "Result is not empty" )
+	@TestOrig.Impl( src = "public String Cache.toString()", desc = "Result is not empty" )
 	public void toString_ResultIsNotEmpty( TestCase tc ) {
 		tc.assertFalse( this.cache.toString().isEmpty() );
 	}
 
-	@Test.Impl( src = "public String Cache.toString()", desc = "Result is not null" )
+	@TestOrig.Impl( src = "public String Cache.toString()", desc = "Result is not null" )
 	public void toString_ResultIsNotNull( TestCase tc ) {
 		tc.notNull( this.cache.toString() );
 	}
 
-	@Test.Impl( src = "public int Cache.size()", desc = "Created empty" )
+	@TestOrig.Impl( src = "public int Cache.size()", desc = "Created empty" )
 	public void size_CreatedEmpty( TestCase tc ) {
 		tc.assertEqual( 0,  this.cache.size() );
 	}
 
-	@Test.Impl( src = "public int Cache.size()", desc = "Not empty after get" )
+	@TestOrig.Impl( src = "public int Cache.size()", desc = "Not empty after get" )
 	public void size_NotEmptyAfterGet( TestCase tc ) {
 		this.cache.get( 0 );
 		tc.assertEqual( 1,  this.cache.size() );
 	}
 
-	@Test.Impl( src = "public boolean Cache.collected()", desc = "False at creation" )
+	@TestOrig.Impl( src = "public boolean Cache.collected()", desc = "False at creation" )
 	public void collected_FalseAtCreation( TestCase tc ) {
 		tc.assertFalse( this.cache.collected() );
 	}
@@ -254,8 +254,8 @@ public class CacheTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(CacheTest.class);
-		Test.printResults();
+		new TestOrig(CacheTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

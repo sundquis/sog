@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 import sog.core.Assert;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
@@ -32,7 +32,7 @@ public class Fault implements Printable {
 	 * 
 	 * @param listener
 	 */
-	@Test.Decl( "Subsequent faults are deleivered to listener" )
+	@TestOrig.Decl( "Subsequent faults are deleivered to listener" )
 	public static void addListener( Consumer<Fault> listener ) {
 		Fault.listeners.add( listener );
 	}
@@ -42,7 +42,7 @@ public class Fault implements Printable {
 	 * 
 	 * @param listener
 	 */
-	@Test.Decl( "Subsequent faults are deleivered to listener" )
+	@TestOrig.Decl( "Subsequent faults are deleivered to listener" )
 	public static void removeListener( Consumer<Fault> listener ) {
 		Fault.listeners.remove( listener );
 	}
@@ -67,8 +67,8 @@ public class Fault implements Printable {
 	 * @param description
 	 * @param sources
 	 */
-	@Test.Decl( "Throws assertion error for enpty string" )
-	@Test.Decl( "Fault location is recorded" )
+	@TestOrig.Decl( "Throws assertion error for enpty string" )
+	@TestOrig.Decl( "Fault location is recorded" )
 	public Fault( String description, Object ... sources ) {
 		this.description = Assert.nonEmpty( description );
 		this.sources = new ArrayList<>();
@@ -85,7 +85,7 @@ public class Fault implements Printable {
 	 * Similar to throwing an exception but "gentler". Useful in compilation-style
 	 * processes where it's useful to gather as much feedback as possible.
 	 */
-	@Test.Decl( "Fault is deleiverd to listeners" )
+	@TestOrig.Decl( "Fault is deleiverd to listeners" )
 	public void toss() {
 		Fault.listeners.stream().forEach( l -> l.accept(this) );
 	}
@@ -98,8 +98,8 @@ public class Fault implements Printable {
 	 * @param source
 	 * @return
 	 */
-	@Test.Decl( "Source is appended to previous sources" )
-	@Test.Decl( "Returns this" )
+	@TestOrig.Decl( "Source is appended to previous sources" )
+	@TestOrig.Decl( "Returns this" )
 	public Fault addSource( String source ) {			
 
 		this.sources.add( source );
@@ -111,7 +111,7 @@ public class Fault implements Printable {
 	 * Description of the fault
 	 */
 	@Override
-	@Test.Decl( "Returns non-empty description" )
+	@TestOrig.Decl( "Returns non-empty description" )
 	public String toString() {
 		return "Fault(" + this.description + ")";
 	}
@@ -123,10 +123,10 @@ public class Fault implements Printable {
 	 * @see sog.util.Printable#print(sog.util.IndentWriter)
 	 */
 	@Override
-	@Test.Decl( "Description printed" )
-	@Test.Decl( "Fault location printed" )
-	@Test.Decl( "Model location printed when possible" )
-	@Test.Decl( "All provided sources printed" )
+	@TestOrig.Decl( "Description printed" )
+	@TestOrig.Decl( "Fault location printed" )
+	@TestOrig.Decl( "Model location printed when possible" )
+	@TestOrig.Decl( "All provided sources printed" )
 	public void print( IndentWriter out ) {
 		out.println( "FAULT: " + this.description );
 		out.increaseIndent();

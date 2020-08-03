@@ -24,7 +24,7 @@ import sog.core.App;
 import sog.core.Procedure;
 import sog.core.SoftString;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -63,33 +63,33 @@ public class SoftStringTest implements TestContainer {
 	};
 
 	
-	@Test.Impl( src = "public SoftString(String)", desc = "Can construct empty" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Can construct empty" )
 	public void SoftString_CanConstructEmpty( TestCase tc ) {
 		soft = new SoftString( "" );
 		tc.assertEqual( "",  soft.toString() );
 	}
 
-	@Test.Impl( src = "public SoftString(String)", desc = "Can construct long strings" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Can construct long strings" )
 	public void SoftString_CanConstructLongStrings( TestCase tc ) {
 		String arg = Strings.rightJustify( "42",  this.threshold,  '.' );
 		soft = new SoftString( arg );
 		tc.assertEqual( arg,  soft.toString() );
 	}
 
-	@Test.Impl( src = "public SoftString(String)", desc = "Can construct short strings" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Can construct short strings" )
 	public void SoftString_CanConstructShortStrings( TestCase tc ) {
 		String arg = "42";
 		soft = new SoftString( arg );
 		tc.assertEqual( arg,  soft.toString() );
 	}
 
-	@Test.Impl( src = "public SoftString(String)", desc = "Throws assertion error for null strings" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Throws assertion error for null strings" )
 	public void SoftString_ThrowsAssertionErrorForNullStrings( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		soft = new SoftString( null );
 	}
 	
-	@Test.Impl( src = "public String SoftString.toString()", desc = "Stress test correct value", weight = 10 )
+	@TestOrig.Impl( src = "public String SoftString.toString()", desc = "Stress test correct value", weight = 10 )
 	public void toString_StressTestCorrectValue( TestCase tc ) throws IOException {
 		
 		// find a big file...
@@ -108,7 +108,7 @@ public class SoftStringTest implements TestContainer {
 	}
 
 	
-	@Test.Impl( src = "public int SoftString.compareTo(SoftString)", desc = "Can sort large collections" )
+	@TestOrig.Impl( src = "public int SoftString.compareTo(SoftString)", desc = "Can sort large collections" )
 	public void compareTo_CanSortLargeCollections( TestCase tc ) throws IOException {
 		
 		// find a big file...
@@ -135,7 +135,7 @@ public class SoftStringTest implements TestContainer {
 		tc.assertTrue( match );
 	}
 	
-	@Test.Impl( src = "public boolean SoftString.equals(Object)", desc = "Consistent with compare" )
+	@TestOrig.Impl( src = "public boolean SoftString.equals(Object)", desc = "Consistent with compare" )
 	public void equals_ConsistentWithCompare( TestCase tc ) throws IOException {
 		// find a big file...
 		// find . -type f -printf '%s %p\n' | sort -nr | less
@@ -205,35 +205,35 @@ public class SoftStringTest implements TestContainer {
 		"tonsillectomy tracheotomy  unaccustomed vasectomy"
 	};
 	
-	@Test.Impl( src = "public boolean SoftString.equals(Object)", desc = "Sample cases equal" )
+	@TestOrig.Impl( src = "public boolean SoftString.equals(Object)", desc = "Sample cases equal" )
 	public void equals_SampleCasesEqual( TestCase tc ) {
 		for ( int i = 0; i < args1.length; i++ ) {
 			tc.assertEqual( new SoftString( args1[i] ), new SoftString( args2[i] ) );
 		}
 	}
 
-	@Test.Impl( src = "public boolean SoftString.equals(Object)", desc = "Sample cases not equal" )
+	@TestOrig.Impl( src = "public boolean SoftString.equals(Object)", desc = "Sample cases not equal" )
 	public void equals_SampleCasesNotEqual( TestCase tc ) {
 		for ( int i = 0; i < args1.length; i++ ) {
 			tc.assertFalse( new SoftString( args1[i] ).equals( new SoftString( args3[i] ) ) );
 		}
 	}
 
-	@Test.Impl( src = "public int SoftString.hashCode()", desc = "Sample cases equal" )
+	@TestOrig.Impl( src = "public int SoftString.hashCode()", desc = "Sample cases equal" )
 	public void hashCode_SampleCasesEqual( TestCase tc ) {
 		for ( int i = 0; i < args1.length; i++ ) {
 			tc.assertEqual( new SoftString( args1[i] ).hashCode(), new SoftString( args2[i] ).hashCode() );
 		}
 	}
 	
-	@Test.Impl( src = "public SoftString(String)", desc = "Strings longer than threshold are soft" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Strings longer than threshold are soft" )
 	public void SoftString_StringsLongerThanThresholdOrSoft( TestCase tc ) {
 		String big = Strings.rightJustify( "",  this.threshold,  '.' );
 		SoftString soft = new SoftString( big );
 		tc.assertTrue( this.getSubjectField( soft,  "hard",  "" ) == null );
 	}
 	
-	@Test.Impl( src = "public SoftString(String)", desc = "Correct value after collection" )
+	@TestOrig.Impl( src = "public SoftString(String)", desc = "Correct value after collection" )
 	public void SoftString_CorrectValueAfterCollection( TestCase tc ) {
 		String value = Strings.rightJustify( "",  this.threshold,  '.' );
 		List<SoftString> strings = new ArrayList<>();
@@ -263,8 +263,8 @@ public class SoftStringTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(SoftStringTest.class);
-		Test.printResults();
+		new TestOrig(SoftStringTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

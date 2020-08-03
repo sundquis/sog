@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import sog.core.Objects;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -32,14 +32,14 @@ public class ObjectsTest implements TestContainer {
 	// Test implementations
 
 	// deepArrayEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "Is symmetric" )
 	public void deepArrayEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "Sample cases deep equal" )
 	public void deepArrayEquals_SampleCasesDeepEquals( TestCase tc ) {
@@ -62,7 +62,7 @@ public class ObjectsTest implements TestContainer {
 		tc.assertTrue( Objects.deepArrayEquals( o1,  o2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "Sample cases deep not equal" )
 	public void deepArrayEquals_SampleCasesDeepNotEqual( TestCase tc ) {
@@ -85,7 +85,7 @@ public class ObjectsTest implements TestContainer {
 			tc.assertFalse( Objects.deepArrayEquals( o1,  o2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "Throws Assertion error for non array first arg" )
 	public void deepArrayEquals_ThrowsAssertionErrorForNonArrayFirstArg( TestCase tc ) {
@@ -93,7 +93,7 @@ public class ObjectsTest implements TestContainer {
 		Objects.deepArrayEquals( "foo", new String[] {"foo" } );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "Throws Assertion error for non array second arg" )
 	public void deepArrayEquals_ThrowsAssertionErrorForNonArraySecondArg( TestCase tc ) {
@@ -101,14 +101,14 @@ public class ObjectsTest implements TestContainer {
 		Objects.deepArrayEquals( new String[] {"foo" }, "foo" );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "null equals null" )
 	public void deepArrayEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.deepArrayEquals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		desc = "null not equal non null" )
 	public void deepArrayEquals_NullNotEqualNonNull( TestCase tc ) {
@@ -118,14 +118,14 @@ public class ObjectsTest implements TestContainer {
 
 	
 	// deepCollectionEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", 
 		desc = "Is symmetric" )
 	public void deepCollectionEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", 
 		desc = "Sample cases deep equal" )
 	public void deepCollectionEquals_SampleCasesDeepEqual( TestCase tc ) {
@@ -148,7 +148,7 @@ public class ObjectsTest implements TestContainer {
 		tc.assertTrue( Objects.deepCollectionEquals( c1, c2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", 
 		desc = "Sample cases deep not equal" )
 	public void deepCollectionEquals_SampleCasesDeepNotEqual( TestCase tc ) {
@@ -171,56 +171,56 @@ public class ObjectsTest implements TestContainer {
 		tc.assertFalse( Objects.deepCollectionEquals( c1, c2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", 
 		desc = "null equals null" )
 	public void deepCollectionEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.deepCollectionEquals( null,  null ) );
 	}
 
-	@Test.Impl( src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", desc = "null not equal non null" )
+	@TestOrig.Impl( src = "public boolean Objects.deepCollectionEquals(Collection, Collection)", desc = "null not equal non null" )
 	public void deepCollectionEquals_NullNotEqualNonNull( TestCase tc ) {
 		tc.assertFalse( Objects.deepCollectionEquals( null, new ArrayList<String>() ) );
 	}
 
 	
 	// deepEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "Array not equal collection" )
 	public void deepEquasl_ArrayNotEqualCollection( TestCase tc ) {
 		tc.assertFalse( Objects.deepEquals( new String[] { "a" },  Arrays.asList( "a" ) ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "Is symmetric" )
 	public void deepEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "Object not equal array" )
 	public void deepEquals_ObjectNotEqualArray( TestCase tc ) {
 		tc.assertFalse( Objects.deepEquals( "A",  new String[] { "A" } ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "Object not equal collection" )
 	public void deepEquals_ObjectNotEqualCollection( TestCase tc ) {
 		tc.assertFalse( Objects.deepEquals( "A", Arrays.asList( "A" ) ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "null equals null" )
 	public void deepEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.deepEquals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.deepEquals(Object, Object)", 
 		desc = "null not equal non null" )
 	public void deepEquals_NullNotEqualNonNull( TestCase tc ) {
@@ -229,35 +229,35 @@ public class ObjectsTest implements TestContainer {
 
 	
 	// equals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.equals(Object, Object)", 
 		desc = "Is symmetric" )
 	public void equals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.equals(Object, Object)", 
 		desc = "Sample cases for equals" )
 	public void equals_SampleCasesForEquals( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.equals(Object, Object)", 
 		desc = "Sample cases for not equals" )
 	public void equals_SampleCasesForNotEquals( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public boolean Objects.equals(Object, Object)", 
 		desc = "null equals null" )
 	public void equals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.equals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.equals(Object, Object)", 
 		desc = "null not equal non null" )
 	public void equals_NullNotEqualNonNull( TestCase tc ) {
@@ -266,14 +266,14 @@ public class ObjectsTest implements TestContainer {
 
 	
 	// shallowArrayEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Is symmetric" )
 	public void shallowArrayEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Sample cases shallow but not deep" )
 	public void shallowArrayEquals_SampleCasesShallowButNotDeep( TestCase tc ) {
@@ -308,7 +308,7 @@ public class ObjectsTest implements TestContainer {
 		tc.assertTrue( Objects.shallowArrayEquals( o1,  o2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Sample cases shallow equal" )
 	public void shallowArrayEquals_SampleCasesShallowEqual( TestCase tc ) {
@@ -341,7 +341,7 @@ public class ObjectsTest implements TestContainer {
 			tc.assertTrue( Objects.shallowArrayEquals( o1,  o2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Sample cases shallow not equal" )
 	public void shallowArrayEquals_SampleCasesShallowNotEqual( TestCase tc ) {
@@ -360,7 +360,7 @@ public class ObjectsTest implements TestContainer {
 			tc.assertFalse( Objects.shallowArrayEquals( o1,  o2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Throws Assertion error for non array first arg" )
 	public void shallowArrayEquals_ThrowsAssertionErrorForNonArrayFirstArg( TestCase tc ) {
@@ -368,7 +368,7 @@ public class ObjectsTest implements TestContainer {
 		Objects.shallowArrayEquals( 42,  new int[] {42} );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "Throws Assertion error for non array second arg" )
 	public void shallowArrayEquals_ThrowsAssertionErrorForNonArraySecondArg( TestCase tc ) {
@@ -376,14 +376,14 @@ public class ObjectsTest implements TestContainer {
 		Objects.shallowArrayEquals( new int[] {42}, 42 );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "null equals null" )
 	public void shallowArrayEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.shallowArrayEquals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		desc = "null not equal non null" )
 	public void shallowArrayEquals_NullNotEqualNonNull( TestCase tc ) {
@@ -392,14 +392,14 @@ public class ObjectsTest implements TestContainer {
 
 	
 	// shallowCollectionEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "Is symmetric" )
 	public void shallowCollectionEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "Sample cases shallow but not deep" )
 	public void shallowCollectionEquals_SampleCasesShallowButNotDeep( TestCase tc ) {
@@ -434,7 +434,7 @@ public class ObjectsTest implements TestContainer {
 		tc.assertTrue( Objects.shallowCollectionEquals( c1,  c2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "Sample cases shallow equal" )
 	public void shallowCollectionEquals_SampleCasesShallowEqual( TestCase tc ) {
@@ -467,7 +467,7 @@ public class ObjectsTest implements TestContainer {
 		tc.assertTrue( Objects.shallowCollectionEquals( c1,  c2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "Sample cases shallow not equal" )
 	public void shallowCollectionEquals_SampleCasesShallowNotEqual( TestCase tc ) {
@@ -486,14 +486,14 @@ public class ObjectsTest implements TestContainer {
 		tc.assertFalse( Objects.shallowCollectionEquals( c1,  c2 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "null equals null" )
 	public void shallowCollectionEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.shallowCollectionEquals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		desc = "null not equal non null" )
 	public void shallowCollectionEquals_NullNotEqualNonNull( TestCase tc ) {
@@ -502,42 +502,42 @@ public class ObjectsTest implements TestContainer {
 
 	
 	// shallowEquals
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "Array not equal collection" )
 	public void shallowEquals_ArrayNotEqualCollection( TestCase tc ) {
 		tc.assertFalse( Objects.shallowEquals( new int[] {1},  Arrays.asList( 1 ) ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "Is symmetric" )
 	public void shallowEquals_IsSymmetric( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "Object not equal array" )
 	public void shallowEquals_ObjectNotEqualArray( TestCase tc ) {
 		tc.assertFalse( Objects.shallowEquals( 42, new int[] {42} ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "Object not equal collection" )
 	public void shallowEquals_ObjectNotEqualCollection( TestCase tc ) {
 		tc.assertFalse( Objects.shallowEquals( 42,  Arrays.asList( 42 ) ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "null equals null" )
 	public void shallowEquals_NullEqualsNull( TestCase tc ) {
 		tc.assertTrue( Objects.shallowEquals( null,  null ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public boolean Objects.shallowEquals(Object, Object)", 
 		desc = "null not equal non null" )
 	public void shallowEquals_NullNotEqualNonNull( TestCase tc ) {
@@ -550,8 +550,8 @@ public class ObjectsTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(ObjectsTest.class);
-		Test.printResults();
+		new TestOrig(ObjectsTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

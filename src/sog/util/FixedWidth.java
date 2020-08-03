@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import sog.core.Assert;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
@@ -42,7 +42,7 @@ public class FixedWidth {
 	/**
 	 * Construct an empty {@code FixedWidth} formatter.
 	 */
-	@Test.Decl( "Empty formatter produces empty formatted string" )
+	@TestOrig.Decl( "Empty formatter produces empty formatted string" )
 	public FixedWidth() {
 		super();
 		
@@ -60,12 +60,12 @@ public class FixedWidth {
 	 * @param defaultFieldSeparator
 	 * @return
 	 */
-	@Test.Decl( "Can be emtpty" )
-	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Applied to remaining fields" )
-	@Test.Decl( "Previous fields unaffected" )
-	@Test.Decl( "If not specified, default is empty string" )
-	@Test.Decl( "Overrides default empty" )
+	@TestOrig.Decl( "Can be emtpty" )
+	@TestOrig.Decl( "Throws assertion error for null" )
+	@TestOrig.Decl( "Applied to remaining fields" )
+	@TestOrig.Decl( "Previous fields unaffected" )
+	@TestOrig.Decl( "If not specified, default is empty string" )
+	@TestOrig.Decl( "Overrides default empty" )
 	public FixedWidth defaultFieldSeparator( String defaultFieldSeparator ) {
 		this.defaultSeparator = Assert.nonNull( defaultFieldSeparator );
 		return this;
@@ -77,12 +77,12 @@ public class FixedWidth {
 	 * @param nullRepresentation
 	 * @return
 	 */
-	@Test.Decl( "Can be empty" )
-	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Applied to remaining fields" )
-	@Test.Decl( "Previous fields unaffected" )
-	@Test.Decl( "If not specified, default is empty string" )
-	@Test.Decl( "Overrides default empty" )
+	@TestOrig.Decl( "Can be empty" )
+	@TestOrig.Decl( "Throws assertion error for null" )
+	@TestOrig.Decl( "Applied to remaining fields" )
+	@TestOrig.Decl( "Previous fields unaffected" )
+	@TestOrig.Decl( "If not specified, default is empty string" )
+	@TestOrig.Decl( "Overrides default empty" )
 	public FixedWidth nullFields( String nullRepresentation ) {
 		this.nullRepresentation = Assert.nonNull( nullRepresentation );
 		return this;
@@ -94,11 +94,11 @@ public class FixedWidth {
 	 * @param width
 	 * @return
 	 */
-	@Test.Decl( "Width must be positive" )
-	@Test.Decl( "Appends left justified field" )
-	@Test.Decl( "Padding character is used" )
-	@Test.Decl( "Width is correct for short" )
-	@Test.Decl( "Truncated for long" )
+	@TestOrig.Decl( "Width must be positive" )
+	@TestOrig.Decl( "Appends left justified field" )
+	@TestOrig.Decl( "Padding character is used" )
+	@TestOrig.Decl( "Width is correct for short" )
+	@TestOrig.Decl( "Truncated for long" )
 	public FixedWidth left( int width, char pad ) {
 		Assert.positive( width );
 		this.addField( width,  pad,  Strings::leftJustify );
@@ -111,9 +111,9 @@ public class FixedWidth {
 	 * @param width
 	 * @return
 	 */
-	@Test.Decl( "Throws assertion error for null representation" )
-	@Test.Decl( "Representation overrides toString() for this field" )
-	@Test.Decl( "Other fields unaffected" )
+	@TestOrig.Decl( "Throws assertion error for null representation" )
+	@TestOrig.Decl( "Representation overrides toString() for this field" )
+	@TestOrig.Decl( "Other fields unaffected" )
 	public <T> FixedWidth left( int width, char pad, Function<T, String> representation ) {
 		Assert.positive( width );
 		this.addField( width,  pad,  Strings::leftJustify, Assert.nonNull( representation ) );
@@ -126,11 +126,11 @@ public class FixedWidth {
 	 * @param width
 	 * @return
 	 */
-	@Test.Decl( "Width must be positive" )
-	@Test.Decl( "Appends right justified field" )
-	@Test.Decl( "Padding character is used" )
-	@Test.Decl( "Width is correct for short" )
-	@Test.Decl( "Truncated for long" )
+	@TestOrig.Decl( "Width must be positive" )
+	@TestOrig.Decl( "Appends right justified field" )
+	@TestOrig.Decl( "Padding character is used" )
+	@TestOrig.Decl( "Width is correct for short" )
+	@TestOrig.Decl( "Truncated for long" )
 	public FixedWidth right( int width, char pad ) {
 		Assert.positive( width );
 		this.addField( width,  pad,  Strings::rightJustify );
@@ -143,9 +143,9 @@ public class FixedWidth {
 	 * @param width
 	 * @return
 	 */
-	@Test.Decl( "Throws assertion error for null representation" )
-	@Test.Decl( "Representation overrides toString() for this field" )
-	@Test.Decl( "Other fields unaffected" )
+	@TestOrig.Decl( "Throws assertion error for null representation" )
+	@TestOrig.Decl( "Representation overrides toString() for this field" )
+	@TestOrig.Decl( "Other fields unaffected" )
 	public <T> FixedWidth right( int width, char pad, Function<T, String> representation ) {
 		Assert.positive( width );
 		this.addField( width,  pad,  Strings::rightJustify, Assert.nonNull( representation ) );
@@ -160,12 +160,12 @@ public class FixedWidth {
 	 * @param separator
 	 * @return
 	 */
-	@Test.Decl( "Can be empty" )
-	@Test.Decl( "Throws assertion error for null separator" )
-	@Test.Decl( "Overrides default" )
-	@Test.Decl( "Does not affect subsequent separators" )
-	@Test.Decl( "Multiple separators allowed" )
-	@Test.Decl( "Appends if last" )
+	@TestOrig.Decl( "Can be empty" )
+	@TestOrig.Decl( "Throws assertion error for null separator" )
+	@TestOrig.Decl( "Overrides default" )
+	@TestOrig.Decl( "Does not affect subsequent separators" )
+	@TestOrig.Decl( "Multiple separators allowed" )
+	@TestOrig.Decl( "Appends if last" )
 	public FixedWidth sep( String separator ) {
 		this.addSep( Assert.nonNull( separator ) );
 		return this;
@@ -176,10 +176,10 @@ public class FixedWidth {
 	 * 
 	 * @return
 	 */
-	@Test.Decl( "Includes fields" )
-	@Test.Decl( "Includes separators" )
-	@Test.Decl( "Increases when field appended" )
-	@Test.Decl( "Increses when separator appended" )
+	@TestOrig.Decl( "Includes fields" )
+	@TestOrig.Decl( "Includes separators" )
+	@TestOrig.Decl( "Increases when field appended" )
+	@TestOrig.Decl( "Increses when separator appended" )
 	public int length() {
 		return this.length;
 	}
@@ -190,14 +190,14 @@ public class FixedWidth {
 	 * @param args
 	 * @return
 	 */
-	@Test.Decl( "Throws illegal argument exception for too few fields" )
-	@Test.Decl( "Throws illegal argument exception for too many fields" )
-	@Test.Decl( "Null fields use null representation" )
-	@Test.Decl( "Non null fields represented appropriately" )
-	@Test.Decl( "Fields formatted in the order specified" )
-	@Test.Decl( "Fields are separated as specified" )
-	@Test.Decl( "Fields can be added after formatting" )
-	@Test.Decl( "Throws class cast exception for wron argument type" )
+	@TestOrig.Decl( "Throws illegal argument exception for too few fields" )
+	@TestOrig.Decl( "Throws illegal argument exception for too many fields" )
+	@TestOrig.Decl( "Null fields use null representation" )
+	@TestOrig.Decl( "Non null fields represented appropriately" )
+	@TestOrig.Decl( "Fields formatted in the order specified" )
+	@TestOrig.Decl( "Fields are separated as specified" )
+	@TestOrig.Decl( "Fields can be added after formatting" )
+	@TestOrig.Decl( "Throws class cast exception for wron argument type" )
 	public String format( Object ... fields ) {
 		if ( this.fieldCount != fields.length ) {
 			throw new IllegalArgumentException( "Wrong number of fields. Expected " + this.fieldCount + ", got " + fields.length );
@@ -214,14 +214,14 @@ public class FixedWidth {
 	/**
 	 * Return basic info about this formatter
 	 */
-	@Test.Decl( "Includes field count" )
-	@Test.Decl( "Includes length" )
+	@TestOrig.Decl( "Includes field count" )
+	@TestOrig.Decl( "Includes length" )
 	@Override
 	public String toString() {
 		return "FixedWidth(" + this.fieldCount + " fields, length = " + this.length + ")";
 	}
 
-	@Test.Skip
+	@TestOrig.Skip
 	@FunctionalInterface
 	private static interface Justifier {
 		public String fmt( String s, int width, char pad );

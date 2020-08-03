@@ -29,11 +29,11 @@ public class Objects {
 	 * Replication of java.util.Objects
 	 * Included for completeness
 	 */
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases for equals" )
-	@Test.Decl( "Sample cases for not equals" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Sample cases for equals" )
+	@TestOrig.Decl( "Sample cases for not equals" )
 	public static boolean equals( Object o1, Object o2 ) {
 		if ( o1 == null || o2 == null ) {
 			return o1 == o2;
@@ -47,12 +47,12 @@ public class Objects {
 	 * Otherwise use equal()
 	 */
 	@SuppressWarnings("unchecked")
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Object not equal array" )
-	@Test.Decl( "Object not equal collection" )
-	@Test.Decl( "Array not equal collection" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Object not equal array" )
+	@TestOrig.Decl( "Object not equal collection" )
+	@TestOrig.Decl( "Array not equal collection" )
 	public static boolean shallowEquals( Object o1, Object o2 ) {
 		if ( o1 == null || o2 == null ) {
 			return o1 == o2;
@@ -82,12 +82,12 @@ public class Objects {
 	 * Otherwise use equal()
 	 */
 	@SuppressWarnings("unchecked")
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Object not equal array" )
-	@Test.Decl( "Object not equal collection" )
-	@Test.Decl( "Array not equal collection" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Object not equal array" )
+	@TestOrig.Decl( "Object not equal collection" )
+	@TestOrig.Decl( "Array not equal collection" )
 	public static boolean deepEquals( Object o1, Object o2 ) {
 		if ( o1 == null || o2 == null ) {
 			return o1 == o2;
@@ -116,14 +116,14 @@ public class Objects {
 	/*
 	 * Shallow check for equality of two arrays
 	 */
-	@Test.Decl( "Throws Assertion error for non array first arg" )
-	@Test.Decl( "Throws Assertion error for non array second arg" )
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases shallow equal" )
-	@Test.Decl( "Sample cases shallow not equal" )
-	@Test.Decl( "Sample cases shallow but not deep" )
+	@TestOrig.Decl( "Throws Assertion error for non array first arg" )
+	@TestOrig.Decl( "Throws Assertion error for non array second arg" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Sample cases shallow equal" )
+	@TestOrig.Decl( "Sample cases shallow not equal" )
+	@TestOrig.Decl( "Sample cases shallow but not deep" )
 	public static boolean shallowArrayEquals( Object a1, Object a2 ) {
 		if ( a1 == null || a2 == null ) {
 			return a1 == a2;
@@ -151,13 +151,13 @@ public class Objects {
 	/*
 	 * Deep check for equality of two arrays
 	 */
-	@Test.Decl( "Throws Assertion error for non array first arg" )
-	@Test.Decl( "Throws Assertion error for non array second arg" )
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases deep equal" )
-	@Test.Decl( "Sample cases deep not equal" )
+	@TestOrig.Decl( "Throws Assertion error for non array first arg" )
+	@TestOrig.Decl( "Throws Assertion error for non array second arg" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Sample cases deep equal" )
+	@TestOrig.Decl( "Sample cases deep not equal" )
 	public static boolean deepArrayEquals( Object a1, Object a2 ) {
 		if ( a1 == null || a2 == null ) {
 			return a1 == a2;
@@ -186,12 +186,12 @@ public class Objects {
 	 * Shallow check for equality of two Collection objects
 	 * Examines elements in the order presented by the iterators.
 	 */
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases shallow equal" )
-	@Test.Decl( "Sample cases shallow not equal" )
-	@Test.Decl( "Sample cases shallow but not deep" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Sample cases shallow equal" )
+	@TestOrig.Decl( "Sample cases shallow not equal" )
+	@TestOrig.Decl( "Sample cases shallow but not deep" )
 	public static boolean shallowCollectionEquals( Collection<?> c1, Collection<?> c2 ) {
 		if ( c1 == null || c2 == null ) {
 			return c1 == c2;
@@ -217,11 +217,11 @@ public class Objects {
 	 * Deep check for equality of two Collection objects
 	 * Examines elements in the order presented by the iterators.
 	 */
-	@Test.Decl( "null equals null" )
-	@Test.Decl( "null not equal non null" )
-	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases deep equal" )
-	@Test.Decl( "Sample cases deep not equal" )
+	@TestOrig.Decl( "null equals null" )
+	@TestOrig.Decl( "null not equal non null" )
+	@TestOrig.Decl( "Is symmetric" )
+	@TestOrig.Decl( "Sample cases deep equal" )
+	@TestOrig.Decl( "Sample cases deep not equal" )
 	public static boolean deepCollectionEquals( Collection<?> c1, Collection<?> c2 ) {
 		if ( c1 == null || c2 == null ) {
 			return c1 == c2;

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import sog.core.AppException;
 import sog.core.Fatal;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 import sog.core.Trace;
@@ -47,13 +47,13 @@ public class TraceTest implements TestContainer {
 
 
 	// 1. Run this first:
-	@Test.Impl( src = "public boolean Trace.isEnabled()", desc = "Enabled when initialized", priority = -3 )
+	@TestOrig.Impl( src = "public boolean Trace.isEnabled()", desc = "Enabled when initialized", priority = -3 )
 	public void isEnabled_EnabledWhenInitialized( TestCase tc ) {
 		tc.assertTrue( Trace.isEnabled() );
 	}
 
 	// 2. Next check warn limit
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Warning issued when count exceeds warn limit", priority = -2 )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Warning issued when count exceeds warn limit", priority = -2 )
 	public void write_WarningIssuedWhenCountExceedsWarnLimit( TestCase tc ) {
 		// TOGGLE
 		/* */	tc.addMessage( "Manually tested" ).pass();	/*
@@ -71,7 +71,7 @@ public class TraceTest implements TestContainer {
 	}
 
 	// 3. Next check limits
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Fatal error issued when count exceeds fail limit", priority = -1 )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Fatal error issued when count exceeds fail limit", priority = -1 )
 	public void write_FatalErrorIssuedWhenCountExceedsFailLimit( TestCase tc ) throws IOException {
 		int orig = this.getSubjectField( null,  "FAIL_LIMIT",  0 );
 		tc.afterThis( () -> this.setSubjectField( null,  "FAIL_LIMIT",  orig ) );
@@ -108,7 +108,7 @@ public class TraceTest implements TestContainer {
 		}
 	}
 	
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Multi thread stress test" )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Multi thread stress test" )
 	public void write_MultiThreadStressTest( TestCase tc ) throws IOException {
 		// Get a clean trace file
 		this.delete( Trace.close() );
@@ -132,19 +132,19 @@ public class TraceTest implements TestContainer {
 		this.delete( path );
 	}
 
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Throws assertion exception for null message" )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Throws assertion exception for null message" )
 	public void write_ThrowsAssertionExceptionForNullMessage( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		new Trace( "TEST" ).write( null );
 	}
 
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Throws assetrion exception for empty message" )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Throws assetrion exception for empty message" )
 	public void write_ThrowsAssetrionExceptionForEmptyMessage( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		new Trace( "TEST" ).write( "" );
 	}
 	
-	@Test.Impl( src = "public void Trace.write(String)", desc = "Message printed if echo enabled" )
+	@TestOrig.Impl( src = "public void Trace.write(String)", desc = "Message printed if echo enabled" )
 	public void write_MessagePrintedIfEchoEnabled( TestCase tc ) {
 		// TOGGLE
 		/* */	tc.addMessage( "Manually tested" ).pass();	/*
@@ -156,13 +156,13 @@ public class TraceTest implements TestContainer {
 		// */
 	}
 
-	@Test.Impl( src = "public Trace(String, boolean)", desc = "Throws assertion error for empty topic" )
+	@TestOrig.Impl( src = "public Trace(String, boolean)", desc = "Throws assertion error for empty topic" )
 	public void Trace_ThrowsAssertionErrorForEmptyTopic( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		new Trace( "" );
 	}
 	
-	@Test.Impl( src = "public Path Trace.close()", desc = "Returned file contains messages if written and enabled" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Returned file contains messages if written and enabled" )
 	public void close_ReturnedFileContainsMessagesIfWrittenAndEnabled( TestCase tc ) throws IOException {
 		String uniqueMessage = "Foo " + System.currentTimeMillis();
 		Trace t = new Trace( "Test" );
@@ -172,14 +172,14 @@ public class TraceTest implements TestContainer {
 		this.delete( path );
 	}
 
-	@Test.Impl( src = "public Path Trace.close()", desc = "File does not exist if no messages written" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "File does not exist if no messages written" )
 	public void close_FileDoesNotExistIfNoMessagesWritten( TestCase tc ) {
 		Path path = Trace.close();
 		tc.assertFalse( Files.exists( path ) );
 		this.delete( path );
 	}
 
-	@Test.Impl( src = "public Path Trace.close()", desc = "Returns readable file if written and enabled" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Returns readable file if written and enabled" )
 	public void close_ReturnsReadableFileIfWrittenAndEnabled( TestCase tc ) {
 		new Trace( "Test" ).write( "Foo" );
 		Path path = Trace.close();
@@ -187,19 +187,19 @@ public class TraceTest implements TestContainer {
 		this.delete( path );
 	}
 
-	@Test.Impl( src = "public Trace(String)", desc = "Default does not echo messages" )
+	@TestOrig.Impl( src = "public Trace(String)", desc = "Default does not echo messages" )
 	public void Trace_DefaultDoesNotEchoMessages( TestCase tc ) {
 		tc.addMessage( "Manually verified" ).pass();
 	}
 
-	@Test.Impl( src = "public void Trace.disable()", desc = "Not enabled after" )
+	@TestOrig.Impl( src = "public void Trace.disable()", desc = "Not enabled after" )
 	public void disable_NotEnabledAfter( TestCase tc ) {
 		Trace.disable();
 		tc.assertFalse( Trace.isEnabled() );
 		Trace.enable();  // Other tests require enabled
 	}
 
-	@Test.Impl( src = "public void Trace.enable()", desc = "Is enabled after" )
+	@TestOrig.Impl( src = "public void Trace.enable()", desc = "Is enabled after" )
 	public void enable_IsEnabledAfter( TestCase tc ) {
 		Trace.disable();
 		tc.assertFalse( Trace.isEnabled() );
@@ -207,7 +207,7 @@ public class TraceTest implements TestContainer {
 		tc.assertTrue( Trace.isEnabled() );
 	}
 
-	@Test.Impl( src = "public Path Trace.close()", desc = "Opens new handler with different file" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Opens new handler with different file" )
 	public void close_OpensNewHandlerWithDifferentFile( TestCase tc ) {
 		Path path1 = Trace.close();
 		Path path2 = Trace.close();
@@ -216,7 +216,7 @@ public class TraceTest implements TestContainer {
 		this.delete( path2 );
 	}
 
-	@Test.Impl( src = "public Path Trace.close()", desc = "Returns non null when disabled" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Returns non null when disabled" )
 	public void close_ReturnsNonNullWhenDisabled( TestCase tc ) {
 		Trace.disable();
 		Path path = Trace.close();
@@ -225,7 +225,7 @@ public class TraceTest implements TestContainer {
 		this.delete( path );;
 	}
 
-	@Test.Impl( src = "public Path Trace.close()", desc = "Returns non null when enabled" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Returns non null when enabled" )
 	public void close_ReturnsNonNullWhenEnabled( TestCase tc ) {
 		Trace.enable();
 		Path path = Trace.close();
@@ -234,7 +234,7 @@ public class TraceTest implements TestContainer {
 		this.delete( path );;
 	}
 	
-	@Test.Impl( src = "public String Trace.toString()", desc = "Identifies state when disabled" )
+	@TestOrig.Impl( src = "public String Trace.toString()", desc = "Identifies state when disabled" )
 	public void toString_IdentifiesStateWhenDisabled( TestCase tc ) {
 		Trace trace = new Trace( "Test" );
 		Trace.disable();
@@ -242,7 +242,7 @@ public class TraceTest implements TestContainer {
 		Trace.enable();
 	}
 
-	@Test.Impl( src = "public String Trace.toString()", desc = "Indicates topic when enabled" )
+	@TestOrig.Impl( src = "public String Trace.toString()", desc = "Indicates topic when enabled" )
 	public void toString_IndicatesTopicWhenEnabled( TestCase tc ) {
 		String topic = "Some topic string";
 		Trace trace = new Trace( topic );
@@ -250,7 +250,7 @@ public class TraceTest implements TestContainer {
 	}
 
 
-	@Test.Impl( src = "public void Trace.disable()", desc = "Messages ignored" )
+	@TestOrig.Impl( src = "public void Trace.disable()", desc = "Messages ignored" )
 	public void disable_MessagesIgnored( TestCase tc ) throws IOException {
 		String includedMessage = "INCLUDED " + System.currentTimeMillis();
 		String excludedMessage = "EXCLUDED " + System.currentTimeMillis();
@@ -268,7 +268,7 @@ public class TraceTest implements TestContainer {
 		this.delete( path );
 	}
 
-	@Test.Impl( src = "public void Trace.enable()", desc = "Same file used when re-enabled without close" )
+	@TestOrig.Impl( src = "public void Trace.enable()", desc = "Same file used when re-enabled without close" )
 	public void enable_SameFileUsedWhenReEnabledWithoutClose( TestCase tc ) {
 		Trace trace = new Trace( "Test" );
 		String before = trace.toString();
@@ -281,7 +281,7 @@ public class TraceTest implements TestContainer {
 		tc.assertEqual( before, after );
 	}
 	
-	@Test.Impl( src = "public Path Trace.close()", desc = "File does not exist if disabled messages written" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "File does not exist if disabled messages written" )
 	public void close_FileDoesNotExistIfDisabledMessagesWritten( TestCase tc ) {
 		this.delete( Trace.close() );
 		Trace trace = new Trace( "Ignored" );
@@ -291,13 +291,13 @@ public class TraceTest implements TestContainer {
 		tc.assertFalse( Files.exists( Trace.close() ) );  // If this test fails there is an undeleted trace file
 	}
 
-	@Test.Impl( src = "public String Trace.toString()", desc = "Indicates state when enabled" )
+	@TestOrig.Impl( src = "public String Trace.toString()", desc = "Indicates state when enabled" )
 	public void toString_IndicatesStateWhenEnabled( TestCase tc ) {
 		Trace trace = new Trace( "Test" );
 		tc.assertTrue( trace.toString().contains( "ENABLED" ) );
 	}
 	
-	@Test.Impl( src = "public Path Trace.close()", desc = "Can write after close" )
+	@TestOrig.Impl( src = "public Path Trace.close()", desc = "Can write after close" )
 	public void close_CanWriteAfterClose( TestCase tc ) throws IOException {
 		Trace t = new Trace( "Test" );
 		t.write( "Before close" );
@@ -317,8 +317,8 @@ public class TraceTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(TraceTest.class);
-		Test.printResults();
+		new TestOrig(TraceTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

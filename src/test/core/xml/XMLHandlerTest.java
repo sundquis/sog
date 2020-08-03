@@ -26,7 +26,7 @@ import org.xml.sax.SAXParseException;
 
 import sog.core.AppException;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 import sog.core.xml.XMLHandler;
@@ -112,7 +112,7 @@ public class XMLHandlerTest implements TestContainer {
 	// ATTRIBUTE		<child />
 	// ATTRIBUTE	</root>
 	
-	@Test.Impl( src = "public Map XMLHandler.attributesToMap(Attributes)", desc = "Empty map returned when no attributes" )
+	@TestOrig.Impl( src = "public Map XMLHandler.attributesToMap(Attributes)", desc = "Empty map returned when no attributes" )
 	public void attributesToMap_EmptyMapReturnedWhenNoAttributes( TestCase tc ) {
 		Map<String, String> result = new Adapter<Map<String, String>>( "ATTRIBUTE" ) {
 			@Override public void startElement( String name, Map<String, String> attributes ) {
@@ -122,7 +122,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.assertEqual( 0,  result.size() );
 	}
 
-	@Test.Impl( src = "public Map XMLHandler.attributesToMap(Attributes)", desc = "Result is not null" )
+	@TestOrig.Impl( src = "public Map XMLHandler.attributesToMap(Attributes)", desc = "Result is not null" )
 	public void attributesToMap_ResultIsNotNull( TestCase tc ) {
 		Map<String, String> result = new Adapter<Map<String, String>>( "ATTRIBUTE" ) {
 			@Override public void startElement( String name, Map<String, String> attributes ) {
@@ -132,7 +132,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.notNull( result );
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "Attributes is not null" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "Attributes is not null" )
 	public void startElement_AttributesIsNotNull( TestCase tc ) {
 		tc.notNull( new Adapter<Object>( "ATTRIBUTE" ) {
 			@Override
@@ -142,7 +142,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for fixed attribute" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for fixed attribute" )
 	public void startElement_ValueCorrectForFixedAttribute( TestCase tc ) {
 		tc.assertEqual( "42", new Adapter<String>( "ATTRIBUTE" ) {
 			@Override
@@ -152,7 +152,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for implied attribute" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for implied attribute" )
 	public void startElement_ValueCorrectForImpliedAttribute( TestCase tc ) {
 		tc.assertEqual( "56", new Adapter<String>( "ATTRIBUTE" ) {
 			@Override
@@ -162,7 +162,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for required attribute" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for required attribute" )
 	public void startElement_ValueCorrectForRequiredAttribute( TestCase tc ) {
 		tc.assertEqual( "My name", new Adapter<String>( "ATTRIBUTE" ) {
 			@Override
@@ -172,7 +172,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for enumerated" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Value correct for enumerated" )
 	public void startElement_ValueCorrectForFixedEnumerated( TestCase tc ) {
 		tc.assertEqual( "newton", new Adapter<String>( "ATTRIBUTE" ) {
 			@Override
@@ -187,34 +187,34 @@ public class XMLHandlerTest implements TestContainer {
 	
 	// CONSTRUCTOR	
 	
-	@Test.Impl( src = "public XMLHandler(InputSource)", desc = "Throws assertion error for null source" )
+	@TestOrig.Impl( src = "public XMLHandler(InputSource)", desc = "Throws assertion error for null source" )
 	public void XMLHandler_ThrowsAssertionErrorForNullSource( TestCase tc ) {
 		InputSource source = null;
 		tc.expectError( AssertionError.class );
 		new XMLHandler( source );
 	}
 
-	@Test.Impl( src = "public XMLHandler(InputStream)", desc = "Throws assertion error for null stream" )
+	@TestOrig.Impl( src = "public XMLHandler(InputStream)", desc = "Throws assertion error for null stream" )
 	public void XMLHandler_ThrowsAssertionErrorForNullStream( TestCase tc ) {
 		InputStream stream = null;
 		tc.expectError( AssertionError.class );
 		new XMLHandler( stream );
 	}
 
-	@Test.Impl( src = "public XMLHandler(Path)", desc = "Throws NoSuchFileException if the file is missing" )
+	@TestOrig.Impl( src = "public XMLHandler(Path)", desc = "Throws NoSuchFileException if the file is missing" )
 	public void XMLHandler_ThrowsNosuchfileexceptionIfTheFileIsMissing( TestCase tc ) throws IOException {
 		tc.expectError( NoSuchFileException.class );
 		new XMLHandler( Paths.get( "BOGUS") );
 	}
 
-	@Test.Impl( src = "public XMLHandler(Path)", desc = "Throws assertion error for null path" )
+	@TestOrig.Impl( src = "public XMLHandler(Path)", desc = "Throws assertion error for null path" )
 	public void XMLHandler_ThrowsAssertionErrorForNullPath( TestCase tc ) throws IOException {
 		Path path = null;
 		tc.expectError( AssertionError.class );
 		new XMLHandler( path );
 	}
 
-	@Test.Impl( src = "public XMLHandler(Reader)", desc = "Throws assertion error for null reader" )
+	@TestOrig.Impl( src = "public XMLHandler(Reader)", desc = "Throws assertion error for null reader" )
 	public void XMLHandler_ThrowsAssertionErrorForNullReader( TestCase tc ) {
 		Reader reader = null;
 		tc.expectError( AssertionError.class );
@@ -229,19 +229,19 @@ public class XMLHandlerTest implements TestContainer {
 	// LOCATION	]>
 	// LOCATION	<root></root>
 
-	@Test.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Is not null" )
+	@TestOrig.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Is not null" )
 	public void getLocation_IsNotNull( TestCase tc ) {
 		tc.notNull( new Adapter<Object>( "LOCATION" ) {}.getLocation() );
 	}
 
-	@Test.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Location is unknown after parsing" )
+	@TestOrig.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Location is unknown after parsing" )
 	public void getLocation_LocationIsUnknownAfterParsing( TestCase tc ) {
 		Adapter<Object> a = new Adapter<Object>( "LOCATION" ) {};
 		a.parse();
 		tc.assertEqual( "(-1, -1)",  a.getLocation().toString() );
 	}
 
-	@Test.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Location is unknown before parsing" )
+	@TestOrig.Impl( src = "public XMLHandler.Location XMLHandler.getLocation()", desc = "Location is unknown before parsing" )
 	public void getLocation_LocationIsUnknownBeforeParsing( TestCase tc ) {
 		Adapter<Object> a = new Adapter<Object>( "LOCATION" ) {};
 		tc.assertEqual( "(-1, -1)",  a.getLocation().toString() );
@@ -263,7 +263,7 @@ public class XMLHandlerTest implements TestContainer {
 	// CONTENT		<!-- Comment -->
 	// CONTENT	</root>
 
-	@Test.Impl( src = "public void XMLHandler.characters(char[], int, int)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.characters(char[], int, int)", desc = "Location is identified" )
 	public void characters_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(10, 21)", new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -273,7 +273,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.characters(char[], int, int)", desc = "Parser uses to signal content" )
+	@TestOrig.Impl( src = "public void XMLHandler.characters(char[], int, int)", desc = "Parser uses to signal content" )
 	public void characters_ParserUsesToSignalContent( TestCase tc ) {
 		tc.assertEqual( 3, new Adapter<Integer>( "CONTENT" ) {
 			int count = 0;
@@ -284,7 +284,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.comment(char[], int, int)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.comment(char[], int, int)", desc = "Location is identified" )
 	public void comment_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(11, 18)", new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -294,7 +294,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.comment(char[], int, int)", desc = "Parser signals comments" )
+	@TestOrig.Impl( src = "public void XMLHandler.comment(char[], int, int)", desc = "Parser signals comments" )
 	public void comment_ParserSignalsComments( TestCase tc ) {
 		tc.assertEqual( " Comment ", new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -304,7 +304,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.startCDATA()", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.startCDATA()", desc = "Location is identified" )
 	public void startCDATA_LocationIsIdentified( TestCase tc ) {
 		// Thought this would be column 49 based on other locations. 
 		// Location data is heuristic 
@@ -316,7 +316,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startCDATA()", desc = "Parser signals start of CDATA" )
+	@TestOrig.Impl( src = "public void XMLHandler.startCDATA()", desc = "Parser signals start of CDATA" )
 	public void startCDATA_ParserSignalsStartOfCdata( TestCase tc ) {
 		tc.assertEqual( "Unparsed <data>data</data>", new Adapter<String>( "CONTENT" ) {
 			boolean ready = false;
@@ -334,7 +334,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endCDATA()", desc = "Called after startCDATA()" )
+	@TestOrig.Impl( src = "public void XMLHandler.endCDATA()", desc = "Called after startCDATA()" )
 	public void endCDATA_CalledAfterStartcdata( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "CONTENT" ) {
 			boolean startEncountered = false;
@@ -343,7 +343,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endCDATA()", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.endCDATA()", desc = "Location is identified" )
 	public void endCDATA_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(8, 47)", new Adapter<String>( "CONTENT" ) {
 			@Override public void endCDATA() throws SAXException { 
@@ -351,7 +351,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Location is identified" )
 	public void startEntity_LocationIsIdentified( TestCase tc ) {
 		// Hmmm... It appears the location of an entity is not correctly identified
 		// Should be (9, 17) or (9, 15)
@@ -364,14 +364,14 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Name is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Name is correct" )
 	public void startEntity_NameIsCorrect( TestCase tc ) {
 		tc.assertEqual( "HGTG", new Adapter<String>( "CONTENT" ) {
 			@Override public void startEntity( String name ) throws SAXException { this.accept( name ); }
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Parser signals use of entity" )
+	@TestOrig.Impl( src = "public void XMLHandler.startEntity(String)", desc = "Parser signals use of entity" )
 	public void startEntity_ParserSignalsUseOfEntity( TestCase tc ) {
 		tc.assertEqual( "The answer to the ultimate question...", new Adapter<String>( "CONTENT" ) {
 			boolean ready = false;
@@ -389,7 +389,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Called after startEntity()" )
+	@TestOrig.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Called after startEntity()" )
 	public void endEntity_CalledAfterStartentity( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "CONTENT" ) {
 			boolean startEncountered = false;
@@ -398,7 +398,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Location is identified" )
 	public void endEntity_LocationIsIdentified( TestCase tc ) {
 		// Curiouser and curiouser...
 		// Column 39 is one past the end of the first row
@@ -411,7 +411,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Name is consistent" )
+	@TestOrig.Impl( src = "public void XMLHandler.endEntity(String)", desc = "Name is consistent" )
 	public void endEntity_NameIsConsistent( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "CONTENT" ) {
 			String startName = null;
@@ -420,7 +420,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.ignorableWhitespace(char[], int, int)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.ignorableWhitespace(char[], int, int)", desc = "Location is identified" )
 	public void ignorableWhitespace_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(7, 12)", new Adapter<String>( "CONTENT" ) {
 			boolean foundFirst = false;
@@ -434,7 +434,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Data is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Data is correct" )
 	public void processingInstruction_DataIsCorrect( TestCase tc ) {
 		tc.assertEqual( "This is an annotation",  new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -444,7 +444,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Location is identified" )
 	public void processingInstruction_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(7, 47)", new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -454,7 +454,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Target is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.processingInstruction(String, String)", desc = "Target is correct" )
 	public void processingInstruction_TargetIsCorrect( TestCase tc ) {
 		tc.assertEqual( "annotation",  new Adapter<String>( "CONTENT" ) {
 			@Override
@@ -491,7 +491,7 @@ public class XMLHandlerTest implements TestContainer {
 	// ELEMENT		</B>
 	// ELEMENT	</root>
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Location is identified" )
 	public void startElement_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(8, 7)",  new Adapter<String>( "ELEMENT" ) {
 			@Override
@@ -501,7 +501,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Name is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, Map)", desc = "Name is not empty" )
 	public void startElement_NameIsNotEmpty( TestCase tc ) {
 		new Adapter<Object>( "ELEMENT" ) {
 			@Override
@@ -512,7 +512,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "Parser signals start of element processing" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "Parser signals start of element processing" )
 	public void startElement_ParserSignalsStartOfElementProcessing( TestCase tc ) {
 		new Adapter<Object>( "ELEMENT" ) {
 			@Override
@@ -523,7 +523,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "qName is not null" )
+	@TestOrig.Impl( src = "public void XMLHandler.startElement(String, String, String, Attributes)", desc = "qName is not null" )
 	public void startElement_QnameIsNotNull( TestCase tc ) {
 		new Adapter<Object>( "ELEMENT" ) {
 			@Override
@@ -534,7 +534,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.endElement(String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.endElement(String)", desc = "Location is identified" )
 	public void endElement_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(21, 8)",  new Adapter<String>( "ELEMENT" ) {
 			@Override
@@ -544,7 +544,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endElement(String)", desc = "Name is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.endElement(String)", desc = "Name is not empty" )
 	public void endElement_NameIsNotEmpty( TestCase tc ) {
 		new Adapter<Boolean>( "ELEMENT" ) {
 			@Override
@@ -555,7 +555,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endElement(String)", desc = "Elements closed in LIFO order" )
+	@TestOrig.Impl( src = "public void XMLHandler.endElement(String)", desc = "Elements closed in LIFO order" )
 	public void endElement_ElementsClosedInLifoOrder( TestCase tc ) {
 		new Adapter<Object>( "ELEMENT" ) {
 			Stack<String> names = new Stack<>();
@@ -565,7 +565,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.endElement(String, String, String)", desc = "qName is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.endElement(String, String, String)", desc = "qName is not empty" )
 	public void endElement_QnameIsNotEmpty( TestCase tc ) {
 		new Adapter<Object>( "ELEMENT" ) {
 			@Override
@@ -587,7 +587,7 @@ public class XMLHandlerTest implements TestContainer {
 	// STRUCTURE	<root>
 	// STRUCTURE	</root>
 
-	@Test.Impl( src = "public void XMLHandler.setDocumentLocator(Locator)", desc = "Called before startDocument()" )
+	@TestOrig.Impl( src = "public void XMLHandler.setDocumentLocator(Locator)", desc = "Called before startDocument()" )
 	public void setDocumentLocator_CalledBeforeStartdocument( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "STRUCTURE" ) {
 			boolean locatorSet = false;
@@ -596,7 +596,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.setDocumentLocator(Locator)", desc = "Parser registers non-null locator" )
+	@TestOrig.Impl( src = "public void XMLHandler.setDocumentLocator(Locator)", desc = "Parser registers non-null locator" )
 	public void setDocumentLocator_ParserRegistersNonNullLocator( TestCase tc ) {
 		new Adapter<Object>( "STRUCTURE" ) {
 			@Override public void setDocumentLocator( Locator locator ) { tc.notNull( locator ); }
@@ -604,7 +604,7 @@ public class XMLHandlerTest implements TestContainer {
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.startDocument()", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.startDocument()", desc = "Location is identified" )
 	public void startDocument_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(1, 1)",  new Adapter<String>( "STRUCTURE" ) {
 			@Override public void startDocument() throws SAXException { 
@@ -613,7 +613,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endDocument()", desc = "Called after startDocument()" )
+	@TestOrig.Impl( src = "public void XMLHandler.endDocument()", desc = "Called after startDocument()" )
 	public void endDocument_CalledAfterStartdocument( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "STRUCTURE" ) {
 			boolean startEncountered = false;
@@ -622,14 +622,14 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endDocument()", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.endDocument()", desc = "Location is identified" )
 	public void endDocument_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(-1, -1)",  new Adapter<String>( "STRUCTURE" ) {
 			@Override public void endDocument() throws SAXException { this.accept( this.getLocation().toString() ); }
 		}.get() );
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.startDTD(String, String, String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.startDTD(String, String, String)", desc = "Location is identified" )
 	public void startDTD_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(1, 16)",  new Adapter<String>( "STRUCTURE" ) {
 			@Override
@@ -639,7 +639,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.startDTD(String, String, String)", desc = "Name is root element" )
+	@TestOrig.Impl( src = "public void XMLHandler.startDTD(String, String, String)", desc = "Name is root element" )
 	public void startDTD_NameIsRootElement( TestCase tc ) {
 		tc.assertEqual( "root",  new Adapter<String>( "STRUCTURE" ) {
 			@Override
@@ -649,7 +649,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endDTD()", desc = "Called after startDTD()" )
+	@TestOrig.Impl( src = "public void XMLHandler.endDTD()", desc = "Called after startDTD()" )
 	public void endDTD_CalledAfterStartdtd( TestCase tc ) {
 		tc.assertTrue( new Adapter<Boolean>( "STRUCTURE" ) {
 			boolean startEncountered = false;
@@ -658,7 +658,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.endDTD()", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.endDTD()", desc = "Location is identified" )
 	public void endDTD_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(3, 1)",  new Adapter<String>( "STRUCTURE" ) {
 			@Override public void endDTD() throws SAXException { this.accept( this.getLocation().toString() ); }
@@ -670,7 +670,7 @@ public class XMLHandlerTest implements TestContainer {
 	
 	// ERRORS
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Location is identified" )
 	public void error_LocationIsIdentified( TestCase tc ) {
 		// ERR-POS	<!DOCTYPE	root [ <!ELEMENT root EMPTY > ]>
 		// ERR-POS	<root> </root> <!-- Err line 2 column ??? -->
@@ -679,7 +679,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for changing #FIXED attribute" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for changing #FIXED attribute" )
 	public void error_TrigeredForChangingFixedAttribute( TestCase tc ) {
 		// ERR-FIXED	<!DOCTYPE root [ <!ELEMENT root EMPTY> <!ATTLIST root id CDATA #FIXED "42"> ]>
 		// ERR-FIXED	<root id="43" />
@@ -688,7 +688,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for missing DTD" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for missing DTD" )
 	public void error_TrigeredForMissingDtd( TestCase tc ) {
 		// ERR-NO-DTD	<root></root>
 		tc.notNull( new Adapter<SAXException>( "ERR-NO-DTD" ) {
@@ -696,7 +696,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered when element does not match declared type" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered when element does not match declared type" )
 	public void error_TrigeredWhenElementDoesNotMatchDeclaredType( TestCase tc ) {
 		// ERR-MISMATCH	<!DOCTYPE root [ <!ELEMENT root (child)*> <!ELEMENT child ANY> ]>
 		// ERR-MISMATCH	<root>Illegal</root>
@@ -705,7 +705,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for missing requiured attribute" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for missing requiured attribute" )
 	public void error_TrigeredForMissingRequiuredAttribute( TestCase tc ) {
 		// ERR-REQUIRED	<!DOCTYPE root [ <!ELEMENT root ANY> <!ATTLIST root id CDATA #REQUIRED> ]>
 		// ERR-REQUIRED	<root />
@@ -714,7 +714,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for undeclared attributes" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for undeclared attributes" )
 	public void error_TrigeredForUndeclaredAttributes( TestCase tc ) {
 		// ERR-UNDECLARED-ATT	<!DOCTYPE root [ <!ELEMENT root ANY> ]>
 		// ERR-UNDECLARED-ATT	<root not="allowed"></root>
@@ -723,7 +723,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for undeclared elements" )
+	@TestOrig.Impl( src = "public void XMLHandler.error(SAXParseException)", desc = "Trigered for undeclared elements" )
 	public void error_TrigeredForUndeclaredElements( TestCase tc ) {
 		// ERR-UNDECLARED-ELT	<!DOCTYPE root [ <!ELEMENT root ANY> ]>
 		// ERR-UNDECLARED-ELT	<root><illegal></illegal></root>
@@ -732,7 +732,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Excpetion is thrown after signaling" )
+	@TestOrig.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Excpetion is thrown after signaling" )
 	public void fatalError_ExcpetionIsThrownAfterSignaling( TestCase tc ) {
 		// FATAL-THROW	<!DOGTYPE woof [ <!ELEMENT woof CFATA EMPTU> ]>
 		Adapter<String> adapter = new Adapter<String>( "FATAL-THROW" ) {
@@ -749,7 +749,7 @@ public class XMLHandlerTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Location is identified" )
 	public void fatalError_LocationIsIdentified( TestCase tc ) {
 		Adapter<String> adapter = new Adapter<String>( "FATAL-THROW" ) {
 			String result = "";
@@ -764,7 +764,7 @@ public class XMLHandlerTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Trigered for illegal DTD structure" )
+	@TestOrig.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Trigered for illegal DTD structure" )
 	public void fatalError_TrigeredForIllegalDtdStructure( TestCase tc ) {
 		// FATAL-MALFORMED	<!DOCTYPE root [ <!ELEMENT root ANY> <!ATTLIST root att CDATA> ]>
 		// FATAL-MALFORMED	<root>Attribute missing type</root>
@@ -781,7 +781,7 @@ public class XMLHandlerTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Trigered for undeclared entity" )
+	@TestOrig.Impl( src = "public void XMLHandler.fatalError(SAXParseException)", desc = "Trigered for undeclared entity" )
 	public void fatalError_TrigeredForUndeclaredEntity( TestCase tc ) {
 		// ERR-UNDECLARED-ENT	<!DOCTYPE root [ <!ELEMENT root ANY> ]>
 		// ERR-UNDECLARED-ENT	<root>&undeclared;</root>
@@ -808,7 +808,7 @@ public class XMLHandlerTest implements TestContainer {
 	// DTD	]>
 	// DTD	<root>&pf;</root>
 
-	@Test.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Location is identified" )
 	public void internalEntityDecl_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(2, 22)",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -818,7 +818,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Name is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Name is correct" )
 	public void internalEntityDecl_NameIsCorrect( TestCase tc ) {
 		tc.assertEqual( "pf",  new Adapter<String>( "DTD" ) {
 			@Override public void internalEntityDecl( String name, String value ) throws SAXException { 
@@ -827,7 +827,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Value is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.internalEntityDecl(String, String)", desc = "Value is correct" )
 	public void internalEntityDecl_ValueIsCorrect( TestCase tc ) {
 		tc.assertEqual( "proof",  new Adapter<String>( "DTD" ) {
 			@Override public void internalEntityDecl( String name, String value ) throws SAXException { 
@@ -836,7 +836,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 	
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Location is identified" )
 	public void attributeDecl_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(4, 38)",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -846,7 +846,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Attribute name is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Attribute name is not empty" )
 	public void attributeDecl_AttributeNameIsNotEmpty( TestCase tc ) {
 		tc.assertEqual( "age",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -856,7 +856,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Element name is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Element name is not empty" )
 	public void attributeDecl_ElementNameIsNotEmpty( TestCase tc ) {
 		tc.assertEqual( "root",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -866,7 +866,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Mode is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Mode is correct" )
 	public void attributeDecl_ModeIsCorrect( TestCase tc ) {
 		tc.assertEqual( "#FIXED",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -876,7 +876,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Type is correct" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Type is correct" )
 	public void attributeDecl_TypeIsCorrect( TestCase tc ) {
 		tc.assertEqual( "CDATA",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -886,7 +886,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Value is correct when supplied in DTD" )
+	@TestOrig.Impl( src = "public void XMLHandler.attributeDecl(String, String, String, String, String)", desc = "Value is correct when supplied in DTD" )
 	public void attributeDecl_ValueIsCorrectWhenSuppliedInDtd( TestCase tc ) {
 		tc.assertEqual( "45",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -896,7 +896,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.elementDecl(String, String)", desc = "Location is identified" )
+	@TestOrig.Impl( src = "public void XMLHandler.elementDecl(String, String)", desc = "Location is identified" )
 	public void elementDecl_LocationIsIdentified( TestCase tc ) {
 		tc.assertEqual( "(3, 21)",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -906,7 +906,7 @@ public class XMLHandlerTest implements TestContainer {
 		}.get() );
 	}
 
-	@Test.Impl( src = "public void XMLHandler.elementDecl(String, String)", desc = "Name is not empty" )
+	@TestOrig.Impl( src = "public void XMLHandler.elementDecl(String, String)", desc = "Name is not empty" )
 	public void elementDecl_NameIsNotEmpty( TestCase tc ) {
 		tc.assertEqual( "root",  new Adapter<String>( "DTD" ) {
 			@Override
@@ -924,8 +924,8 @@ public class XMLHandlerTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(XMLHandlerTest.class);
-		Test.printResults();
+		new TestOrig(XMLHandlerTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

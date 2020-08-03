@@ -16,14 +16,14 @@ import java.util.Arrays;
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestContainer;
 
 /**
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 public class TestRunner {
 
 	
@@ -109,7 +109,7 @@ public class TestRunner {
 	@SuppressWarnings("unchecked")
 	public static void testClass( Class<?> clazz ) {
 		if ( clazz != null && !clazz.isInterface()  && TestContainer.class.isAssignableFrom( clazz ) ) {
-			new Test( (Class<TestContainer>) clazz );
+			new TestOrig( (Class<TestContainer>) clazz );
 		}
 	}
 	
@@ -136,7 +136,7 @@ public class TestRunner {
 		//testPackage( "test", "persist", "model" );
 		testSourceDir( "home", "sundquis", "book", "sog", "src" );
 
-		Test.printResults();
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

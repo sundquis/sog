@@ -1,213 +1,119 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
- * 
+/**
+ * Copyright (C) 2017, 2018, 2019, 2020 by TS Sundquist
+ * *** *** * 
  * All rights reserved.
  * 
  */
-
 package sog.core.test;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import sog.core.Assert;
-import sog.core.Property;
-import sog.core.Test;
+import sog.util.IndentWriter;
+import sog.util.Printable;
 
 /**
- * @author sundquis
- *
+ * Base class for various results associated with testing.
  */
-@Test.Skip( "How to test abstract?" )
-public abstract class Result {
-
-	
-	protected static boolean SHOW_GLOBAL_RESULTS =
-		Property.get( "show.global.results",  true,  Property.BOOLEAN );
-	
-	protected static boolean SHOW_CLASS_RESULTS =
-		Property.get( "show.class.results",  true,  Property.BOOLEAN );
-	
-	protected static boolean SHOW_MEMBER_RESULTS =
-		Property.get( "show.member.results",  true,  Property.BOOLEAN );
-		
-	protected static boolean SHOW_CASE_RESULTS =
-		Property.get( "show.case.results",  true,  Property.BOOLEAN );
-	
-	protected static boolean SHOW_FAIL_CASES =
-		Property.get( "show.fail.cases",  true,  Property.BOOLEAN );
-		
-	protected static boolean SHOW_PASS_CASES =
-			Property.get( "show.pass.cases",  false,  Property.BOOLEAN );
-			
-	protected static boolean SHOW_UNEXECUTED_CASES =
-			Property.get( "show.unexecuted.cases",  true,  Property.BOOLEAN );
-	
-	protected static boolean WARN_UNTESTED_CLASS =
-			Property.get( "warn.untested.class",  false,  Property.BOOLEAN );
-
-	protected static boolean WARN_UNTESTED_CONSTRUCTOR =
-		Property.get( "warn.untested.constructor",  false,  Property.BOOLEAN );
-
-	protected static boolean WARN_UNTESTED_METHOD =
-		Property.get( "warn.untested.method",  true,  Property.BOOLEAN );
-
-	protected static boolean WARN_UNTESTED_FIELD =
-		Property.get( "warn.untested.field",  false,  Property.BOOLEAN );
-		
-	protected static boolean WARN_UNTESTED_NONPUBLIC_MEMBERS =
-		Property.get( "warn.untested.nonpublic.members",  false,  Property.BOOLEAN );
-
-	protected static boolean WARN_UNTESTED_PUBLIC_MEMBERS =
-		Property.get( "warn.untested.public.members",  true,  Property.BOOLEAN );
-
-	public static void summary() {
-		SHOW_GLOBAL_RESULTS = true;
-		SHOW_CLASS_RESULTS = true;
-		SHOW_MEMBER_RESULTS = false;
-		SHOW_CASE_RESULTS = true;
-		SHOW_FAIL_CASES = true;
-		SHOW_PASS_CASES = false;
-		SHOW_UNEXECUTED_CASES = false;
-	}
-	
-	public static void verbose() {
-		SHOW_GLOBAL_RESULTS = true;
-		SHOW_CLASS_RESULTS = true;
-		SHOW_MEMBER_RESULTS = true;
-		SHOW_CASE_RESULTS = true;
-		SHOW_FAIL_CASES = true;
-		SHOW_PASS_CASES = true;
-		SHOW_UNEXECUTED_CASES = true;
-		WARN_UNTESTED_CLASS = true;
-		WARN_UNTESTED_CONSTRUCTOR = true;
-		WARN_UNTESTED_METHOD = true;
-		WARN_UNTESTED_FIELD = true;
-		WARN_UNTESTED_NONPUBLIC_MEMBERS = true;
-		WARN_UNTESTED_PUBLIC_MEMBERS = true;
-	}
-
-
-	
+public abstract class Result implements Printable {
 	
 	private final String label;
 	
-	private final Map<String, Result> children;
+	private final List<Result> children;
 	
-	private final Object statMutex;
+	private boolean notSet;
 	
 	private volatile long time;
 	
-	private volatile int passCount;
+	private volatile int totalCases;
 	
-	private volatile int failCount;
+	private volatile int passCases;
 	
-	private volatile int totalCount;
-	
-	
+	private volatile int failCases;
+
+	/**
+	 * Base result construction. Must supply a text label for the type of result.
+	 * 
+	 * Concrete subclasses must provide the logic for finding and adding children.
+	 */
 	protected Result( String label ) {
 		this.label = Assert.nonEmpty( label );
-		this.children = new TreeMap<String, Result>();
-		this.statMutex = new Object(){};
+		this.children = new LinkedList<Result>();
 		
-		this.time = -1L;
-		this.passCount = -1;
-		this.failCount = -1;
-		this.totalCount = -1;
-	}
-
-	public String getLabel() {
-		return Assert.nonEmpty( this.label );
+		this.notSet = true;
+		this.time = 0L;
+		this.totalCases = 0;
+		this.passCases = 0;
+		this.failCases = 0;
 	}
 	
-	public int getPassCount() {
-		if ( this.time < 0L ) {
-			this.setStats();
-		}
-		return this.passCount;
+	protected void addChild( Result child ) {
+		this.children.add( Assert.nonNull( child ) );
 	}
 	
-	public int getFailCount() {
-		if ( this.time < 0L ) {
-			this.setStats();
-		}
-		return this.failCount;
-	}
-	
-	public int getTotalCount() {
-		if ( this.time < 0L ) {
-			this.setStats();
-		}
-		return this.totalCount;
-	}
-	
-	public long getTime() {
-		if ( this.time < 0L ) {
+	protected long getTime() {
+		if ( this.notSet ) {
 			this.setStats();
 		}
 		return this.time;
 	}
 	
-	private void setStats() {
-		synchronized ( this.statMutex ) {
-			if ( this.time < 0L ) {
-				int p = 0;
-				int f = 0;
-				int t = 0;
-				long time = 0L;
-				for ( Result r : this.children.values() ) {
-					p += r.getPassCount();
-					f += r.getFailCount();
-					t += r.getTotalCount();
-					time += r.getTime();
-				}
-				this.passCount = p;
-				this.failCount = f;
-				this.totalCount = t;
-				this.time = time;
-			}
+	protected int getTotalCases() {
+		if ( this.notSet ) {
+			this.setStats();
 		}
+		return this.totalCases;
 	}
 	
-	public Result addChild( Result child ) {
-		Result result = Assert.nonNull( child );
-		
-		synchronized ( this.children ) {
-			Result current = this.children.get( result.getLabel() );
-			if ( current == null ) {
-				this.children.put( result.getLabel(),  result );
-			} else {
-				result = current;
-			}
+	protected int getPassCases() {
+		if ( this.notSet ) {
+			this.setStats();
 		}
-		
-		return Assert.nonNull( result );
+		return this.passCases;
 	}
 	
-	public void print( String prefix ) {
-		if ( this.showResults() ) {
-			System.err.println( prefix + this );
+	protected int getFailCases() {
+		if ( this.notSet ) {
+			this.setStats();
 		}
-		
-		for ( Result r : this.children.values() ) {
-			r.print( "\t" + prefix );
-		}
+		return this.failCases;
 	}
 	
 	@Override
 	public String toString() {
-		int tot = this.getTotalCount();
-		int pass = this.getPassCount();
-		int fail = this.getFailCount();
+		int tot = this.getTotalCases();
+		int pass = this.getPassCases();
+		int fail = this.getFailCases();
 		int unx = tot - pass - fail;
 		double success = (double) 100 * pass / (tot == 0 ? 1 : tot);
 		double seconds = (double) this.time / 1000.0;
-		return String.format( "[%s] Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d, U = %d)", this.label, success, seconds, tot, pass, fail, unx );
+		return String.format( "[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d]: %s", success, seconds, tot, pass, fail, unx, this.label );
+		//return String.format( "[%s] Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d, U = %d)", this.label, success, seconds, tot, pass, fail, unx );
 	}
 	
-	
-	public abstract boolean showResults();
+	@Override
+	public void print( IndentWriter out ) {
+		Assert.nonNull( out );
+		
+		out.println( this.toString() );
+		
+		out.increaseIndent();
+		this.children.stream().forEach( (c) -> c.print( out ) );
+		out.decreaseIndent();
+	}
 
-	
+	private void setStats() {
+		this.children.stream().forEach( this::combine );
+	}
 
+	private void combine( Result other ) {
+		Assert.nonNull( other );
+		
+		this.time += other.getTime();
+		this.totalCases += other.getTotalCases();
+		this.passCases += other.getPassCases();
+		this.failCases += other.getFailCases();
+	}
+	
 }

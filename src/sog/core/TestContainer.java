@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
  * Classes that contain test cases for a subject class implement this interface.
  * 
  */
-@Test.Skip
+@TestOrig.Skip
 public interface TestContainer {
 	
 	/**
@@ -80,7 +80,7 @@ public interface TestContainer {
 	}
 	
 	
-	@Test.Skip( "May need testing. Appears correct" )
+	@TestOrig.Skip( "May need testing. Appears correct" )
 	public static String location() {
 		StackTraceElement[] stes = (new Exception()).getStackTrace();
 		int index = 0;

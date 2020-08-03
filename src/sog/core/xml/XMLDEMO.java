@@ -33,7 +33,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 import sog.core.Fatal;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.util.Commented;
 import sog.util.StreamReader;
 
@@ -43,7 +43,7 @@ import sog.util.StreamReader;
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 public class XMLDEMO implements ContentHandler, DTDHandler, ErrorHandler, DeclHandler, LexicalHandler {
 	
 	private InputSource source;

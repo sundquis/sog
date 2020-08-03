@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.util.stream.Stream;
 
 import sog.core.App;
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * @author sundquis
@@ -20,7 +20,7 @@ import sog.core.Test;
  */
 public interface Commented {
 	
-	@Test.Skip
+	@TestOrig.Skip
 	public static String getRegExp( String tag ) {
 		return "^\\s*//\\s*" + tag + "[ \\t]?";
 	}
@@ -34,17 +34,17 @@ public interface Commented {
 	 * @return
 	 * @throws IOException
 	 */
-	@Test.Decl( "Return is not null" )
-	@Test.Decl( "Return is empty when no label matches" )
-	@Test.Decl( "Empty label returns end-of-line comments" )
-	@Test.Decl( "Returned line can be empty" )
-	@Test.Decl( "Lines returned in order" )
-	@Test.Decl( "Multiple labels allowed" )
-	@Test.Decl( "Labels can be interspersed" )
-	@Test.Decl( "Ignores optional tab after label" )
-	@Test.Decl( "White space before label is optional" )
-	@Test.Decl( "One space or tab after label ignored" )
-	@Test.Decl( "Works with anonymous classes" )
+	@TestOrig.Decl( "Return is not null" )
+	@TestOrig.Decl( "Return is empty when no label matches" )
+	@TestOrig.Decl( "Empty label returns end-of-line comments" )
+	@TestOrig.Decl( "Returned line can be empty" )
+	@TestOrig.Decl( "Lines returned in order" )
+	@TestOrig.Decl( "Multiple labels allowed" )
+	@TestOrig.Decl( "Labels can be interspersed" )
+	@TestOrig.Decl( "Ignores optional tab after label" )
+	@TestOrig.Decl( "White space before label is optional" )
+	@TestOrig.Decl( "One space or tab after label ignored" )
+	@TestOrig.Decl( "Works with anonymous classes" )
 	default Stream<String> getCommentedLines( String label ) throws IOException {
 		return Files.lines( App.get().sourceFile( this.getClass() ) )
 			.filter( s -> s.matches( getRegExp( label + ".*" ) ) )

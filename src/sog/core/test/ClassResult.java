@@ -1,65 +1,51 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
- * 
+/**
+ * Copyright (C) 2017, 2018, 2019, 2020 by TS Sundquist
+ * *** *** * 
  * All rights reserved.
  * 
  */
-
 package sog.core.test;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import sog.core.Assert;
-import sog.core.Test;
 
 /**
- * Represents the results for all tested components of a subject class
- *
+ * 
  */
 public class ClassResult extends Result {
-
 	
-	public ClassResult( Class<?> clazz ) {
-		super( clazz.getCanonicalName() );
-	}
-	
-
-	@Test.Decl( "Throws assertion error for null class" )
-	public MemberResult addMember( Class<?> c ) {
-		Assert.nonNull( c );
-		MemberResult result = new MemberResult( c );
-		return (MemberResult) this.addChild( result );
-	}
-
-	@Test.Decl( "Throws assertion error for null constructor" )
-	public MemberResult addMember( Constructor<?> c ) {
-		Assert.nonNull( c );
-		MemberResult result = new MemberResult( c );
-		return (MemberResult) this.addChild( result );
-	}
-
-	@Test.Decl( "Throws assertion error for null method" )
-	public MemberResult addMember( Method m ) {
-		Assert.nonNull( m );
-		MemberResult result = new MemberResult( m );
-		return (MemberResult) this.addChild( result );
-	}
-
-	@Test.Decl( "Throws assertion error for null field" )
-	public MemberResult addMember( Field f ) {
-		Assert.nonNull( f );
-		MemberResult result = new MemberResult( f );
-		return (MemberResult) this.addChild( result );
-	}
-	
-	@Override
-	@Test.Skip
-	public boolean showResults() {
-		return Result.SHOW_CLASS_RESULTS && this.getTotalCount() > 0;
-	}
-	
-	
+	/**
+	 * @param subject
+	 */
+	public ClassResult( Class<?> subject ) {
+		super( Assert.nonNull( subject).getSimpleName() );
 		
+		this.scan( subject );
+	}
+	
+	private void scan( Class<?> subject ) {
+		// The class itself is treated as a "member"
+		this.addChild( new MemberResult( subject ) );
+		
+		// Constructors
+		Arrays.stream( subject.getDeclaredConstructors() )
+			.filter( c -> !c.isSynthetic() )
+			.forEach( c -> this.addChild( new MemberResult(c) ) );
+
+		// Fields
+		Arrays.stream( subject.getDeclaredFields() )
+			.filter( f -> !f.isSynthetic() )
+			.forEach( f -> this.addChild( new MemberResult(f) ) );
+
+		// Methods
+		Arrays.stream( subject.getDeclaredMethods() )
+			.filter( m -> !m.isSynthetic() )
+			.filter( m -> !"main".equals( m.getName() ) )
+			.forEach( m -> this.addChild( new MemberResult(m) ) );
+		
+		// Member classes
+		Arrays.stream( subject.getDeclaredClasses() ).forEach( this::scan );
+	}
+
 }

@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import sog.core.App;
 import sog.core.Procedure;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -91,14 +91,14 @@ public class StringsTest implements TestContainer {
 	
 	
 	// arrayToString
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)", 
 		desc = "Empty array allowed" )
 	public void arrayToString_EmptyArrayAllowed( TestCase tc ) {
 		tc.assertEqual( "[]" , Strings.arrayToString( new String[] {} ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)", 
 		desc = "Enclosed in set brackets" )
 	public void arrayToString_EnclosedInSetBrackets( TestCase tc ) {
@@ -107,7 +107,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( ']', result.charAt( result.length()-1 ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)",
 		desc = "Omitted elements are indicated" )
 	public void arrayToString_OmittedElementsAreIndicated( TestCase tc ) {
@@ -115,7 +115,7 @@ public class StringsTest implements TestContainer {
 		tc.assertTrue( result.contains( "more>" ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)",
 		desc = "Sample cases for arrays of arrays" )
 	public void arrayToString_SampleCasesForArraysOfArrays( TestCase tc ) {
@@ -127,7 +127,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "[[1], [true, false], [a, b, c]]", Strings.arrayToString( arrayOfArray ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)",
 		desc = "Sample cases for arrays of collections" )
 	public void arrayToString_SampleCasesForArraysOfCollections( TestCase tc ) {
@@ -139,7 +139,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "[{1}, {true, false}, {a, b, c}]", Strings.arrayToString( arrayOfCollection ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)",
 		desc = "Sample cases for arrays of primitive" )
 	public void arrayToString_SampleCasesForArraysOfPrimitive( TestCase tc ) {
@@ -149,7 +149,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.arrayToString(Object)", 
 		desc = "Throws assertion error on null arrays" )
 	public void arrayToString_ThrowsAssertionErrorOnNullArrays( TestCase tc ) {
@@ -159,14 +159,14 @@ public class StringsTest implements TestContainer {
 
 	
 	// collectionToString
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Empty collection allowed" )
 	public void collectionToString_EmptyCollectionAllowed( TestCase tc ) {
 		tc.assertEqual( "{}",  Strings.collectionToString( new ArrayList<Object>() ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Enclosed in set braces" )
 	public void collectionToString_EnclosedInSetBraces( TestCase tc ) {
@@ -175,7 +175,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( '}', result.charAt( result.length()-1 ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Omitted elements are indicated" )
 	public void collectionToString_OmittedElementsAreIndicated( TestCase tc ) {
@@ -183,7 +183,7 @@ public class StringsTest implements TestContainer {
 		tc.assertTrue( result.contains( "more>" ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Sample cases for collections of arrays" )
 	public void collectionToString_SampleCasesForCollectionsOfArrays( TestCase tc ) {
@@ -194,7 +194,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "{[1], [true, false], [a, b, c]}", Strings.collectionToString( lo ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Sample cases for collections of collections" )
 	public void collectionToString_SampleCasesForCollectionsOfCollections( TestCase tc ) {
@@ -206,7 +206,7 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "{{1}, {true, false}, {a, b, c}}", Strings.collectionToString( collectionOfCollections ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Sample cases for collections of primitive" )
 	public void collectionToString_SampleCasesForCollectionsOfPrimitive( TestCase tc ) {
@@ -216,7 +216,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.collectionToString(Collection)", 
 		desc = "Throws assertion error on null collections" )
 	public void collectionToString_ThrowsAssertionErrorOnNullCollections( TestCase tc ) {
@@ -226,21 +226,21 @@ public class StringsTest implements TestContainer {
 
 	
 	// justify
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.justify(String, int, char)", 
 		desc = "Justify empty with neg width is not empty" )
 	public void justify_JustifyEmptyWithNegWidthIsNotEmpty( TestCase tc ) {
 		tc.assertEqual( "X",  Strings.justify( "",  -1,  'X' ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.justify(String, int, char)", 
 		desc = "Justify empty with pos width is not empty" )
 	public void justify_JustifyEmptyWithPosWidthIsNotEmpty( TestCase tc ) {
 		tc.assertEqual( "X",  Strings.justify( "",  1,  'X' ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.justify(String, int, char)", 
 		desc = "Throws assertion error for null string" )
 	public void justify_ThrowsAssertionErrorForNullString( TestCase tc ) {
@@ -248,7 +248,7 @@ public class StringsTest implements TestContainer {
 		Strings.justify( null,  1,  ' ' );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.justify(String, int, char)", 
 		desc = "Throws assertion error for zero width" )
 	public void justify_ThrowsAssertionErrorForZeroWidth( TestCase tc ) {
@@ -258,14 +258,14 @@ public class StringsTest implements TestContainer {
 
 	
 	// leftJustify
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Long string truncated" )
 	public void leftJustify_LongStringTruncated( TestCase tc ) {
 		tc.assertEqual( "Hell",  Strings.leftJustify( "Hello world",  4,  '_' ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Result has specified length" )
 	public void leftJustify_ResultHasSpecifiedLength( TestCase tc ) {
@@ -274,7 +274,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Sample cases" )
 	public void leftJustify_SampleCases( TestCase tc ) {
@@ -284,7 +284,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Short string padded with given character" )
 	public void leftJustify_ShortStringPaddedWithGivenCharacter( TestCase tc ) {
@@ -293,7 +293,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Throws assertion error for non positive width" )
 	public void leftJustify_ThrowsAssertionErrorForNonPositiveWidth( TestCase tc ) {
@@ -301,7 +301,7 @@ public class StringsTest implements TestContainer {
 		Strings.leftJustify( "Foo",  -2,  'c' );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.leftJustify(String, int, char)", 
 		desc = "Throws assertion error for null string" )
 	public void leftJustify_ThrowsAssertionErrorForNullString( TestCase tc ) {
@@ -311,14 +311,14 @@ public class StringsTest implements TestContainer {
 
 	
 	// rightJustify
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Long string truncated" )
 	public void rightJustify_LongStringTruncated( TestCase tc ) {
 		tc.assertEqual( "Hell",  Strings.rightJustify( "Hello world",  4,  '_' ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Result has specified length" )
 	public void rightJustify_ResultHasSpecifiedLength( TestCase tc ) {
@@ -327,7 +327,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Sample cases" )
 	public void rightJustify_SampleCases( TestCase tc ) {
@@ -337,7 +337,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Short string padded with given character" )
 	public void rightJustify_ShortStringPaddedWithGivenCharacter( TestCase tc ) {
@@ -346,7 +346,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Throws assertion error for non positive width" )
 	public void rightJustify_ThrowsAssertionErrorForNonPositiveWidth( TestCase tc ) {
@@ -354,7 +354,7 @@ public class StringsTest implements TestContainer {
 		Strings.rightJustify( "Foo",  -2,  'c' );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.rightJustify(String, int, char)", 
 		desc = "Throws assertion error for null string" )
 	public void rightJustify_ThrowsAssertionErrorForNullString( TestCase tc ) {
@@ -365,7 +365,7 @@ public class StringsTest implements TestContainer {
 	
 	
 	// strip
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Identity for non quoted trimmed strings" )
 	public void strip_IdentityForNonQuotedTrimmedStrings( TestCase tc ) {
@@ -381,14 +381,14 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.strip(String)", 
 		desc = "Identity on empty" )
 	public void strip_IdentityOnEmpty( TestCase tc ) {
 		tc.assertEqual( "",  Strings.strip( "" ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Ignores unmatched quotes" )
 	public void strip_IgnoresUnmatchedQuotes( TestCase tc ) {
@@ -405,7 +405,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Is idempotent" )
 	public void strip_IsIdempotent( TestCase tc ) throws FileNotFoundException, IOException {
@@ -428,33 +428,33 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Removes double quotes" )
 	public void strip_RemovesDoubleQuotes( TestCase tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\"Hello world\"" ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Removes nested quotes" )
 	public void strip_RemovesNestedQuotes( TestCase tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\"\'Hello world\'\"" ) );
 	}
 
-	@Test.Impl(
+	@TestOrig.Impl(
 		src = "public String Strings.strip(String)", 
 		desc = "Removes single quotes" )
 	public void strip_RemovesSingleQuotes( TestCase tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\'Hello world\'" ) );
 	}
 
-	@Test.Impl( src = "public String Strings.strip(String)", desc = "Result is trimmed" )
+	@TestOrig.Impl( src = "public String Strings.strip(String)", desc = "Result is trimmed" )
 	public void strip_ResultIsTrimmed( TestCase tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\t\n  Hello world   " ) );
 	}
 
-	@Test.Impl( src = "public String Strings.strip(String)", desc = "Sample cases" )
+	@TestOrig.Impl( src = "public String Strings.strip(String)", desc = "Sample cases" )
 	public void strip_SampleCases( TestCase tc ) {
 		String[] args = {
 			"No quotes",
@@ -488,7 +488,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.strip(String)", 
 		desc = "Throws assertion error for null string" )
 	public void strip_ThrowsAssertionErrorForNullString( TestCase tc ) {
@@ -499,7 +499,7 @@ public class StringsTest implements TestContainer {
 	
 	
 	// toCamelCase
-	@Test.Impl( src = "public String Strings.toCamelCase(String)", desc = "Does not start with a digit" )
+	@TestOrig.Impl( src = "public String Strings.toCamelCase(String)", desc = "Does not start with a digit" )
 	public void toCamelCase_DoesNotStartWithADigit( TestCase tc ) {
 		String[] args = {
 			"A 2-normal subgroup",
@@ -517,14 +517,14 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Identity on empty" )
 	public void toCamelCase_IdentityOnEmpty( TestCase tc ) {
 		tc.assertEqual( "",  Strings.toCamelCase( "" ) );
 	}
 	
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Result contains no white space" )
 	public void toCamelCase_ResultContainsNoWhiteSpace( TestCase tc ) {
@@ -545,7 +545,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Result contains only letters" )
 	public void toCamelCase_ResultContainsOnlyLetters( TestCase tc ) {
@@ -566,7 +566,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Sample cases" )
 	public void toCamelCase_SampleCases( TestCase tc ) {
@@ -609,7 +609,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Starts with uppercase" )
 	public void toCamelCase_StartsWithUppercase( TestCase tc ) {
@@ -636,7 +636,7 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toCamelCase(String)", 
 		desc = "Throws assertion error for null string" )
 	public void toCamelCase_ThrowsAssertionErrorForNullString( TestCase tc ) {
@@ -644,7 +644,7 @@ public class StringsTest implements TestContainer {
 		Strings.toCamelCase( null );
 	}
 
-	@Test.Impl( src = "public String Strings.toCamelCase(String)", desc = "Underscore removed" )
+	@TestOrig.Impl( src = "public String Strings.toCamelCase(String)", desc = "Underscore removed" )
 	public void toCamelCase_UnderscoreRemoved( TestCase tc ) {
 		String[] args = {
 			"Hello_world!",
@@ -683,7 +683,7 @@ public class StringsTest implements TestContainer {
 
 	
 	// toString
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toString(Object)", 
 		desc = "Agrees with object to string for non array non collection" )
 	public void toString_AgreesWithObjectToStringForNonArrayNonCollection( TestCase tc ) {
@@ -705,14 +705,14 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toString(Object)", 
 		desc = "Identity on empty" )
 	public void toString_IdentityOnEmpty( TestCase tc ) {
 		tc.assertEqual( "",  Strings.toString( "" ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toString(Object)", 
 		desc = "Provides alternate string representation for arrays" )
 	public void toString_ProvidesAlternateStringRepresentationForArrays( TestCase tc ) {
@@ -720,7 +720,7 @@ public class StringsTest implements TestContainer {
 		tc.assertFalse( arg.toString() == Strings.toString( arg ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toString(Object)", 
 		desc = "Provides alternate string representation for collections" )
 	public void toString_ProvidesAlternateStringRepresentationForCollections( TestCase tc ) {
@@ -728,20 +728,20 @@ public class StringsTest implements TestContainer {
 		tc.assertFalse( arg.toString() == Strings.toString( arg ) );
 	}
 
-	@Test.Impl( 
+	@TestOrig.Impl( 
 		src = "public String Strings.toString(Object)", 
 		desc = "String representation of null is null" )
 	public void toString_StringRepresentationOfNullIsNull( TestCase tc ) {
 		tc.assertEqual( "null",  Strings.toString( null ) );
 	}
 				
-	@Test.Impl( src = "public String Strings.relativePathToClassname(Path)", desc = "Class to relative path to classname correct" )
+	@TestOrig.Impl( src = "public String Strings.relativePathToClassname(Path)", desc = "Class to relative path to classname correct" )
 	public void relativePathToClassname_ClassToRelativePathToClassnameCorrect( TestCase tc ) {
 		Class<?>[] classes = new Class<?>[] { 
 			App.class,
 			Procedure.class,
 			Strings.class,
-			Test.class,
+			TestOrig.class,
 			TestCase.class,
 			TestContainer.class
 		};
@@ -763,8 +763,8 @@ public class StringsTest implements TestContainer {
 
 		System.out.println();
 
-		new Test(StringsTest.class);
-		Test.printResults();
+		new TestOrig(StringsTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

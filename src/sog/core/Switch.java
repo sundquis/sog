@@ -71,10 +71,10 @@ public class Switch<T, A, R> {
 	 * @param handler
 	 *        A non-null implementation of the apply method
 	 */
-	@Test.Decl( "Throws assertion error for null key" )
-	@Test.Decl( "Throws assertion error for null handler" )
-	@Test.Decl( "Returns non null" )
-	@Test.Decl( "Returns this Switch instance" )
+	@TestOrig.Decl( "Throws assertion error for null key" )
+	@TestOrig.Decl( "Throws assertion error for null handler" )
+	@TestOrig.Decl( "Returns non null" )
+	@TestOrig.Decl( "Returns this Switch instance" )
 	public Switch<T, A, R> addCase( T key, Function<? super A, ? extends R> handler ) {
 		Assert.nonNull( key );
 		Assert.nonNull( handler );
@@ -93,9 +93,9 @@ public class Switch<T, A, R> {
 	 * @param handler
 	 *        The non-null handler for the default case.
 	 */
-	@Test.Decl( "Throws assertion error for null handler" )
-	@Test.Decl( "Returns non null" )
-	@Test.Decl( "Returns this Switch instance" )
+	@TestOrig.Decl( "Throws assertion error for null handler" )
+	@TestOrig.Decl( "Returns non null" )
+	@TestOrig.Decl( "Returns this Switch instance" )
 	public Switch<T, A, R> addDefault( Function<? super A, ? extends R> handler ) {
 		this.defaultHandler = Assert.nonNull( handler );
 
@@ -114,9 +114,9 @@ public class Switch<T, A, R> {
 	 * @return
 	 * 		The result of the corresponding apply method
 	 */
-	@Test.Decl( "Throws assertion error for null key" )
-	@Test.Decl( "Throws App exception when no handler found" )
-	@Test.Decl( "Throws App exception when handler raises exception" )
+	@TestOrig.Decl( "Throws assertion error for null key" )
+	@TestOrig.Decl( "Throws App exception when no handler found" )
+	@TestOrig.Decl( "Throws App exception when handler raises exception" )
 	public R apply( T key, A arg ) {
 		Assert.nonNull( key );
 		

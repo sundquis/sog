@@ -15,7 +15,7 @@ package sog.util;
  * @see MultiQueue
  * @see PriorityQueue
  */
-@sog.core.Test.Skip
+@sog.core.TestOrig.Skip
 public interface Queue<E> extends AutoCloseable {
 
 	/*

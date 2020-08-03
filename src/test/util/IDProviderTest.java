@@ -13,7 +13,7 @@ import java.io.FileReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 import sog.util.IDProvider;
@@ -33,7 +33,7 @@ public class IDProviderTest implements TestContainer {
 	
 	
 
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "Case sensitive" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Case sensitive" )
 	public void get_CaseSensitive( TestCase tc ) {
 		String[] args = { "hello", "world", "foo", "bar", "hello2", "world2" };
 		for ( String arg : args ) {
@@ -42,7 +42,7 @@ public class IDProviderTest implements TestContainer {
 		}
 	}
 
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "Short names distinct" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Short names distinct" )
 	public void get_ShortNamesDistinct( TestCase tc ) {
 		String lower = "abcdefghijklmnopqrstuvwxyz";
 		String upper = lower.toUpperCase();
@@ -64,19 +64,19 @@ public class IDProviderTest implements TestContainer {
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "Throws assertion error for empty name" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Throws assertion error for empty name" )
 	public void get_ThrowsAssertionErrorForEmptyName( TestCase tc ) {
 		tc.expectError( AssertionError.class );
 		IDProvider.get("");
 	}
 	
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "Long strings have id" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Long strings have id" )
 	public void get_LongStringsHaveId( TestCase tc ) {
 		IDProvider.get( "123456789012345678901234567890123456789012345678901234567890" );
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "No collision dict test" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "No collision dict test" )
 	public void get_NoCollisionDictTest( TestCase tc ) throws Exception {
 		File file = new File( "/usr/share/dict/american-english" );
 		try ( BufferedReader br = new BufferedReader( new FileReader( file ) ) ) {
@@ -93,7 +93,7 @@ public class IDProviderTest implements TestContainer {
 		tc.pass();
 	}
 	
-	@Test.Impl( src = "public int IDProvider.get(String)", desc = "Qualified name stress test" )
+	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Qualified name stress test" )
 	public void get_QualifiedNameStressTest( TestCase tc ) throws Exception {
 		File file = new File( "/usr/share/dict/american-english" );
 		try ( BufferedReader br = new BufferedReader( new FileReader( file ) ) ) {
@@ -129,8 +129,8 @@ public class IDProviderTest implements TestContainer {
 		System.out.println();
 
 		//Test.verbose();
-		new Test(IDProviderTest.class);
-		Test.printResults();
+		new TestOrig(IDProviderTest.class);
+		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

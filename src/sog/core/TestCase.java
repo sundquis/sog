@@ -12,7 +12,7 @@ package sog.core;
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 public interface TestCase {
 
 

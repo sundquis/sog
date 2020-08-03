@@ -8,7 +8,7 @@ package sog.util;
 
 import java.util.LinkedList;
 
-import sog.core.Test;
+import sog.core.TestOrig;
 
 /**
  * Implements the Queue behavior and specifies a FIFO property on elements.
@@ -24,7 +24,7 @@ import sog.core.Test;
  * 		"First in first out"
  * 
  */
-@Test.Decl( "Elements retrieved in FIFO order" )
+@TestOrig.Decl( "Elements retrieved in FIFO order" )
 public class FifoQueue<E> extends AbstractQueue<E> {
 
 
@@ -33,7 +33,7 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	/**
 	 * Constructs an empty FIFO queue. The queue is open and accepting input.
 	 */
-	@Test.Decl( "FifoQueues are created empty" )
+	@TestOrig.Decl( "FifoQueues are created empty" )
 	public FifoQueue() {
 		this.elements = new LinkedList<E>();
 	}
@@ -45,18 +45,18 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 	 *      <tt>true</tt> if the queue contains no elements.
 	 */
 	@Override
-	@Test.Decl( "Put on empty is not empty" )
-	@Test.Decl( "Put on non empty is not empty" )
-	@Test.Decl( "Put then get on empty is empty" )
-	@Test.Decl( "Put then put then get is not empty" )
+	@TestOrig.Decl( "Put on empty is not empty" )
+	@TestOrig.Decl( "Put on non empty is not empty" )
+	@TestOrig.Decl( "Put then get on empty is empty" )
+	@TestOrig.Decl( "Put then put then get is not empty" )
 	public boolean isEmpty() {
 		return this.elements.isEmpty();
 	}
 
 	@Override
-	@Test.Decl( "Put on open is accepted" )
-	@Test.Decl( "Put on closed is ignored" )
-	@Test.Decl( "Put on terminated is ignored" )
+	@TestOrig.Decl( "Put on open is accepted" )
+	@TestOrig.Decl( "Put on closed is ignored" )
+	@TestOrig.Decl( "Put on terminated is ignored" )
 	protected boolean putImpl( E elt ) {
 		this.elements.addLast( elt );
 		return true;
@@ -64,12 +64,12 @@ public class FifoQueue<E> extends AbstractQueue<E> {
 
 
 	@Override
-	@Test.Decl( "Get on open non empty returns non null" )
-	@Test.Decl( "Get on open empty returns null" )
-	@Test.Decl( "Get on closed non empty returns non null" )
-	@Test.Decl( "Get on closed empty returns null" )
-	@Test.Decl( "Get on terminated non empty returns null" )
-	@Test.Decl( "Get on terminated empty returns null" )
+	@TestOrig.Decl( "Get on open non empty returns non null" )
+	@TestOrig.Decl( "Get on open empty returns null" )
+	@TestOrig.Decl( "Get on closed non empty returns non null" )
+	@TestOrig.Decl( "Get on closed empty returns null" )
+	@TestOrig.Decl( "Get on terminated non empty returns null" )
+	@TestOrig.Decl( "Get on terminated empty returns null" )
 	protected E getImpl() {
 		return this.isEmpty() ? null : this.elements.removeFirst();
 	}

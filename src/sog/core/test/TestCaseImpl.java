@@ -14,7 +14,7 @@ import sog.core.Assert;
 import sog.core.Objects;
 import sog.core.Procedure;
 import sog.core.Strings;
-import sog.core.Test;
+import sog.core.TestOrig;
 import sog.core.TestCase;
 import sog.core.TestContainer;
 
@@ -22,11 +22,11 @@ import sog.core.TestContainer;
  * @author sundquis
  *
  */
-@Test.Skip
+@TestOrig.Skip
 public class TestCaseImpl implements TestCase, Runnable, Comparable<TestCaseImpl> {
 	
 	// Meta data for this test case; used to implement Comparable
-	private final Test.Impl impl;
+	private final TestOrig.Impl impl;
 	
 	// Container instance on which to invoke the corresponding method
 	private final TestContainer testContainer;
@@ -35,7 +35,7 @@ public class TestCaseImpl implements TestCase, Runnable, Comparable<TestCaseImpl
 	private final Method method;
 	
 	// The result object for reporting
-	private final CaseResult cr;
+	private final CaseResultOrig cr;
 	
 	// Type of exception expected to be thrown by the method invocation
 	private volatile Class<? extends Throwable> expectedError;
@@ -44,7 +44,7 @@ public class TestCaseImpl implements TestCase, Runnable, Comparable<TestCaseImpl
 	// and after the TestContainer.afterEach procedure
 	private volatile Procedure afterThis;
 	
-	public TestCaseImpl( Test.Impl impl, TestContainer testContainer, Method method, CaseResult cr ) {
+	public TestCaseImpl( TestOrig.Impl impl, TestContainer testContainer, Method method, CaseResultOrig cr ) {
 		this.impl = Assert.nonNull( impl );
 		this.testContainer = Assert.nonNull( testContainer );
 		this.method = Assert.nonNull( method );
