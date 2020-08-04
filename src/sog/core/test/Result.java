@@ -6,6 +6,7 @@
  */
 package sog.core.test;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +49,10 @@ public abstract class Result implements Printable {
 		this.failCases = 0;
 	}
 	
+	protected abstract void init();
+	
 	protected void addChild( Result child ) {
+		child.init();
 		this.children.add( Assert.nonNull( child ) );
 	}
 	
@@ -101,6 +105,10 @@ public abstract class Result implements Printable {
 		out.increaseIndent();
 		this.children.stream().forEach( (c) -> c.print( out ) );
 		out.decreaseIndent();
+	}
+	
+	public void print() {
+		this.print( new IndentWriter( System.out ) );
 	}
 
 	private void setStats() {

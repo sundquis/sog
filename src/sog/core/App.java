@@ -8,6 +8,7 @@
 package sog.core;
 
 
+import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -177,14 +178,43 @@ public class App implements Runnable {
 	 * @param offset, the position on the calling stack. The call to getLocation has offset 0
 	 * @return (fileName:lineNo) link to calling location
 	 */
-	public String getLocation( int offset ) {
-		Exception e = new Exception();
-		StackTraceElement[] stes = e.getStackTrace();
-		Assert.isTrue( stes.length > offset );
-		StackTraceElement ste = stes[offset];
-		String fileName = ste.getFileName();
-		int lineNo = ste.getLineNumber();
-		return fileName == null ? "(unknown)" : "(" + fileName + ":" + lineNo + ")";
+	public String getFileLocation( int offset ) {
+		return this.getFileLocation( offset,  1 );
+	}
+	
+	public String getFileLocation( int offset, int count ) {
+		return StackWalker.getInstance().walk( s -> s
+			.skip( offset )
+			.limit( count )
+			.map( sf -> "(" + sf.getFileName() + ":" + sf.getLineNumber() + ")" )
+			.collect( Collectors.joining(", ") )
+		);
+	}
+
+	public Class<?> getCallingClass( int offset ) {
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
+			s -> s.skip(offset).findFirst().get()
+		).getDeclaringClass();
+	}
+	
+	
+	
+	// FIXME: Convert to proper testing
+	public static class Inner {
+		public static void a() {
+			System.out.println( App.get().getCallingClass(0));
+			System.out.println( App.get().getCallingClass(1));
+			System.out.println( App.get().getCallingClass(2));
+			System.out.println( App.get().getCallingClass(3));
+		}
+	}
+	
+	public static class Other {
+		public static void a() { Inner.a(); }
+	}
+	
+	public static void main( String[] args ) {
+		Other.a();
 	}
 
 	

@@ -93,6 +93,13 @@ public @interface Test {
 		int weight() default 1;
 		
 	}
-
+	
+	
+	public interface Foo {
+		default public void run() {
+		}
+	}
+	
+	
 
 }

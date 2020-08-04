@@ -9,7 +9,6 @@ package sog.util;
 
 
 
-import java.io.Closeable;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayDeque;
@@ -23,7 +22,7 @@ import sog.core.TestOrig;
  * @author sundquis
  *
  */
-public class IndentWriter implements Closeable {
+public class IndentWriter {
 
 	private final PrintWriter out;
 	private final String indent;

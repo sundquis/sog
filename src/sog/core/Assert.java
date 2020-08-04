@@ -126,6 +126,14 @@ public class Assert {
 		}
 		return predicate;
 	}
+	
+	public static <T> T equal( T arg1, Object arg2 ) {
+		if ( ! Objects.equals( arg1,  arg2 ) ) {
+			Assert.fail();
+		}
+
+		return arg1;
+	}
 
 	
 	private static void fail() {

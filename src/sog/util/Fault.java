@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Strings;
 import sog.core.TestOrig;
@@ -85,7 +86,7 @@ public class Fault implements Printable {
 	 * Similar to throwing an exception but "gentler". Useful in compilation-style
 	 * processes where it's useful to gather as much feedback as possible.
 	 */
-	@TestOrig.Decl( "Fault is deleiverd to listeners" )
+	@TestOrig.Decl( "Fault is delivered to listeners" )
 	public void toss() {
 		Fault.listeners.stream().forEach( l -> l.accept(this) );
 	}
@@ -101,7 +102,6 @@ public class Fault implements Printable {
 	@TestOrig.Decl( "Source is appended to previous sources" )
 	@TestOrig.Decl( "Returns this" )
 	public Fault addSource( String source ) {			
-
 		this.sources.add( source );
 		return this;
 	}
@@ -144,20 +144,13 @@ public class Fault implements Printable {
 		out.println("");
 	}
 
-	
-	// Overlap with TestContainer.location()
-	// Consider implementing a service from App
+
+	// 0: StackWalker.getInstance
+	// 1: App.getFileLocation
+	// 2: Fault.getFileLocation
+	// 3: Originating source
 	private String getFaultLocation() {
-		Exception e = new Exception();
-		StackTraceElement[] stes = e.getStackTrace();
-		// 0: getLocation
-		// 1: <init> from new Fault(...)
-		// 2: caller location
-		Assert.isTrue( stes.length > 2 );
-		StackTraceElement ste = stes[2];
-		String fileName = ste.getFileName();
-		int lineNo = ste.getLineNumber();
-		return fileName == null ? "(unknown)" : "(" + fileName + ":" + lineNo + ")";
+		return App.get().getFileLocation( 3, 3 );
 	}
 	
 	

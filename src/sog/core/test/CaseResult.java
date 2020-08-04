@@ -6,15 +6,28 @@
  */
 package sog.core.test;
 
+import java.lang.reflect.Method;
+
 import sog.core.Assert;
 
 /**
  * 
  */
 public class CaseResult extends Result {
+	
+	private final Container container;
+	private final Method method;
 
-	public CaseResult( String description ) {
+	public CaseResult( String description, Container container, Method method ) {
 		super( Assert.nonNull( description ) );
+		
+		this.container = container;
+		this.method = method;
+	}
+	
+	public void init() {
+		// execute
+System.out.println( ">>> Executing: " + method );
 	}
 
 }
