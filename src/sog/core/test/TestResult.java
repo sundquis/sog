@@ -7,52 +7,47 @@
 package sog.core.test;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
-import java.util.function.Consumer;
 
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.Fault;
-import sog.util.IndentWriter;
 
 /**
  * 
  */
-public class TestResult extends Result implements Consumer<Fault> {
+public class TestResult extends Result {
 	
-	private final IndentWriter err;
+	private final Collection<Class<?>> subjectClasses;
 	
 	/**
 	 * Empty set of classes.
 	 */
-	public TestResult() {
+	public TestResult( Collection<Class<?>> subjectClasses ) {
 		super( "TESTS: " + new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
+		Assert.nonNull( subjectClasses );
 		
-		this.err = new IndentWriter( System.err );
-		Fault.addListener( this );
+		this.subjectClasses = subjectClasses;
 	}
 	
 	
 	@Override
-	public void init() {}
+	public void load() {
+		this.subjectClasses.forEach( this::addSubject );
+	}
 	
 	
 	public void addSubject( Class<?> subjectClass ) {
 		Assert.nonNull( subjectClass );
 		
-		if ( Container.class.isAssignableFrom( subjectClass ) ) {
-			new Fault( "Ignoring container class", subjectClass ).toss();
-			return;
+		Container container = Validate.getContainer( subjectClass );
+		if ( container != null ) {
+			this.addChild( new ClassResult( subjectClass, container ) );
 		}
-		this.addChild( new ClassResult( subjectClass ) );
 	}
 
 		
-	@Override
-	public void accept( Fault fault ) {
-		fault.print( err );
-	}
-
 
 
 	
@@ -70,7 +65,6 @@ public class TestResult extends Result implements Consumer<Fault> {
 	public void bar() {}
 	public String label;
 	
-	@Test.Skip
 	public class Inner {
 		public void bar() {}
 		protected int ft;
@@ -90,11 +84,9 @@ public class TestResult extends Result implements Consumer<Fault> {
 	public static void main( String[] args ) {
 		System.out.println( ">>> Hello world!" );
 		
-		TestResult res = new TestResult( );
-		res.addSubject( TestResult.class );
-		res.addSubject( Container.class );
+		TestResult res = new TestResult( Arrays.asList( TestResult.class, Container.class ) );
 		res.print();
-
+		
 		System.out.println( ">>> Done!" );
 	}
 

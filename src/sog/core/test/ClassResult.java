@@ -23,82 +23,31 @@ import sog.util.Fault;
 public class ClassResult extends Result {
 	
 	private final Class<?> subjectClass;
-	private final Test.Skip skip;
 	private Container container;
 	private Map<String, Map<String, Method>> containerMethods;
 	
 	/**
 	 * @param subjectClass
 	 */
-	public ClassResult( Class<?> subjectClass ) {
+	public ClassResult( Class<?> subjectClass, Container container ) {
 		super( Assert.nonNull( subjectClass ).getSimpleName() );
+		this.container = Assert.nonNull( container );
 		
 		this.subjectClass = subjectClass;
-		this.skip = subjectClass.getDeclaredAnnotation( Test.Skip.class );
-		this.container = null;
 		this.containerMethods = null;
 	}
 	
-	public void init() {
-		this.getContainer();
-		this.loadContainer();
-		this.scan( this.subjectClass );
-		this.warnOrphans();
+	
+	public void load() {
+		//this.loadContainer();
+		//this.scan( this.subjectClass );
+		//this.warnOrphans();
 	}
 	
 	
-	/**
-	 * If {@code this.subjectClass} represents a {@code Container} then a Fault is generated.
-	 * 
-	 * Otherwise, a set of well-known locations is examined for a container class.
-	 * 
-	 * 1. A public static inner class of {@code this.subjectClass} implementing Container.
-	 * 2. A class in the "parallel" package obtained by replacing the root package name-element with "test".
-	 * 
-	 * If a legal {@code Container} instance cannot be created a Fault is generated.
-	 */
-	private void getContainer() {
-		Class<?> containerClass = null;
-		
-		containerClass = Arrays.stream( this.subjectClass.getDeclaredClasses() )
-			.filter( c -> Container.class.isAssignableFrom( c ) )
-			.findFirst()
-			.orElse( null );
-		
-		if( containerClass == null ) {
-			String[] comps = this.subjectClass.getName().split( "\\." );
-			comps[0] = "test";
-			try {
-				containerClass = Class.forName( String.join( ".",  comps ) );
-			} catch ( ClassNotFoundException e ) {
-			}
-		}
-		
-		if ( containerClass == null ) {
-			new Fault( "No container for subject", this.subjectClass ).toss();
-			return;
-		}
-		
-		try {
-			this.container = (Container) containerClass.getDeclaredConstructor().newInstance();
-		} catch ( Exception e ) {
-			new Fault( "Unable to construct Container", e ).toss();
-			return;
-		}
-		
-		if ( !this.subjectClass.equals( this.container.subjectClass() ) ) {
-			new Fault( "Bad container", 
-				"this.subject = ", this.subjectClass, 
-				"container.subject = ", this.container.subjectClass() ).toss();
-			return;
-		}
-		
-	}
 	
 	
 	private void loadContainer() {
-		if ( this.container == null ) { return; }
-		
 		Function<Method, String> key1 = m -> m.getDeclaredAnnotation( Test.Impl.class ).member();
 		Function<Method, String> key2 = m -> m.getDeclaredAnnotation( Test.Impl.class ).description();
 		this.containerMethods = Arrays.stream( this.container.getClass().getDeclaredMethods() )

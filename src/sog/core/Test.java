@@ -16,14 +16,18 @@ import java.lang.annotation.Target;
 /**
  * Annotation types used by the testing framework.
  */
-@Test.Skip
 public @interface Test {
+	
+	@Retention( RetentionPolicy.RUNTIME )
+	@Target( ElementType.TYPE )
+	public @interface Container {
+		Class<? extends sog.core.test.Container> clazz();
+	}
 	
 	/**
 	 * Annotate class elements (containing class, member class, constructor, field, method)
 	 * with {@code Test.Case} to declare a test case pertaining to the element.
 	 */
-	@Test.Skip
 	@Repeatable( Test.Cases.class )
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
@@ -42,7 +46,6 @@ public @interface Test {
 	/**
 	 * Container for repeated {@code Test.Case} annotations.
 	 */
-	@Test.Skip
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
 	public @interface Cases {
@@ -57,7 +60,6 @@ public @interface Test {
 	 * 
 	 * The optional string {@code value} can be used to describe alternate testing
 	 */
-	@Test.Skip
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
 	public @interface Skip {
@@ -72,7 +74,6 @@ public @interface Test {
 	 * 
 	 * The optional numeric fields may be included to adjust features of the test.
 	 */
-	@Test.Skip
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( ElementType.METHOD )
 	public @interface Impl {
@@ -93,13 +94,6 @@ public @interface Test {
 		int weight() default 1;
 		
 	}
-	
-	
-	public interface Foo {
-		default public void run() {
-		}
-	}
-	
 	
 
 }

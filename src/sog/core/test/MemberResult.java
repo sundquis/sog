@@ -37,6 +37,7 @@ public class MemberResult extends Result {
 	
 	private void add( Test.Case tc ) {
 		String description = tc.value();
+		if ( this.methods == null ) { return; }
 		Method method = this.methods.remove( description );
 		if ( method == null ) {
 			new Fault( "No implementation for declared test case", this.member, description ).toss();
@@ -45,7 +46,7 @@ public class MemberResult extends Result {
 		this.addChild( new CaseResult( description, this.container, method ));
 	}
 	
-	public void init() {
+	public void load() {
 		Arrays.stream( member.getDeclaredAnnotationsByType( Test.Case.class ) ).forEach( this::add );
 		this.warnOrphans();
 	}

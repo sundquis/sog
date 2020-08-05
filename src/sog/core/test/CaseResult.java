@@ -25,7 +25,7 @@ public class CaseResult extends Result {
 		this.method = method;
 	}
 	
-	public void init() {
+	public void load() {
 		// execute
 System.out.println( ">>> Executing: " + method );
 	}
