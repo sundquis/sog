@@ -8,7 +8,6 @@ package sog.core.test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.function.Consumer;
 
 import sog.core.Assert;
 import sog.core.Test;
@@ -18,7 +17,7 @@ import sog.util.IndentWriter;
 /**
  * 
  */
-public class TestResult extends Result implements Consumer<Fault> {
+public class TestResult extends Result {
 	
 	private final IndentWriter err;
 	
@@ -29,7 +28,7 @@ public class TestResult extends Result implements Consumer<Fault> {
 		super( "TESTS: " + new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
 		
 		this.err = new IndentWriter( System.err );
-		Fault.addListener( this );
+		Fault.addListener( f -> f.print( this.err ) );
 	}
 	
 	
@@ -48,11 +47,6 @@ public class TestResult extends Result implements Consumer<Fault> {
 	}
 
 		
-	@Override
-	public void accept( Fault fault ) {
-		fault.print( err );
-	}
-
 
 
 	
@@ -70,7 +64,6 @@ public class TestResult extends Result implements Consumer<Fault> {
 	public void bar() {}
 	public String label;
 	
-	@Test.Skip
 	public class Inner {
 		public void bar() {}
 		protected int ft;

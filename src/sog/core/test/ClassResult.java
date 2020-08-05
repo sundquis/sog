@@ -39,8 +39,18 @@ public class ClassResult extends Result {
 		this.containerMethods = null;
 	}
 	
+	
 	public void init() {
+		if ( this.skip != null ) {
+			new Fault( "Skipping:", this.subjectClass, this.skip.value() ).toss();
+			return;
+		}
+
 		this.getContainer();
+		if ( this.container == null ) {
+			return;
+		}
+		
 		this.loadContainer();
 		this.scan( this.subjectClass );
 		this.warnOrphans();
@@ -71,18 +81,16 @@ public class ClassResult extends Result {
 			try {
 				containerClass = Class.forName( String.join( ".",  comps ) );
 			} catch ( ClassNotFoundException e ) {
+				new Fault( "No container for subject", this.subjectClass ).toss();
+				return;
 			}
-		}
-		
-		if ( containerClass == null ) {
-			new Fault( "No container for subject", this.subjectClass ).toss();
-			return;
 		}
 		
 		try {
 			this.container = (Container) containerClass.getDeclaredConstructor().newInstance();
 		} catch ( Exception e ) {
 			new Fault( "Unable to construct Container", e ).toss();
+			this.container = null;
 			return;
 		}
 		
@@ -90,6 +98,7 @@ public class ClassResult extends Result {
 			new Fault( "Bad container", 
 				"this.subject = ", this.subjectClass, 
 				"container.subject = ", this.container.subjectClass() ).toss();
+			this.container = null;
 			return;
 		}
 		
@@ -97,8 +106,6 @@ public class ClassResult extends Result {
 	
 	
 	private void loadContainer() {
-		if ( this.container == null ) { return; }
-		
 		Function<Method, String> key1 = m -> m.getDeclaredAnnotation( Test.Impl.class ).member();
 		Function<Method, String> key2 = m -> m.getDeclaredAnnotation( Test.Impl.class ).description();
 		this.containerMethods = Arrays.stream( this.container.getClass().getDeclaredMethods() )

@@ -92,8 +92,9 @@ public abstract class Result implements Printable {
 		int unx = tot - pass - fail;
 		double success = (double) 100 * pass / (tot == 0 ? 1 : tot);
 		double seconds = (double) this.time / 1000.0;
-		return String.format( "[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d]: %s", success, seconds, tot, pass, fail, unx, this.label );
-		//return String.format( "[%s] Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d, U = %d)", this.label, success, seconds, tot, pass, fail, unx );
+		return String.format( 
+			"[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d]: %s", 
+			success, seconds, tot, pass, fail, unx, this.label );
 	}
 	
 	@Override
