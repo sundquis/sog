@@ -52,39 +52,11 @@ public class TestResult extends Result {
 
 	
 	
-	// FIXME: Convert to proper testing
-	@Test.Case( "1" )
-	@Test.Case( "2" )
-	@Test.Case( "3" )
-	public static void fooStatic() {}
-	public static int fooIntStatic() { return 42; }
-	
-	@Test.Case( "1" )
-	public static int fooIntStatic(int x) { return x; }
-	
-	public void bar() {}
-	public String label;
-	
-	public class Inner {
-		public void bar() {}
-		protected int ft;
-	}
-	
-	public static class MyContainer extends Container {
-
-		public Class<?> subjectClass() {
-			return TestResult.class;
-		}
-		
-		@Test.Impl( description = "The description", member = "Made_up_member_name" )
-		public void foo() {}
-		
-	}
-	
 	public static void main( String[] args ) {
 		System.out.println( ">>> Hello world!" );
 		
-		TestResult res = new TestResult( Arrays.asList( TestResult.class, Container.class ) );
+		TestResult res = new TestResult( Arrays.asList( TestResult.class ) );
+		res.load();
 		res.print();
 		
 		System.out.println( ">>> Done!" );

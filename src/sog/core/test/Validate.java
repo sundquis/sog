@@ -58,7 +58,7 @@ public class Validate {
 	 */
 	public static Container getContainer( Class<?> subjectClass ) {
 		Assert.nonNull( subjectClass );
-		
+
 		if ( subjectClass.getEnclosingClass() != null ) {
 			Validate.err( "Subject must be a top-level class", subjectClass.getName() );
 			return null;
@@ -88,6 +88,7 @@ public class Validate {
 			return null;
 		}
 
+		// ELSE: container != null && skip == null
 		Container result = null;
 		try {
 			result = (Container) container.clazz().getDeclaredConstructor().newInstance();
