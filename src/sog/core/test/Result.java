@@ -76,7 +76,7 @@ public abstract class Result implements Printable {
 	@Override public String toString() {
 		return this.label;
 	}
-	
+		
 	@Override
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out );
