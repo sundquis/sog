@@ -17,10 +17,10 @@ import sog.core.Test;
 /**
  * 
  */
+@Test.Container( "test.core.test.TestResultx" )
 public class TestResult extends Result {
 	
-	private final Collection<Class<?>> subjectClasses;
-	
+
 	/**
 	 * Empty set of classes.
 	 */
@@ -28,14 +28,9 @@ public class TestResult extends Result {
 		super( "TESTS: " + new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
 		Assert.nonNull( subjectClasses );
 		
-		this.subjectClasses = subjectClasses;
+		subjectClasses.forEach( this::addSubject );
 	}
 	
-	
-	@Override
-	public void load() {
-		this.subjectClasses.forEach( this::addSubject );
-	}
 	
 	
 	public void addSubject( Class<?> subjectClass ) {
@@ -45,6 +40,11 @@ public class TestResult extends Result {
 		if ( container != null ) {
 			this.addChild( new ClassResult( subjectClass, container ) );
 		}
+	}
+	
+	
+	public void messages() {
+		Validate.print();
 	}
 
 		
@@ -56,8 +56,8 @@ public class TestResult extends Result {
 		System.out.println( ">>> Hello world!" );
 		
 		TestResult res = new TestResult( Arrays.asList( TestResult.class ) );
-		res.load();
 		res.print();
+		res.messages();
 		
 		System.out.println( ">>> Done!" );
 	}

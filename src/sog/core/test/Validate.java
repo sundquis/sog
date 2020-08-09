@@ -7,44 +7,75 @@
 package sog.core.test;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.IndentWriter;
 
 /**
  * 
  */
 public class Validate {
+	
+	private static final List<String> errMessages = new LinkedList<String>();
+	
+	private static final List<String> warnMessages = new LinkedList<String>();
 
-	private static final IndentWriter err = new IndentWriter( System.err );
 	
-	private static final IndentWriter warn = new IndentWriter( System.out );
+	public static void printErrors() {
+		Validate.errMessages.forEach( System.err::println );
+	}
 	
 	
-	public static void err( String description, String... details) {
+	public static void printWarnings() {
+		Validate.warnMessages.forEach( System.out::println );
+	}
+	
+	
+	public static void print() {
+		Validate.printErrors();
+		Validate.printWarnings();
+	}
+
+	
+	public static void err( String description, String... details ) {
 		Assert.nonEmpty( description );
 		
-		// FIXME Capture frame data
+		Validate.errMessages.add( "" );
+		Validate.errMessages.add( "ERROR: " + description );
 		
-		Validate.err.println( description );
+		Validate.errMessages.add( "    Location: " );
+		App.get().getFrames( "sog",  10 ).stream()
+			.map( f -> "        (" + f.getFileName() + ":" + f.getLineNumber() + ")" )
+			.forEach( Validate.errMessages::add );
 		
-		Validate.err.increaseIndent();
-		Arrays.stream( details ).forEach( Validate.err::println );
-		Validate.err.decreaseIndent();
+		Validate.errMessages.add( "    Details:" );
+		Arrays.stream( details ).forEach( s -> Validate.errMessages.add( "        " + s ) );
+		Validate.errMessages.add( "" );
 	}
+	
 	
 	
 	public static void warn( String description, String... details) {
 		Assert.nonEmpty( description );
 		
-		// FIXME Capture frame data and save messages to print later
+		Validate.warnMessages.add( "" );
+		Validate.warnMessages.add( "WARNING: " + description );
 		
-		Validate.warn.println( description );
+		Exception e = new Exception();
+		Validate.warnMessages.add( "    Location: " );
+		Function<StackTraceElement, String> location = 
+			ste -> { return "        (" + ste.getFileName() + ":" + ste.getLineNumber() + ")"; };
+		Consumer<StackTraceElement> write = ste -> { Validate.warnMessages.add( location.apply(ste) ); };
+		Arrays.stream( e.getStackTrace() ).limit( 5 ).forEach( write );
 		
-		Validate.warn.increaseIndent();
-		Arrays.stream( details ).forEach( Validate.warn::println );
-		Validate.warn.decreaseIndent();
+		Validate.warnMessages.add( "    Details:" );
+		Arrays.stream( details ).forEach( s -> Validate.warnMessages.add( "        " + s ) );
+		Validate.warnMessages.add( "" );
 	}
 
 	
@@ -74,7 +105,7 @@ public class Validate {
 		
 		if ( container != null && skip != null ) {
 			Validate.err( "Inconsistent meta-data", "Subject = " + subjectClass.getName(),
-				"Container class = " + container.clazz().getName(), "Skip = " + skip.value() );
+				"Container class = " + container.value(), "Skip = " + skip.value() );
 			return null;
 		}
 		
@@ -91,9 +122,10 @@ public class Validate {
 		// ELSE: container != null && skip == null
 		Container result = null;
 		try {
-			result = (Container) container.clazz().getDeclaredConstructor().newInstance();
+			Class<?> clazz = Class.forName( container.value() );
+			result = (Container) clazz.getDeclaredConstructor().newInstance();
 		} catch ( Exception e ) {
-			Validate.err( "Unable to construct Container", container.clazz().getName(), e.getMessage() );
+			Validate.err( "Unable to construct Container", e.toString(), container.value() );
 			return null;
 		}
 		

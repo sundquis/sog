@@ -190,6 +190,14 @@ public class App implements Runnable {
 			.collect( Collectors.joining(", ") )
 		);
 	}
+	
+	public List<StackWalker.StackFrame> getFrames( String fullClassNameStartsWith, int limit ) {
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
+			.filter( f -> f.getClassName().startsWith( fullClassNameStartsWith ) )
+			.limit( limit )
+			.collect( Collectors.toList() )
+		);
+	}
 
 	public Class<?> getCallingClass( int offset ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(

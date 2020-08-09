@@ -17,11 +17,17 @@ import java.lang.annotation.Target;
  * Annotation types used by the testing framework.
  */
 public @interface Test {
-	
+
+	/**
+	 * Subject classes register a container that holds test methods
+	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( ElementType.TYPE )
 	public @interface Container {
-		Class<? extends sog.core.test.Container> clazz();
+		/**
+		 * Name of the test container class
+		 */
+		String value();
 	}
 	
 	/**

@@ -6,12 +6,10 @@
  */
 package sog.core.test;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
 import java.util.List;
 
 import sog.core.Assert;
-import sog.core.Test;
 import sog.util.IndentWriter;
 import sog.util.Printable;
 
@@ -47,13 +45,8 @@ public abstract class Result implements Printable {
 		this.failCases = 0;
 	}
 	
-	// Find, construct, and add children
-	protected abstract void load();
-	
 	protected void addChild( Result child ) {
 		Assert.nonNull( child );
-		
-		child.load();
 		
 		this.time += child.time;
 		this.totalCases += child.totalCases;
