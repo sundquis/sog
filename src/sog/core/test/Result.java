@@ -24,11 +24,9 @@ public abstract class Result implements Printable {
 	
 	private volatile long time;
 	
-	private volatile int totalCases;
+	private volatile int passCount;
 	
-	private volatile int passCases;
-	
-	private volatile int failCases;
+	private volatile int failCount;
 
 	/**
 	 * Base result construction. Must supply a text label for the type of result.
@@ -40,36 +38,46 @@ public abstract class Result implements Printable {
 		this.children = new ArrayList<Result>();
 		
 		this.time = 0L;
-		this.totalCases = 0;
-		this.passCases = 0;
-		this.failCases = 0;
+		this.passCount = 0;
+		this.failCount = 0;
 	}
 	
 	// Find and construct valid children, call addChild for each
 	protected abstract void load();
 	
 	
+	protected long getTime() {
+		return this.time;
+	}
+	
+	protected int getPassCount() {
+		return this.passCount;
+	}
+	
+	protected int getFailCount() {
+		return this.failCount;
+	}
+	
 	protected void addChild( Result child ) {
 		Assert.nonNull( child );
 		
 		child.load();
 		
-		this.time += child.time;
-		this.totalCases += child.totalCases;
-		this.passCases += child.passCases;
-		this.failCases += child.failCases;
+		this.time += child.getTime();
+		this.passCount += child.getPassCount();
+		this.failCount += child.getFailCount();
 		
 		this.children.add( child );
 	}
 	
 
 	public String getStats() {
-		int unx = this.totalCases - this.passCases - this.failCases;
-		double success = (double) 100 * this.passCases / (this.totalCases == 0 ? 1 : this.totalCases);
+		int totalCount = this.passCount + this.failCount;
+		double success = (double) 100 * this.passCount / (totalCount == 0 ? 1 : totalCount);
 		double seconds = (double) this.time / 1000.0;
 		return String.format( 
-			"[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d] ", 
-			success, seconds, this.totalCases, this.passCases, this.failCases, unx );
+			"[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d] ", 
+			success, seconds, totalCount, this.passCount, this.failCount );
 	}
 	
 	@Override public String toString() {

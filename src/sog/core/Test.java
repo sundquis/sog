@@ -14,9 +14,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation types used by the testing framework.
  */
-public @interface Test {
+public interface Test {
 
 	/**
 	 * Subject classes register a container that holds test methods
@@ -93,13 +92,125 @@ public @interface Test {
 		/** CURRENTLY NOT USED */
 		long timeout() default 0L;
 		
-		/** Used to control the order of execution of test methods */
-		int priority() default 0;
-		
 		/** Used to scale the relative importance of the test case */
 		int weight() default 1;
 		
 	}
+	
+	
+	
+	
+	/**
+	 * Only displayed for non-passing cases
+	 * 
+	 * @param message
+	 * 		Failure message
+	 * @return
+	 * 		this Test
+	 */
+	public Test addMessage( String message );
+
+
+	/**
+	 * Type of Throwable that subsequent code is expected to throw
+	 * 
+	 * @param expectedError
+	 * 		Throwable type
+	 * @return
+	 * 		this Test
+	 */
+	public Test expectError( Class<? extends Throwable> expectedError );
+
+
+	/**
+	 * Procedure to call after the current method (in a Container) completes
+	 * Will be called even if the method throws an exception.
+	 * 
+	 * @param callAfter
+	 * @return
+	 * 		this Test
+	 */
+	public Test afterThis( Procedure callAfter );
+
+	
+	/**
+	 * Mark the current case as successful.
+	 * 
+	 * @return
+	 * 		this Test
+	 */
+	public Test pass();
+
+
+	/**
+	 * Mark the current case as failed.
+	 * 
+	 * @return
+	 * 		this Test
+	 */
+	public Test fail();
+	
+
+	/**
+	 * Assert that the given object is not null.
+	 * 
+	 * @param obj
+	 * @return
+	 * 		this Test
+	 */
+	public Test notNull( Object obj );
+	
+	/**
+	 * Assert that the given string is non-null and not empty
+	 * 
+	 * @param s
+	 * @return
+	 * 		this Test
+	 */
+	public Test notEmpty( String s );
+	
+	
+	/**
+	 * Assert that the given object is not null.
+	 * 
+	 * @param obj
+	 * @return
+	 * 		this Test
+	 */
+	public Test isNull( Object obj );
+	
+	
+	/**
+	 * Conditionally mark the case as passed/failed.
+	 *  
+	 * @param passIfTrue
+	 * @return
+	 * 		this Test
+	 */
+	public Test assertTrue( boolean passIfTrue );
+	
+	
+	/**
+	 * Conditionally mark the case as passed/failed.
+	 *  
+	 * @param passIfFalse
+	 * @return
+	 * 		this Test
+	 */
+	public Test assertFalse( boolean passIfFalse);
+	
+	
+	/**
+	 * Test for equality using Object.equals().
+	 * If T is a compound type (array or collection) then the components are shallowly tested.
+	 * 
+	 * @param expected
+	 * @param actual
+	 * @return
+	 * 		this Test
+	 */
+	public <T> Test assertEqual( T expected, T actual );
+	
 	
 
 }

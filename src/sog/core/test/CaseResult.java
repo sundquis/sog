@@ -9,26 +9,31 @@ package sog.core.test;
 import java.lang.reflect.Method;
 
 import sog.core.Assert;
+import sog.core.Test;
 
 /**
  * 
  */
 public class CaseResult extends Result {
 	
+	private final Test.Case tc;
 	private final Container container;
 	private final Method method;
+	
+	private boolean pass = true;
+	private long time = 0L;
 
-	public CaseResult( String description, Container container, Method method ) {
-		super( Assert.nonEmpty( description ) );
+	public CaseResult( Test.Case tc, Container container, Method method ) {
+		super( Assert.nonEmpty( tc.value() ) );
 		
-		this.container = container;
+		this.tc = tc;
+		this.container = Assert.nonNull( container );
 		this.method = method;
 	}
 
 	@Override
 	protected void load() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	

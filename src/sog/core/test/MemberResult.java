@@ -6,14 +6,12 @@
  */
 package sog.core.test;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.Fault;
 
 /**
  * 
@@ -33,23 +31,18 @@ public class MemberResult extends Result {
 	}
 	
 	public void load() {
-		//Arrays.stream( member.getDeclaredAnnotationsByType( Test.Case.class ) ).forEach( this::add );
+		Arrays.stream( this.cases ).forEach( this::add );
 		this.warnOrphans();
 	}
 
 	private void add( Test.Case tc ) {
-		String description = tc.value();
-		if ( this.methods == null ) { return; }
-		Method method = this.methods.remove( description );
-		if ( method == null ) {
-			//new Fault( "No implementation for declared test case", this.member, description ).toss();
-		}
+		Method method = this.methods == null ? null : this.methods.remove( tc.value() );
 		
-		this.addChild( new CaseResult( description, this.container, method ));
+		this.addChild( new CaseResult( tc, this.container, method ));
 	}
 	
 	private void warnOrphan( String description ) {
-		//new Fault( "Orphaned test implementation", this.member, description ).toss();
+		Msg.error( "Orphaned test implementation", "Container = " + this.container.getClass().getName(), "Description = " + description  );
 	}
 	
 	private void warnOrphans() {
