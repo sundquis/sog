@@ -12,10 +12,13 @@ import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import sog.util.FixedWidth;
 
 /**
  * @author sundquis
@@ -114,7 +117,7 @@ public class App implements Runnable {
 			.findAny()
 			.orElseGet( () -> { Fatal.error( "No source directory for " + clazz ); return null; } );
 	}
-	
+		
 	@TestOrig.Decl( "Throws assertion error for null class" )
 	@TestOrig.Decl( "Throws App Excetion for missing source file" )
 	@TestOrig.Decl( "Returns non null" )
@@ -170,34 +173,75 @@ public class App implements Runnable {
 			}
 		}
 	}
+	
+	// FIXME: Test
+	public static class Location {
+		
+		public static String get( StackWalker.StackFrame sf ) {
+			return new Location( sf ) .toString();
+		}
+		
+		public static String get( StackTraceElement ste ) {
+			return new Location( ste ) .toString();
+		}
+				
+		private final String className;
+		private final String methodName;
+		private final String fileName;
+		private final int lineNo;
+		
+		private Location( StackWalker.StackFrame sf ) {
+			Assert.nonNull( sf );
+			
+			this.className = sf.getClassName();
+			this.methodName = sf.getMethodName();
+			this.fileName = sf.getFileName();
+			this.lineNo = sf.getLineNumber();
+		}
+		
+		private Location( StackTraceElement ste ) {
+			Assert.nonNull( ste );
+			
+			this.className = ste.getClassName();
+			this.methodName = ste.getMethodName();
+			this.fileName = ste.getFileName();
+			this.lineNo = ste.getLineNumber();
+		}
+		
+		@Override
+		public String toString() {
+			String[] comps = this.className.split("\\.");
+			comps[comps.length-1] = ".";
+			return String.join(".",  comps) + "(" + this.fileName + ":" + this.lineNo + ") in " + this.methodName;
+		}
+	}
 
+	// FIXME: Document
 	/**
 	 * Return a file name and line number pointer to the calling location of an executing program.
 	 * If the calling stack does not have the requested depth, an AppException is thrown.
-	 * 
-	 * @param offset, the position on the calling stack. The call to getLocation has offset 0
-	 * @return (fileName:lineNo) link to calling location
 	 */
-	public String getFileLocation( int offset ) {
-		return this.getFileLocation( offset,  1 );
-	}
-	
-	public String getFileLocation( int offset, int count ) {
-		return StackWalker.getInstance().walk( s -> s
-			.skip( offset )
-			.limit( count )
-			.map( sf -> "(" + sf.getFileName() + ":" + sf.getLineNumber() + ")" )
-			.collect( Collectors.joining(", ") )
-		);
-	}
-	
-	public List<StackWalker.StackFrame> getFrames( String fullClassNameStartsWith, int limit ) {
+	public List<String> getLocation() {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
-			.filter( f -> f.getClassName().startsWith( fullClassNameStartsWith ) )
-			.limit( limit )
+			.map( Location::get )
 			.collect( Collectors.toList() )
 		);
 	}
+	
+	public List<String> getLocation( String prefix ) {
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
+			.filter( sf -> sf.getClassName().startsWith( prefix ) )
+			.map( Location::get )
+			.collect( Collectors.toList() )
+		);
+	}
+	
+	public List<String> getLocation( Throwable th ) {
+		return Arrays.stream( th.getStackTrace() )
+			.map( Location::get )
+			.collect( Collectors.toList() );
+	}
+	
 
 	public Class<?> getCallingClass( int offset ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(

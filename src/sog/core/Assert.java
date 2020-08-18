@@ -36,6 +36,13 @@ public class Assert {
 		return obj;
 	}
 	
+	public static <T> T[] nonEmpty( T[] array ) {
+		if ( array == null || array.length == 0 ) {
+			Assert.fail();
+		}
+		return array;
+	}
+	
 	public static String nonEmpty( String s ) {
 		if ( s == null || s.isEmpty() ) {
 			Assert.fail();

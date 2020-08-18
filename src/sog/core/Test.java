@@ -36,7 +36,7 @@ public @interface Test {
 	 */
 	@Repeatable( Test.Cases.class )
 	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
+	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
 	public @interface Case {
 		/**
 		 * A description of the test. 
@@ -53,7 +53,7 @@ public @interface Test {
 	 * Container for repeated {@code Test.Case} annotations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
+	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
 	public @interface Cases {
 		Case[] value();
 	}

@@ -7,6 +7,9 @@
 package sog.core.test;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -15,55 +18,59 @@ import java.util.stream.Collectors;
 
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.Fault;
+import sog.util.Protection;
 
 /**
  * 
  */
-public class ClassResult extends Result {
+public class ClassResult extends Result implements Protection {
 	
 	private final Class<?> subjectClass;
-	private Container container;
-	private Map<String, Map<String, Method>> containerMethods;
+	private final Container container;
+	private final Map<String, Map<String, Method>> containerMethods;
 	
 	/**
 	 * @param subjectClass
 	 */
 	public ClassResult( Class<?> subjectClass, Container container ) {
-		super( Assert.nonNull( subjectClass ).getSimpleName() );
-		this.container = Assert.nonNull( container );
+		super( "CLASS: " + Assert.nonNull( subjectClass ).getName() );
 		
 		this.subjectClass = subjectClass;
-		this.containerMethods = null;
-	}
-	
-	
-	public void load() {
-		//this.loadContainer();
-		//this.scan( this.subjectClass );
-		//this.warnOrphans();
-	}
-	
-	
-	
-	
-	private void loadContainer() {
+		this.container = Assert.nonNull( container );
+
 		Function<Method, String> key1 = m -> m.getDeclaredAnnotation( Test.Impl.class ).member();
 		Function<Method, String> key2 = m -> m.getDeclaredAnnotation( Test.Impl.class ).description();
-		this.containerMethods = Arrays.stream( this.container.getClass().getDeclaredMethods() )
+		this.containerMethods = Arrays.stream( container.getClass().getDeclaredMethods() )
 			.filter( m -> m.getDeclaredAnnotation( Test.Impl.class ) != null )
 			.collect( Collectors.groupingBy( key1, Collectors.toMap( key2, Function.identity() ) ) );
 	}
 	
 	
-	private void add( AnnotatedElement elt ) {
-		this.addChild( new MemberResult( elt, this.container, this.containerMethods.remove( elt.toString() ) ) );
+	@Override
+	public void load() {
+		this.scan( this.subjectClass );
+		this.warnOrphans();
 	}
 	
 	
 	private void scan( Class<?> subject ) {
-		// The class itself is treated as a "member"
-		this.add( subject );
+		// Silently skip member containers
+		if ( Container.class.isAssignableFrom( subject ) ) {
+			return;
+		}
+		
+		// Determine if the entire (member) class is skipped; issue warnings/errors
+		Test.Skip skip = subject.getDeclaredAnnotation( Test.Skip.class );
+		if ( skip != null ) {
+			if ( this.hasPublicProtection( subject ) ) {
+				Msg.error( "Skipping public member class", "Subject = " + subject, "Skip = " + skip.value() );
+			}
+			if ( this.hasProtectedProtection( subject ) || this.hasPackageProtection( subject ) ) {
+				Msg.warning( "Skipping member class", "Subject = " + subject, "Skip = " + skip.value() );
+			}
+			// Silently skip private member classes
+			return;
+		}
 		
 		// Constructors
 		Arrays.stream( subject.getDeclaredConstructors() )
@@ -85,12 +92,60 @@ public class ClassResult extends Result {
 		Arrays.stream( subject.getDeclaredClasses() ).forEach( this::scan );
 	}
 	
+	private void add( Constructor<?> c ) {
+		this.add( "CONST: " + c.toString(), c, c);
+	}
+	
+	private void add( Field f ) {
+		this.add( "FIELD: " + f.toString(), f, f );
+	}
+	
+	private void add( Method m ) {
+		this.add( "METHOD: " + m.toString(), m, m );
+	}
+	
+	private void add( String name, AnnotatedElement element, Member member ) {
+		Test.Skip testSkip = element.getDeclaredAnnotation( Test.Skip.class );
+		Test.Case[] testCases = element.getDeclaredAnnotationsByType( Test.Case.class );
+		boolean skip = testSkip != null;
+		boolean test = testCases.length > 0;
+		
+		if ( skip && test ) {
+			Msg.error( "Inconsistent meta-data", "Member = " + name, "Has " + testCases.length + " test cases", "Skip = " + testSkip.value() );
+			return;
+		}
+		
+		if ( !skip && !test ) {
+			if ( this.hasPublicProtection( member ) ) {
+				Msg.error( "No test cases on public member", "Member = " + name );
+			}
+			if ( this.hasProtectedProtection( member ) || this.hasPackageProtection( member ) ) {
+				Msg.warning( "Unstated testing policy", "Member = " + name );
+			}
+			// Silently ignore private
+			return;
+		}
+		
+		if ( skip && !test ) {
+			if ( this.hasPublicProtection( member ) ) {
+				Msg.warning( "Skiping public member", "Member = " + name );
+			}
+			// Silently ignore other levels when Skip is declared
+			return;
+		}
+		
+		// ELSE: !skip && test
+		this.addChild( new MemberResult( name, testCases, this.container, this.containerMethods.remove( name ) ) );
+	}	
+	
+	
 	private void warnOrphan( String memberName ) {
-		new Fault( "Subject class no longer contains member", this.subjectClass, memberName ).toss();
+		Msg.error( "Subject class no longer contains member", "Subject = " + this.subjectClass, "Container = " + this.container.getClass().getName(), "Member = " + memberName );
 	}
 	
 	private void warnOrphans() {
 		this.containerMethods.keySet().stream().forEach( this::warnOrphan );
 	}
+
 
 }

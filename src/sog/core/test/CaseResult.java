@@ -19,11 +19,18 @@ public class CaseResult extends Result {
 	private final Method method;
 
 	public CaseResult( String description, Container container, Method method ) {
-		super( Assert.nonNull( description ) );
+		super( Assert.nonEmpty( description ) );
 		
 		this.container = container;
 		this.method = method;
 	}
+
+	@Override
+	protected void load() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 }

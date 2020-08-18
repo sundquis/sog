@@ -261,7 +261,7 @@ public class AppTest implements TestContainer {
 		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Throws assertion error for null class" )
 		public void sourceDir_ThrowsAssertionErrorForNullClass( TestCase tc ) {
 			tc.expectError( AssertionError.class );
-			App.get().sourceDir( null );
+			App.get().sourceDir( (Class<?>) null );
 		}
 					
 		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns writeable" )

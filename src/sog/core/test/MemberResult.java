@@ -20,39 +20,36 @@ import sog.util.Fault;
  */
 public class MemberResult extends Result {
 	
-	
-	private final AnnotatedElement member;
+	private final Test.Case[] cases;
 	private final Container container;
 	private final Map<String, Method> methods;
-	private final Test.Skip skip;
 
-	public MemberResult( AnnotatedElement member, Container container, Map<String, Method> methods ) {
-		super( Assert.nonNull( member ).toString() );
+	public MemberResult( String name, Test.Case[] cases, Container container, Map<String, Method> methods ) {
+		super( Assert.nonEmpty( name ) );
 		
-		this.member = member;
-		this.container = container;
+		this.cases = Assert.nonEmpty( cases );
+		this.container = Assert.nonNull( container );
 		this.methods = methods;
-		this.skip = member.getDeclaredAnnotation( Test.Skip.class );
 	}
 	
+	public void load() {
+		//Arrays.stream( member.getDeclaredAnnotationsByType( Test.Case.class ) ).forEach( this::add );
+		this.warnOrphans();
+	}
+
 	private void add( Test.Case tc ) {
 		String description = tc.value();
 		if ( this.methods == null ) { return; }
 		Method method = this.methods.remove( description );
 		if ( method == null ) {
-			new Fault( "No implementation for declared test case", this.member, description ).toss();
+			//new Fault( "No implementation for declared test case", this.member, description ).toss();
 		}
 		
 		this.addChild( new CaseResult( description, this.container, method ));
 	}
 	
-	public void load() {
-		Arrays.stream( member.getDeclaredAnnotationsByType( Test.Case.class ) ).forEach( this::add );
-		this.warnOrphans();
-	}
-
 	private void warnOrphan( String description ) {
-		new Fault( "Orphaned test implementation", this.member, description ).toss();
+		//new Fault( "Orphaned test implementation", this.member, description ).toss();
 	}
 	
 	private void warnOrphans() {
@@ -62,5 +59,6 @@ public class MemberResult extends Result {
 		
 		this.methods.keySet().stream().forEach( this::warnOrphan );
 	}
+
 	
 }

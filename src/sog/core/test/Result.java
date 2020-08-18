@@ -6,7 +6,7 @@
  */
 package sog.core.test;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import sog.core.Assert;
@@ -18,7 +18,7 @@ import sog.util.Printable;
  */
 public abstract class Result implements Printable {
 	
-	private final String label;
+	private final String name;
 	
 	private final List<Result> children;
 	
@@ -35,9 +35,9 @@ public abstract class Result implements Printable {
 	 * 
 	 * Concrete subclasses must provide the logic for finding and adding children.
 	 */
-	protected Result( String label ) {
-		this.label = Assert.nonEmpty( label );
-		this.children = new LinkedList<Result>();
+	protected Result( String name ) {
+		this.name = name;
+		this.children = new ArrayList<Result>();
 		
 		this.time = 0L;
 		this.totalCases = 0;
@@ -45,8 +45,14 @@ public abstract class Result implements Printable {
 		this.failCases = 0;
 	}
 	
+	// Find and construct valid children, call addChild for each
+	protected abstract void load();
+	
+	
 	protected void addChild( Result child ) {
 		Assert.nonNull( child );
+		
+		child.load();
 		
 		this.time += child.time;
 		this.totalCases += child.totalCases;
@@ -62,27 +68,30 @@ public abstract class Result implements Printable {
 		double success = (double) 100 * this.passCases / (this.totalCases == 0 ? 1 : this.totalCases);
 		double seconds = (double) this.time / 1000.0;
 		return String.format( 
-			"[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d]", 
+			"[S = %.1f%%, T = %.1fs, N = %d, P = %d, F = %d, U = %d] ", 
 			success, seconds, this.totalCases, this.passCases, this.failCases, unx );
 	}
 	
 	@Override public String toString() {
-		return this.label;
+		return this.name;
 	}
 		
 	@Override
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out );
 		
-		out.println( this.getStats() + ": " + this.toString() );
+		out.println( this.getStats() + this.toString() );
 		
 		out.increaseIndent();
 		this.children.stream().forEach( (c) -> c.print( out ) );
 		out.decreaseIndent();
+		
+		out.println( "" );
 	}
 	
 	public void print() {
 		this.print( new IndentWriter( System.out ) );
+		System.out.flush();
 	}
 	
 	

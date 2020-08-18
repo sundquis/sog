@@ -8,11 +8,12 @@
 package sog.util;
 
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import sog.core.App;
 import sog.core.Assert;
@@ -58,7 +59,7 @@ public class Fault implements Printable {
 	private final List<String> sources;
 	
 	// File and line number where fault was generated
-	private final String faultLocation;
+	private final List<String> faultLocation;
 	
 	/**
 	 * Construct a {@code Fault} representing a application defect. The required
@@ -72,11 +73,9 @@ public class Fault implements Printable {
 	@TestOrig.Decl( "Fault location is recorded" )
 	public Fault( String description, Object ... sources ) {
 		this.description = Assert.nonEmpty( description );
-		this.sources = new ArrayList<>();
-		for ( Object obj : sources ) {
-			this.sources.add( Strings.toString( obj ) );
-		}
-		this.faultLocation = getFaultLocation();
+		this.sources = Arrays.stream( sources ).map( Strings::toString ).collect( Collectors.toList() );
+		// FIXME: adjust using skip(..) and limit(..)
+		this.faultLocation = App.get().getLocation();
 	}
 
 	
@@ -131,27 +130,19 @@ public class Fault implements Printable {
 		out.println( "FAULT: " + this.description );
 		out.increaseIndent();
 
-		out.println( "FAULT LOCATION: " + this.faultLocation );
+		out.println( "FAULT LOCATION:" );
+		out.increaseIndent();
+		this.faultLocation.forEach( out::println );
+		out.decreaseIndent();
 
 		out.println( "SOURCE(S):" );
 		out.increaseIndent();
-		for ( String s : this.sources ) {
-			out.println( s );
-		}
+		this.sources.forEach( out::println );
 		out.decreaseIndent();
 
 		out.decreaseIndent();
 		out.println("");
 	}
 
-
-	// 0: StackWalker.getInstance
-	// 1: App.getFileLocation
-	// 2: Fault.getFileLocation
-	// 3: Originating source
-	private String getFaultLocation() {
-		return App.get().getFileLocation( 3, 3 );
-	}
-	
 	
 }

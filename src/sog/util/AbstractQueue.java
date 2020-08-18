@@ -103,7 +103,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 * 		false if the queue is closed or terminated and the call has been ignored,
 	 * 		true if the element has been accepted
 	 */
-	@TestOrig.Skip( "The beavior depends on putImpl so implementations test this." )
+	@TestOrig.Skip( "The behavior depends on putImpl so implementations test this." )
 	public boolean put( E elt ) {
 		Assert.nonNull( elt );  // Queue cannot accept null elements.
 		
