@@ -23,8 +23,18 @@ import sog.util.Printable;
 public class Msg implements Printable {
 	
 	
+	private static final List<String> STUBS = new ArrayList<String>();
 	private static final List<Msg> ERRORS = new ArrayList<Msg>();
 	private static final List<Msg> WARNINGS = new ArrayList<Msg>();
+	
+	public static void stub( String member, String description ) {
+		StringBuilder sb = new StringBuilder();
+		sb.append( "@Test.Impl( member = \"" + member + "\", description = \"" + description + "\" )\n" );
+		sb.append( "public void XXX( Test test ) {\n" );
+		sb.append( "test.addMessage( \"UNIMPLEMENTED\" ).fail();\n" );
+		sb.append( "}\n\n" );
+		Msg.STUBS.add( sb.toString() );
+	}
 	
 	public static void error( Exception cause, String description, Object ... details ) {
 		Msg.ERRORS.add( new Msg( "ERROR", description, cause, details ) );
@@ -42,6 +52,16 @@ public class Msg implements Printable {
 		Msg.WARNINGS.add( new Msg( "WARNING", description, null, details ) );
 	}
 	
+	public static void printStubs() {
+		if ( Msg.STUBS.isEmpty() ) {
+			return;
+		}
+		
+		System.out.println( "STUBS:\n" );
+		Msg.STUBS.forEach( System.out::println );
+		System.out.flush();
+	}
+	
 	public static void printErrors() {
 		IndentWriter err = new IndentWriter( System.err );
 		Msg.ERRORS.forEach( e -> e.print( err ) );
@@ -55,6 +75,7 @@ public class Msg implements Printable {
 	}
 	
 	public static void print() {
+		Msg.printStubs();
 		Msg.printErrors();
 		Msg.printWarnings();
 	}

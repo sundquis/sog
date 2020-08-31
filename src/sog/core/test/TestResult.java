@@ -124,6 +124,14 @@ public class TestResult extends Result {
 	@Test.Skip( "Ignore: Should not see this message" )
 	private static class SkipPrivate {}
 	
+	@Test.Case( "The description for the foo method")
+	private static void foo( String s ) {}
+
+	@Test.Impl( member = "METHOD: private static void sog.core.test.TestResult.foo(java.lang.String)", description = "The description for the foo method" )
+	public void XXX( Test test ) {
+	test.addMessage( "UNIMPLEMENTED" ).fail();
+	}
+
 	
 	public static void main( String[] args ) {
 		System.out.println( ">>> Hello world!" );

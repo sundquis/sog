@@ -37,6 +37,9 @@ public class MemberResult extends Result {
 
 	private void add( Test.Case tc ) {
 		Method method = this.methods == null ? null : this.methods.remove( tc.value() );
+		if ( method == null ) {
+			Msg.stub( this.toString(), tc.value() );
+		}
 		
 		this.addChild( new CaseResult( tc, this.container, method ));
 	}
