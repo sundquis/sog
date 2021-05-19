@@ -18,21 +18,14 @@ import sog.core.AppException;
 import sog.core.Cache;
 import sog.core.Procedure;
 import sog.core.Strings;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.core.Cache.Builder;
 
 /**
  * @author sundquis
  *
  */
-public class CacheTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return Cache.class;
-	}
+public class CacheTest extends Test.Implementation {
 
 	// Test implementations
 	
@@ -117,14 +110,14 @@ public class CacheTest implements TestContainer {
 		};
 	}
 	
-	@TestOrig.Impl( src = "public Cache(Cache.Builder)", desc = "Null Builder throws Assertion Error" )
-	public void Cache_NullBuilderThrowsAssertionError( TestCase tc ) {
+	@Test.Impl( member = "public Cache(Cache.Builder)", description = "Null Builder throws Assertion Error" )
+	public void Cache_NullBuilderThrowsAssertionError( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new Cache<String, String>( null );
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "From empty cache returns valid object" )
-	public void get_FromEmptyCacheReturnsValidObject( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "From empty cache returns valid object" )
+	public void get_FromEmptyCacheReturnsValidObject( Test.Case tc ) {
 		tc.assertTrue( cache.size() == 0 );
 		Value v1 = this.builder.make(0);
 		Value v2 = this.cache.get(0);
@@ -132,8 +125,8 @@ public class CacheTest implements TestContainer {
 		tc.assertFalse( v1.getId() == v2.getId() );
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Multi thread stress test", weight = 10 )
-	public void get_MultiThreadStressTest( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "Multi thread stress test", weight = 10 )
+	public void get_MultiThreadStressTest( Test.Case tc ) {
 		tc.afterThis( () -> Agent.dispose() );
 		ArrayList<Agent> agents = new ArrayList<>();
 		for ( int i = 0; i < 5; i++ ) {
@@ -150,14 +143,14 @@ public class CacheTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Null key throws Assertion Error" )
-	public void get_NullKeyThrowsAssertionError( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "Null key throws Assertion Error" )
+	public void get_NullKeyThrowsAssertionError( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.cache.get( null );
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Get stress test", weight = 10 )
-	public void get_GetStressTest( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "Get stress test", weight = 10 )
+	public void get_GetStressTest( Test.Case tc ) {
 		boolean consistent = true;
 		Set<Integer> codes = new HashSet<>();
 		int M = 100;
@@ -172,8 +165,8 @@ public class CacheTest implements TestContainer {
 		tc.assertTrue( consistent );
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Stored uncolllectable object returns same object", weight = 10 )
-	public void get_StoredUncolllectableObjectReturnsSameObject( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "Stored uncolllectable object returns same object", weight = 10 )
+	public void get_StoredUncolllectableObjectReturnsSameObject( Test.Case tc ) {
 		int curSize = this.cache.size();
 		tc.assertTrue( curSize == 0 );
 		
@@ -190,13 +183,13 @@ public class CacheTest implements TestContainer {
 		tc.assertEqual( strongReference.getId(), this.cache.get( 42 ).getId() );
 	}
 
-	@TestOrig.Impl( src = "public Object Cache.get(Comparable)", desc = "Values are not null" )
-	public void get_ValuesAreNotNull( TestCase tc ) {
+	@Test.Impl( member = "public Object Cache.get(Comparable)", description = "Values are not null" )
+	public void get_ValuesAreNotNull( Test.Case tc ) {
 		tc.assertTrue( this.cache.get(42) != null );
 	}
 
-	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Cache empty after" )
-	public void flush_CacheEmptyAfter( TestCase tc ) {
+	@Test.Impl( member = "public void Cache.flush()", description = "Cache empty after" )
+	public void flush_CacheEmptyAfter( Test.Case tc ) {
 		for ( int i = 0; i < 1000; i++ ) {
 			this.cache.get(i);
 		}
@@ -205,59 +198,48 @@ public class CacheTest implements TestContainer {
 		tc.assertEqual( this.cache.size(), 0 );
 	}
 
-	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves equivalent value" )
-	public void flush_ThenGetRetrievesEquivalentValue( TestCase tc ) {
+	@Test.Impl( member = "public void Cache.flush()", description = "Then get() retrieves equivalent value" )
+	public void flush_ThenGetRetrievesEquivalentValue( Test.Case tc ) {
 		Value orig = cache.get( 42 );
 		cache.flush();
 		tc.assertEqual( orig.toString() , this.cache.get(42).toString() );
 	}
 
-	@TestOrig.Impl( src = "public void Cache.flush()", desc = "Then get() retrieves distinct instance" )
-	public void flush_ThenGetRetrievesDistinctInstance( TestCase tc ) {
+	@Test.Impl( member = "public void Cache.flush()", description = "Then get() retrieves distinct instance" )
+	public void flush_ThenGetRetrievesDistinctInstance( Test.Case tc ) {
 		Value orig = cache.get( 42 );
 		int id  = orig.getId();
 		cache.flush();
 		tc.assertFalse( id == this.cache.get(42).getId() );
 	}
 	
-	@TestOrig.Impl( src = "public String Cache.toString()", desc = "Result is not empty" )
-	public void toString_ResultIsNotEmpty( TestCase tc ) {
+	@Test.Impl( member = "public String Cache.toString()", description = "Result is not empty" )
+	public void toString_ResultIsNotEmpty( Test.Case tc ) {
 		tc.assertFalse( this.cache.toString().isEmpty() );
 	}
 
-	@TestOrig.Impl( src = "public String Cache.toString()", desc = "Result is not null" )
-	public void toString_ResultIsNotNull( TestCase tc ) {
+	@Test.Impl( member = "public String Cache.toString()", description = "Result is not null" )
+	public void toString_ResultIsNotNull( Test.Case tc ) {
 		tc.notNull( this.cache.toString() );
 	}
 
-	@TestOrig.Impl( src = "public int Cache.size()", desc = "Created empty" )
-	public void size_CreatedEmpty( TestCase tc ) {
+	@Test.Impl( member = "public int Cache.size()", description = "Created empty" )
+	public void size_CreatedEmpty( Test.Case tc ) {
 		tc.assertEqual( 0,  this.cache.size() );
 	}
 
-	@TestOrig.Impl( src = "public int Cache.size()", desc = "Not empty after get" )
-	public void size_NotEmptyAfterGet( TestCase tc ) {
+	@Test.Impl( member = "public int Cache.size()", description = "Not empty after get" )
+	public void size_NotEmptyAfterGet( Test.Case tc ) {
 		this.cache.get( 0 );
 		tc.assertEqual( 1,  this.cache.size() );
 	}
 
-	@TestOrig.Impl( src = "public boolean Cache.collected()", desc = "False at creation" )
-	public void collected_FalseAtCreation( TestCase tc ) {
+	@Test.Impl( member = "public boolean Cache.collected()", description = "False at creation" )
+	public void collected_FalseAtCreation( Test.Case tc ) {
 		tc.assertFalse( this.cache.collected() );
 	}
 
 	
 	
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(CacheTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

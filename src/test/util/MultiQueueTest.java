@@ -11,9 +11,7 @@ import java.util.ArrayList;
 
 import sog.core.Fatal;
 import sog.core.Procedure;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.util.FifoQueue;
 import sog.util.MultiQueue;
 import sog.util.PriorityQueue;
@@ -23,12 +21,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class MultiQueueTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return MultiQueue.class;
-	}
+public class MultiQueueTest extends Test.Implementation {
 
 	// Test implementations
 	
@@ -109,24 +102,24 @@ public class MultiQueueTest implements TestContainer {
 	
 	
 
-	@TestOrig.Impl( src = "MultiQueue", desc = "If backed by FIFO queue elements retrieved in FIFO order" )
-	public void MultiQueue_IfBackedByFifoQueueElementsRetrievedInFifoOrder( TestCase tc ) {
+	@Test.Impl( member = "MultiQueue", description = "If backed by FIFO queue elements retrieved in FIFO order" )
+	public void MultiQueue_IfBackedByFifoQueueElementsRetrievedInFifoOrder( Test.Case tc ) {
 		this.fm.put( "B" );
 		this.fm.put( "A" );
 		tc.assertEqual( "B",  this.fm.get() );
 		tc.assertEqual( "A",  this.fm.get() );
 	}
 
-	@TestOrig.Impl( src = "MultiQueue", desc = "If backed by priority queue elements retrieved in priority order" )
-	public void MultiQueue_IfBackedByPriorityQueueElementsRetrievedInPriorityOrder( TestCase tc ) {
+	@Test.Impl( member = "MultiQueue", description = "If backed by priority queue elements retrieved in priority order" )
+	public void MultiQueue_IfBackedByPriorityQueueElementsRetrievedInPriorityOrder( Test.Case tc ) {
 		this.pm.put( "B" );
 		this.pm.put( "A" );
 		tc.assertEqual( "A",  this.pm.get() );
 		tc.assertEqual( "B",  this.pm.get() );
 	}
 
-	@TestOrig.Impl( src = "MultiQueue", desc = "Multi thread stress test" )
-	public void MultiQueue_MultiThreadStressTest( TestCase tc ) throws InterruptedException {
+	@Test.Impl( member = "MultiQueue", description = "Multi thread stress test" )
+	public void MultiQueue_MultiThreadStressTest( Test.Case tc ) throws InterruptedException {
 		ArrayList<Agent2> threads = new ArrayList<Agent2>();
 
 		Queue<Record> first = new MultiQueue<Record>( new FifoQueue<Record>() );
@@ -152,24 +145,24 @@ public class MultiQueueTest implements TestContainer {
 		tc.pass();
 	}
 
-	@TestOrig.Impl( src = "public MultiQueue(Queue)", desc = "is closed if queue is closed" )
-	public void MultiQueue_IsClosedIfQueueIsClosed( TestCase tc ) {
+	@Test.Impl( member = "public MultiQueue(Queue)", description = "is closed if queue is closed" )
+	public void MultiQueue_IsClosedIfQueueIsClosed( Test.Case tc ) {
 		fifo.close();
 		priority.close();
 		tc.assertTrue( fm.isClosed() );
 		tc.assertTrue( pm.isClosed() );
 	}
 
-	@TestOrig.Impl( src = "public MultiQueue(Queue)", desc = "is empty if queue is empty" )
-	public void MultiQueue_IsEmptyIfQueueIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public MultiQueue(Queue)", description = "is empty if queue is empty" )
+	public void MultiQueue_IsEmptyIfQueueIsEmpty( Test.Case tc ) {
 		tc.assertTrue( fifo.isEmpty() );
 		tc.assertTrue( priority.isEmpty() );
 		tc.assertTrue( fm.isEmpty() );
 		tc.assertTrue( pm.isEmpty() );
 	}
 
-	@TestOrig.Impl( src = "public MultiQueue(Queue)", desc = "is non empty if queue is non empty" )
-	public void MultiQueue_IsNonEmptyIfQueueIsNonEmpty( TestCase tc ) {
+	@Test.Impl( member = "public MultiQueue(Queue)", description = "is non empty if queue is non empty" )
+	public void MultiQueue_IsNonEmptyIfQueueIsNonEmpty( Test.Case tc ) {
 		fifo.put( "A" );
 		priority.put( "A" );
 		tc.assertFalse( fifo.isEmpty() );
@@ -178,16 +171,16 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertFalse( pm.isEmpty() );
 	}
 
-	@TestOrig.Impl( src = "public MultiQueue(Queue)", desc = "is open if queue is open" )
-	public void MultiQueue_IsOpenIfQueueIsOpen( TestCase tc ) {
+	@Test.Impl( member = "public MultiQueue(Queue)", description = "is open if queue is open" )
+	public void MultiQueue_IsOpenIfQueueIsOpen( Test.Case tc ) {
 		tc.assertTrue( fifo.isOpen() );
 		tc.assertTrue( priority.isOpen() );
 		tc.assertTrue( fm.isOpen() );
 		tc.assertTrue( pm.isOpen() );
 	}
 
-	@TestOrig.Impl( src = "public MultiQueue(Queue)", desc = "is terminated if queue is terminated" )
-	public void MultiQueue_IsTerminatedIfQueueIsTerminated( TestCase tc ) {
+	@Test.Impl( member = "public MultiQueue(Queue)", description = "is terminated if queue is terminated" )
+	public void MultiQueue_IsTerminatedIfQueueIsTerminated( Test.Case tc ) {
 		this.fifo.terminate();
 		this.priority.terminate();
 		tc.assertTrue( fifo.isTerminated() );
@@ -196,8 +189,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( pm.isTerminated() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on closed empty returns null" )
-	public void get_GetOnClosedEmptyReturnsNull( TestCase tc ) {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on closed empty returns null" )
+	public void get_GetOnClosedEmptyReturnsNull( Test.Case tc ) {
 		this.fifo.close();
 		this.priority.close();
 		tc.assertTrue( fifo.isEmpty() );
@@ -208,8 +201,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.isNull( pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on closed non empty returns non null" )
-	public void get_GetOnClosedNonEmptyReturnsNonNull( TestCase tc ) {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on closed non empty returns non null" )
+	public void get_GetOnClosedNonEmptyReturnsNonNull( Test.Case tc ) {
 		this.fifo.put( "A" );
 		this.priority.put( "B" );
 		this.fifo.close();
@@ -222,8 +215,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.notNull( pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on open empty blocks awaiting notification" )
-	public void get_GetOnOpenEmptyBlocksAwaitingNotification( TestCase tc ) throws InterruptedException {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on open empty blocks awaiting notification" )
+	public void get_GetOnOpenEmptyBlocksAwaitingNotification( Test.Case tc ) throws InterruptedException {
 		tc.assertTrue( this.fm.isEmpty() );
 		tc.assertTrue( this.pm.isEmpty() );
 		Agent fma = new Agent( this.fm );
@@ -255,8 +248,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertFalse( pma.isAlive() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on open non empty returns non null" )
-	public void get_GetOnOpenNonEmptyReturnsNonNull( TestCase tc ) {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on open non empty returns non null" )
+	public void get_GetOnOpenNonEmptyReturnsNonNull( Test.Case tc ) {
 		this.fifo.put( "A" );
 		this.priority.put( "B" );
 		tc.assertFalse( fifo.isEmpty() );
@@ -267,8 +260,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.notNull( pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on terminated empty returns null" )
-	public void get_GetOnTerminatedEmptyReturnsNull( TestCase tc ) {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on terminated empty returns null" )
+	public void get_GetOnTerminatedEmptyReturnsNull( Test.Case tc ) {
 		this.fifo.terminate();
 		this.priority.terminate();
 		tc.assertTrue( fifo.isEmpty() );
@@ -279,8 +272,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.isNull( pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public Object MultiQueue.get()", desc = "Get on terminated non empty returns null" )
-	public void get_GetOnTerminatedNonEmptyReturnsNull( TestCase tc ) {
+	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on terminated non empty returns null" )
+	public void get_GetOnTerminatedNonEmptyReturnsNull( Test.Case tc ) {
 		this.fifo.put( "A" );
 		this.priority.put( "B" );
 		this.fifo.terminate();
@@ -293,8 +286,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.isNull( pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isClosed()", desc = "is closed if queue is closed" )
-	public void isClosed_IsClosedIfQueueIsClosed( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isClosed()", description = "is closed if queue is closed" )
+	public void isClosed_IsClosedIfQueueIsClosed( Test.Case tc ) {
 		this.fifo.close();
 		this.priority.close();
 		tc.assertTrue( fifo.isClosed() );
@@ -303,8 +296,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( pm.isClosed() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isEmpty()", desc = "Put on empty is not empty" )
-	public void isEmpty_PutOnEmptyIsNotEmpty( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isEmpty()", description = "Put on empty is not empty" )
+	public void isEmpty_PutOnEmptyIsNotEmpty( Test.Case tc ) {
 		tc.assertTrue( fm.isEmpty() );
 		tc.assertTrue( pm.isEmpty() );
 		this.fm.put( "A" );
@@ -313,8 +306,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertFalse( pm.isEmpty() );			
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isEmpty()", desc = "Put on non empty is not empty" )
-	public void isEmpty_PutOnNonEmptyIsNotEmpty( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isEmpty()", description = "Put on non empty is not empty" )
+	public void isEmpty_PutOnNonEmptyIsNotEmpty( Test.Case tc ) {
 		this.fm.put( "A" );
 		this.pm.put( "A" );
 		tc.assertFalse( fm.isEmpty() );
@@ -325,8 +318,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertFalse( pm.isEmpty() );			
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isEmpty()", desc = "Put then get on empty is empty" )
-	public void isEmpty_PutThenGetOnEmptyIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isEmpty()", description = "Put then get on empty is empty" )
+	public void isEmpty_PutThenGetOnEmptyIsEmpty( Test.Case tc ) {
 		tc.assertTrue( fm.isEmpty() );
 		tc.assertTrue( pm.isEmpty() );
 		this.fm.put( "A" );
@@ -337,8 +330,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( pm.isEmpty() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isEmpty()", desc = "Put then put then get is not empty" )
-	public void isEmpty_PutThenPutThenGetIsNotEmpty( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isEmpty()", description = "Put then put then get is not empty" )
+	public void isEmpty_PutThenPutThenGetIsNotEmpty( Test.Case tc ) {
 		tc.assertTrue( fm.isEmpty() );
 		tc.assertTrue( pm.isEmpty() );
 		this.fm.put( "A" );
@@ -351,16 +344,16 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertFalse( pm.isEmpty() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isOpen()", desc = "is open if queue is open" )
-	public void isOpen_IsOpenIfQueueIsOpen( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isOpen()", description = "is open if queue is open" )
+	public void isOpen_IsOpenIfQueueIsOpen( Test.Case tc ) {
 		tc.assertTrue( this.fifo.isOpen() );
 		tc.assertTrue( this.pm.isOpen() );
 		tc.assertTrue( this.fm.isOpen() );
 		tc.assertTrue( this.pm.isOpen() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.isTerminated()", desc = "is terminated if queue is terminated" )
-	public void isTerminated_IsTerminatedIfQueueIsTerminated( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.isTerminated()", description = "is terminated if queue is terminated" )
+	public void isTerminated_IsTerminatedIfQueueIsTerminated( Test.Case tc ) {
 		this.fifo.terminate();
 		this.pm.terminate();
 		tc.assertTrue( this.fifo.isTerminated() );
@@ -369,8 +362,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( this.pm.isTerminated() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.put(Object)", desc = "Put on closed is ignored" )
-	public void put_PutOnClosedIsIgnored( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.put(Object)", description = "Put on closed is ignored" )
+	public void put_PutOnClosedIsIgnored( Test.Case tc ) {
 		this.fm.put( "A" );
 		this.pm.put( "B" );
 		this.fm.close();
@@ -383,8 +376,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertEqual( "B",  this.pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.put(Object)", desc = "Put on open is accepted" )
-	public void put_PutOnOpenIsAccepted( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.put(Object)", description = "Put on open is accepted" )
+	public void put_PutOnOpenIsAccepted( Test.Case tc ) {
 		tc.assertTrue( this.fm.isOpen() );
 		tc.assertTrue( this.pm.isOpen() );
 		tc.assertTrue( this.fm.put( "B" ) );
@@ -393,8 +386,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertEqual( "A",  this.pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public boolean MultiQueue.put(Object)", desc = "Put on terminated is ignored" )
-	public void put_PutOnTerminatedIsIgnored( TestCase tc ) {
+	@Test.Impl( member = "public boolean MultiQueue.put(Object)", description = "Put on terminated is ignored" )
+	public void put_PutOnTerminatedIsIgnored( Test.Case tc ) {
 		this.fm.put( "A" );
 		this.pm.put( "B" );
 		this.fm.terminate();
@@ -407,8 +400,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.isNull( this.pm.get() );
 	}
 
-	@TestOrig.Impl( src = "public void MultiQueue.close()", desc = "Can close if open" )
-	public void close_CanCloseIfOpen( TestCase tc ) {
+	@Test.Impl( member = "public void MultiQueue.close()", description = "Can close if open" )
+	public void close_CanCloseIfOpen( Test.Case tc ) {
 		tc.assertTrue( this.fm.isOpen() );
 		tc.assertTrue( this.pm.isOpen() );
 		this.fm.close();
@@ -417,8 +410,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( this.pm.isClosed() );
 	}
 
-	@TestOrig.Impl( src = "public void MultiQueue.close()", desc = "Close on terminated ignored" )
-	public void close_CloseOnTerminatedIgnored( TestCase tc ) {
+	@Test.Impl( member = "public void MultiQueue.close()", description = "Close on terminated ignored" )
+	public void close_CloseOnTerminatedIgnored( Test.Case tc ) {
 		this.fm.terminate();
 		this.pm.terminate();
 		tc.assertTrue( this.fm.isTerminated() );
@@ -429,8 +422,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( this.pm.isTerminated() );
 	}
 
-	@TestOrig.Impl( src = "public void MultiQueue.terminate()", desc = "Can terminate if closed" )
-	public void terminate_CanTerminateIfClosed( TestCase tc ) {
+	@Test.Impl( member = "public void MultiQueue.terminate()", description = "Can terminate if closed" )
+	public void terminate_CanTerminateIfClosed( Test.Case tc ) {
 		this.fm.close();
 		this.pm.close();
 		tc.assertTrue( this.fm.isClosed() );
@@ -441,8 +434,8 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( this.pm.isTerminated() );
 	}
 
-	@TestOrig.Impl( src = "public void MultiQueue.terminate()", desc = "Can terminate if open" )
-	public void terminate_CanTerminateIfOpen( TestCase tc ) {
+	@Test.Impl( member = "public void MultiQueue.terminate()", description = "Can terminate if open" )
+	public void terminate_CanTerminateIfOpen( Test.Case tc ) {
 		tc.assertTrue( this.fm.isOpen() );
 		tc.assertTrue( this.pm.isOpen() );
 		this.fm.terminate();
@@ -451,16 +444,4 @@ public class MultiQueueTest implements TestContainer {
 		tc.assertTrue( this.pm.isTerminated() );
 	}
 
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		//Test.verbose();
-		new TestOrig(MultiQueueTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

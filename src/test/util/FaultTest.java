@@ -7,96 +7,76 @@
 
 package test.util;
 
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
-import sog.util.Fault;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class FaultTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return Fault.class;
-	}
+public class FaultTest extends Test.Implementation {
 
 	// Test implementations
 	
 	
-	@TestOrig.Impl( src = "public Fault Fault.addSource(String)", desc = "Returns this" )
-	public void addSource_ReturnsThis( TestCase tc ) {
+	@Test.Impl( member = "public Fault Fault.addSource(String)", description = "Returns this" )
+	public void addSource_ReturnsThis( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public Fault Fault.addSource(String)", desc = "Source is appended to previous sources" )
-	public void addSource_SourceIsAppendedToPreviousSources( TestCase tc ) {
+	@Test.Impl( member = "public Fault Fault.addSource(String)", description = "Source is appended to previous sources" )
+	public void addSource_SourceIsAppendedToPreviousSources( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public Fault(String, Object[])", desc = "Fault location is recorded" )
-	public void Fault_FaultLocationIsRecorded( TestCase tc ) {
+	@Test.Impl( member = "public Fault(String, Object[])", description = "Fault location is recorded" )
+	public void Fault_FaultLocationIsRecorded( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public Fault(String, Object[])", desc = "Throws assertion error for enpty string" )
-	public void Fault_ThrowsAssertionErrorForEnptyString( TestCase tc ) {
+	@Test.Impl( member = "public Fault(String, Object[])", description = "Throws assertion error for enpty string" )
+	public void Fault_ThrowsAssertionErrorForEnptyString( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public String Fault.toString()", desc = "Returns non-empty description" )
-	public void toString_ReturnsNonEmptyDescription( TestCase tc ) {
+	@Test.Impl( member = "public String Fault.toString()", description = "Returns non-empty description" )
+	public void toString_ReturnsNonEmptyDescription( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.addListener(Consumer)", desc = "Subsequent faults are deleivered to listener" )
-	public void addListener_SubsequentFaultsAreDeleiveredToListener( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.addListener(Consumer)", description = "Subsequent faults are deleivered to listener" )
+	public void addListener_SubsequentFaultsAreDeleiveredToListener( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.print(IndentWriter)", desc = "All provided sources printed" )
-	public void print_AllProvidedSourcesPrinted( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.print(IndentWriter)", description = "All provided sources printed" )
+	public void print_AllProvidedSourcesPrinted( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.print(IndentWriter)", desc = "Description printed" )
-	public void print_DescriptionPrinted( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.print(IndentWriter)", description = "Description printed" )
+	public void print_DescriptionPrinted( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.print(IndentWriter)", desc = "Fault location printed" )
-	public void print_FaultLocationPrinted( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.print(IndentWriter)", description = "Fault location printed" )
+	public void print_FaultLocationPrinted( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.print(IndentWriter)", desc = "Model location printed when possible" )
-	public void print_ModelLocationPrintedWhenPossible( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.print(IndentWriter)", description = "Model location printed when possible" )
+	public void print_ModelLocationPrintedWhenPossible( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.removeListener(Consumer)", desc = "Subsequent faults are deleivered to listener" )
-	public void removeListener_SubsequentFaultsAreDeleiveredToListener( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.removeListener(Consumer)", description = "Subsequent faults are deleivered to listener" )
+	public void removeListener_SubsequentFaultsAreDeleiveredToListener( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void Fault.toss()", desc = "Fault is deleiverd to listeners" )
-	public void toss_FaultIsDeleiverdToListeners( TestCase tc ) {
+	@Test.Impl( member = "public void Fault.toss()", description = "Fault is deleiverd to listeners" )
+	public void toss_FaultIsDeleiverdToListeners( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
 
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		//Test.verbose();
-		new TestOrig(FaultTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

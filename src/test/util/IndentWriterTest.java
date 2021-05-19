@@ -10,21 +10,14 @@ package test.util;
 import java.io.ByteArrayOutputStream;
 
 import sog.core.Procedure;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.util.IndentWriter;
 
 /**
  * @author sundquis
  *
  */
-public class IndentWriterTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return IndentWriter.class;
-	}
+public class IndentWriterTest extends Test.Implementation {
 
 	// Test implementations
 	
@@ -39,30 +32,29 @@ public class IndentWriterTest implements TestContainer {
 
 	// Test implementations
 
-	@TestOrig.Impl( src = "public IndentWriter(OutputStream)", desc = "Default indent" )
-	public void IndentWriter_DefaultIndent( TestCase tc ) {
+	@Test.Impl( member = "public IndentWriter(OutputStream)", description = "Default indent" )
+	public void IndentWriter_DefaultIndent( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos );
 		out.increaseIndent();
 		out.println( "FOO" );
 		tc.assertEqual( "    FOO\n",  this.baos.toString() );
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.println(String)", desc = "Before increase no prefix" )
-	public void println_BeforeIncreaseNoPrefix( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.println(String)", description = "Before increase no prefix" )
+	public void println_BeforeIncreaseNoPrefix( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos );
 		out.println( "FOO" );
 		tc.assertEqual( "FOO\n",  this.baos.toString() );
 	}
 	
-	@TestOrig.Impl( src = "public IndentWriter(OutputStream, String)", desc = "Indent can be empty" )
-	public void IndentWriter_IndentCanBeEmpty( TestCase tc ) {
+	@Test.Impl( member = "public IndentWriter(OutputStream, String)", description = "Indent can be empty" )
+	public void IndentWriter_IndentCanBeEmpty( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, "" );
 		out.println( "FOO" );
-		tc.pass();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.increaseIndent()", desc = "Increase empty indent is noop" )
-	public void increaseIndent_IncreaseEmptyIndentIsNoop( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.increaseIndent()", description = "Increase empty indent is noop" )
+	public void increaseIndent_IncreaseEmptyIndentIsNoop( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, "" );
 		out.println( "FOO" );
 		String result = this.baos.toString();
@@ -72,20 +64,20 @@ public class IndentWriterTest implements TestContainer {
 		tc.assertEqual( result,  this.baos.toString() );
 	}
 	
-	@TestOrig.Impl( src = "public IndentWriter(OutputStream, String)", desc = "Throws assertion error for null indent" )
-	public void IndentWriter_ThrowsAssertionErrorForNullIndent( TestCase tc ) {
+	@Test.Impl( member = "public IndentWriter(OutputStream, String)", description = "Throws assertion error for null indent" )
+	public void IndentWriter_ThrowsAssertionErrorForNullIndent( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new IndentWriter( this.baos, null );
 	}
 
-	@TestOrig.Impl( src = "public IndentWriter(OutputStream, String)", desc = "Throws assertion error for null stream" )
-	public void IndentWriter_ThrowsAssertionErrorForNullStream( TestCase tc ) {
+	@Test.Impl( member = "public IndentWriter(OutputStream, String)", description = "Throws assertion error for null stream" )
+	public void IndentWriter_ThrowsAssertionErrorForNullStream( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new IndentWriter( null, "" );
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.decreaseIndent()", desc = "Can decrease after increase" )
-	public void decreaseIndent_CanDecreaseAfterIncrease( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.decreaseIndent()", description = "Can decrease after increase" )
+	public void decreaseIndent_CanDecreaseAfterIncrease( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, ">>>" );
 		out.increaseIndent();
 		out.decreaseIndent();
@@ -93,18 +85,17 @@ public class IndentWriterTest implements TestContainer {
 		out.increaseIndent();
 		out.decreaseIndent();
 		out.decreaseIndent();
-		tc.pass();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.decreaseIndent()", desc = "Illegal state for decrease before increase" )
-	public void decreaseIndent_IllegalStateForDecreaseBeforeIncrease( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.decreaseIndent()", description = "Illegal state for decrease before increase" )
+	public void decreaseIndent_IllegalStateForDecreaseBeforeIncrease( Test.Case tc ) {
 		tc.expectError( IllegalStateException.class );
 		IndentWriter out = new IndentWriter( this.baos, ">>>" );
 		out.decreaseIndent();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.decreaseIndent()", desc = "Illegal state for more decreases than increases" )
-	public void decreaseIndent_IllegalStateForMoreDecreasesThanIncreases( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.decreaseIndent()", description = "Illegal state for more decreases than increases" )
+	public void decreaseIndent_IllegalStateForMoreDecreasesThanIncreases( Test.Case tc ) {
 		tc.expectError( IllegalStateException.class );
 		IndentWriter out = new IndentWriter( this.baos, ">>>" );
 		try {
@@ -116,15 +107,14 @@ public class IndentWriterTest implements TestContainer {
 		out.decreaseIndent();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.increaseIndent()", desc = "Can increase indent" )
-	public void increaseIndent_CanIncreaseIndent( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.increaseIndent()", description = "Can increase indent" )
+	public void increaseIndent_CanIncreaseIndent( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, ">>>" );
 		out.increaseIndent();
-		tc.pass();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.println(String)", desc = "Prints prefix" )
-	public void println_PrintsPrefix( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.println(String)", description = "Prints prefix" )
+	public void println_PrintsPrefix( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, "XXXX" );
 		out.increaseIndent();
 		out.println( "FOO" );
@@ -132,8 +122,8 @@ public class IndentWriterTest implements TestContainer {
 		tc.assertTrue( result.startsWith( "XXXXFOO" ) );
 	}
 	
-	@TestOrig.Impl( src = "public void IndentWriter.increaseIndent()", desc = "Increase indent increases indent" )
-	public void increaseIndent_IncreaseIndentIncreasesIndent( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.increaseIndent()", description = "Increase indent increases indent" )
+	public void increaseIndent_IncreaseIndentIncreasesIndent( Test.Case tc ) {
 		IndentWriter out = new IndentWriter( this.baos, "XXXX" );
 		out.increaseIndent();
 		out.increaseIndent();
@@ -142,32 +132,20 @@ public class IndentWriterTest implements TestContainer {
 		tc.assertTrue( result.startsWith( "XXXXXXXXFOO" ) );
 	}
 	
-	@TestOrig.Impl( src = "public void IndentWriter.decreaseIndent()", desc = "Custom indent removed" )
-	public void decreaseIndent_CustomIndentRemoved( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.decreaseIndent()", description = "Custom indent removed" )
+	public void decreaseIndent_CustomIndentRemoved( Test.Case tc ) {
 		tc.addMessage( "Unimplemented" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.increaseIndent(String)", desc = "Custom indent used" )
-	public void increaseIndent_CustomIndentUsed( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.increaseIndent(String)", description = "Custom indent used" )
+	public void increaseIndent_CustomIndentUsed( Test.Case tc ) {
 		tc.addMessage( "Unimplemented" ).fail();
 	}
 
-	@TestOrig.Impl( src = "public void IndentWriter.increaseIndent(String)", desc = "Custom indent used after default" )
-	public void increaseIndent_CustomIndentUsedAfterDefault( TestCase tc ) {
+	@Test.Impl( member = "public void IndentWriter.increaseIndent(String)", description = "Custom indent used after default" )
+	public void increaseIndent_CustomIndentUsedAfterDefault( Test.Case tc ) {
 		tc.addMessage( "Unimplemented" ).fail();
 	}
 	
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		//Test.verbose();
-		new TestOrig(IndentWriterTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

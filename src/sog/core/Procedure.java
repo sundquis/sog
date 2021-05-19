@@ -14,7 +14,6 @@ import java.util.List;
  *
  */
 @FunctionalInterface
-@TestOrig.Skip
 public interface Procedure {
 
 	/**

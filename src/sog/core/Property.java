@@ -39,19 +39,19 @@ public class Property {
 	
 	
 	/** Retrieve a configurable property from the system property file */
-	@TestOrig.Decl( "Throws assertion error for null name" )
-	@TestOrig.Decl( "Throws assertion error for empty name" )
-	@TestOrig.Decl( "throws assertion error for null parser" )
-	@TestOrig.Decl( "Retrieves properties for top level classes" )
-	@TestOrig.Decl( "Retrieves properties for nested classes" )
-	@TestOrig.Decl( "Retrieves properties for double nested classes" )
-	@TestOrig.Decl( "Throws assertion error for anonymous classes" )
-	@TestOrig.Decl( "Throws assertion error for local classs" )
-	@TestOrig.Decl( "Prints declaration for missing property" )
-	@TestOrig.Decl( "Last value for multiple elements" )
-	@TestOrig.Decl( "Uses default for missing" )
-	@TestOrig.Decl( "Throws exception for malformed integer" )
-	@TestOrig.Decl( "Throws exception for malformed long" )
+	@Test.Decl( "Throws assertion error for null name" )
+	@Test.Decl( "Throws assertion error for empty name" )
+	@Test.Decl( "throws assertion error for null parser" )
+	@Test.Decl( "Retrieves properties for top level classes" )
+	@Test.Decl( "Retrieves properties for nested classes" )
+	@Test.Decl( "Retrieves properties for double nested classes" )
+	@Test.Decl( "Throws assertion error for anonymous classes" )
+	@Test.Decl( "Throws assertion error for local classs" )
+	@Test.Decl( "Prints declaration for missing property" )
+	@Test.Decl( "Last value for multiple elements" )
+	@Test.Decl( "Uses default for missing" )
+	@Test.Decl( "Throws exception for malformed integer" )
+	@Test.Decl( "Throws exception for malformed long" )
 	public static <T> T get( String name, T defaultValue, Function<String, T> parser ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( parser );
@@ -71,17 +71,17 @@ public class Property {
 	}
 	
 	/** Retrieve a configurable block of text from the system property file */
-	@TestOrig.Decl( "Throws assertion error for null name" )
-	@TestOrig.Decl( "Throws assertion error for empty name" )
-	@TestOrig.Decl( "Retrieves text for top level classes" )
-	@TestOrig.Decl( "Retrieves text for nested classes" )
-	@TestOrig.Decl( "Retrieves text for double nested classes" )
-	@TestOrig.Decl( "Throws assertion error for anonymous classes" )
-	@TestOrig.Decl( "Throws assertion error for local classs" )
-	@TestOrig.Decl( "Prints declaration for missing property" )
-	@TestOrig.Decl( "Can retrieve empty" )
-	@TestOrig.Decl( "Can use property name" )
-	@TestOrig.Decl( "Last value for multiple elements" )
+	@Test.Decl( "Throws assertion error for null name" )
+	@Test.Decl( "Throws assertion error for empty name" )
+	@Test.Decl( "Retrieves text for top level classes" )
+	@Test.Decl( "Retrieves text for nested classes" )
+	@Test.Decl( "Retrieves text for double nested classes" )
+	@Test.Decl( "Throws assertion error for anonymous classes" )
+	@Test.Decl( "Throws assertion error for local classs" )
+	@Test.Decl( "Prints declaration for missing property" )
+	@Test.Decl( "Can retrieve empty" )
+	@Test.Decl( "Can use property name" )
+	@Test.Decl( "Last value for multiple elements" )
 	public static String getText( String name ) {
 		Assert.nonEmpty( name );
 		
@@ -113,25 +113,20 @@ public class Property {
 	}
 	
 	// Convenience parsers. Add as needed.
-	@TestOrig.Skip
 	public static final Function<String, Integer> INTEGER = (s) -> Integer.parseInt(s);
 
-	@TestOrig.Skip
 	public static final Function<String, Long> LONG = (s) -> Long.parseLong(s);
 	
-	@TestOrig.Skip
 	public static final Function<String, Boolean> BOOLEAN = (s) -> Boolean.parseBoolean(s);
 	
-	@TestOrig.Skip
 	public static final Function<String, String> STRING = (s) -> s;
 
-	@TestOrig.Decl( "Collection of common cases" )
-	@TestOrig.Decl( "Array of length one allowed" )
-	@TestOrig.Decl( "Empty array allowed" )
-	@TestOrig.Decl( "White space after comman ignored" )
+	@Test.Decl( "Collection of common cases" )
+	@Test.Decl( "Array of length one allowed" )
+	@Test.Decl( "Empty array allowed" )
+	@Test.Decl( "White space after comman ignored" )
 	public static final Function<String, String[]> CSV = (s) -> s.split( ",\\s*" );
 	
-	@TestOrig.Skip
 	public static final Function<String, List<String>> LIST = (s) -> Arrays.asList( CSV.apply(s));
 	
 
@@ -197,7 +192,6 @@ public class Property {
 			this.buf = new StringBuilder();
 		}
 		
-		@TestOrig.Skip
 		@Override
 		public void startElement( String name, Map<String, String> attributes ) {
 			Assert.nonEmpty( name );
@@ -221,7 +215,6 @@ public class Property {
 			}
 		}
 		
-		@TestOrig.Skip
 		@Override
 		public void endElement( String name ) {
 			Assert.nonEmpty( name );
@@ -233,7 +226,6 @@ public class Property {
 			}
 		}
 
-		@TestOrig.Skip
 		@Override
 		public void characters( char[] ch, int start, int length ) {
 			this.buf.append( ch, start, length );

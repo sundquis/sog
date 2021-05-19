@@ -10,7 +10,6 @@ package sog.core;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@TestOrig.Skip
 /**
  * @author sundquis
  * 

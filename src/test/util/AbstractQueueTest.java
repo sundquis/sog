@@ -8,9 +8,7 @@
 package test.util;
 
 import sog.core.Procedure;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.util.AbstractQueue;
 import sog.util.Queue;
 
@@ -18,12 +16,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class AbstractQueueTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return AbstractQueue.class;
-	}
+public class AbstractQueueTest extends Test.Implementation {
 
 	// Test implementations
 
@@ -54,36 +47,36 @@ public class AbstractQueueTest implements TestContainer {
 	}
 	
 
-	@TestOrig.Impl( src = "protected AbstractQueue()", desc = "Queues are created open" )
-	public void AbstractQueue_QueuesAreCreatedOpen( TestCase tc ) {
+	@Test.Impl( member = "protected AbstractQueue()", description = "Queues are created open" )
+	public void AbstractQueue_QueuesAreCreatedOpen( Test.Case tc ) {
 		tc.assertTrue( this.queue.isOpen() );
 	}
 
-	@TestOrig.Impl( src = "public void AbstractQueue.close()", desc = "Can close if open" )
-	public void close_CanCloseIfOpen( TestCase tc ) {
+	@Test.Impl( member = "public void AbstractQueue.close()", description = "Can close if open" )
+	public void close_CanCloseIfOpen( Test.Case tc ) {
 		tc.assertTrue( this.queue.isOpen() );
 		this.queue.close();
 		tc.assertTrue( this.queue.isClosed() );
 	}
 
-	@TestOrig.Impl( src = "public void AbstractQueue.close()", desc = "Close on terminated ignored" )
-	public void close_CloseOnTerminatedIgnored( TestCase tc ) {
+	@Test.Impl( member = "public void AbstractQueue.close()", description = "Close on terminated ignored" )
+	public void close_CloseOnTerminatedIgnored( Test.Case tc ) {
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
 		this.queue.close();
 		tc.assertFalse( this.queue.isClosed() );
 	}
 
-	@TestOrig.Impl( src = "public void AbstractQueue.terminate()", desc = "Can terminate if closed" )
-	public void terminate_CanTerminateIfClosed( TestCase tc ) {
+	@Test.Impl( member = "public void AbstractQueue.terminate()", description = "Can terminate if closed" )
+	public void terminate_CanTerminateIfClosed( Test.Case tc ) {
 		this.queue.close();
 		tc.assertTrue( this.queue.isClosed() );
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
 	}
 
-	@TestOrig.Impl( src = "public void AbstractQueue.terminate()", desc = "Can terminate if open" )
-	public void terminate_CanTerminateIfOpen( TestCase tc ) {
+	@Test.Impl( member = "public void AbstractQueue.terminate()", description = "Can terminate if open" )
+	public void terminate_CanTerminateIfOpen( Test.Case tc ) {
 		tc.assertTrue( this.queue.isOpen() );
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
@@ -91,16 +84,4 @@ public class AbstractQueueTest implements TestContainer {
 
 	
 	
-	
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		//Test.verbose();
-		new TestOrig(AbstractQueueTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

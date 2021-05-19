@@ -7,34 +7,16 @@
 
 package test.util;
 
-import sog.core.TestOrig;
-import sog.core.TestContainer;
-import sog.util.XStream;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class XStreamTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return XStream.class;
-	}
+public class XStreamTest extends Test.Implementation {
 
 	// Test implementations
 	
 	
 
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		TestOrig.verbose();
-		new TestOrig(XStreamTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

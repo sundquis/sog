@@ -20,22 +20,16 @@ import sog.core.AppException;
 import sog.core.ByteFile;
 import sog.core.Procedure;
 import sog.core.Property;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class AppTest implements TestContainer {
+public class AppTest extends Test.Implementation {
 
-		@Override
-		public Class<?> subjectClass() {
-			return App.class;
-		}
 
-		public Path mySource;
+		public Path mySource; 
 		
 		public Path myDir;
 		
@@ -49,20 +43,20 @@ public class AppTest implements TestContainer {
 		}
 
 		
-		@TestOrig.Impl( src = "public App App.get()", desc = "Is not null" )
-		public void get_IsNotNull( TestCase tc ) {
+		@Test.Impl( member = "public App App.get()", description = "Is not null" )
+		public void get_IsNotNull( Test.Case tc ) {
 			tc.notNull( App.get() );
 		}
 
-		@TestOrig.Impl( src = "public String App.description()", desc = "Is not empty" )
-		public void description_IsNotEmpty( TestCase tc ) {
+		@Test.Impl( member = "public String App.description()", description = "Is not empty" )
+		public void description_IsNotEmpty( Test.Case tc ) {
 			tc.assertFalse( App.get().description().isEmpty() );
 		}
 
-		@TestOrig.Impl( src = "public void App.run()", desc = "Calls terminate on shutdown" )
-		public void run_CallsTerminateOnShutdown( TestCase tc ) {
+		@Test.Impl( member = "public void App.run()", description = "Calls terminate on shutdown" )
+		public void run_CallsTerminateOnShutdown( Test.Case tc ) {
 			// TOGGLE
-			/* */ tc.addMessage( "Manually tested" ).pass(); /*
+			/* */ tc.addMessage( "Manually tested" ); /*
 			// SHOULD SEE:
 			//		Terminating [0] Thread[ ... ]
 			//		...
@@ -82,48 +76,48 @@ public class AppTest implements TestContainer {
 			// */
 		}
 
-		@TestOrig.Impl( src = "public Path App.root()", desc = "Is not null" )
-		public void root_IsNotNull( TestCase tc ) {
+		@Test.Impl( member = "public Path App.root()", description = "Is not null" )
+		public void root_IsNotNull( Test.Case tc ) {
 			tc.notNull( App.get().root() );
 		}
 
-		@TestOrig.Impl( src = "public Path App.root()", desc = "Is readable" )
-		public void root_IsReadable( TestCase tc ) {
+		@Test.Impl( member = "public Path App.root()", description = "Is readable" )
+		public void root_IsReadable( Test.Case tc ) {
 			tc.assertTrue( Files.isReadable( App.get().root() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.root()", desc = "Is wrieable" )
-		public void root_IsWrieable( TestCase tc ) {
+		@Test.Impl( member = "public Path App.root()", description = "Is wrieable" )
+		public void root_IsWrieable( Test.Case tc ) {
 			tc.assertTrue( Files.isWritable( App.get().root() ) );
 		}
 		
-		@TestOrig.Impl( src = "public String App.description()", desc = "Is not null" )
-		public void description_IsNotNull( TestCase tc ) {
+		@Test.Impl( member = "public String App.description()", description = "Is not null" )
+		public void description_IsNotNull( Test.Case tc ) {
 			tc.notNull( App.get().description() );
 		}
 
-		@TestOrig.Impl( src = "public List App.sourceDirs()", desc = "Is not empty" )
-		public void sourceDirs_IsNotEmpty( TestCase tc ) {
+		@Test.Impl( member = "public List App.sourceDirs()", description = "Is not empty" )
+		public void sourceDirs_IsNotEmpty( Test.Case tc ) {
 			tc.assertTrue( App.get().sourceDirs().size() > 0 );
 		}
 
-		@TestOrig.Impl( src = "public List App.sourceDirs()", desc = "Is not null" )
-		public void sourceDirs_IsNotNull( TestCase tc ) {
+		@Test.Impl( member = "public List App.sourceDirs()", description = "Is not null" )
+		public void sourceDirs_IsNotNull( Test.Case tc ) {
 			tc.notNull( App.get().sourceDirs() );
 		}
 		
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns container for anonymous class" )
-		public void sourceFile_ReturnsContainerForAnonymousClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns container for anonymous class" )
+		public void sourceFile_ReturnsContainerForAnonymousClass( Test.Case tc ) {
 			Object anon = new Object(){};
 			tc.assertEqual( mySource, App.get().sourceFile( anon.getClass() ) );
 		}
 
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns container for local class" )
-		public void sourceFile_ReturnsContainerForLocalClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns container for local class" )
+		public void sourceFile_ReturnsContainerForLocalClass( Test.Case tc ) {
 			class Local {}
 			Local local = new Local();
 			tc.assertEqual( mySource, App.get().sourceFile( local.getClass() ) );
@@ -139,145 +133,145 @@ public class AppTest implements TestContainer {
 			private Object get() { return new Object(){}; }
 		}
 		
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns container for nested anonymous class" )
-		public void sourceFile_ReturnsContainerForNestedAnonymousClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns container for nested anonymous class" )
+		public void sourceFile_ReturnsContainerForNestedAnonymousClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( mySource, App.get().sourceFile( n.anon.getClass() ) );
 		}
 
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)",
-			desc = "Returns container for nested class" )
-		public void sourceFile_ReturnsContainerForNestedClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)",
+			description = "Returns container for nested class" )
+		public void sourceFile_ReturnsContainerForNestedClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( mySource, App.get().sourceFile( n.getClass() ) );
 		}
 		
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns container for nested local class" )
-		public void sourceFile_ReturnsContainerForNestedLocalClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns container for nested local class" )
+		public void sourceFile_ReturnsContainerForNestedLocalClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( mySource, App.get().sourceFile( n.get().getClass() ) );
 		}
 
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns container for nested nested class" )
-		public void sourceFile_ReturnsContainerForNestedNestedClass( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns container for nested nested class" )
+		public void sourceFile_ReturnsContainerForNestedNestedClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( mySource, App.get().sourceFile( n.inner.getClass() ) );
 		}
 
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns non null" )
-		public void sourceFile_ReturnsNonNull( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns non null" )
+		public void sourceFile_ReturnsNonNull( Test.Case tc ) {
 			tc.notNull( App.get().sourceFile( Property.class ) );
 		}
 					
-		@TestOrig.Impl( 
-			src = "public Path App.sourceFile(Class)", 
-			desc = "Returns readable" )
-		public void sourceFile_ReturnsReadable( TestCase tc ) {
+		@Test.Impl( 
+			member = "public Path App.sourceFile(Class)", 
+			description = "Returns readable" )
+		public void sourceFile_ReturnsReadable( Test.Case tc ) {
 			tc.assertTrue( Files.isReadable( App.get().sourceFile( ByteFile.class ) ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceFile(Class)", desc = "Throws App Excetion for missing source file" )
-		public void sourceFile_ThrowsAppExcetionForMissingSourceFile( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceFile(Class)", description = "Throws App Excetion for missing source file" )
+		public void sourceFile_ThrowsAppExcetionForMissingSourceFile( Test.Case tc ) {
 			tc.expectError( AppException.class );
 			App.get().sourceFile( Object.class );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceFile(Class)", desc = "Throws assertion error for null class" )
-		public void sourceFile_ThrowsAssertionErrorForNullClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceFile(Class)", description = "Throws assertion error for null class" )
+		public void sourceFile_ThrowsAssertionErrorForNullClass( Test.Case tc ) {
 			tc.expectError( AssertionError.class );
 			App.get().sourceFile( null );
 		}
 					
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for anonymous class" )
-		public void sourceDir_ReturnsContainerForAnonymousClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for anonymous class" )
+		public void sourceDir_ReturnsContainerForAnonymousClass( Test.Case tc ) {
 			Object anon = new Object() {};
 			tc.assertEqual( myDir, App.get().sourceDir( anon.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for local class" )
-		public void sourceDir_ReturnsContainerForLocalClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for local class" )
+		public void sourceDir_ReturnsContainerForLocalClass( Test.Case tc ) {
 			class Local{};
 			Local local = new Local();
 			tc.assertEqual( myDir, App.get().sourceDir( local.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for nested anonymous class" )
-		public void sourceDir_ReturnsContainerForNestedAnonymousClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for nested anonymous class" )
+		public void sourceDir_ReturnsContainerForNestedAnonymousClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( myDir, App.get().sourceDir( n.anon.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for nested class" )
-		public void sourceDir_ReturnsContainerForNestedClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for nested class" )
+		public void sourceDir_ReturnsContainerForNestedClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( myDir, App.get().sourceDir( n.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for nested local class" )
-		public void sourceDir_ReturnsContainerForNestedLocalClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for nested local class" )
+		public void sourceDir_ReturnsContainerForNestedLocalClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( myDir, App.get().sourceDir( n.get().getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns container for nested nested class" )
-		public void sourceDir_ReturnsContainerForNestedNestedClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns container for nested nested class" )
+		public void sourceDir_ReturnsContainerForNestedNestedClass( Test.Case tc ) {
 			Nested n = new Nested();
 			tc.assertEqual( myDir, App.get().sourceDir( n.inner.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns directory" )
-		public void sourceDir_ReturnsDirectory( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns directory" )
+		public void sourceDir_ReturnsDirectory( Test.Case tc ) {
 			Object obj = new Object() {};
 			tc.assertTrue( Files.isDirectory( App.get().sourceDir( obj.getClass()) ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns non null" )
-		public void sourceDir_ReturnsNonNull( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns non null" )
+		public void sourceDir_ReturnsNonNull( Test.Case tc ) {
 			Object obj = new Object() {};
 			tc.notNull( App.get().sourceDir( obj.getClass() ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns readable" )
-		public void sourceDir_ReturnsReadable( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns readable" )
+		public void sourceDir_ReturnsReadable( Test.Case tc ) {
 			Object obj = new Object() {};
 			tc.assertTrue( Files.isReadable( App.get().sourceDir( obj.getClass()) ) );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Throws App Excetion for missing source dir" )
-		public void sourceDir_ThrowsAppExcetionForMissingSourceDir( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Throws App Excetion for missing source dir" )
+		public void sourceDir_ThrowsAppExcetionForMissingSourceDir( Test.Case tc ) {
 			tc.expectError( AppException.class );
 			App.get().sourceDir( Object.class );
 		}
 
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Throws assertion error for null class" )
-		public void sourceDir_ThrowsAssertionErrorForNullClass( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Throws assertion error for null class" )
+		public void sourceDir_ThrowsAssertionErrorForNullClass( Test.Case tc ) {
 			tc.expectError( AssertionError.class );
 			App.get().sourceDir( (Class<?>) null );
 		}
 					
-		@TestOrig.Impl( src = "public Path App.sourceDir(Class)", desc = "Returns writeable" )
-		public void sourceDir_ReturnsWriteable( TestCase tc ) {
+		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns writeable" )
+		public void sourceDir_ReturnsWriteable( Test.Case tc ) {
 			Object obj = new Object() {};
 			tc.assertTrue( Files.isWritable( App.get().sourceDir( obj.getClass()) ) );
 		}
 
-		@TestOrig.Impl( src = "public void App.terminateOnShutdown(App.OnShutdown)", desc = "Throws assertion error for null" )
-		public void terminateOnShutdown_ThrowsAssertionErrorForNull( TestCase tc ) {
+		@Test.Impl( member = "public void App.terminateOnShutdown(App.OnShutdown)", description = "Throws assertion error for null" )
+		public void terminateOnShutdown_ThrowsAssertionErrorForNull( Test.Case tc ) {
 			tc.expectError( AssertionError.class );
 			App.get().terminateOnShutdown( null );
 		}
 		
-		@TestOrig.Impl( src = "public void App.terminateOnShutdown(App.OnShutdown)", desc = "Registers hook" )
-		public void terminateOnShutdown_RegistersHook( TestCase tc ) {
+		@Test.Impl( member = "public void App.terminateOnShutdown(App.OnShutdown)", description = "Registers hook" )
+		public void terminateOnShutdown_RegistersHook( Test.Case tc ) {
 			List<App.OnShutdown> witness = new ArrayList<App.OnShutdown>();
 			List<?> hooks = this.getSubjectField( App.get(), "objectsForShutdown", witness );
 			int size = hooks.size();
@@ -288,14 +282,4 @@ public class AppTest implements TestContainer {
 
 		
 		
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(AppTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

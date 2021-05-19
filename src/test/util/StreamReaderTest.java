@@ -10,16 +10,14 @@ package test.util;
 import java.util.stream.Stream;
 
 import sog.core.Procedure;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.util.StreamReader;
 
 /**
  * @author sundquis
  *
  */
-public class StreamReaderTest implements TestContainer {
+public class StreamReaderTest extends Test.Implementation {
 
 	private static final String[] lines = {
 		"First line.",
@@ -31,8 +29,6 @@ public class StreamReaderTest implements TestContainer {
 	
 	private char[] buffer = new char[100];
 
-	@Override public Class<?> subjectClass() { return StreamReader.class; }
-	
 	@Override public Procedure beforeEach() { return () -> reader = new StreamReader( Stream.of( lines ) ); }
 	
 	@Override public Procedure afterEach() { return () -> reader = null; }
@@ -43,20 +39,20 @@ public class StreamReaderTest implements TestContainer {
 	// Test implementations
 	
 	@SuppressWarnings( "resource" )
-	@TestOrig.Impl( src = "public StreamReader(Stream)", desc = "Throws Assertion Error for null stream" )
-	public void StreamReader_ThrowsAssertionErrorForNullStream( TestCase tc ) {
+	@Test.Impl( member = "public StreamReader(Stream)", description = "Throws Assertion Error for null stream" )
+	public void StreamReader_ThrowsAssertionErrorForNullStream( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new StreamReader( null );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Returns -1 after close()" )
-	public void read_Returns1AfterClose( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Returns -1 after close()" )
+	public void read_Returns1AfterClose( Test.Case tc ) {
 		this.reader.close();
 		tc.assertEqual( -1,  this.fillBuffer() );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Returns -1 at end of stream" )
-	public void read_Returns1AtEndOfStream( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Returns -1 at end of stream" )
+	public void read_Returns1AtEndOfStream( Test.Case tc ) {
 		int iterations = 0;  // To guard against infinite while on bad implementation
 		while ( iterations < 100 && this.fillBuffer() != -1 ) {
 			iterations++;
@@ -64,39 +60,39 @@ public class StreamReaderTest implements TestContainer {
 		tc.assertTrue( iterations < 100 );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Returns lines terminated with LF character" )
-	public void read_ReturnsLinesTerminatedWithLfCharacter( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Returns lines terminated with LF character" )
+	public void read_ReturnsLinesTerminatedWithLfCharacter( Test.Case tc ) {
 		String line = new String( buffer, 0, this.fillBuffer() );
 		tc.assertTrue( line.endsWith( "\n" ) );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Return is at most count" )
-	public void read_ReturnIsAtMostCount( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Return is at most count" )
+	public void read_ReturnIsAtMostCount( Test.Case tc ) {
 		for ( int i = 0; i < 10; i++ ) {
 			tc.assertTrue( this.reader.read( buffer, 0, 5) <= 5 );
 		}
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Throws Assertion Error for negative offset" )
-	public void read_ThrowsAssertionErrorForNegativeOffset( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Throws Assertion Error for negative offset" )
+	public void read_ThrowsAssertionErrorForNegativeOffset( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.reader.read( buffer,  -1,  10 );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Throws Assertion Error for null buffer" )
-	public void read_ThrowsAssertionErrorForNullBuffer( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Throws Assertion Error for null buffer" )
+	public void read_ThrowsAssertionErrorForNullBuffer( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.reader.read( null,  0,  10 );
 	}
 
-	@TestOrig.Impl( src = "public int StreamReader.read(char[], int, int)", desc = "Throws Assertion Error for offset + count > length" )
-	public void read_ThrowsAssertionErrorForOffsetCountLength( TestCase tc ) {
+	@Test.Impl( member = "public int StreamReader.read(char[], int, int)", description = "Throws Assertion Error for offset + count > length" )
+	public void read_ThrowsAssertionErrorForOffsetCountLength( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.reader.read( buffer,  10,  buffer.length );
 	}
 
-	@TestOrig.Impl( src = "public void StreamReader.close()", desc = "Close after close is no op" )
-	public void close_CloseAfterCloseIsNoOp( TestCase tc ) {
+	@Test.Impl( member = "public void StreamReader.close()", description = "Close after close is no op" )
+	public void close_CloseAfterCloseIsNoOp( Test.Case tc ) {
 		this.reader.close();
 		this.reader.close();
 		tc.pass();
@@ -104,15 +100,4 @@ public class StreamReaderTest implements TestContainer {
 
 
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(StreamReaderTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

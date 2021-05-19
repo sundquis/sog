@@ -13,20 +13,13 @@ import java.util.function.Function;
 import sog.core.AppException;
 import sog.core.Procedure;
 import sog.core.Switch;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class SwitchTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return Switch.class;
-	}
+public class SwitchTest extends Test.Implementation {
 
 	// Test implementations
 	
@@ -50,20 +43,20 @@ public class SwitchTest implements TestContainer {
 	
 	
 	// apply
-	@TestOrig.Impl( 
-		src = "public Object Switch.apply(Object, Object)", 
-		desc = "Throws App exception when handler raises exception" )
-	public void apply_ThrowsAppExceptionWhenHandlerRaisesException( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Object Switch.apply(Object, Object)", 
+		description = "Throws App exception when handler raises exception" )
+	public void apply_ThrowsAppExceptionWhenHandlerRaisesException( Test.Case tc ) {
 		tc.expectError( AppException.class );
 		this.sw.addCase( State.OPEN, (s) -> s + 1/0 );
 		this.sw.apply( State.OPEN, "Foo" );
 	}
 		
 
-	@TestOrig.Impl( 
-		src = "public Object Switch.apply(Object, Object)", 
-		desc = "Throws App exception when no handler found" )
-	public void apply_ThrowsAppExceptionWhenNoHandlerFound( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Object Switch.apply(Object, Object)", 
+		description = "Throws App exception when no handler found" )
+	public void apply_ThrowsAppExceptionWhenNoHandlerFound( Test.Case tc ) {
 		tc.expectError( AppException.class );
 		this.sw.addCase( State.OPEN, ID ).addCase( State.CLOSED, ID );
 		tc.assertEqual( "Foo",  this.sw.apply( State.OPEN, "Foo" ) );
@@ -71,10 +64,10 @@ public class SwitchTest implements TestContainer {
 		this.sw.apply( State.MURKY, "Foo" );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Object Switch.apply(Object, Object)", 
-		desc = "Throws assertion error for null key" )
-	public void apply_ThrowsAssertionErrorForNullKey( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Object Switch.apply(Object, Object)", 
+		description = "Throws assertion error for null key" )
+	public void apply_ThrowsAssertionErrorForNullKey( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.sw.addCase( State.OPEN, ID ).addCase( State.CLOSED, ID );
 		this.sw.apply( null, "Foo" );
@@ -82,70 +75,59 @@ public class SwitchTest implements TestContainer {
 
 	
 	// addCase
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addCase(Object, Function)", 
-		desc = "Returns non null" )
-	public void addCase_ReturnsNonNull( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addCase(Object, Function)", 
+		description = "Returns non null" )
+	public void addCase_ReturnsNonNull( Test.Case tc ) {
 		tc.notNull( this.sw.addCase( State.OPEN, ID ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addCase(Object, Function)", 
-		desc = "Returns this Switch instance" )
-	public void addCase_ReturnsThisSwitchInstance( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addCase(Object, Function)", 
+		description = "Returns this Switch instance" )
+	public void addCase_ReturnsThisSwitchInstance( Test.Case tc ) {
 		tc.assertEqual( this.sw, this.sw.addCase( State.OPEN, ID ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addCase(Object, Function)", 
-		desc = "Throws assertion error for null handler" )
-	public void addCase_ThrowsAssertionErrorForNullHandler( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addCase(Object, Function)", 
+		description = "Throws assertion error for null handler" )
+	public void addCase_ThrowsAssertionErrorForNullHandler( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.sw.addCase( State.OPEN, null );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addCase(Object, Function)", 
-		desc = "Throws assertion error for null key" )
-	public void addCase_ThrowsAssertionErrorForNullKey( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addCase(Object, Function)", 
+		description = "Throws assertion error for null key" )
+	public void addCase_ThrowsAssertionErrorForNullKey( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.sw.addCase( null, ID );
 	}
 
 	
 	// addDefault
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addDefault(Function)", 
-		desc = "Returns non null" )
-	public void addDefault_ReturnsNonNull( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addDefault(Function)", 
+		description = "Returns non null" )
+	public void addDefault_ReturnsNonNull( Test.Case tc ) {
 		tc.notNull( this.sw.addDefault( ID ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addDefault(Function)", 
-		desc = "Returns this Switch instance" )
-	public void addDefault_ReturnsThisSwitchInstance( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addDefault(Function)", 
+		description = "Returns this Switch instance" )
+	public void addDefault_ReturnsThisSwitchInstance( Test.Case tc ) {
 		tc.assertEqual( this.sw, this.sw.addDefault( ID ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public Switch Switch.addDefault(Function)", 
-		desc = "Throws assertion error for null handler" )
-	public void addDefault_ThrowsAssertionErrorForNullHandler( TestCase tc ) {
+	@Test.Impl( 
+		member = "public Switch Switch.addDefault(Function)", 
+		description = "Throws assertion error for null handler" )
+	public void addDefault_ThrowsAssertionErrorForNullHandler( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		this.sw.addDefault( null );
 	}
 	
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(SwitchTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

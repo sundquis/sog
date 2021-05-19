@@ -32,7 +32,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 import sog.core.Assert;
 import sog.core.Fatal;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 /**
  * @author sundquis
@@ -48,7 +48,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param source
 	 */
-	@TestOrig.Decl( "Throws assertion error for null source" )
+	@Test.Decl( "Throws assertion error for null source" )
 	public XMLHandler( InputSource source ) {
 		this.source = Assert.nonNull( source );
 	}
@@ -58,7 +58,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@TestOrig.Decl( "Throws assertion error for null reader" )
+	@Test.Decl( "Throws assertion error for null reader" )
 	public XMLHandler( Reader reader ) {
 		this( new InputSource( Assert.nonNull( reader ) ) );
 	}
@@ -68,7 +68,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@TestOrig.Decl( "Throws assertion error for null stream" )
+	@Test.Decl( "Throws assertion error for null stream" )
 	public XMLHandler( InputStream stream ) {
 		this( new InputSource( Assert.nonNull( stream ) ) );
 	}
@@ -78,8 +78,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@TestOrig.Decl( "Throws assertion error for null path" )
-	@TestOrig.Decl( "Throws NoSuchFileException if the file is missing" )
+	@Test.Decl( "Throws assertion error for null path" )
+	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
 	}
@@ -90,7 +90,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * Parse the document provided by the ({@code InputSource}
 	 * This {@code XMLHandler} will receive parsing events
 	 */
-	@TestOrig.Skip( "Extensively exercised in other tests" )
 	public void parse() {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -122,14 +121,13 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @return
 	 */
-	@TestOrig.Decl( "Is not null" )
-	@TestOrig.Decl( "Location is unknown before parsing" )
-	@TestOrig.Decl( "Location is unknown after parsing" )
+	@Test.Decl( "Is not null" )
+	@Test.Decl( "Location is unknown before parsing" )
+	@Test.Decl( "Location is unknown after parsing" )
 	public Location getLocation() {
 		return new Location();
 	}
 
-	@TestOrig.Skip( "Tested extensively in event-based tests" )
 	public class Location {
 		
 		private final int line;
@@ -153,8 +151,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
 	 */
 	@Override
-	@TestOrig.Decl( "Parser registers non-null locator" )
-	@TestOrig.Decl( "Called before startDocument()" )
+	@Test.Decl( "Parser registers non-null locator" )
+	@Test.Decl( "Called before startDocument()" )
 	public void setDocumentLocator( Locator locator ) {
 		this.locator = locator;
 	}
@@ -164,7 +162,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#startDocument()
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Location is identified" )
 	public void startDocument() throws SAXException {
 	}
 
@@ -173,8 +171,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endDocument()
 	 */
 	@Override
-	@TestOrig.Decl( "Called after startDocument()" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Called after startDocument()" )
+	@Test.Decl( "Location is identified" )
 	public void endDocument() throws SAXException {
 	}
 
@@ -183,7 +181,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Skip( "Namespaces are disabled" )
 	public void startPrefixMapping( String prefix, String uri ) throws SAXException {
 	}
 
@@ -192,7 +189,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
 	 */
 	@Override
-	@TestOrig.Skip( "Namespaces are disabled" )
 	public void endPrefixMapping( String prefix ) throws SAXException {
 	}
 
@@ -203,8 +199,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @param atts
 	 * @return
 	 */
-	@TestOrig.Decl( "Result is not null" )
-	@TestOrig.Decl( "Empty map returned when no attributes" )
+	@Test.Decl( "Result is not null" )
+	@Test.Decl( "Empty map returned when no attributes" )
 	public static Map<String, String> attributesToMap( Attributes atts ) {
 		Map<String, String> result = atts.getLength() > 0 ? new TreeMap<>() : XMLHandler.EMPTY_MAP;
 		
@@ -221,9 +217,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
 	@Override
-	@TestOrig.Decl( "Parser signals start of element processing" )
-	@TestOrig.Decl( "qName is not null" )
-	@TestOrig.Decl( "Attributes is not null" )
+	@Test.Decl( "Parser signals start of element processing" )
+	@Test.Decl( "qName is not null" )
+	@Test.Decl( "Attributes is not null" )
 	public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
 		this.startElement( qName,  attributesToMap( atts ) );
 	}
@@ -239,12 +235,12 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @param name
 	 * @param attributes
 	 */
-	@TestOrig.Decl( "Name is not empty" )
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Value correct for required attribute" )
-	@TestOrig.Decl( "Value correct for implied attribute" )
-	@TestOrig.Decl( "Value correct for fixed attribute" )
-	@TestOrig.Decl( "Value correct for enumerated" )
+	@Test.Decl( "Name is not empty" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Value correct for required attribute" )
+	@Test.Decl( "Value correct for implied attribute" )
+	@Test.Decl( "Value correct for fixed attribute" )
+	@Test.Decl( "Value correct for enumerated" )
 	public void startElement( String name, Map<String, String> attributes ) {
 	}
 
@@ -253,7 +249,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "qName is not empty" )
+	@Test.Decl( "qName is not empty" )
 	public void endElement( String uri, String localName, String qName ) throws SAXException {
 		this.endElement( qName );
 	}
@@ -269,9 +265,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param name
 	 */
-	@TestOrig.Decl( "Name is not empty" )
-	@TestOrig.Decl( "Elements closed in LIFO order" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Name is not empty" )
+	@Test.Decl( "Elements closed in LIFO order" )
+	@Test.Decl( "Location is identified" )
 	public void endElement( String name ) {
 	}
 
@@ -280,8 +276,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#characters(char[], int, int)
 	 */
 	@Override
-	@TestOrig.Decl( "Parser uses to signal content" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Parser uses to signal content" )
+	@Test.Decl( "Location is identified" )
 	public void characters( char[] ch, int start, int length ) throws SAXException {
 	}
 
@@ -290,7 +286,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Location is identified" )
 	public void ignorableWhitespace( char[] ch, int start, int length ) throws SAXException {
 	}
 
@@ -299,9 +295,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#processingInstruction(java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Target is correct" )
-	@TestOrig.Decl( "Data is correct" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Target is correct" )
+	@Test.Decl( "Data is correct" )
 	public void processingInstruction( String target, String data ) throws SAXException {
 	}
 
@@ -310,7 +306,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
 	 */
 	@Override
-	@TestOrig.Skip( "Failed to trigger this event" )
 	public void skippedEntity( String name ) throws SAXException {
 	}
 
@@ -319,7 +314,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
 	 */
 	@Override
-	@TestOrig.Skip( "Failed to trigger this event" )
 	public void warning( SAXParseException exception ) throws SAXException {
 	}
 
@@ -328,13 +322,13 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
 	 */
 	@Override
-	@TestOrig.Decl( "Trigered for missing DTD" )
-	@TestOrig.Decl( "Trigered when element does not match declared type" )
-	@TestOrig.Decl( "Trigered for undeclared elements" )
-	@TestOrig.Decl( "Trigered for undeclared attributes" )
-	@TestOrig.Decl( "Trigered for missing requiured attribute" )
-	@TestOrig.Decl( "Trigered for changing #FIXED attribute" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Trigered for missing DTD" )
+	@Test.Decl( "Trigered when element does not match declared type" )
+	@Test.Decl( "Trigered for undeclared elements" )
+	@Test.Decl( "Trigered for undeclared attributes" )
+	@Test.Decl( "Trigered for missing requiured attribute" )
+	@Test.Decl( "Trigered for changing #FIXED attribute" )
+	@Test.Decl( "Location is identified" )
 	public void error( SAXParseException exception ) throws SAXException {
 	}
 
@@ -343,10 +337,10 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
 	 */
 	@Override
-	@TestOrig.Decl( "Trigered for illegal DTD structure" )
-	@TestOrig.Decl( "Trigered for undeclared entity" )
-	@TestOrig.Decl( "Excpetion is thrown after signaling" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Trigered for illegal DTD structure" )
+	@Test.Decl( "Trigered for undeclared entity" )
+	@Test.Decl( "Excpetion is thrown after signaling" )
+	@Test.Decl( "Location is identified" )
 	public void fatalError( SAXParseException exception ) throws SAXException {
 	}
 
@@ -355,8 +349,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.DeclHandler#elementDecl(java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Name is not empty" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Name is not empty" )
 	public void elementDecl( String name, String model ) throws SAXException {
 	}
 
@@ -365,12 +359,12 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.DeclHandler#attributeDecl(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Element name is not empty" )
-	@TestOrig.Decl( "Attribute name is not empty" )
-	@TestOrig.Decl( "Type is correct" )
-	@TestOrig.Decl( "Mode is correct" )
-	@TestOrig.Decl( "Value is correct when supplied in DTD" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Element name is not empty" )
+	@Test.Decl( "Attribute name is not empty" )
+	@Test.Decl( "Type is correct" )
+	@Test.Decl( "Mode is correct" )
+	@Test.Decl( "Value is correct when supplied in DTD" )
 	public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
 	}
 
@@ -379,9 +373,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.DeclHandler#internalEntityDecl(java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Name is correct" )
-	@TestOrig.Decl( "Value is correct" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Name is correct" )
+	@Test.Decl( "Value is correct" )
 	public void internalEntityDecl( String name, String value ) throws SAXException {
 	}
 
@@ -390,7 +384,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.DeclHandler#externalEntityDecl(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Skip( "Not using external entities" )
 	public void externalEntityDecl( String name, String publicId, String systemId ) throws SAXException {
 	}
 
@@ -399,8 +392,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startDTD(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Name is root element" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Name is root element" )
 	public void startDTD( String name, String publicId, String systemId ) throws SAXException {
 	}
 
@@ -409,8 +402,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#endDTD()
 	 */
 	@Override
-	@TestOrig.Decl( "Called after startDTD()" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Called after startDTD()" )
+	@Test.Decl( "Location is identified" )
 	public void endDTD() throws SAXException {
 	}
 
@@ -419,9 +412,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Parser signals use of entity" )
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Name is correct" )
+	@Test.Decl( "Parser signals use of entity" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Name is correct" )
 	public void startEntity( String name ) throws SAXException {
 	}
 
@@ -430,9 +423,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
 	 */
 	@Override
-	@TestOrig.Decl( "Called after startEntity()" )
-	@TestOrig.Decl( "Location is identified" )
-	@TestOrig.Decl( "Name is consistent" )
+	@Test.Decl( "Called after startEntity()" )
+	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Name is consistent" )
 	public void endEntity( String name ) throws SAXException {
 	}
 
@@ -441,8 +434,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startCDATA()
 	 */
 	@Override
-	@TestOrig.Decl( "Parser signals start of CDATA" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Parser signals start of CDATA" )
+	@Test.Decl( "Location is identified" )
 	public void startCDATA() throws SAXException {
 	}
 
@@ -451,8 +444,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#endCDATA()
 	 */
 	@Override
-	@TestOrig.Decl( "Called after startCDATA()" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Called after startCDATA()" )
+	@Test.Decl( "Location is identified" )
 	public void endCDATA() throws SAXException {
 	}
 
@@ -461,8 +454,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#comment(char[], int, int)
 	 */
 	@Override
-	@TestOrig.Decl( "Parser signals comments" )
-	@TestOrig.Decl( "Location is identified" )
+	@Test.Decl( "Parser signals comments" )
+	@Test.Decl( "Location is identified" )
 	public void comment( char[] ch, int start, int length ) throws SAXException {
 	}
 

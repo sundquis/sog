@@ -14,7 +14,6 @@ package sog.core;
  * These (with the exception of warning) throw AppException.
  * Contract violations (illegal arguments, etc.) use the Assert class and throw AssertionError
  */
-@TestOrig.Skip
 public final class Fatal {
 
 	/**

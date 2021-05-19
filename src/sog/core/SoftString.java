@@ -77,12 +77,12 @@ public class SoftString implements Comparable<SoftString> {
 	 * @param threshold
 	 * 		Strings this length or longer are held via a soft reference and can be GC'd
 	 */
-	@TestOrig.Decl( "Throws assertion error for null strings" )
-	@TestOrig.Decl( "Can construct empty" )
-	@TestOrig.Decl( "Can construct short strings" )
-	@TestOrig.Decl( "Can construct long strings" )
-	@TestOrig.Decl( "Correct value after collection" )
-	@TestOrig.Decl( "Strings longer than threshold are soft" )
+	@Test.Decl( "Throws assertion error for null strings" )
+	@Test.Decl( "Can construct empty" )
+	@Test.Decl( "Can construct short strings" )
+	@Test.Decl( "Can construct long strings" )
+	@Test.Decl( "Correct value after collection" )
+	@Test.Decl( "Strings longer than threshold are soft" )
 	public SoftString( String s ) {
 		Assert.nonNull( s );
 		
@@ -98,7 +98,7 @@ public class SoftString implements Comparable<SoftString> {
 	}
 	
 	@Override
-	@TestOrig.Decl( "Stress test correct value" )
+	@Test.Decl( "Stress test correct value" )
 	public String toString() {
 		String result;
 		
@@ -116,15 +116,15 @@ public class SoftString implements Comparable<SoftString> {
 	}
 	
 	@Override
-	@TestOrig.Decl( "Can sort large collections" )
+	@Test.Decl( "Can sort large collections" )
 	public int compareTo( SoftString other ) {
 		return this.toString().compareTo( other.toString() );
 	}
 	
 	@Override
-	@TestOrig.Decl( "Sample cases equal" )
-	@TestOrig.Decl( "Sample cases not equal" )
-	@TestOrig.Decl( "Consistent with compare" )
+	@Test.Decl( "Sample cases equal" )
+	@Test.Decl( "Sample cases not equal" )
+	@Test.Decl( "Consistent with compare" )
 	public boolean equals( Object other ) {
 		boolean result;
 		if ( other == null || !SoftString.class.equals( other.getClass() ) ) {
@@ -136,7 +136,7 @@ public class SoftString implements Comparable<SoftString> {
 	}
 	
 	@Override
-	@TestOrig.Decl( "Sample cases equal" )
+	@Test.Decl( "Sample cases equal" )
 	public int hashCode() {
 		return this.toString().hashCode();
 	}

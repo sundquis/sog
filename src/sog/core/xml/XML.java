@@ -10,7 +10,7 @@ package sog.core.xml;
 
 import sog.core.Assert;
 import sog.core.Property;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 /**
  * Static help with xml
@@ -20,7 +20,7 @@ public class XML {
 	private static XML instance = null;
 
 	/** Retrieve the singleton instance */
-	@TestOrig.Decl( "Is not null" )
+	@Test.Decl( "Is not null" )
 	public static XML get() {
 		if ( XML.instance == null ) {
 			synchronized ( XML.class ) {
@@ -39,8 +39,8 @@ public class XML {
 		this.declaration = Property.getText( "declaration" );
 	}
 	
-	@TestOrig.Decl( "Not empty" )
-	@TestOrig.Decl( "starts correct" )
+	@Test.Decl( "Not empty" )
+	@Test.Decl( "starts correct" )
 	public String getDeclaration() {
 		return this.declaration;
 	}

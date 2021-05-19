@@ -24,20 +24,13 @@ import java.util.function.Supplier;
 import sog.core.App;
 import sog.core.Procedure;
 import sog.core.Strings;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class StringsTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return Strings.class;
-	}
+public class StringsTest extends Test.Implementation {
 
 	// Test implementations
 	
@@ -91,34 +84,34 @@ public class StringsTest implements TestContainer {
 	
 	
 	// arrayToString
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)", 
-		desc = "Empty array allowed" )
-	public void arrayToString_EmptyArrayAllowed( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)", 
+		description = "Empty array allowed" )
+	public void arrayToString_EmptyArrayAllowed( Test.Case tc ) {
 		tc.assertEqual( "[]" , Strings.arrayToString( new String[] {} ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)", 
-		desc = "Enclosed in set brackets" )
-	public void arrayToString_EnclosedInSetBrackets( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)", 
+		description = "Enclosed in set brackets" )
+	public void arrayToString_EnclosedInSetBrackets( Test.Case tc ) {
 		String result = Strings.arrayToString( testArrays.get(0) );
 		tc.assertEqual( '[', result.charAt(0) );
 		tc.assertEqual( ']', result.charAt( result.length()-1 ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)",
-		desc = "Omitted elements are indicated" )
-	public void arrayToString_OmittedElementsAreIndicated( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)",
+		description = "Omitted elements are indicated" )
+	public void arrayToString_OmittedElementsAreIndicated( Test.Case tc ) {
 		String result = Strings.arrayToString( testArrays.get(0) );
 		tc.assertTrue( result.contains( "more>" ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)",
-		desc = "Sample cases for arrays of arrays" )
-	public void arrayToString_SampleCasesForArraysOfArrays( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)",
+		description = "Sample cases for arrays of arrays" )
+	public void arrayToString_SampleCasesForArraysOfArrays( Test.Case tc ) {
 		Object[] arrayOfArray = {
 			new int[] { 1 },
 			new boolean[] { true, false },
@@ -127,10 +120,10 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "[[1], [true, false], [a, b, c]]", Strings.arrayToString( arrayOfArray ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)",
-		desc = "Sample cases for arrays of collections" )
-	public void arrayToString_SampleCasesForArraysOfCollections( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)",
+		description = "Sample cases for arrays of collections" )
+	public void arrayToString_SampleCasesForArraysOfCollections( Test.Case tc ) {
 		Object[] arrayOfCollection = {
 				Arrays.asList( 1 ),
 				Arrays.asList( true, false ),
@@ -139,54 +132,54 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "[{1}, {true, false}, {a, b, c}]", Strings.arrayToString( arrayOfCollection ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)",
-		desc = "Sample cases for arrays of primitive" )
-	public void arrayToString_SampleCasesForArraysOfPrimitive( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)",
+		description = "Sample cases for arrays of primitive" )
+	public void arrayToString_SampleCasesForArraysOfPrimitive( Test.Case tc ) {
 		Iterator<Object> args = testArrays.iterator();
 		for ( String s : testArrayStrings ) {
 			tc.assertEqual( s,  Strings.arrayToString( args.next() ) );
 		}
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.arrayToString(Object)", 
-		desc = "Throws assertion error on null arrays" )
-	public void arrayToString_ThrowsAssertionErrorOnNullArrays( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.arrayToString(Object)", 
+		description = "Throws assertion error on null arrays" )
+	public void arrayToString_ThrowsAssertionErrorOnNullArrays( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.arrayToString( null );
 	}
 
 	
 	// collectionToString
-	@TestOrig.Impl( 
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Empty collection allowed" )
-	public void collectionToString_EmptyCollectionAllowed( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Empty collection allowed" )
+	public void collectionToString_EmptyCollectionAllowed( Test.Case tc ) {
 		tc.assertEqual( "{}",  Strings.collectionToString( new ArrayList<Object>() ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Enclosed in set braces" )
-	public void collectionToString_EnclosedInSetBraces( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Enclosed in set braces" )
+	public void collectionToString_EnclosedInSetBraces( Test.Case tc ) {
 		String result = Strings.collectionToString( testLists.get(0) );
 		tc.assertEqual( '{', result.charAt(0) );
 		tc.assertEqual( '}', result.charAt( result.length()-1 ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Omitted elements are indicated" )
-	public void collectionToString_OmittedElementsAreIndicated( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Omitted elements are indicated" )
+	public void collectionToString_OmittedElementsAreIndicated( Test.Case tc ) {
 		String result = Strings.collectionToString( testLists.get(0) );
 		tc.assertTrue( result.contains( "more>" ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Sample cases for collections of arrays" )
-	public void collectionToString_SampleCasesForCollectionsOfArrays( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Sample cases for collections of arrays" )
+	public void collectionToString_SampleCasesForCollectionsOfArrays( Test.Case tc ) {
 		List<Object> lo = new ArrayList<>();
 		lo.add( new int[] { 1 } );
 		lo.add( new boolean[] { true, false } );
@@ -194,10 +187,10 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "{[1], [true, false], [a, b, c]}", Strings.collectionToString( lo ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Sample cases for collections of collections" )
-	public void collectionToString_SampleCasesForCollectionsOfCollections( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Sample cases for collections of collections" )
+	public void collectionToString_SampleCasesForCollectionsOfCollections( Test.Case tc ) {
 		List<Object> collectionOfCollections = Arrays.asList(
 			Arrays.asList( 1 ),
 			Arrays.asList( true, false ),
@@ -206,158 +199,158 @@ public class StringsTest implements TestContainer {
 		tc.assertEqual( "{{1}, {true, false}, {a, b, c}}", Strings.collectionToString( collectionOfCollections ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Sample cases for collections of primitive" )
-	public void collectionToString_SampleCasesForCollectionsOfPrimitive( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Sample cases for collections of primitive" )
+	public void collectionToString_SampleCasesForCollectionsOfPrimitive( Test.Case tc ) {
 		Iterator<Collection<Object>> args = testLists.iterator();
 		for ( String s : testListStrings ) {
 			tc.assertEqual( s,  Strings.collectionToString( args.next() ) );
 		}
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.collectionToString(Collection)", 
-		desc = "Throws assertion error on null collections" )
-	public void collectionToString_ThrowsAssertionErrorOnNullCollections( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.collectionToString(Collection)", 
+		description = "Throws assertion error on null collections" )
+	public void collectionToString_ThrowsAssertionErrorOnNullCollections( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.collectionToString( null );
 	}
 
 	
 	// justify
-	@TestOrig.Impl( 
-		src = "public String Strings.justify(String, int, char)", 
-		desc = "Justify empty with neg width is not empty" )
-	public void justify_JustifyEmptyWithNegWidthIsNotEmpty( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.justify(String, int, char)", 
+		description = "Justify empty with neg width is not empty" )
+	public void justify_JustifyEmptyWithNegWidthIsNotEmpty( Test.Case tc ) {
 		tc.assertEqual( "X",  Strings.justify( "",  -1,  'X' ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.justify(String, int, char)", 
-		desc = "Justify empty with pos width is not empty" )
-	public void justify_JustifyEmptyWithPosWidthIsNotEmpty( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.justify(String, int, char)", 
+		description = "Justify empty with pos width is not empty" )
+	public void justify_JustifyEmptyWithPosWidthIsNotEmpty( Test.Case tc ) {
 		tc.assertEqual( "X",  Strings.justify( "",  1,  'X' ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.justify(String, int, char)", 
-		desc = "Throws assertion error for null string" )
-	public void justify_ThrowsAssertionErrorForNullString( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.justify(String, int, char)", 
+		description = "Throws assertion error for null string" )
+	public void justify_ThrowsAssertionErrorForNullString( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.justify( null,  1,  ' ' );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.justify(String, int, char)", 
-		desc = "Throws assertion error for zero width" )
-	public void justify_ThrowsAssertionErrorForZeroWidth( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.justify(String, int, char)", 
+		description = "Throws assertion error for zero width" )
+	public void justify_ThrowsAssertionErrorForZeroWidth( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.justify( "Foo",  0,  ' ' );
 	}
 
 	
 	// leftJustify
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Long string truncated" )
-	public void leftJustify_LongStringTruncated( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Long string truncated" )
+	public void leftJustify_LongStringTruncated( Test.Case tc ) {
 		tc.assertEqual( "Hell",  Strings.leftJustify( "Hello world",  4,  '_' ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Result has specified length" )
-	public void leftJustify_ResultHasSpecifiedLength( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Result has specified length" )
+	public void leftJustify_ResultHasSpecifiedLength( Test.Case tc ) {
 		for ( int i = 1; i < 10; i++ ) {
 			tc.assertEqual( i,  Strings.leftJustify( "Foo", i,  'x' ).length() );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Sample cases" )
-	public void leftJustify_SampleCases( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Sample cases" )
+	public void leftJustify_SampleCases( Test.Case tc ) {
 		String[] expected = { "H", "He", "Hel", "Hell", "Hello", "Hello_", "Hello__" };
 		for ( int i = 0; i < 7; i++ ) {
 			tc.assertEqual( expected[i],  Strings.leftJustify( "Hello",  i+1,  '_' ) );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Short string padded with given character" )
-	public void leftJustify_ShortStringPaddedWithGivenCharacter( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Short string padded with given character" )
+	public void leftJustify_ShortStringPaddedWithGivenCharacter( Test.Case tc ) {
 		for ( int i = 5; i < 10; i++ ) {
 			tc.assertEqual( 'x',  Strings.leftJustify( "Fooo",  10,  'x' ).charAt(i) );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Throws assertion error for non positive width" )
-	public void leftJustify_ThrowsAssertionErrorForNonPositiveWidth( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Throws assertion error for non positive width" )
+	public void leftJustify_ThrowsAssertionErrorForNonPositiveWidth( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.leftJustify( "Foo",  -2,  'c' );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.leftJustify(String, int, char)", 
-		desc = "Throws assertion error for null string" )
-	public void leftJustify_ThrowsAssertionErrorForNullString( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.leftJustify(String, int, char)", 
+		description = "Throws assertion error for null string" )
+	public void leftJustify_ThrowsAssertionErrorForNullString( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.leftJustify( null,  2,  'c' );
 	}
 
 	
 	// rightJustify
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Long string truncated" )
-	public void rightJustify_LongStringTruncated( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Long string truncated" )
+	public void rightJustify_LongStringTruncated( Test.Case tc ) {
 		tc.assertEqual( "Hell",  Strings.rightJustify( "Hello world",  4,  '_' ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Result has specified length" )
-	public void rightJustify_ResultHasSpecifiedLength( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Result has specified length" )
+	public void rightJustify_ResultHasSpecifiedLength( Test.Case tc ) {
 		for ( int i = 1; i < 10; i++ ) {
 			tc.assertEqual( i,  Strings.rightJustify( "Foo", i,  'x' ).length() );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Sample cases" )
-	public void rightJustify_SampleCases( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Sample cases" )
+	public void rightJustify_SampleCases( Test.Case tc ) {
 		String[] expected = { "H", "He", "Hel", "Hell", "Hello", "_Hello", "__Hello" };
 		for ( int i = 0; i < 7; i++ ) {
 			tc.assertEqual( expected[i],  Strings.rightJustify( "Hello",  i+1,  '_' ) );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Short string padded with given character" )
-	public void rightJustify_ShortStringPaddedWithGivenCharacter( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Short string padded with given character" )
+	public void rightJustify_ShortStringPaddedWithGivenCharacter( Test.Case tc ) {
 		for ( int i = 0; i < 5; i++ ) {
 			tc.assertEqual( 'x',  Strings.rightJustify( "Fooo",  10,  'x' ).charAt(i) );
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Throws assertion error for non positive width" )
-	public void rightJustify_ThrowsAssertionErrorForNonPositiveWidth( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Throws assertion error for non positive width" )
+	public void rightJustify_ThrowsAssertionErrorForNonPositiveWidth( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.rightJustify( "Foo",  -2,  'c' );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.rightJustify(String, int, char)", 
-		desc = "Throws assertion error for null string" )
-	public void rightJustify_ThrowsAssertionErrorForNullString( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.rightJustify(String, int, char)", 
+		description = "Throws assertion error for null string" )
+	public void rightJustify_ThrowsAssertionErrorForNullString( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.rightJustify( null,  2,  'c' );
 	}
@@ -365,10 +358,10 @@ public class StringsTest implements TestContainer {
 	
 	
 	// strip
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Identity for non quoted trimmed strings" )
-	public void strip_IdentityForNonQuotedTrimmedStrings( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Identity for non quoted trimmed strings" )
+	public void strip_IdentityForNonQuotedTrimmedStrings( Test.Case tc ) {
 		String[] expected = { 
 			"Unquoted strings", 
 			"1, 2, 3, 4, and 5",
@@ -381,17 +374,17 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.strip(String)", 
-		desc = "Identity on empty" )
-	public void strip_IdentityOnEmpty( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.strip(String)", 
+		description = "Identity on empty" )
+	public void strip_IdentityOnEmpty( Test.Case tc ) {
 		tc.assertEqual( "",  Strings.strip( "" ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Ignores unmatched quotes" )
-	public void strip_IgnoresUnmatchedQuotes( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Ignores unmatched quotes" )
+	public void strip_IgnoresUnmatchedQuotes( Test.Case tc ) {
 		String[] expected = {
 			"\"Leading double",
 			"\'Leading single",
@@ -405,10 +398,10 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Is idempotent" )
-	public void strip_IsIdempotent( TestCase tc ) throws FileNotFoundException, IOException {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Is idempotent" )
+	public void strip_IsIdempotent( Test.Case tc ) throws FileNotFoundException, IOException {
 		List<String> lines = new ArrayList<String>();
 		
 		String line;
@@ -428,34 +421,34 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Removes double quotes" )
-	public void strip_RemovesDoubleQuotes( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Removes double quotes" )
+	public void strip_RemovesDoubleQuotes( Test.Case tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\"Hello world\"" ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Removes nested quotes" )
-	public void strip_RemovesNestedQuotes( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Removes nested quotes" )
+	public void strip_RemovesNestedQuotes( Test.Case tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\"\'Hello world\'\"" ) );
 	}
 
-	@TestOrig.Impl(
-		src = "public String Strings.strip(String)", 
-		desc = "Removes single quotes" )
-	public void strip_RemovesSingleQuotes( TestCase tc ) {
+	@Test.Impl(
+		member = "public String Strings.strip(String)", 
+		description = "Removes single quotes" )
+	public void strip_RemovesSingleQuotes( Test.Case tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\'Hello world\'" ) );
 	}
 
-	@TestOrig.Impl( src = "public String Strings.strip(String)", desc = "Result is trimmed" )
-	public void strip_ResultIsTrimmed( TestCase tc ) {
+	@Test.Impl( member = "public String Strings.strip(String)", description = "Result is trimmed" )
+	public void strip_ResultIsTrimmed( Test.Case tc ) {
 		tc.assertEqual( "Hello world",  Strings.strip( "\t\n  Hello world   " ) );
 	}
 
-	@TestOrig.Impl( src = "public String Strings.strip(String)", desc = "Sample cases" )
-	public void strip_SampleCases( TestCase tc ) {
+	@Test.Impl( member = "public String Strings.strip(String)", description = "Sample cases" )
+	public void strip_SampleCases( Test.Case tc ) {
 		String[] args = {
 			"No quotes",
 			"\"Double\"",
@@ -488,10 +481,10 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.strip(String)", 
-		desc = "Throws assertion error for null string" )
-	public void strip_ThrowsAssertionErrorForNullString( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.strip(String)", 
+		description = "Throws assertion error for null string" )
+	public void strip_ThrowsAssertionErrorForNullString( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.strip( null );
 	}
@@ -499,8 +492,8 @@ public class StringsTest implements TestContainer {
 	
 	
 	// toCamelCase
-	@TestOrig.Impl( src = "public String Strings.toCamelCase(String)", desc = "Does not start with a digit" )
-	public void toCamelCase_DoesNotStartWithADigit( TestCase tc ) {
+	@Test.Impl( member = "public String Strings.toCamelCase(String)", description = "Does not start with a digit" )
+	public void toCamelCase_DoesNotStartWithADigit( Test.Case tc ) {
 		String[] args = {
 			"A 2-normal subgroup",
 			"2-3 cisethylene",
@@ -517,17 +510,17 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Identity on empty" )
-	public void toCamelCase_IdentityOnEmpty( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Identity on empty" )
+	public void toCamelCase_IdentityOnEmpty( Test.Case tc ) {
 		tc.assertEqual( "",  Strings.toCamelCase( "" ) );
 	}
 	
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Result contains no white space" )
-	public void toCamelCase_ResultContainsNoWhiteSpace( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Result contains no white space" )
+	public void toCamelCase_ResultContainsNoWhiteSpace( Test.Case tc ) {
 		String[] args = {
 			"Gibberish!t\t dfk\tljg sv;lrjtl a;sljt;lA\n\nSEJ r;slej  l;krsetj tkl ",
 			"Hello, world!",
@@ -545,10 +538,10 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Result contains only letters" )
-	public void toCamelCase_ResultContainsOnlyLetters( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Result contains only letters" )
+	public void toCamelCase_ResultContainsOnlyLetters( Test.Case tc ) {
 		String[] args = {
 			"Gibberish!t\t dfk\tljg sv;lrjtl a;sljt;lA\n\nSEJ r;slej  l;krsetj tkl ",
 			"Hello, world!",
@@ -566,10 +559,10 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Sample cases" )
-	public void toCamelCase_SampleCases( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Sample cases" )
+	public void toCamelCase_SampleCases( Test.Case tc ) {
 		String[] args = {
 			"Hello, world!",
 			"a e i o u and sometimes y",
@@ -609,10 +602,10 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Starts with uppercase" )
-	public void toCamelCase_StartsWithUppercase( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Starts with uppercase" )
+	public void toCamelCase_StartsWithUppercase( Test.Case tc ) {
 		String[] args = {
 			"Hello, world!",
 			"a e i o u and sometimes y",
@@ -636,16 +629,16 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toCamelCase(String)", 
-		desc = "Throws assertion error for null string" )
-	public void toCamelCase_ThrowsAssertionErrorForNullString( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toCamelCase(String)", 
+		description = "Throws assertion error for null string" )
+	public void toCamelCase_ThrowsAssertionErrorForNullString( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Strings.toCamelCase( null );
 	}
 
-	@TestOrig.Impl( src = "public String Strings.toCamelCase(String)", desc = "Underscore removed" )
-	public void toCamelCase_UnderscoreRemoved( TestCase tc ) {
+	@Test.Impl( member = "public String Strings.toCamelCase(String)", description = "Underscore removed" )
+	public void toCamelCase_UnderscoreRemoved( Test.Case tc ) {
 		String[] args = {
 			"Hello_world!",
 			"a_e_i_o_u and sometimes y",
@@ -683,10 +676,10 @@ public class StringsTest implements TestContainer {
 
 	
 	// toString
-	@TestOrig.Impl( 
-		src = "public String Strings.toString(Object)", 
-		desc = "Agrees with object to string for non array non collection" )
-	public void toString_AgreesWithObjectToStringForNonArrayNonCollection( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toString(Object)", 
+		description = "Agrees with object to string for non array non collection" )
+	public void toString_AgreesWithObjectToStringForNonArrayNonCollection( Test.Case tc ) {
 		Object[] args = {
 			null,
 			"null",
@@ -705,45 +698,45 @@ public class StringsTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toString(Object)", 
-		desc = "Identity on empty" )
-	public void toString_IdentityOnEmpty( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toString(Object)", 
+		description = "Identity on empty" )
+	public void toString_IdentityOnEmpty( Test.Case tc ) {
 		tc.assertEqual( "",  Strings.toString( "" ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toString(Object)", 
-		desc = "Provides alternate string representation for arrays" )
-	public void toString_ProvidesAlternateStringRepresentationForArrays( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toString(Object)", 
+		description = "Provides alternate string representation for arrays" )
+	public void toString_ProvidesAlternateStringRepresentationForArrays( Test.Case tc ) {
 		String[] arg = { "a", "b" };
 		tc.assertFalse( arg.toString() == Strings.toString( arg ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toString(Object)", 
-		desc = "Provides alternate string representation for collections" )
-	public void toString_ProvidesAlternateStringRepresentationForCollections( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toString(Object)", 
+		description = "Provides alternate string representation for collections" )
+	public void toString_ProvidesAlternateStringRepresentationForCollections( Test.Case tc ) {
 		List<String> arg = Arrays.asList( "a", "b" );
 		tc.assertFalse( arg.toString() == Strings.toString( arg ) );
 	}
 
-	@TestOrig.Impl( 
-		src = "public String Strings.toString(Object)", 
-		desc = "String representation of null is null" )
-	public void toString_StringRepresentationOfNullIsNull( TestCase tc ) {
+	@Test.Impl( 
+		member = "public String Strings.toString(Object)", 
+		description = "String representation of null is null" )
+	public void toString_StringRepresentationOfNullIsNull( Test.Case tc ) {
 		tc.assertEqual( "null",  Strings.toString( null ) );
 	}
 				
-	@TestOrig.Impl( src = "public String Strings.relativePathToClassname(Path)", desc = "Class to relative path to classname correct" )
-	public void relativePathToClassname_ClassToRelativePathToClassnameCorrect( TestCase tc ) {
+	@Test.Impl( member = "public String Strings.relativePathToClassname(Path)", description = "Class to relative path to classname correct" )
+	public void relativePathToClassname_ClassToRelativePathToClassnameCorrect( Test.Case tc ) {
 		Class<?>[] classes = new Class<?>[] { 
 			App.class,
 			Procedure.class,
 			Strings.class,
-			TestOrig.class,
-			TestCase.class,
-			TestContainer.class
+			Test.class,
+			Test.Case.class,
+			Test.Implementation.class
 		};
 		
 		for ( int i = 0; i < classes.length; i++ ) {
@@ -758,15 +751,4 @@ public class StringsTest implements TestContainer {
 	
 	
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(StringsTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

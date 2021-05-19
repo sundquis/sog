@@ -8,48 +8,30 @@
 package test.core.xml;
 
 
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.core.xml.XML;
 
 /**
  * @author sundquis
  *
  */
-public class XMLTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return XML.class;
-	}
+public class XMLTest extends Test.Implementation {
 
 	// Test implementations
 	
-	@TestOrig.Impl( src = "public String XML.getDeclaration()", desc = "Not empty" )
-	public void getDeclaration_NotEmpty( TestCase tc ) {
+	@Test.Impl( member = "public String XML.getDeclaration()", description = "Not empty" )
+	public void getDeclaration_NotEmpty( Test.Case tc ) {
 		tc.assertTrue( XML.get().getDeclaration().length() > 0 );
 	}
 
-	@TestOrig.Impl( src = "public XML XML.get()", desc = "Is not null" )
-	public void get_IsNotNull( TestCase tc ) {
+	@Test.Impl( member = "public XML XML.get()", description = "Is not null" )
+	public void get_IsNotNull( Test.Case tc ) {
 		tc.notNull( XML.get() );
 	}
 
-	@TestOrig.Impl( src = "public String XML.getDeclaration()", desc = "starts correct" )
-	public void getDeclaration_StartsCorrect( TestCase tc ) {
+	@Test.Impl( member = "public String XML.getDeclaration()", description = "starts correct" )
+	public void getDeclaration_StartsCorrect( Test.Case tc ) {
 		tc.assertTrue( XML.get().getDeclaration().startsWith( "<?xml" ) );
 	}
 	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(XMLTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

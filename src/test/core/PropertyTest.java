@@ -10,29 +10,22 @@ package test.core;
 
 import sog.core.App;
 import sog.core.Property;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.core.xml.XML;
 
 /**
  * @author sundquis
  *
  */
-public class PropertyTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return Property.class;
-	}
+public class PropertyTest extends Test.Implementation {
 
 	// Test implementations
 
 	
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Prints declaration for missing property" )
-	public void get_PrintsDeclarationForMissingProperty( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Prints declaration for missing property" )
+	public void get_PrintsDeclarationForMissingProperty( Test.Case tc ) {
 		// TOGGLE
-		/* */ tc.addMessage( "Manually verified" ).pass(); /*
+		/* */ tc.addMessage( "Manually verified" ); /*
 		tc.addMessage( "SHOULD SEE:" );
 		tc.addMessage( "WARNING: Property not found:" );
 		tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
@@ -43,8 +36,8 @@ public class PropertyTest implements TestContainer {
 		// */
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Retrieves properties for nested classes" )
-	public void get_RetrievesPropertiesForNestedClasses( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Retrieves properties for nested classes" )
+	public void get_RetrievesPropertiesForNestedClasses( Test.Case tc ) {
 		// Should use a mock-up. Instead put a fake entry in system.xml
 		tc.assertTrue( Property.get( "nested.test",  false,  Property.BOOLEAN ) );
 	}
@@ -57,18 +50,18 @@ public class PropertyTest implements TestContainer {
 			return Property.getText( "innertest" );
 		}
 	}
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Retrieves properties for double nested classes" )
-	public void get_RetrievesPropertiesForDoubleNestedClasses( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Retrieves properties for double nested classes" )
+	public void get_RetrievesPropertiesForDoubleNestedClasses( Test.Case tc ) {
 		tc.assertTrue( Inner.getTestProp() );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Retrieves properties for top level classes" )
-	public void get_RetrievesPropertiesForTopLevelClasses( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Retrieves properties for top level classes" )
+	public void get_RetrievesPropertiesForTopLevelClasses( Test.Case tc ) {
 		tc.assertTrue( App.get().description() != null );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws assertion error for anonymous classes" )
-	public void get_ThrowsAssertionErrorForAnonymousClasses( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws assertion error for anonymous classes" )
+	public void get_ThrowsAssertionErrorForAnonymousClasses( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Object anon = new Object() {
 			@Override public String toString() {
@@ -78,14 +71,14 @@ public class PropertyTest implements TestContainer {
 		tc.assertEqual( "bar",  anon.toString() );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws assertion error for empty name" )
-	public void get_ThrowsAssertionErrorForEmptyName( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws assertion error for empty name" )
+	public void get_ThrowsAssertionErrorForEmptyName( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Property.get( "",  "foo",  Property.STRING );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws assertion error for local classs" )
-	public void get_ThrowsAssertionErrorForLocalClasss( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws assertion error for local classs" )
+	public void get_ThrowsAssertionErrorForLocalClasss( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		class Local {
 			boolean getProp() {
@@ -96,20 +89,20 @@ public class PropertyTest implements TestContainer {
 		tc.assertEqual( "bar",  local.getProp() );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws assertion error for null name" )
-	public void get_ThrowsAssertionErrorForNullName( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws assertion error for null name" )
+	public void get_ThrowsAssertionErrorForNullName( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Property.get( null,  "foo",  Property.STRING );
 	}
 	
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "throws assertion error for null parser" )
-	public void get_ThrowsAssertionErrorForNullParser( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "throws assertion error for null parser" )
+	public void get_ThrowsAssertionErrorForNullParser( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Property.get( "foo",  "foo",  null );
 	}
 	
-	@TestOrig.Impl( src = "public Function Property.CSV", desc = "Array of length one allowed" )
-	public void CSV_ArrayOfLengthOneAllowed( TestCase tc ) {
+	@Test.Impl( member = "public Function Property.CSV", description = "Array of length one allowed" )
+	public void CSV_ArrayOfLengthOneAllowed( Test.Case tc ) {
 		String arg = "A single string.";
 		String[] array = { "A single string." };
 		tc.assertEqual( array, Property.CSV.apply( arg ) );
@@ -129,31 +122,31 @@ public class PropertyTest implements TestContainer {
 		"",
 		"Singleton"
 	};
-	@TestOrig.Impl( src = "public Function Property.CSV", desc = "Collection of common cases", weight = 5 )
-	public void CSV_CollectionOfCommonCases( TestCase tc ) {
+	@Test.Impl( member = "public Function Property.CSV", description = "Collection of common cases", weight = 5 )
+	public void CSV_CollectionOfCommonCases( Test.Case tc ) {
 		for ( int i = 0; i < ARRAYS.length; i++ ) {
 			tc.assertEqual( ARRAYS[i],  Property.CSV.apply( ARGS[i] ) );
 		}
 	}
 
-	@TestOrig.Impl( src = "public Function Property.CSV", desc = "Empty array allowed" )
-	public void CSV_EmptyArrayAllowed( TestCase tc ) {
+	@Test.Impl( member = "public Function Property.CSV", description = "Empty array allowed" )
+	public void CSV_EmptyArrayAllowed( Test.Case tc ) {
 		String arg = "";
 		String[] array = { "" };
 		tc.assertEqual( array, Property.CSV.apply( arg ) );
 	}
 	
-	@TestOrig.Impl( src = "public Function Property.CSV", desc = "White space after comman ignored" )
-	public void CSV_WhiteSpaceAfterCommanIgnored( TestCase tc ) {
+	@Test.Impl( member = "public Function Property.CSV", description = "White space after comman ignored" )
+	public void CSV_WhiteSpaceAfterCommanIgnored( Test.Case tc ) {
 		String arg = "Spaces ignored,        Tabs ignored,\t\tNewlines ignored,\n\n Done";
 		String[] array = { "Spaces ignored", "Tabs ignored", "Newlines ignored", "Done" };
 		tc.assertEqual( array, Property.CSV.apply( arg ) );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Prints declaration for missing property" )
-	public void getText_PrintsDeclarationForMissingProperty( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Prints declaration for missing property" )
+	public void getText_PrintsDeclarationForMissingProperty( Test.Case tc ) {
 		// TOGGLE
-		/* */ tc.addMessage( "Manually verified" ).pass(); /*
+		/* */ tc.addMessage( "Manually verified" ); /*
 		tc.addMessage( "SHOULD SEE:" );
 		tc.addMessage( "WARNING: Text not found:" );
 		tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
@@ -164,23 +157,23 @@ public class PropertyTest implements TestContainer {
 		// */
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Retrieves text for double nested classes" )
-	public void getText_RetrievesTextForDoubleNestedClasses( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Retrieves text for double nested classes" )
+	public void getText_RetrievesTextForDoubleNestedClasses( Test.Case tc ) {
 		tc.assertTrue( Inner.getTestText().length() > 0 );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Retrieves text for nested classes" )
-	public void getText_RetrievesTextForNestedClasses( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Retrieves text for nested classes" )
+	public void getText_RetrievesTextForNestedClasses( Test.Case tc ) {
 		tc.assertEqual( "Nested",  Property.getText( "nested" ) );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Retrieves text for top level classes" )
-	public void getText_RetrievesTextForTopLevelClasses( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Retrieves text for top level classes" )
+	public void getText_RetrievesTextForTopLevelClasses( Test.Case tc ) {
 		tc.assertTrue( XML.get().getDeclaration().length() > 0 );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Throws assertion error for anonymous classes" )
-	public void getText_ThrowsAssertionErrorForAnonymousClasses( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Throws assertion error for anonymous classes" )
+	public void getText_ThrowsAssertionErrorForAnonymousClasses( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Object anon = new Object() {
 			@Override public String toString() {
@@ -190,14 +183,14 @@ public class PropertyTest implements TestContainer {
 		tc.assertEqual( "foo",  anon.toString() );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Throws assertion error for empty name" )
-	public void getText_ThrowsAssertionErrorForEmptyName( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Throws assertion error for empty name" )
+	public void getText_ThrowsAssertionErrorForEmptyName( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Property.getText( "" );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Throws assertion error for local classs" )
-	public void getText_ThrowsAssertionErrorForLocalClasss( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Throws assertion error for local classs" )
+	public void getText_ThrowsAssertionErrorForLocalClasss( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		class Local {
 			String getText() {
@@ -208,62 +201,51 @@ public class PropertyTest implements TestContainer {
 		tc.assertEqual( "foo",  local.getText() );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Throws assertion error for null name" )
-	public void getText_ThrowsAssertionErrorForNullName( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Throws assertion error for null name" )
+	public void getText_ThrowsAssertionErrorForNullName( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Property.getText( null );
 	}
 	
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Last value for multiple elements" )
-	public void get_LastValueForMultipleElements( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Last value for multiple elements" )
+	public void get_LastValueForMultipleElements( Test.Case tc ) {
 		tc.assertTrue( Property.get( "duplicate",  false,  Property.BOOLEAN ) );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Can retrieve empty" )
-	public void getText_CanRetrieveEmpty( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Can retrieve empty" )
+	public void getText_CanRetrieveEmpty( Test.Case tc ) {
 		tc.assertTrue( "".equals( Property.getText( "empty" ) ) );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Can use property name" )
-	public void getText_CanUsePropertyName( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Can use property name" )
+	public void getText_CanUsePropertyName( Test.Case tc ) {
 		tc.assertEqual( "Duplicate", Property.getText( "duplicate" ) );
 	}
 
-	@TestOrig.Impl( src = "public String Property.getText(String)", desc = "Last value for multiple elements" )
-	public void getText_LastValueForMultipleElements( TestCase tc ) {
+	@Test.Impl( member = "public String Property.getText(String)", description = "Last value for multiple elements" )
+	public void getText_LastValueForMultipleElements( Test.Case tc ) {
 		tc.assertEqual( "Repeated", Property.getText( "repeated" ) );
 	}
 	
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Uses default for missing" )
-	public void get_UsesDefaultForMissing( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Uses default for missing" )
+	public void get_UsesDefaultForMissing( Test.Case tc ) {
 		// This results in a warning that can be ignored
 		// TODO: Suppress warning?
 		System.err.println( "Can ignore: WARNING: Property not found:..." );
 		tc.assertEqual( "Default",  Property.get( "bogus",  "Default",  Property.STRING ) );
 	}
 	
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws exception for malformed integer" )
-	public void get_ThrowsExceptionForMalformedInteger( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws exception for malformed integer" )
+	public void get_ThrowsExceptionForMalformedInteger( Test.Case tc ) {
 		tc.expectError( NumberFormatException.class );
 		tc.assertEqual( 10,  Property.get( "malformed", 10, Property.INTEGER ) );
 	}
 
-	@TestOrig.Impl( src = "public Object Property.get(String, Object, Function)", desc = "Throws exception for malformed long" )
-	public void get_ThrowsExceptionForMalformedLong( TestCase tc ) {
+	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Throws exception for malformed long" )
+	public void get_ThrowsExceptionForMalformedLong( Test.Case tc ) {
 		tc.expectError( NumberFormatException.class );
 		tc.assertEqual( 10L,  Property.get( "malformed", 10L, Property.LONG ) );
 	}
 
 	
-	
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(PropertyTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

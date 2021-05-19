@@ -11,112 +11,94 @@ package test.core;
 import java.nio.file.Files;
 
 import sog.core.LocalDir;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class LocalDirTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return LocalDir.class;
-	}
+public class LocalDirTest extends Test.Implementation {
 
 	// Test implementations
 
-	@TestOrig.Impl( src = "public Path LocalDir.getDir()", desc = "Exists" )
-	public void getDir_Exists( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getDir()", description = "Exists" )
+	public void getDir_Exists( Test.Case tc ) {
 		tc.assertTrue( Files.exists( new LocalDir().getDir() ) );
 	}
 
-	@TestOrig.Impl( src = "public Path LocalDir.getDir()", desc = "Is directory" )
-	public void getDir_IsDirectory( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getDir()", description = "Is directory" )
+	public void getDir_IsDirectory( Test.Case tc ) {
 		tc.assertTrue( Files.isDirectory( new LocalDir().getDir() ) );
 	}
 
-	@TestOrig.Impl( src = "public Path LocalDir.getDir()", desc = "Is readable" )
-	public void getDir_IsReadable( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getDir()", description = "Is readable" )
+	public void getDir_IsReadable( Test.Case tc ) {
 		tc.assertTrue( Files.isReadable( new LocalDir().getDir() ) );
 	}
 
-	@TestOrig.Impl( src = "public Path LocalDir.getFile(String, LocalDir.Type)", desc = "throws Assertion Error if name is null" )
-	public void getFile_ThrowsAssertionErrorIfNameIsNull( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getFile(String, LocalDir.Type)", description = "throws Assertion Error if name is null" )
+	public void getFile_ThrowsAssertionErrorIfNameIsNull( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().getFile( null, LocalDir.Type.PLAIN );
 	}
 
-	@TestOrig.Impl( src = "public Path LocalDir.getFile(String, LocalDir.Type)", desc = "throws Assertion Error if name is empty" )
-	public void getFile_ThrowsAssertionErrorIfNameIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getFile(String, LocalDir.Type)", description = "throws Assertion Error if name is empty" )
+	public void getFile_ThrowsAssertionErrorIfNameIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().getFile( "", LocalDir.Type.PLAIN );
 	}
 
-	@TestOrig.Impl( src = "public Path LocalDir.getFile(String, LocalDir.Type)", desc = "throws Assertion Error if type is null" )
-	public void getFile_ThrowsAssertionErrorIfTypeIsNull( TestCase tc ) {
+	@Test.Impl( member = "public Path LocalDir.getFile(String, LocalDir.Type)", description = "throws Assertion Error if type is null" )
+	public void getFile_ThrowsAssertionErrorIfTypeIsNull( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().getFile( "Foo", null );
 	}
 	
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Temporary file exists" )
-	public void getTmpFile_TemporaryFileExists( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Temporary file exists" )
+	public void getTmpFile_TemporaryFileExists( Test.Case tc ) {
 		tc.assertTrue( new LocalDir().sub( "tmp" ).getTmpFile( "Foo" ).exists() );
 	}
 
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Temporary file is readable" )
-	public void getTmpFile_TemporaryFileIsReadable( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Temporary file is readable" )
+	public void getTmpFile_TemporaryFileIsReadable( Test.Case tc ) {
 		tc.assertTrue( new LocalDir().sub( "tmp" ).getTmpFile( "Foo" ).canRead() );
 	}
 
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Temporary file is writeable" )
-	public void getTmpFile_TemporaryFileIsWriteable( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Temporary file is writeable" )
+	public void getTmpFile_TemporaryFileIsWriteable( Test.Case tc ) {
 		tc.assertTrue( new LocalDir().sub( "tmp" ).getTmpFile( "Foo" ).canWrite() );
 	}
 
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Throws arretion error if prefix is empty" )
-	public void getTmpFile_ThrowsArretionErrorIfPrefixIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Throws arretion error if prefix is empty" )
+	public void getTmpFile_ThrowsArretionErrorIfPrefixIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().sub( "tmp" ).getTmpFile( "" );
 	}
 
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Throws arretion error if prefix is short" )
-	public void getTmpFile_ThrowsArretionErrorIfPrefixIsShort( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Throws arretion error if prefix is short" )
+	public void getTmpFile_ThrowsArretionErrorIfPrefixIsShort( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().sub( "tmp" ).getTmpFile( "AB" );
 	}
 
-	@TestOrig.Impl( src = "public File LocalDir.getTmpFile(String)", desc = "Throws arretion error if prefix is null" )
-	public void getTmpFile_ThrowsArretionErrorIfPrefixIsNull( TestCase tc ) {
+	@Test.Impl( member = "public File LocalDir.getTmpFile(String)", description = "Throws arretion error if prefix is null" )
+	public void getTmpFile_ThrowsArretionErrorIfPrefixIsNull( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().sub( "tmp" ).getTmpFile( null );
 	}
 
-	@TestOrig.Impl( src = "public LocalDir LocalDir.sub(String)", desc = "Appending empty subdir throws assertion error" )
-	public void sub_AppendingEmptySubdirThrowsAssertionError( TestCase tc ) {
+	@Test.Impl( member = "public LocalDir LocalDir.sub(String)", description = "Appending empty subdir throws assertion error" )
+	public void sub_AppendingEmptySubdirThrowsAssertionError( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().sub( "" );
 	}
 
-	@TestOrig.Impl( src = "public LocalDir LocalDir.sub(String)", desc = "Appending null subdir throws assertion error" )
-	public void sub_AppendingNullSubdirThrowsAssertionError( TestCase tc ) {
+	@Test.Impl( member = "public LocalDir LocalDir.sub(String)", description = "Appending null subdir throws assertion error" )
+	public void sub_AppendingNullSubdirThrowsAssertionError( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		new LocalDir().sub( null );
 	}
 	
 	
 	
-	
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(LocalDirTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

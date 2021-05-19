@@ -16,14 +16,12 @@ import java.util.Arrays;
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Strings;
-import sog.core.TestOrig;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-@TestOrig.Skip
 public class TestRunner {
 
 	
@@ -106,10 +104,10 @@ public class TestRunner {
 		Arrays.stream( clazz.getDeclaredClasses() ).forEach( TestRunner::testClass );
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static void testClass( Class<?> clazz ) {
-		if ( clazz != null && !clazz.isInterface()  && TestContainer.class.isAssignableFrom( clazz ) ) {
-			new TestOrig( (Class<TestContainer>) clazz );
+	//@SuppressWarnings("unchecked")
+	public static void testClass( Class<?> clazz ) { 
+		if ( clazz != null && !clazz.isInterface()  && Test.Implementation.class.isAssignableFrom( clazz ) ) {
+			//new TestOrig( (Class<TestContainer>) clazz );
 		}
 	}
 	
@@ -136,7 +134,6 @@ public class TestRunner {
 		//testPackage( "test", "persist", "model" );
 		testSourceDir( "home", "sundquis", "book", "sog", "src" );
 
-		TestOrig.printResults();
 
 		System.out.println("\nDone!");
 

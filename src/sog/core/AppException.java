@@ -15,7 +15,6 @@ package sog.core;
  * Depends on:
  * 		NONE
  */
-@TestOrig.Skip
 public class AppException extends RuntimeException {
 
 	private static final long serialVersionUID = -2314875945481995828L;

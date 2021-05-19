@@ -17,8 +17,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import sog.util.FixedWidth;
 
 /**
  * @author sundquis
@@ -31,7 +31,7 @@ public class App implements Runnable {
 	private static App instance = null;
 	
 	/** Retrieve the singleton instance */
-	@TestOrig.Decl( "Is not null" )
+	@Test.Decl( "Is not null" )
 	public static App get() {
 		if ( App.instance == null ) {
 			synchronized ( App.class ) {
@@ -52,12 +52,9 @@ public class App implements Runnable {
 	private final List<OnShutdown> objectsForShutdown;
 		
 	private App() {
-		String rootDirName = Property.get( "root", null, Property.STRING );
-		Assert.nonEmpty( rootDirName );
+		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Property.STRING ) );
 		this.root = Assert.rwDirectory( Paths.get( rootDirName ) );
-
 		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Property.STRING ) );
-		
 		this.sourceDirs = Property.get( "source.dirs", Collections.<String>emptyList(), Property.LIST )
 			.stream()
 			.map( Paths::get )
@@ -69,37 +66,37 @@ public class App implements Runnable {
 	}
 
 	/** Root directory for all application resources */
-	@TestOrig.Decl( "Is not null" )
-	@TestOrig.Decl( "Is readable" )
-	@TestOrig.Decl( "Is wrieable" )
+	@Test.Decl( "Is not null" )
+	@Test.Decl( "Is readable" )
+	@Test.Decl( "Is wrieable" )
 	public Path root() {
 		return this.root;
 	}
 
-	@TestOrig.Decl( "Is not empty" )
-	@TestOrig.Decl( "Is not null" )
+	@Test.Decl( "Is not empty" )
+	@Test.Decl( "Is not null" )
 	public String description() {
 		return this.description;
 	}
 	
-	@TestOrig.Decl( "Is not empty" )
-	@TestOrig.Decl( "Is not null" )
+	@Test.Decl( "Is not empty" )
+	@Test.Decl( "Is not null" )
 	public List<Path> sourceDirs() {
 		return this.sourceDirs;
 	}
 	
-	@TestOrig.Decl( "Throws assertion error for null class" )
-	@TestOrig.Decl( "Throws App Excetion for missing source dir" )
-	@TestOrig.Decl( "Returns non null" )
-	@TestOrig.Decl( "Returns readable" )
-	@TestOrig.Decl( "Returns writeable" )
-	@TestOrig.Decl( "Returns directory" )
-	@TestOrig.Decl( "Returns container for nested class" )
-	@TestOrig.Decl( "Returns container for nested nested class" )
-	@TestOrig.Decl( "Returns container for local class" )
-	@TestOrig.Decl( "Returns container for anonymous class" )
-	@TestOrig.Decl( "Returns container for nested local class" )
-	@TestOrig.Decl( "Returns container for nested anonymous class" )
+	@Test.Decl( "Throws assertion error for null class" )
+	@Test.Decl( "Throws App Excetion for missing source dir" )
+	@Test.Decl( "Returns non null" )
+	@Test.Decl( "Returns readable" )
+	@Test.Decl( "Returns writeable" )
+	@Test.Decl( "Returns directory" )
+	@Test.Decl( "Returns container for nested class" )
+	@Test.Decl( "Returns container for nested nested class" )
+	@Test.Decl( "Returns container for local class" )
+	@Test.Decl( "Returns container for anonymous class" )
+	@Test.Decl( "Returns container for nested local class" )
+	@Test.Decl( "Returns container for nested anonymous class" )
 	public Path sourceDir( Class<?> clazz ) {
 		Assert.nonNull( clazz );
 
@@ -118,16 +115,16 @@ public class App implements Runnable {
 			.orElseGet( () -> { Fatal.error( "No source directory for " + clazz ); return null; } );
 	}
 		
-	@TestOrig.Decl( "Throws assertion error for null class" )
-	@TestOrig.Decl( "Throws App Excetion for missing source file" )
-	@TestOrig.Decl( "Returns non null" )
-	@TestOrig.Decl( "Returns readable" )
-	@TestOrig.Decl( "Returns container for nested class" )
-	@TestOrig.Decl( "Returns container for nested nested class" )
-	@TestOrig.Decl( "Returns container for local class" )
-	@TestOrig.Decl( "Returns container for anonymous class" )
-	@TestOrig.Decl( "Returns container for nested local class" )
-	@TestOrig.Decl( "Returns container for nested anonymous class" )
+	@Test.Decl( "Throws assertion error for null class" )
+	@Test.Decl( "Throws App Excetion for missing source file" )
+	@Test.Decl( "Returns non null" )
+	@Test.Decl( "Returns readable" )
+	@Test.Decl( "Returns container for nested class" )
+	@Test.Decl( "Returns container for nested nested class" )
+	@Test.Decl( "Returns container for local class" )
+	@Test.Decl( "Returns container for anonymous class" )
+	@Test.Decl( "Returns container for nested local class" )
+	@Test.Decl( "Returns container for nested anonymous class" )
 	public Path sourceFile( Class<?> clazz ) {
 		Assert.nonNull( clazz );
 
@@ -148,21 +145,20 @@ public class App implements Runnable {
 	}
 	
 	/** For objects that require clean-up before shutdown. */
-	@TestOrig.Skip
 	public static interface OnShutdown {
 		public void terminate();
 	}
 
 	/** Register for shutdown termination */
-	@TestOrig.Decl( "Throws assertion error for null" )
-	@TestOrig.Decl( "Registers hook" )
+	@Test.Decl( "Throws assertion error for null" )
+	@Test.Decl( "Registers hook" )
 	public void terminateOnShutdown( OnShutdown os ) {
 		this.objectsForShutdown.add( Assert.nonNull( os ) );
 	}
 
 	/** @see java.lang.Runnable#run() */
 	@Override
-	@TestOrig.Decl( "Calls terminate on shutdown" )
+	@Test.Decl( "Calls terminate on shutdown" )
 	public void run() {
 		for ( OnShutdown os : this.objectsForShutdown ) {
 			try {
@@ -177,20 +173,12 @@ public class App implements Runnable {
 	// FIXME: Test
 	public static class Location {
 		
-		public static String get( StackWalker.StackFrame sf ) {
-			return new Location( sf ) .toString();
-		}
-		
-		public static String get( StackTraceElement ste ) {
-			return new Location( ste ) .toString();
-		}
-				
 		private final String className;
 		private final String methodName;
 		private final String fileName;
 		private final int lineNo;
 		
-		private Location( StackWalker.StackFrame sf ) {
+		public Location( StackWalker.StackFrame sf ) {
 			Assert.nonNull( sf );
 			
 			this.className = sf.getClassName();
@@ -199,7 +187,7 @@ public class App implements Runnable {
 			this.lineNo = sf.getLineNumber();
 		}
 		
-		private Location( StackTraceElement ste ) {
+		public Location( StackTraceElement ste ) {
 			Assert.nonNull( ste );
 			
 			this.className = ste.getClassName();
@@ -221,25 +209,29 @@ public class App implements Runnable {
 	 * Return a file name and line number pointer to the calling location of an executing program.
 	 * If the calling stack does not have the requested depth, an AppException is thrown.
 	 */
-	public List<String> getLocation() {
+	public Stream<String> getLocation() {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
-			.map( Location::get )
-			.collect( Collectors.toList() )
+			.map( Location::new )
+			.map( Location::toString )
 		);
 	}
 	
-	public List<String> getLocation( String prefix ) {
+	
+	
+	public Stream<String> getLocation( String prefix ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
 			.filter( sf -> sf.getClassName().startsWith( prefix ) )
-			.map( Location::get )
-			.collect( Collectors.toList() )
+			.map( Location::new )
+			.map( Location::toString )
 		);
 	}
 	
-	public List<String> getLocation( Throwable th ) {
+	
+
+	public Stream<String> getLocation( Throwable th ) {
 		return Arrays.stream( th.getStackTrace() )
-			.map( Location::get )
-			.collect( Collectors.toList() );
+			.map( Location::new )
+			.map( Location::toString );
 	}
 	
 

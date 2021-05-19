@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 /**
  * Wrap a {@code java.util.stream.Stream} of String to provide a {@code java.io.Reader}
@@ -35,7 +35,7 @@ public class StreamReader extends Reader implements AutoCloseable {
 	 * 
 	 * @param stream
 	 */
-	@TestOrig.Decl( "Throws Assertion Error for null stream" )
+	@Test.Decl( "Throws Assertion Error for null stream" )
 	public StreamReader( Stream<String> stream ) {
 		this.stream = Assert.nonNull( stream );
 		this.lines = stream.iterator();
@@ -47,13 +47,13 @@ public class StreamReader extends Reader implements AutoCloseable {
 	 * @see java.io.Reader#read(char[], int, int)
 	 */
 	@Override
-	@TestOrig.Decl( "Throws Assertion Error for null buffer" )
-	@TestOrig.Decl( "Throws Assertion Error for negative offset" )
-	@TestOrig.Decl( "Throws Assertion Error for offset + count > length" )
-	@TestOrig.Decl( "Returns -1 at end of stream" )
-	@TestOrig.Decl( "Returns -1 after close()" )
-	@TestOrig.Decl( "Returns lines terminated with LF character" )
-	@TestOrig.Decl( "Return is at most count" )
+	@Test.Decl( "Throws Assertion Error for null buffer" )
+	@Test.Decl( "Throws Assertion Error for negative offset" )
+	@Test.Decl( "Throws Assertion Error for offset + count > length" )
+	@Test.Decl( "Returns -1 at end of stream" )
+	@Test.Decl( "Returns -1 after close()" )
+	@Test.Decl( "Returns lines terminated with LF character" )
+	@Test.Decl( "Return is at most count" )
 	public int read( char[] buffer, int offset, int count ) {
 		Assert.nonNull( buffer );
 		Assert.nonNeg( offset );
@@ -79,7 +79,7 @@ public class StreamReader extends Reader implements AutoCloseable {
 	 * @see java.io.Reader#close()
 	 */
 	@Override
-	@TestOrig.Decl( "Close after close is no op" )
+	@Test.Decl( "Close after close is no op" )
 	public void close() {
 		if ( stream != null ) {
 			this.stream.close();

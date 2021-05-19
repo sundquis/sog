@@ -47,7 +47,6 @@ public class Trace {
 	
 	
 
-	@TestOrig.Skip
 	private static class MsgHandler implements Runnable, OnShutdown, Consumer<String> {
 		
 		private static int fileNo = 0;
@@ -184,7 +183,7 @@ public class Trace {
 	 * Report the current tracing status.
 	 * @return
 	 */
-	@TestOrig.Decl( "Enabled when initialized" )
+	@Test.Decl( "Enabled when initialized" )
 	public static boolean isEnabled() {
 		return Trace.currentHandler != Trace.DISABLED;
 	}
@@ -192,8 +191,8 @@ public class Trace {
 	/**
 	 * When enabled, trace messages are written to a trace file.
 	 */
-	@TestOrig.Decl( "Is enabled after" )
-	@TestOrig.Decl( "Same file used when re-enabled without close" )
+	@Test.Decl( "Is enabled after" )
+	@Test.Decl( "Same file used when re-enabled without close" )
 	public static void enable() {
 		synchronized ( mutex ) {
 			Trace.currentHandler = Trace.ENABLED;
@@ -204,8 +203,8 @@ public class Trace {
 	 * When disabled, messages are not written to file. Messages may still be echoed to
 	 * standard out.
 	 */
-	@TestOrig.Decl( "Not enabled after" )
-	@TestOrig.Decl( "Messages ignored" )
+	@Test.Decl( "Not enabled after" )
+	@Test.Decl( "Messages ignored" )
 	public static void disable() {
 		synchronized ( mutex ) {
 			Trace.currentHandler = Trace.DISABLED;
@@ -220,14 +219,14 @@ public class Trace {
 	 * 
 	 * @return
 	 */
-	@TestOrig.Decl( "Returns non null when disabled" )
-	@TestOrig.Decl( "Returns non null when enabled" )
-	@TestOrig.Decl( "File does not exist if no messages written" )
-	@TestOrig.Decl( "File does not exist if disabled messages written" )
-	@TestOrig.Decl( "Returns readable file if written and enabled" )
-	@TestOrig.Decl( "Returned file contains messages if written and enabled" )
-	@TestOrig.Decl( "Opens new handler with different file" )
-	@TestOrig.Decl( "Can write after close" )
+	@Test.Decl( "Returns non null when disabled" )
+	@Test.Decl( "Returns non null when enabled" )
+	@Test.Decl( "File does not exist if no messages written" )
+	@Test.Decl( "File does not exist if disabled messages written" )
+	@Test.Decl( "Returns readable file if written and enabled" )
+	@Test.Decl( "Returned file contains messages if written and enabled" )
+	@Test.Decl( "Opens new handler with different file" )
+	@Test.Decl( "Can write after close" )
 	public static Path close() {
 		synchronized ( mutex ) {
 			MsgHandler current = Trace.ENABLED;
@@ -249,7 +248,7 @@ public class Trace {
 	private int seqNo;
 	private boolean echoMessages;
 	
-	@TestOrig.Decl( "Throws assertion error for empty topic" )
+	@Test.Decl( "Throws assertion error for empty topic" )
 	public Trace( String topic, boolean echoMessages ) {
 		this.topic = Assert.nonEmpty( topic );
 		this.seqNo = 1;
@@ -260,7 +259,7 @@ public class Trace {
 		}
 	}
 
-	@TestOrig.Decl( "Default does not echo messages" )
+	@Test.Decl( "Default does not echo messages" )
 	public Trace( String topic ) {
 		this( topic, false );
 	}
@@ -278,12 +277,12 @@ public class Trace {
 	private static final String HEADER = Trace.formatter.format(
 		"SEQ NO", "TOPIC", "THREAD", "CLASS NAME", "METHOD", "MESSAGE" );
 
-	@TestOrig.Decl( "Throws assertion exception for null message" )
-	@TestOrig.Decl( "Throws assetrion exception for empty message" )
-	@TestOrig.Decl( "Multi thread stress test" )
-	@TestOrig.Decl( "Message printed if echo enabled" )
-	@TestOrig.Decl( "Warning issued when count exceeds warn limit" )
-	@TestOrig.Decl( "Fatal error issued when count exceeds fail limit")
+	@Test.Decl( "Throws assertion exception for null message" )
+	@Test.Decl( "Throws assetrion exception for empty message" )
+	@Test.Decl( "Multi thread stress test" )
+	@Test.Decl( "Message printed if echo enabled" )
+	@Test.Decl( "Warning issued when count exceeds warn limit" )
+	@Test.Decl( "Fatal error issued when count exceeds fail limit")
 	public void write( String message ) {
 		Assert.nonEmpty( message );
 		StackTraceElement ste = (new Exception()).getStackTrace()[1];
@@ -302,9 +301,9 @@ public class Trace {
 	}
 	
 	@Override
-	@TestOrig.Decl( "Indicates topic when enabled" )
-	@TestOrig.Decl( "Indicates state when enabled" )
-	@TestOrig.Decl( "Identifies state when disabled" )
+	@Test.Decl( "Indicates topic when enabled" )
+	@Test.Decl( "Indicates state when enabled" )
+	@Test.Decl( "Identifies state when disabled" )
 	public String toString() {
 		return "Trace(" + this.topic + ", " + (Trace.isEnabled() ? "ENABLED" : "DISABLED") + ")";
 	}

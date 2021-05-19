@@ -8,15 +8,12 @@ package sog.util;
 
 
 import sog.core.Assert;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 /**
  * Decorates a queue by adding thread-safe synchronization and blocking
  * semantics to the accessors.
  */
-@TestOrig.Decl( "If backed by priority queue elements retrieved in priority order" )
-@TestOrig.Decl( "If backed by FIFO queue elements retrieved in FIFO order" )
-@TestOrig.Decl( "Multi thread stress test" )
 public class MultiQueue<E> implements Queue<E> {
 
 
@@ -35,11 +32,11 @@ public class MultiQueue<E> implements Queue<E> {
 	 * @param elements
 	 *      A queue of elements.
 	 */
-	@TestOrig.Decl( "is empty if queue is empty" )
-	@TestOrig.Decl( "is non empty if queue is non empty" )
-	@TestOrig.Decl( "is open if queue is open" )
-	@TestOrig.Decl( "is closed if queue is closed" )
-	@TestOrig.Decl( "is terminated if queue is terminated" )
+	@Test.Decl( "is empty if queue is empty" )
+	@Test.Decl( "is non empty if queue is non empty" )
+	@Test.Decl( "is open if queue is open" )
+	@Test.Decl( "is closed if queue is closed" )
+	@Test.Decl( "is terminated if queue is terminated" )
 	public MultiQueue( Queue<E> q ) {
 		this.q = Assert.nonNull( q );
 	}
@@ -51,7 +48,7 @@ public class MultiQueue<E> implements Queue<E> {
 	 *      <tt>true</tt> if the queue is open and accepting inputs and producing outputs.
 	 */
 	@Override
-	@TestOrig.Decl( "is open if queue is open" )
+	@Test.Decl( "is open if queue is open" )
 	public synchronized boolean isOpen() {
 		return this.q.isOpen();
 	}
@@ -63,7 +60,7 @@ public class MultiQueue<E> implements Queue<E> {
 	 *      <tt>true</tt> if the queue is closed and not accepting inputs.
 	 */
 	@Override
-	@TestOrig.Decl( "is closed if queue is closed" )
+	@Test.Decl( "is closed if queue is closed" )
 	public synchronized boolean isClosed() {
 		return this.q.isClosed();
 	}
@@ -76,7 +73,7 @@ public class MultiQueue<E> implements Queue<E> {
 	 *      producing outputs.
 	 */
 	@Override
-	@TestOrig.Decl( "is terminated if queue is terminated" )
+	@Test.Decl( "is terminated if queue is terminated" )
 	public synchronized boolean isTerminated() {
 		return this.q.isTerminated();
 	}
@@ -85,8 +82,8 @@ public class MultiQueue<E> implements Queue<E> {
 	 * Request that this queue be closed, blocking further input.
 	 */
 	@Override
-	@TestOrig.Decl( "Can close if open" )
-	@TestOrig.Decl( "Close on terminated ignored" )
+	@Test.Decl( "Can close if open" )
+	@Test.Decl( "Close on terminated ignored" )
 	public synchronized void close() {
 		this.q.close();
 		this.notifyAll();
@@ -97,8 +94,8 @@ public class MultiQueue<E> implements Queue<E> {
 	 * to get, put, and close.
 	 */
 	@Override
-	@TestOrig.Decl( "Can terminate if open" )
-	@TestOrig.Decl( "Can terminate if closed" )
+	@Test.Decl( "Can terminate if open" )
+	@Test.Decl( "Can terminate if closed" )
 	public synchronized void terminate() {
 		this.q.terminate();
 		this.notifyAll();
@@ -115,9 +112,9 @@ public class MultiQueue<E> implements Queue<E> {
 	 * 		true if the element has been accepted
 	 */
 	@Override
-	@TestOrig.Decl( "Put on open is accepted" )
-	@TestOrig.Decl( "Put on closed is ignored" )
-	@TestOrig.Decl( "Put on terminated is ignored" )
+	@Test.Decl( "Put on open is accepted" )
+	@Test.Decl( "Put on closed is ignored" )
+	@Test.Decl( "Put on terminated is ignored" )
 	public synchronized boolean put( E elt ) {
 		boolean result = this.q.put( elt );
 		this.notifyAll();
@@ -138,12 +135,12 @@ public class MultiQueue<E> implements Queue<E> {
 	 *       producing elements.
 	 */
 	@Override
-	@TestOrig.Decl( "Get on open non empty returns non null" )
-	@TestOrig.Decl( "Get on open empty blocks awaiting notification" )
-	@TestOrig.Decl( "Get on closed non empty returns non null" )
-	@TestOrig.Decl( "Get on closed empty returns null" )
-	@TestOrig.Decl( "Get on terminated non empty returns null" )
-	@TestOrig.Decl( "Get on terminated empty returns null" )
+	@Test.Decl( "Get on open non empty returns non null" )
+	@Test.Decl( "Get on open empty blocks awaiting notification" )
+	@Test.Decl( "Get on closed non empty returns non null" )
+	@Test.Decl( "Get on closed empty returns null" )
+	@Test.Decl( "Get on terminated non empty returns null" )
+	@Test.Decl( "Get on terminated empty returns null" )
 	public synchronized E get() {
 		while ( true ) {
 			if ( this.q.isTerminated() ) {
@@ -172,10 +169,10 @@ public class MultiQueue<E> implements Queue<E> {
 	 *      <tt>true</tt> if the queue contains no elements.
 	 */
 	@Override
-	@TestOrig.Decl( "Put on empty is not empty" )
-	@TestOrig.Decl( "Put on non empty is not empty" )
-	@TestOrig.Decl( "Put then get on empty is empty" )
-	@TestOrig.Decl( "Put then put then get is not empty" )
+	@Test.Decl( "Put on empty is not empty" )
+	@Test.Decl( "Put on non empty is not empty" )
+	@Test.Decl( "Put then get on empty is empty" )
+	@Test.Decl( "Put then put then get is not empty" )
 	public synchronized boolean isEmpty() {
 		return this.q.isEmpty();
 	}

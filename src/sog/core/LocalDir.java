@@ -21,7 +21,6 @@ public class LocalDir {
 	/**
 	 * The enumerated type for possible extensions.
 	 */
-	@TestOrig.Skip
 	public static enum Type {
 
 		/** No system type defined. */
@@ -88,8 +87,8 @@ public class LocalDir {
 	 * @return
 	 *      This LocalDir instance.
 	 */
-	@TestOrig.Decl( "Appending null subdir throws assertion error")
-	@TestOrig.Decl( "Appending empty subdir throws assertion error")
+	@Test.Decl( "Appending null subdir throws assertion error")
+	@Test.Decl( "Appending empty subdir throws assertion error")
 	public LocalDir sub( String subDir ) {
 		Assert.nonEmpty( subDir );
 		this.path = this.path.resolve( subDir );
@@ -111,9 +110,9 @@ public class LocalDir {
 	 * @return
 	 *      The non-null Path instance representing the readable directory
 	 */
-	@TestOrig.Decl( "Is directory" )
-	@TestOrig.Decl( "Exists" )
-	@TestOrig.Decl( "Is readable")
+	@Test.Decl( "Is directory" )
+	@Test.Decl( "Exists" )
+	@Test.Decl( "Is readable")
 	public Path getDir() {
 		return this.path;
 	}
@@ -121,9 +120,9 @@ public class LocalDir {
 	/**
 	 * Retrieve the named file of the given type in the current directory.
 	 */
-	@TestOrig.Decl( "throws Assertion Error if name is null" )
-	@TestOrig.Decl( "throws Assertion Error if name is empty" )
-	@TestOrig.Decl( "throws Assertion Error if type is null" )
+	@Test.Decl( "throws Assertion Error if name is null" )
+	@Test.Decl( "throws Assertion Error if name is empty" )
+	@Test.Decl( "throws Assertion Error if type is null" )
 	public Path getFile( String name, Type type ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( type );
@@ -131,12 +130,12 @@ public class LocalDir {
 	}
 	
 	/** Retrieve a temporary file that will be deleted when the JVM exits */
-	@TestOrig.Decl( "Temporary file exists" )
-	@TestOrig.Decl( "Temporary file is readable" )
-	@TestOrig.Decl( "Temporary file is writeable" )
-	@TestOrig.Decl( "Throws arretion error if prefix is null" )
-	@TestOrig.Decl( "Throws arretion error if prefix is empty" )
-	@TestOrig.Decl( "Throws arretion error if prefix is short" )
+	@Test.Decl( "Temporary file exists" )
+	@Test.Decl( "Temporary file is readable" )
+	@Test.Decl( "Temporary file is writeable" )
+	@Test.Decl( "Throws arretion error if prefix is null" )
+	@Test.Decl( "Throws arretion error if prefix is empty" )
+	@Test.Decl( "Throws arretion error if prefix is short" )
 	public File getTmpFile( String prefix ) {
 		Assert.nonEmpty( prefix );
 		Assert.isTrue( prefix.length() >= 3 );

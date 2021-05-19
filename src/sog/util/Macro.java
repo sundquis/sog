@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import sog.core.AppException;
 import sog.core.Assert;
 import sog.core.Property;
-import sog.core.TestOrig;
+import sog.core.Test;
 //import sog.util.FifoQueue;
 //import sog.util.Queue;
 
@@ -91,7 +91,7 @@ public class Macro implements Function<String, Stream<String>> {
 	/**
 	 * Constructs a stateless instance. Expansion rules are added via chained methods.
 	 */
-	@TestOrig.Decl( "Stateless instance acts as identity function" )
+	@Test.Decl( "Stateless instance acts as identity function" )
 	public Macro() { }
 	
 	
@@ -103,19 +103,19 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @param values The sequence of replacement values to use.
 	 * @return This {@code Macro} instance for chaining.
 	 */
-	@TestOrig.Decl( "Throws AssertionError for empty key" )
-	@TestOrig.Decl( "Dollar wihtin key not allowed" )
-	@TestOrig.Decl( "Left brace in key not allowed" )
-	@TestOrig.Decl( "Right brace in key not allowed" )
-	@TestOrig.Decl( "Key does not start with white space" )
-	@TestOrig.Decl( "Key does not end with white space" )
-	@TestOrig.Decl( "Whitespace in key is allowed" )
-	@TestOrig.Decl( "Special characters in key allowed" )
-	@TestOrig.Decl( "Empty value sequence allowed" )
-	@TestOrig.Decl( "Throws assertion error for a null value" )
-	@TestOrig.Decl( "Any value may be empty" )
-	@TestOrig.Decl( "Replacement rules can be over-written" )
-	@TestOrig.Decl( "Returns this instance" )
+	@Test.Decl( "Throws AssertionError for empty key" )
+	@Test.Decl( "Dollar wihtin key not allowed" )
+	@Test.Decl( "Left brace in key not allowed" )
+	@Test.Decl( "Right brace in key not allowed" )
+	@Test.Decl( "Key does not start with white space" )
+	@Test.Decl( "Key does not end with white space" )
+	@Test.Decl( "Whitespace in key is allowed" )
+	@Test.Decl( "Special characters in key allowed" )
+	@Test.Decl( "Empty value sequence allowed" )
+	@Test.Decl( "Throws assertion error for a null value" )
+	@Test.Decl( "Any value may be empty" )
+	@Test.Decl( "Replacement rules can be over-written" )
+	@Test.Decl( "Returns this instance" )
 	public Macro expand( String key, String... values ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );
@@ -137,11 +137,11 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @param values The collection of replacement values to use.
 	 * @return This {@code Macro} instance for chaining.
 	 */
-	@TestOrig.Decl( "Throws assertion error for null collection of values" )
-	@TestOrig.Decl( "Empty value collection allowed" )
-	@TestOrig.Decl( "Any value may be empty" )
-	@TestOrig.Decl( "Throws assertion error for a null value" )
-	@TestOrig.Decl( "Returns this instance" )
+	@Test.Decl( "Throws assertion error for null collection of values" )
+	@Test.Decl( "Empty value collection allowed" )
+	@Test.Decl( "Any value may be empty" )
+	@Test.Decl( "Throws assertion error for a null value" )
+	@Test.Decl( "Returns this instance" )
 	public Macro expand( String key, List<String> values ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );
@@ -181,20 +181,20 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @return A {@code Stream} containing the results of applying expansion rules for each macro key.
 	 */
 	@Override 
-	@TestOrig.Decl( "Throws AssertionError for null line" )
-	@TestOrig.Decl( "Input line without keys is unchanged" )
-	@TestOrig.Decl( "Throws AppException for excessive recursion" )
-	@TestOrig.Decl( "An empty expansion rule produces an empty stream" )
-	@TestOrig.Decl( "Throws AppExcpetion for missing key" )
-	@TestOrig.Decl( "Simple replacement works" )
-	@TestOrig.Decl( "Multiple keys replaced" )
-	@TestOrig.Decl( "All keys replaced in output stream" )
-	@TestOrig.Decl( "Works with flatMap to expand a stream" )
-	@TestOrig.Decl( "Replacement within replacement allowed" )
-	@TestOrig.Decl( "Mal-formed patterns are ignored" )
-	@TestOrig.Decl( "One letter keys work" )
-	@TestOrig.Decl( "Multiple lines in output for multiple replacements" )
-	@TestOrig.Decl( "Can trigger recursion exception through excessive replacements" )
+	@Test.Decl( "Throws AssertionError for null line" )
+	@Test.Decl( "Input line without keys is unchanged" )
+	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "An empty expansion rule produces an empty stream" )
+	@Test.Decl( "Throws AppExcpetion for missing key" )
+	@Test.Decl( "Simple replacement works" )
+	@Test.Decl( "Multiple keys replaced" )
+	@Test.Decl( "All keys replaced in output stream" )
+	@Test.Decl( "Works with flatMap to expand a stream" )
+	@Test.Decl( "Replacement within replacement allowed" )
+	@Test.Decl( "Mal-formed patterns are ignored" )
+	@Test.Decl( "One letter keys work" )
+	@Test.Decl( "Multiple lines in output for multiple replacements" )
+	@Test.Decl( "Can trigger recursion exception through excessive replacements" )
 	public Stream<String> apply( String line ) {
 		Assert.nonNull( line );
 		List<String> results = new LinkedList<>();
@@ -242,10 +242,10 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @param lines A sequence of lines to expand.
 	 * @return A {@code Stream} containing the results of applying expansion rules for each macro key.
 	 */
-	@TestOrig.Decl( "An empty sequence of lines produces an empty stream" )
-	@TestOrig.Decl( "Throws AppException for excessive recursion" )
-	@TestOrig.Decl( "An empty expansion rule removes line from output stream" )
-	@TestOrig.Decl( "Multiple lines in output for multiple input lines" )
+	@Test.Decl( "An empty sequence of lines produces an empty stream" )
+	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "An empty expansion rule removes line from output stream" )
+	@Test.Decl( "Multiple lines in output for multiple input lines" )
 	public Stream<String> apply( String ... lines ) {
 		return Stream.of( lines ).flatMap( this );
 	}
@@ -262,11 +262,11 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @param lines A collection of lines to expand.
 	 * @return A {@code Stream} containing the results of applying expansion rules for each macro key.
 	 */
-	@TestOrig.Decl( "An empty collection produces an empty stream" )
-	@TestOrig.Decl( "Throws Assertion Error for null lines" )
-	@TestOrig.Decl( "Throws AppException for excessive recursion" )
-	@TestOrig.Decl( "An empty expansion rule removes line from output stream" )
-	@TestOrig.Decl( "Multiple lines in output for multiple input lines" )
+	@Test.Decl( "An empty collection produces an empty stream" )
+	@Test.Decl( "Throws Assertion Error for null lines" )
+	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "An empty expansion rule removes line from output stream" )
+	@Test.Decl( "Multiple lines in output for multiple input lines" )
 	public Stream<String> apply( List<String> lines ) {
 		Assert.nonNull( lines );
 		return lines.stream().flatMap( this );

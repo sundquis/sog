@@ -13,28 +13,21 @@ import java.io.FileReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 import sog.util.IDProvider;
 
 /**
  * @author sundquis
  *
  */
-public class IDProviderTest implements TestContainer {
-
-	@Override
-	public Class<?> subjectClass() {
-		return IDProvider.class;
-	}
+public class IDProviderTest extends Test.Implementation {
 
 	// Test implementations
 	
 	
 
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Case sensitive" )
-	public void get_CaseSensitive( TestCase tc ) {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "Case sensitive" )
+	public void get_CaseSensitive( Test.Case tc ) {
 		String[] args = { "hello", "world", "foo", "bar", "hello2", "world2" };
 		for ( String arg : args ) {
 			String cap = arg.substring(0,1).toUpperCase() + arg.substring(1);
@@ -42,8 +35,8 @@ public class IDProviderTest implements TestContainer {
 		}
 	}
 
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Short names distinct" )
-	public void get_ShortNamesDistinct( TestCase tc ) {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "Short names distinct" )
+	public void get_ShortNamesDistinct( Test.Case tc ) {
 		String lower = "abcdefghijklmnopqrstuvwxyz";
 		String upper = lower.toUpperCase();
 		String other = "._0123456789!@#$%^&*()<>?;:";
@@ -61,23 +54,21 @@ public class IDProviderTest implements TestContainer {
 				results.put( id,  arg );
 			}
 		}
-		tc.pass();
 	}
 	
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Throws assertion error for empty name" )
-	public void get_ThrowsAssertionErrorForEmptyName( TestCase tc ) {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "Throws assertion error for empty name" )
+	public void get_ThrowsAssertionErrorForEmptyName( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		IDProvider.get("");
 	}
 	
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Long strings have id" )
-	public void get_LongStringsHaveId( TestCase tc ) {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "Long strings have id" )
+	public void get_LongStringsHaveId( Test.Case tc ) {
 		IDProvider.get( "123456789012345678901234567890123456789012345678901234567890" );
-		tc.pass();
 	}
 	
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "No collision dict test" )
-	public void get_NoCollisionDictTest( TestCase tc ) throws Exception {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "No collision dict test" )
+	public void get_NoCollisionDictTest( Test.Case tc ) throws Exception {
 		File file = new File( "/usr/share/dict/american-english" );
 		try ( BufferedReader br = new BufferedReader( new FileReader( file ) ) ) {
 			Map<Integer, String> results = new TreeMap<>();
@@ -90,11 +81,10 @@ public class IDProviderTest implements TestContainer {
 				results.put( id, line );
 			}
 		} 
-		tc.pass();
 	}
 	
-	@TestOrig.Impl( src = "public int IDProvider.get(String)", desc = "Qualified name stress test" )
-	public void get_QualifiedNameStressTest( TestCase tc ) throws Exception {
+	@Test.Impl( member = "public int IDProvider.get(String)", description = "Qualified name stress test" )
+	public void get_QualifiedNameStressTest( Test.Case tc ) throws Exception {
 		File file = new File( "/usr/share/dict/american-english" );
 		try ( BufferedReader br = new BufferedReader( new FileReader( file ) ) ) {
 			Map<Integer, String> results = new TreeMap<>();
@@ -119,20 +109,7 @@ public class IDProviderTest implements TestContainer {
 				}
 			}
 		} 
-		tc.pass();
 	}
 
 
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		//Test.verbose();
-		new TestOrig(IDProviderTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

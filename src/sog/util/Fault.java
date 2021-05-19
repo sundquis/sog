@@ -14,11 +14,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Strings;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 /**
  * @author sundquis
@@ -34,7 +35,7 @@ public class Fault implements Printable {
 	 * 
 	 * @param listener
 	 */
-	@TestOrig.Decl( "Subsequent faults are deleivered to listener" )
+	@Test.Decl( "Subsequent faults are deleivered to listener" )
 	public static void addListener( Consumer<Fault> listener ) {
 		Fault.listeners.add( listener );
 	}
@@ -44,7 +45,7 @@ public class Fault implements Printable {
 	 * 
 	 * @param listener
 	 */
-	@TestOrig.Decl( "Subsequent faults are deleivered to listener" )
+	@Test.Decl( "Subsequent faults are deleivered to listener" )
 	public static void removeListener( Consumer<Fault> listener ) {
 		Fault.listeners.remove( listener );
 	}
@@ -59,7 +60,7 @@ public class Fault implements Printable {
 	private final List<String> sources;
 	
 	// File and line number where fault was generated
-	private final List<String> faultLocation;
+	private final Stream<String> faultLocation;
 	
 	/**
 	 * Construct a {@code Fault} representing a application defect. The required
@@ -69,8 +70,8 @@ public class Fault implements Printable {
 	 * @param description
 	 * @param sources
 	 */
-	@TestOrig.Decl( "Throws assertion error for enpty string" )
-	@TestOrig.Decl( "Fault location is recorded" )
+	@Test.Decl( "Throws assertion error for enpty string" )
+	@Test.Decl( "Fault location is recorded" )
 	public Fault( String description, Object ... sources ) {
 		this.description = Assert.nonEmpty( description );
 		this.sources = Arrays.stream( sources ).map( Strings::toString ).collect( Collectors.toList() );
@@ -85,7 +86,7 @@ public class Fault implements Printable {
 	 * Similar to throwing an exception but "gentler". Useful in compilation-style
 	 * processes where it's useful to gather as much feedback as possible.
 	 */
-	@TestOrig.Decl( "Fault is delivered to listeners" )
+	@Test.Decl( "Fault is delivered to listeners" )
 	public void toss() {
 		Fault.listeners.stream().forEach( l -> l.accept(this) );
 	}
@@ -98,8 +99,8 @@ public class Fault implements Printable {
 	 * @param source
 	 * @return
 	 */
-	@TestOrig.Decl( "Source is appended to previous sources" )
-	@TestOrig.Decl( "Returns this" )
+	@Test.Decl( "Source is appended to previous sources" )
+	@Test.Decl( "Returns this" )
 	public Fault addSource( String source ) {			
 		this.sources.add( source );
 		return this;
@@ -110,7 +111,7 @@ public class Fault implements Printable {
 	 * Description of the fault
 	 */
 	@Override
-	@TestOrig.Decl( "Returns non-empty description" )
+	@Test.Decl( "Returns non-empty description" )
 	public String toString() {
 		return "Fault(" + this.description + ")";
 	}
@@ -122,10 +123,10 @@ public class Fault implements Printable {
 	 * @see sog.util.Printable#print(sog.util.IndentWriter)
 	 */
 	@Override
-	@TestOrig.Decl( "Description printed" )
-	@TestOrig.Decl( "Fault location printed" )
-	@TestOrig.Decl( "Model location printed when possible" )
-	@TestOrig.Decl( "All provided sources printed" )
+	@Test.Decl( "Description printed" )
+	@Test.Decl( "Fault location printed" )
+	@Test.Decl( "Model location printed when possible" )
+	@Test.Decl( "All provided sources printed" )
 	public void print( IndentWriter out ) {
 		out.println( "FAULT: " + this.description );
 		out.increaseIndent();

@@ -10,103 +10,83 @@ package test.core;
 
 
 import sog.core.AppException;
-import sog.core.TestOrig;
-import sog.core.TestCase;
-import sog.core.TestContainer;
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
-public class TestTest implements TestContainer{
-
-	@Override public Class<?> subjectClass() { return TestOrig.class; }
+public class TestTest extends Test.Implementation{
 
 	// Test implementations
 	
-	@TestOrig.Impl( src = "Test", desc = "Loads correctly" )
-	public void Test_LoadsCorrectly( TestCase tc ) {
-		tc.addMessage( "Manually verified" ).pass();
+	@Test.Impl( member = "Test", description = "Loads correctly" )
+	public void Test_LoadsCorrectly( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
 	}
 
-	@TestOrig.Impl( src = "private void Test.addAnnotations(MemberResult)", desc = "Can change name of generated method" )
-	public void addAnnotations_CanChangeNameOfGeneratedMethod( TestCase tc ) {
-		tc.addMessage( "Manually verified" ).pass();
+	@Test.Impl( member = "private void Test.addAnnotations(MemberResult)", description = "Can change name of generated method" )
+	public void addAnnotations_CanChangeNameOfGeneratedMethod( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
 	}
 
-	@TestOrig.Impl( src = "private void Test.addAnnotations(MemberResult)", desc = "Description's with; puc-tuation! handled... right?" )
-	public void addAnnotations_DescriptionSWithPucTuationHandledRight( TestCase tc ) {
-		tc.addMessage( "Manually verified" ).pass();
+	@Test.Impl( member = "private void Test.addAnnotations(MemberResult)", description = "Description's with; puc-tuation! handled... right?" )
+	public void addAnnotations_DescriptionSWithPucTuationHandledRight( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
 	}
 	
-	@TestOrig.Impl( src = "public Test(Class)", desc = "Fails for containers with illegal constructors" )
-	public void Test_FailsForContainersWithIllegalConstructors( TestCase tc ) {
-		final class BadContainer implements TestContainer {
-			@SuppressWarnings("unused")
-			BadContainer() {}
-			
-			@Override
-			public Class<?> subjectClass() {
-				return null;
-			}
-		}
+	@Test.Impl( member = "public Test(Class)", description = "Fails for containers with illegal constructors" )
+	public void Test_FailsForContainersWithIllegalConstructors( Test.Case tc ) {
+//		final class BadContainer extends Test.Container {
+//			@SuppressWarnings("unused")
+//			BadContainer() {}
+//			
+//		}
 		tc.expectError( AppException.class );
-		new TestOrig( BadContainer.class );
+		//new Test( BadContainer.class );
 	}
 
-	@TestOrig.Impl( src = "public Test(Class)", desc = "Throws assertion error for null container" )
-	public void Test_ThrowsAssertionErrorForNullContainer( TestCase tc ) {
+	@Test.Impl( member = "public Test(Class)", description = "Throws assertion error for null container" )
+	public void Test_ThrowsAssertionErrorForNullContainer( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		new TestOrig( null );
+		//new Test( null );
 	}
 
-	@TestOrig.Impl( src = "public void Test.addStub(String, String, String)", desc = "Throws assertion error if descrption is empty" )
-	public void addStub_ThrowsAssertionErrorIfDescrptionIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public void Test.addStub(String, String, String)", description = "Throws assertion error if descrption is empty" )
+	public void addStub_ThrowsAssertionErrorIfDescrptionIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestOrig.addStub( "", "Hello", "World" );
+		//Test.addStub( "", "Hello", "World" );
 	}
 
-	@TestOrig.Impl( src = "public void Test.addStub(String, String, String)", desc = "Throws assertion error if member is empty" )
-	public void addStub_ThrowsAssertionErrorIfMemberIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public void Test.addStub(String, String, String)", description = "Throws assertion error if member is empty" )
+	public void addStub_ThrowsAssertionErrorIfMemberIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestOrig.addStub( "Hello", "", "World" );
+		//Test.addStub( "Hello", "", "World" );
 	}
 
-	@TestOrig.Impl( src = "public void Test.addStub(String, String, String)", desc = "Throws assertion error if subject is empty" )
-	public void addStub_ThrowsAssertionErrorIfSubjectIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public void Test.addStub(String, String, String)", description = "Throws assertion error if subject is empty" )
+	public void addStub_ThrowsAssertionErrorIfSubjectIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestOrig.addStub( "Hello", "World", "" );
+		//Test.addStub( "Hello", "World", "" );
 	}
 
-	@TestOrig.Impl( src = "public void Test.addWarning(String)", desc = "Throws assertion error if warning is empty" )
-	public void addWarning_ThrowsAssertionErrorIfWarningIsEmpty( TestCase tc ) {
+	@Test.Impl( member = "public void Test.addWarning(String)", description = "Throws assertion error if warning is empty" )
+	public void addWarning_ThrowsAssertionErrorIfWarningIsEmpty( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestOrig.addWarning( "" );
+		//Test.addWarning( "" );
 	}
 
-	@TestOrig.Impl( src = "public void Test.addWarning(String)", desc = "Throws assertion error if warning is null" )
-	public void addWarning_ThrowsAssertionErrorIfWarningIsNull( TestCase tc ) {
+	@Test.Impl( member = "public void Test.addWarning(String)", description = "Throws assertion error if warning is null" )
+	public void addWarning_ThrowsAssertionErrorIfWarningIsNull( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestOrig.addWarning( null );
+		//Test.addWarning( null );
 	}
 
-	@TestOrig.Impl( src = "private void Test.evaluateTests()", desc = "Handles cases in priority order." )
-	public void evaluateTests_HandlesCasesInPriorityOrder( TestCase tc ) {
-		tc.addMessage( "Manually verified" ).pass();
+	@Test.Impl( member = "private void Test.evaluateTests()", description = "Handles cases in priority order." )
+	public void evaluateTests_HandlesCasesInPriorityOrder( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
 	}
 
 	
 	
-	
-
-	public static void main(String[] args) {
-
-		System.out.println();
-
-		new TestOrig(TestTest.class);
-		TestOrig.printResults();
-
-		System.out.println("\nDone!");
-
-	}
 }

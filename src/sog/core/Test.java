@@ -8,39 +8,59 @@
 package sog.core;
 
 import java.lang.annotation.Repeatable;
+import java.lang.StackWalker.Option;
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.util.function.Predicate;
+
+import sog.core.test.TestContainer;
+
 
 /**
+ * 	SUBJECT
+ * 		A class that is the subject of one or more tests.
+ * 		Specifies a class holding test methods using Test.Container
+ * 		Declares test cases using Test.Decl on members
+ * 		Policy specifies which members should have cases declared
+ * 
+ * 	CONTAINER
+ * 		A class that holds test method implementations
+ * 		Extends the abstract base class Test.Implementation
+ * 		Specified by the subjects' Test.Container annotation
+ * 		Has methods marked with Test.Impl
+ * 
  */
-public interface Test {
-
+public class Test {
+	
+	
 	/**
-	 * Subject classes register a container that holds test methods
+	 * Subject classes use this annotation to identify the name of the
+	 * Test.Implementation that holds test method implementations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( ElementType.TYPE )
 	public @interface Container {
-		/**
-		 * Name of the test container class
-		 */
-		String value();
+		/** Fully qualified classname, or name of a member class */
+		String value(); 
 	}
-	
+
 	/**
-	 * Annotate class elements (containing class, member class, constructor, field, method)
-	 * with {@code Test.Case} to declare a test case pertaining to the element.
+	 * Annotate class members (constructor, field, method)
+	 * with {@code Test.Decl} to declare a test case pertaining to the element.
 	 */
-	@Repeatable( Test.Cases.class )
+	@Repeatable( Test.Decls.class )
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
-	public @interface Case {
+	@Documented
+	public @interface Decl {
 		/**
 		 * A description of the test. 
 		 * 
-		 * Members may have multiple {@code Test.Case} annotations but the descriptions for each member's 
+		 * Members may have multiple {@code Test.Decl} annotations but the descriptions for each member's 
 		 * tests must be unique. Descriptions serve to further document the member's properties,
 		 * but descriptions should be brief. 
 		 */
@@ -49,33 +69,94 @@ public interface Test {
 	
 	
 	/**
-	 * Container for repeated {@code Test.Case} annotations.
+	 * Container for repeated {@code Test.Decl} annotations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
-	public @interface Cases {
-		Case[] value();
+	@Documented
+	public @interface Decls {
+		Decl[] value();
 	}
 
 
+
+	
 	/**
-	 * Used to indicate that the member (and contained members of a class) should not
-	 * be scanned for test cases. Can be used to mark simple components that do not require
-	 * testing or components that are externally tested.
-	 * 
-	 * The optional string {@code value} can be used to describe alternate testing
+	 * Container classes that hold test method implementations extend this abstract base class.
 	 */
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD, ElementType.TYPE } )
-	public @interface Skip {
-		String value() default "No test";
+	public static abstract class Implementation {
+		
+		private Class<?> subjectClass;
+		
+		protected Implementation() {}
+		
+		protected void setSubjectClass( Class<?> subjectClass ) {
+			this.subjectClass = Assert.nonNull( subjectClass );
+		}
+		
+		/** The procedure to be called before any method invocation occurs. */
+		public Procedure beforeAll() {
+			return Procedure.NOOP;
+		}
+		
+		/** The procedure to be called before each method invocation. */
+		public Procedure beforeEach() {
+			return Procedure.NOOP;
+		}
+		
+		/** The procedure to be called after each method invocation. */
+		public Procedure afterEach() {
+			return Procedure.NOOP;
+		}
+		
+		/** The procedure to be called after all method invocations have completed. */
+		public Procedure afterAll() {
+			return Procedure.NOOP;
+		}
+
+		/** Retrieve the value of a subject's field. */
+		public void setSubjectField( Object subject, String  fieldName, Object fieldValue ) {
+			try {
+				Field field = this.subjectClass.getDeclaredField( fieldName );
+				field.setAccessible( true );
+				field.set( subject, fieldValue );
+			} catch ( Exception e ) {
+				throw new AppException( e );
+			} 
+		}
+
+		/** Set the value of a subject's field. */
+		@SuppressWarnings("unchecked")
+		public <T> T getSubjectField( Object subject, String fieldName, T witness ) {
+			T result = null;
+			try {
+				Field field = this.subjectClass.getDeclaredField( fieldName );
+				field.setAccessible( true );
+				result = (T) field.get( subject );
+			} catch ( Exception e ) {
+				throw new AppException( e );
+			} 
+			return result;
+		}
+		
+		/** Calling location in a concrete Container. */
+		public static String getFileLocation() {
+			Predicate<StackWalker.StackFrame> sfp = sf -> 
+				Test.Implementation.class.isAssignableFrom( sf.getDeclaringClass() ) 
+				&& !sf.getDeclaringClass().equals( Test.Implementation.class );
+			StackWalker.StackFrame sf = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
+				s -> s.filter( sfp ).findFirst().orElse( null )
+			);
+			
+			return sf == null ? "UNKNOWN" : new App.Location( sf ).toString();
+		}
+		
 	}
 	
-
 	/**
-	 * Marker for test implementation methods. These are generated by the test framework and generally
-	 * should not be hand coded. In particular the {@code src} and {@code desc} fields are generated to 
-	 * correspond to a test declaration.
+	 * Marker for test method implementations. These are generated by the test framework and generally
+	 * should not be hand coded. In particular the {@code member} and {@code description} fields are 
+	 * generated to correspond to a test declaration.
 	 * 
 	 * The optional numeric fields may be included to adjust features of the test.
 	 */
@@ -88,6 +169,9 @@ public interface Test {
 		
 		/** Do not edit. Must match the corresponding declaration */
 		String description();
+		
+		/** Used to determine order that a class's test cases should be executed */
+		int priority() default 0;
 
 		/** CURRENTLY NOT USED */
 		long timeout() default 0L;
@@ -98,119 +182,131 @@ public interface Test {
 	}
 	
 	
-	
-	
-	/**
-	 * Only displayed for non-passing cases
-	 * 
-	 * @param message
-	 * 		Failure message
-	 * @return
-	 * 		this Test
-	 */
-	public Test addMessage( String message );
+	public interface Case {
+		
+		/**
+		 * Only displayed for non-passing cases
+		 * 
+		 * @param message
+		 * 		Failure message
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case addMessage( String message );
 
 
-	/**
-	 * Type of Throwable that subsequent code is expected to throw
-	 * 
-	 * @param expectedError
-	 * 		Throwable type
-	 * @return
-	 * 		this Test
-	 */
-	public Test expectError( Class<? extends Throwable> expectedError );
+		/**
+		 * Type of Throwable that subsequent code is expected to throw
+		 * 
+		 * @param expectedError
+		 * 		Throwable tpye
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case expectError( Class<? extends Throwable> expectedError );
 
 
-	/**
-	 * Procedure to call after the current method (in a Container) completes
-	 * Will be called even if the method throws an exception.
-	 * 
-	 * @param callAfter
-	 * @return
-	 * 		this Test
-	 */
-	public Test afterThis( Procedure callAfter );
+		/**
+		 * Procedure to call after the current method (in a Test.Container) completes
+		 * Will be called even if the method throws an exception.
+		 * 
+		 * @param callafter
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case afterThis( Procedure callafter );
 
-	
-	/**
-	 * Mark the current case as successful.
-	 * 
-	 * @return
-	 * 		this Test
-	 */
-	public Test pass();
+		
+		/**
+		 * Mark the current case as failed.
+		 * 
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case fail();
+		
 
+		/**
+		 * Mark the current case as passed.
+		 * 
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case pass();
+		
 
-	/**
-	 * Mark the current case as failed.
-	 * 
-	 * @return
-	 * 		this Test
-	 */
-	public Test fail();
+		/**
+		 * Assert that the given object is not null.
+		 * 
+		 * @param obj
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case notNull( Object obj );
+		
+		/**
+		 * Assert that the given string is non-null and not empty
+		 * 
+		 * @param s
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case notEmpty( String s );
+		
+		
+		/**
+		 * Assert that the given object is not null.
+		 * 
+		 * @param obj
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case isNull( Object obj );
+		
+		
+		/**
+		 * Conditionally mark the case as passed/failed.
+		 *  
+		 * @param passIfTrue
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case assertTrue( boolean passIfTrue );
+		
+		
+		/**
+		 * Conditionally mark the case as passed/failed.
+		 *  
+		 * @param passIfFalse
+		 * @return
+		 * 		this TestCase
+		 */
+		public Test.Case assertFalse( boolean passIfFalse);
+		
+		
+		/**
+		 * Test for equality using Object.equals().
+		 * If T is a compound type (array or collection) then the components are shallowly tested.
+		 * 
+		 * @param expected
+		 * @param actual
+		 * @return
+		 * 		this Test.Case
+		 */
+		public <T> Test.Case assertEqual( T expected, T actual );
+		
+	}
 	
-
-	/**
-	 * Assert that the given object is not null.
-	 * 
-	 * @param obj
-	 * @return
-	 * 		this Test
-	 */
-	public Test notNull( Object obj );
-	
-	/**
-	 * Assert that the given string is non-null and not empty
-	 * 
-	 * @param s
-	 * @return
-	 * 		this Test
-	 */
-	public Test notEmpty( String s );
-	
-	
-	/**
-	 * Assert that the given object is not null.
-	 * 
-	 * @param obj
-	 * @return
-	 * 		this Test
-	 */
-	public Test isNull( Object obj );
-	
-	
-	/**
-	 * Conditionally mark the case as passed/failed.
-	 *  
-	 * @param passIfTrue
-	 * @return
-	 * 		this Test
-	 */
-	public Test assertTrue( boolean passIfTrue );
-	
-	
-	/**
-	 * Conditionally mark the case as passed/failed.
-	 *  
-	 * @param passIfFalse
-	 * @return
-	 * 		this Test
-	 */
-	public Test assertFalse( boolean passIfFalse);
-	
-	
-	/**
-	 * Test for equality using Object.equals().
-	 * If T is a compound type (array or collection) then the components are shallowly tested.
-	 * 
-	 * @param expected
-	 * @param actual
-	 * @return
-	 * 		this Test
-	 */
-	public <T> Test assertEqual( T expected, T actual );
 	
 	
 
+	public static String eval( Class<?> subjectClass ) {
+		return TestContainer.eval( subjectClass );
+	}
+	
+	// FIXME: Needs testing
+	public static String eval() {
+		return Test.eval( App.get().getCallingClass( 2 ) );
+	}
+	
 }

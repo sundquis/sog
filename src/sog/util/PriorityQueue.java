@@ -10,7 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import sog.core.Assert;
-import sog.core.TestOrig;
+import sog.core.Test;
 
 
 /**
@@ -40,7 +40,6 @@ import sog.core.TestOrig;
  * 		Smallest element with respect to the Comparable property
  * 
  */
-@TestOrig.Decl( "Elements retrieved in comparable order" )
 public class PriorityQueue<E extends Comparable<E>> extends AbstractQueue<E> {
 
 
@@ -50,7 +49,7 @@ public class PriorityQueue<E extends Comparable<E>> extends AbstractQueue<E> {
 	 * Constructs an empty priority queue. The queue is open and
 	 * accepting input.
 	 */
-	@TestOrig.Decl( "Can be created empty" )
+	@Test.Decl( "Can be created empty" )
 	public PriorityQueue() {
 		this.elements = new TreeSet<E>();
 	}
@@ -66,26 +65,26 @@ public class PriorityQueue<E extends Comparable<E>> extends AbstractQueue<E> {
 	 *      "head" of the queue and will be the first to be produced by a
 	 *      call to <code>get</code>.
 	 */
-	@TestOrig.Decl( "Can be created non empty" )
+	@Test.Decl( "Can be created non empty" )
 	public PriorityQueue( SortedSet<E> elements ) {
 		this.elements = Assert.nonNull( elements );
 	}
 
 	@Override
-	@TestOrig.Decl( "Put on open is accepted" )
-	@TestOrig.Decl( "Put on closed is ignored" )
-	@TestOrig.Decl( "Put on terminated is ignored" )
+	@Test.Decl( "Put on open is accepted" )
+	@Test.Decl( "Put on closed is ignored" )
+	@Test.Decl( "Put on terminated is ignored" )
 	protected boolean putImpl( E elt ) {
 		return this.elements.add( elt );
 	}
 
 	@Override
-	@TestOrig.Decl( "Get on open non empty returns non null" )
-	@TestOrig.Decl( "Get on open empty returns null" )
-	@TestOrig.Decl( "Get on closed non empty returns non null" )
-	@TestOrig.Decl( "Get on closed empty returns null" )
-	@TestOrig.Decl( "Get on terminated non empty returns null" )
-	@TestOrig.Decl( "Get on terminated empty returns null" )
+	@Test.Decl( "Get on open non empty returns non null" )
+	@Test.Decl( "Get on open empty returns null" )
+	@Test.Decl( "Get on closed non empty returns non null" )
+	@Test.Decl( "Get on closed empty returns null" )
+	@Test.Decl( "Get on terminated non empty returns null" )
+	@Test.Decl( "Get on terminated empty returns null" )
 	protected E getImpl() {
 		if ( this.isEmpty() ) {
 			return null;
@@ -97,10 +96,10 @@ public class PriorityQueue<E extends Comparable<E>> extends AbstractQueue<E> {
 	}
 
 	@Override
-	@TestOrig.Decl( "Put on empty is not empty" )
-	@TestOrig.Decl( "Put on non empty is not empty" )
-	@TestOrig.Decl( "Put then get on empty is empty" )
-	@TestOrig.Decl( "Put then put then get is not empty" )
+	@Test.Decl( "Put on empty is not empty" )
+	@Test.Decl( "Put on non empty is not empty" )
+	@Test.Decl( "Put then get on empty is empty" )
+	@Test.Decl( "Put then put then get is not empty" )
 	public boolean isEmpty() {
 		return this.elements.isEmpty();
 	}
