@@ -16,7 +16,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class ByteFileTest extends Test.Implementation {
+public class ByteFileTest extends Test.Container {
 
 
 	private byte[] BYTES = "A fairly long string that we use for testing".getBytes();

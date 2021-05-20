@@ -17,7 +17,7 @@ import sog.util.StreamReader;
  * @author sundquis
  *
  */
-public class StreamReaderTest extends Test.Implementation {
+public class StreamReaderTest extends Test.Container {
 
 	private static final String[] lines = {
 		"First line.",

@@ -30,7 +30,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class StringsTest extends Test.Implementation {
+public class StringsTest extends Test.Container {
 
 	// Test implementations
 	
@@ -736,7 +736,7 @@ public class StringsTest extends Test.Implementation {
 			Strings.class,
 			Test.class,
 			Test.Case.class,
-			Test.Implementation.class
+			Test.Container.class
 		};
 		
 		for ( int i = 0; i < classes.length; i++ ) {

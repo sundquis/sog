@@ -20,7 +20,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class ObjectsTest extends Test.Implementation {
+public class ObjectsTest extends Test.Container {
 
 	// Test implementations
 

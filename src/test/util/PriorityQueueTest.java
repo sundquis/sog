@@ -18,7 +18,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class PriorityQueueTest extends Test.Implementation {
+public class PriorityQueueTest extends Test.Container {
 
 	// Test implementations
 

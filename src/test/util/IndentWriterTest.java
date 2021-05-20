@@ -17,7 +17,7 @@ import sog.util.IndentWriter;
  * @author sundquis
  *
  */
-public class IndentWriterTest extends Test.Implementation {
+public class IndentWriterTest extends Test.Container {
 
 	// Test implementations
 	

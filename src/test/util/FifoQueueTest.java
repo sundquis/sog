@@ -16,7 +16,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class FifoQueueTest extends Test.Implementation {
+public class FifoQueueTest extends Test.Container {
 
 	// Test implementations
 	

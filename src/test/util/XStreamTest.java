@@ -13,7 +13,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class XStreamTest extends Test.Implementation {
+public class XStreamTest extends Test.Container {
 
 	// Test implementations
 	

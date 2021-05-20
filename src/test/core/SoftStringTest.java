@@ -30,7 +30,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class SoftStringTest extends Test.Implementation {
+public class SoftStringTest extends Test.Container {
 
 	private SoftString soft;
 	

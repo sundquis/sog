@@ -21,7 +21,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class MultiQueueTest extends Test.Implementation {
+public class MultiQueueTest extends Test.Container {
 
 	// Test implementations
 	

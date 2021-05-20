@@ -26,7 +26,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class AppTest extends Test.Implementation {
+public class AppTest extends Test.Container {
 
 
 		public Path mySource; 

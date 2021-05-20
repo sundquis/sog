@@ -106,7 +106,7 @@ public class TestRunner {
 	
 	//@SuppressWarnings("unchecked")
 	public static void testClass( Class<?> clazz ) { 
-		if ( clazz != null && !clazz.isInterface()  && Test.Implementation.class.isAssignableFrom( clazz ) ) {
+		if ( clazz != null && !clazz.isInterface()  && Test.Container.class.isAssignableFrom( clazz ) ) {
 			//new TestOrig( (Class<TestContainer>) clazz );
 		}
 	}

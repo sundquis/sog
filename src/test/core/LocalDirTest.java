@@ -17,7 +17,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class LocalDirTest extends Test.Implementation {
+public class LocalDirTest extends Test.Container {
 
 	// Test implementations
 

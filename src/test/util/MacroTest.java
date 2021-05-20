@@ -20,7 +20,7 @@ import sog.util.Macro;
  * @author sundquis
  *
  */
-public class MacroTest extends Test.Implementation {
+public class MacroTest extends Test.Container {
 
 	// Test implementations
 

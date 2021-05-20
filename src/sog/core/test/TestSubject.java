@@ -43,7 +43,7 @@ public class TestSubject {
 	
 	// FIXME
 	public void loadContainer() {
-		if ( Test.Implementation.class.isAssignableFrom( this.subjectClass ) ) {
+		if ( Test.Container.class.isAssignableFrom( this.subjectClass ) ) {
 			Msg.info( "Skipping Container" ).addDetail( "Subject class", this.subjectClass );
 		}
 		

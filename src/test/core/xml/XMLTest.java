@@ -15,7 +15,7 @@ import sog.core.xml.XML;
  * @author sundquis
  *
  */
-public class XMLTest extends Test.Implementation {
+public class XMLTest extends Test.Container {
 
 	// Test implementations
 	

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017, 2018, 2019, 2020 by TS Sundquist
+ * Copyright (C) 2017, 2018, 2019, 2020, 2021 by TS Sundquist
  * *** *** * 
  * All rights reserved.
  * 
@@ -19,32 +19,70 @@ import java.util.function.Predicate;
 
 import sog.core.test.TestContainer;
 
-
 /**
  * 	SUBJECT
  * 		A class that is the subject of one or more tests.
- * 		Specifies a class holding test methods using Test.Container
+ * 		A class identifies as a subject using Test.Subject, which indicates the test container.
+ * 		Container name conventions:
+ * 			.MemberName		Search for a member class Test.Container
+ * 			packages.		Prepend packages to full subject class name
+ * 			ClassName		Look in the same package for ClassName
+ * 			Otherwise		Name is a fully qualified class name
  * 		Declares test cases using Test.Decl on members
+ * 		Test declarations serve as additional documentation on behavior
  * 		Policy specifies which members should have cases declared
+ * 		A class may also use Test.Skip to declare no testing is required
  * 
  * 	CONTAINER
  * 		A class that holds test method implementations
- * 		Extends the abstract base class Test.Implementation
- * 		Specified by the subjects' Test.Container annotation
- * 		Has methods marked with Test.Impl
+ * 		Extends the abstract base class Test.Container
+ * 		Specified by the subjects' Test.Subject annotation
+ * 		Framework generates stubs for test methods and marks with Test.Impl annotations
+ * 		Implementations use Test.Case interface
+ * 
+ * 	CASE
+ * 		Each test method implementation gets an instance of Test.Case to record results
+ * 		Implemented by TestCase
+ * 
+ * 	RESULT
+ * 		Test.Result aggregates the results of all test cases for an individual class
+ * 		Implemented by TestResult
+ * 		Creates TestCase instances
  * 
  */
 public class Test {
 	
 	
 	/**
-	 * Subject classes use this annotation to identify the name of the
-	 * Test.Implementation that holds test method implementations.
+	 * Classes and/or members can be marked as not requiring testing.
+	 * The test policy is not applied, and no messages are generated.
+	 */
+	@Retention( RetentionPolicy.RUNTIME )
+	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
+	@Documented
+	public @interface Skip {
+		/** Optional description, for example explanation of alternate testing */
+		String value() default "No testing required.";
+	}
+
+	
+	
+	/**
+	 * Subject classes use to identify as a class needing testing.
+	 * The value identifies the location of the 
+	 * Test.Container that holds test method implementations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( ElementType.TYPE )
-	public @interface Container {
-		/** Fully qualified classname, or name of a member class */
+	@Documented
+	public @interface Subject {
+		/**
+		 * The value determines the location according to the following rules:
+		 *   1. If the string starts with a dot (.Member) it is treated as the name of a member class Test.Container
+		 *   2. If the string ends with a dot (package.) it is prepended to the subject full classname
+		 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
+		 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container
+		 */
 		String value(); 
 	}
 
@@ -84,15 +122,12 @@ public class Test {
 	/**
 	 * Container classes that hold test method implementations extend this abstract base class.
 	 */
-	public static abstract class Implementation {
+	public static abstract class Container {
 		
-		private Class<?> subjectClass;
+		protected Container() {}
 		
-		protected Implementation() {}
-		
-		protected void setSubjectClass( Class<?> subjectClass ) {
-			this.subjectClass = Assert.nonNull( subjectClass );
-		}
+		/** The named class must be annotated as a subject naming this Test.Container */
+		protected abstract Class<?> getSubjectClass();
 		
 		/** The procedure to be called before any method invocation occurs. */
 		public Procedure beforeAll() {
@@ -115,9 +150,9 @@ public class Test {
 		}
 
 		/** Set the value of a subject's field. */
-		public void setSubjectField( Object subject, String  fieldName, Object fieldValue ) {
+		public void setSubjectField( Object subject, String fieldName, Object fieldValue ) {
 			try {
-				Field field = this.subjectClass.getDeclaredField( fieldName );
+				Field field = this.getSubjectClass().getDeclaredField( fieldName );
 				field.setAccessible( true );
 				field.set( subject, fieldValue );
 			} catch ( Exception e ) {
@@ -130,7 +165,7 @@ public class Test {
 		public <T> T getSubjectField( Object subject, String fieldName, T witness ) {
 			T result = null;
 			try {
-				Field field = this.subjectClass.getDeclaredField( fieldName );
+				Field field = this.getSubjectClass().getDeclaredField( fieldName );
 				field.setAccessible( true );
 				result = (T) field.get( subject );
 			} catch ( Exception e ) {
@@ -142,8 +177,8 @@ public class Test {
 		/** Calling location in a concrete Container. */
 		public static String getFileLocation() {
 			Predicate<StackWalker.StackFrame> sfp = sf -> 
-				Test.Implementation.class.isAssignableFrom( sf.getDeclaringClass() ) 
-				&& !sf.getDeclaringClass().equals( Test.Implementation.class );
+				Test.Container.class.isAssignableFrom( sf.getDeclaringClass() ) 
+				&& !sf.getDeclaringClass().equals( Test.Container.class );
 			StackWalker.StackFrame sf = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
 				s -> s.filter( sfp ).findFirst().orElse( null )
 			);
@@ -281,7 +316,7 @@ public class Test {
 		 * @return
 		 * 		this TestCase
 		 */
-		public Test.Case assertFalse( boolean passIfFalse);
+		public Test.Case assertFalse( boolean passIfFalse );
 		
 		
 		/**

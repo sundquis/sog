@@ -25,7 +25,7 @@ import sog.core.Cache.Builder;
  * @author sundquis
  *
  */
-public class CacheTest extends Test.Implementation {
+public class CacheTest extends Test.Container {
 
 	// Test implementations
 	

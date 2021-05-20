@@ -35,7 +35,7 @@ import sog.util.StreamReader;
  * @author sundquis
  *
  */
-public class XMLHandlerTest extends Test.Implementation {
+public class XMLHandlerTest extends Test.Container {
 
 	// Override event handler of interest, using accept() to assign the result
 	private static abstract class Adapter<T> extends XMLHandler implements Supplier<T>, Consumer<T> {
@@ -67,7 +67,7 @@ public class XMLHandlerTest extends Test.Implementation {
 		private void out( Object ... msg ) {
 			if ( !FEEDBACK ) { return; }
 			
-			String message = ">>> " + this.getLocation() + " IN " + Test.Implementation.getFileLocation();
+			String message = ">>> " + this.getLocation() + " IN " + Test.Container.getFileLocation();
 			for ( int i = 0; i < msg.length; i++ ) {
 				message += ", " + Strings.toString( msg[i] );
 			}

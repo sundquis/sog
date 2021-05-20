@@ -120,14 +120,14 @@ public class TestContainer {
 	
 	private final Map<String, TestCase> testCases;
 
-	private Test.Implementation container;
+	private Test.Container container;
 
 	// Created empty
 	private TestContainer() {
 		this.testCases = new TreeMap<String, TestCase>();
 	}
 	
-	private void setContainer( Test.Implementation container ) {
+	private void setContainer( Test.Container container ) {
 		//this.container = Assert.nonNull( container );
 		// load methods -> cases
 	}

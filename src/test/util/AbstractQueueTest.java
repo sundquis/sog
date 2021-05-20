@@ -16,7 +16,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
-public class AbstractQueueTest extends Test.Implementation {
+public class AbstractQueueTest extends Test.Container {
 
 	// Test implementations
 

@@ -18,7 +18,7 @@ import sog.util.FixedWidth;
  * @author sundquis
  *
  */
-public class FixedWidthTest extends Test.Implementation {
+public class FixedWidthTest extends Test.Container {
 
 	private FixedWidth formatter;
 	

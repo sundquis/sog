@@ -20,7 +20,7 @@ import sog.util.IDProvider;
  * @author sundquis
  *
  */
-public class IDProviderTest extends Test.Implementation {
+public class IDProviderTest extends Test.Container {
 
 	// Test implementations
 	

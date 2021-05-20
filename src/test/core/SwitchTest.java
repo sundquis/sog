@@ -19,7 +19,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class SwitchTest extends Test.Implementation {
+public class SwitchTest extends Test.Container {
 
 	// Test implementations
 	

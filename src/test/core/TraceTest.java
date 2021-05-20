@@ -23,7 +23,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class TraceTest extends Test.Implementation {
+public class TraceTest extends Test.Container {
 
 	// Test implementations
 

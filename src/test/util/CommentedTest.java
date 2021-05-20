@@ -16,7 +16,7 @@ import sog.util.Commented;
  * @author sundquis
  *
  */
-public class CommentedTest extends Test.Implementation implements Commented {
+public class CommentedTest extends Test.Container implements Commented {
 
 	// Test implementations
 

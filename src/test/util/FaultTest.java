@@ -13,7 +13,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class FaultTest extends Test.Implementation {
+public class FaultTest extends Test.Container {
 
 	// Test implementations
 	
