@@ -70,6 +70,10 @@ public class TestContainer {
 		return (clazz.isMemberClass() ? getSimpleName(clazz.getEnclosingClass()) + "." : "") + clazz.getSimpleName();
 	}
 	
+	protected void setSubjectClass( Class<?> subjectClass ) {
+		this.subjectClass = Assert.nonNull( subjectClass );
+	}
+	
 	// Naming policy for constructors
 	private static String getSimpleName( Constructor<?> constructor ) {
 		return new StringBuilder()

@@ -114,7 +114,7 @@ public class Test {
 			return Procedure.NOOP;
 		}
 
-		/** Retrieve the value of a subject's field. */
+		/** Set the value of a subject's field. */
 		public void setSubjectField( Object subject, String  fieldName, Object fieldValue ) {
 			try {
 				Field field = this.subjectClass.getDeclaredField( fieldName );
@@ -125,7 +125,7 @@ public class Test {
 			} 
 		}
 
-		/** Set the value of a subject's field. */
+		/** Retrieve the value of a subject's field. */
 		@SuppressWarnings("unchecked")
 		public <T> T getSubjectField( Object subject, String fieldName, T witness ) {
 			T result = null;
