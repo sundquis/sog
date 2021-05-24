@@ -30,6 +30,11 @@ public class MultiQueueTest extends Test.Container {
 	private Queue<String> pm;
 	private Queue<String> fifo;
 	private Queue<String> priority;
+	
+	public MultiQueueTest() {
+		super( MultiQueue.class );
+	}
+	
 
 	@Override
 	public Procedure beforeEach() {

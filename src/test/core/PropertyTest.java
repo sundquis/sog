@@ -18,6 +18,10 @@ import sog.core.xml.XML;
  *
  */
 public class PropertyTest extends Test.Container {
+	
+	public PropertyTest() {
+		super( Property.class );
+	}
 
 	// Test implementations
 

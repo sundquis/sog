@@ -88,6 +88,11 @@ public class XMLHandlerTest extends Test.Container {
 		
 	}
 	
+	public XMLHandlerTest() {
+		super( XMLHandler.class );
+	}
+
+	
 	// Test implementations
 	
 	

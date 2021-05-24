@@ -23,6 +23,11 @@ public class FifoQueueTest extends Test.Container {
 	
 	
 	private Queue<String> queue;
+	
+	public FifoQueueTest() {
+		super( FifoQueue.class );
+	}
+	
 
 	@Override
 	public Procedure beforeEach() {

@@ -18,44 +18,63 @@ import java.lang.reflect.Field;
 import java.util.function.Predicate;
 
 import sog.core.test.TestContainer;
+import sog.core.test.TestRunner;
 
 /**
+ * All classes import Test as the single public access to the testing framework.
+ * 
+ * Resources fall into two categories. Classes intending to be tested, "subject classes", use annotations to
+ * declare test cases. The framework generates method stubs for each declared test case, which are
+ * implemented in a "container class." 
+ * 
+ * 
  * 	SUBJECT
  * 		A class that is the subject of one or more tests.
  * 		A class identifies as a subject using Test.Subject, which indicates the test container.
  * 		Container name conventions:
- * 			.MemberName		Search for a member class Test.Container
+ * 			.MemberName		Search for a member class Test.Container in the subject
  * 			packages.		Prepend packages to full subject class name
- * 			ClassName		Look in the same package for ClassName
+ * 			ClassName		Look in the same package as the subject for ClassName
  * 			Otherwise		Name is a fully qualified class name
- * 		Declares test cases using Test.Decl on members
- * 		Test declarations serve as additional documentation on behavior
+ * 		A subject class declares test cases using Test.Decl annotations on members
+ * 		The framework represents each Test.Decl annotation with an instance of test.TestDecl.
+ * 		Test declarations serve as additional documentation of behavior
  * 		Policy specifies which members should have cases declared
  * 		A class may also use Test.Skip to declare no testing is required
  * 
  * 	CONTAINER
- * 		A class that holds test method implementations
+ * 		A class that holds test method implementations for a specified subject class
  * 		Extends the abstract base class Test.Container
- * 		Specified by the subjects' Test.Subject annotation
+ * 		Subject indicates container through the Test.Subject annotation; Container indicates subject
+ * 			through the class supplied to the Container constructor; the framework checks consistency.
  * 		Framework generates stubs for test methods and marks with Test.Impl annotations
- * 		Implementations use Test.Case interface
+ * 		The framework represents each Test.Impl annotation with an instance of test.TestImpl.
+ * 		Test method implementations use the Test.Case interface to interact with the framework
+ * 		Provides convenience instance methods for getting and setting values on the subject
+ * 		Provides static convenience method for finding the file location in the concrete Container
  * 
  * 	CASE
- * 		Each test method implementation gets an instance of Test.Case to record results
- * 		Implemented by TestCase
+ * 		The Test.Case interface specifies how test methods interact with the framework to report results.
+ * 		The test.TestCase implementation facilitates communication between the TestDecl, method, and test.TestResult
  * 
  * 	RESULT
- * 		Test.Result aggregates the results of all test cases for an individual class
- * 		Implemented by TestResult
- * 		Creates TestCase instances
- * 
+ * 		The abstract class Test.Result specifies the information available after completion of tests 
+ * 			for one or more subject classes
+ * 		Extends and refines the Printable interface
+ * 		Specifies that Object.toString() should return summary information
+ * 		Provides accessors for elapsed time, pass count, fail cunt, and unimplemented count.
+ * 		Concrete class test.TestResult handles testing for a single subject class.
+ * 		Concrete class test.TestSetResult handles results for sets of subject classes
+ * 		The convenience method Test.testSubject(...) prints the Test.Result from a single test.TestResult
+ * 		Various methods in TestRunner print results from testing sets of subject classes
+ * 		
  */
 public class Test {
 	
 	
 	/**
 	 * Classes and/or members can be marked as not requiring testing.
-	 * The test policy is not applied, and no messages are generated.
+	 * The test policy is not applied, but a reminder message is generated.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( { ElementType.CONSTRUCTOR , ElementType.FIELD, ElementType.METHOD } )
@@ -78,8 +97,8 @@ public class Test {
 	public @interface Subject {
 		/**
 		 * The value determines the location according to the following rules:
-		 *   1. If the string starts with a dot (.Member) it is treated as the name of a member class Test.Container
-		 *   2. If the string ends with a dot (package.) it is prepended to the subject full classname
+		 *   1. If the string starts with a dot (.Member) it is treated as the name of a member Test.Container
+		 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name
 		 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
 		 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container
 		 */
@@ -124,14 +143,19 @@ public class Test {
 	 */
 	public static abstract class Container {
 		
-		protected Container() {}
+		private final Class<?> subjectClass;
+		
+		protected Container( Class<?> subjectClass ) {
+			this.subjectClass = subjectClass;
+		}
 		
 		/** The named class must be annotated as a subject naming this Test.Container */
-		protected abstract Class<?> getSubjectClass();
+		protected Class<?> getSubjectClass() {
+			return this.subjectClass;
+		}
 		
 		/** The procedure to be called before any method invocation occurs. */
-		public Procedure beforeAll() {
-			return Procedure.NOOP;
+		public void beforeAll() {
 		}
 		
 		/** The procedure to be called before each method invocation. */
@@ -217,6 +241,10 @@ public class Test {
 	}
 	
 	
+	/**
+	 * Test.Container classes contain methods annotated with Test.Impl. These methods are passed 
+	 * an instance of Test.Case to describe the results of the test case.
+	 */
 	public interface Case {
 		
 		/**
@@ -335,13 +363,10 @@ public class Test {
 	
 	
 
-	public static String eval( Class<?> subjectClass ) {
-		return TestContainer.eval( subjectClass );
+	/** Convenience method for evaluating one or more tests. If no classes are given the calling class is tested. */
+	public static void eval( Class<?>... subjects ) {
+		TestRunner.testClasses( Assert.nonNull( subjects ) );
 	}
 	
-	// FIXME: Needs testing
-	public static String eval() {
-		return Test.eval( App.get().getCallingClass( 2 ) );
-	}
 	
 }

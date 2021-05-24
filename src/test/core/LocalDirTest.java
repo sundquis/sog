@@ -18,6 +18,10 @@ import sog.core.Test;
  *
  */
 public class LocalDirTest extends Test.Container {
+	
+	public LocalDirTest() {
+		super( LocalDir.class );
+	}
 
 	// Test implementations
 

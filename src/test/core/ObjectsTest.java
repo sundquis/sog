@@ -21,6 +21,10 @@ import sog.core.Test;
  *
  */
 public class ObjectsTest extends Test.Container {
+	
+	public ObjectsTest() {
+		super( Objects.class );
+	}
 
 	// Test implementations
 

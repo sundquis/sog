@@ -32,7 +32,6 @@ import sog.core.Test;
  */
 public class StringsTest extends Test.Container {
 
-	// Test implementations
 	
 	// These objects are various arrays
 	private List<Object> testArrays;
@@ -43,6 +42,12 @@ public class StringsTest extends Test.Container {
 	private List<Collection<Object>> testLists;
 	
 	private List<String> testListStrings;
+	
+	public StringsTest() {
+		super( Strings.class );
+		
+		init();
+	}
 	
 	private void init() {
 		this.testArrays = new ArrayList<Object>();
@@ -75,11 +80,6 @@ public class StringsTest extends Test.Container {
 		for ( String s : testArrayStrings ) {
 			this.testListStrings.add( s.replace( '[',  '{' ).replace( ']', '}' ) );
 		}
-	}
-	
-	
-	public Procedure beforeAll() {
-		return () -> init();
 	}
 	
 	

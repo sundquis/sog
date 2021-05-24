@@ -111,6 +111,14 @@ public class TestRunner {
 		}
 	}
 	
+	public static void testClasses( Class<?>... subjects ) {
+		// If length is zero use calling class.
+		// Maybe:
+		//		App.get().getCallingClass( 3 );
+		// Get TestResult for each subject
+		// If exactly one, print detailed results
+		// Otherwise, aggregate stats, print overall, print each summary
+	}
 	
 
 	

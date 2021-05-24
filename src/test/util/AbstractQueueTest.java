@@ -38,6 +38,11 @@ public class AbstractQueueTest extends Test.Container {
 	
 	private Queue<String> queue;
 	
+	public AbstractQueueTest() {
+		super( AbstractQueue.class );
+	}
+	
+	
 	@Override public Procedure beforeEach() {
 		return () -> this.queue = new ConcreteQueue<>();
 	}

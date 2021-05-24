@@ -33,6 +33,10 @@ public class SwitchTest extends Test.Container {
 	
 	private Switch<State, String, String> sw;
 	
+	public SwitchTest() {
+		super( Switch.class );
+	}
+	
 	public Procedure beforeEach() {
 		return () -> this.sw = new Switch<State, String, String>();
 	}

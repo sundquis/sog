@@ -21,6 +21,11 @@ import sog.util.IDProvider;
  *
  */
 public class IDProviderTest extends Test.Container {
+	
+	public IDProviderTest() {
+		super( IDProvider.class );
+	}
+	
 
 	// Test implementations
 	

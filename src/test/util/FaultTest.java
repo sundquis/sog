@@ -9,11 +9,18 @@ package test.util;
 
 import sog.core.Test;
 
+import sog.util.Fault;
+
 /**
  * @author sundquis
  *
  */
 public class FaultTest extends Test.Container {
+	
+	public FaultTest() {
+		super( Fault.class );
+	}
+	
 
 	// Test implementations
 	

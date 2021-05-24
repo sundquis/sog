@@ -24,7 +24,12 @@ import sog.core.Test;
  *
  */
 public class TraceTest extends Test.Container {
+	
+	public TraceTest() {
+		super( Trace.class );
+	}
 
+	
 	// Test implementations
 
 	// If a test gets the path via Trace.close() then the test should delete the path

@@ -27,14 +27,14 @@ public class ByteFileTest extends Test.Container {
 	private long warnLimit;
 	private long failLimit;
 	
-	@Override
-	public Procedure beforeAll() {
-		return () -> {
-			this.maxLength = this.getSubjectField( null,  "MAX_LENGTH", 0L );
-			this.warnLimit = this.getSubjectField( null,  "WARN_LIMIT", 0L );
-			this.failLimit = this.getSubjectField( null,  "FAIL_LIMIT", 0L );
-		};
+	public ByteFileTest() {
+		super( ByteFile.class );
+		
+		this.maxLength = this.getSubjectField( null,  "MAX_LENGTH", 0L );
+		this.warnLimit = this.getSubjectField( null,  "WARN_LIMIT", 0L );
+		this.failLimit = this.getSubjectField( null,  "FAIL_LIMIT", 0L );
 	}
+	
 	
 	@Override
 	public Procedure beforeEach() {

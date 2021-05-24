@@ -17,6 +17,11 @@ import sog.util.Commented;
  *
  */
 public class CommentedTest extends Test.Container implements Commented {
+	
+	public CommentedTest() {
+		super( Commented.class );
+	}
+	
 
 	// Test implementations
 

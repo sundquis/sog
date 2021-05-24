@@ -16,6 +16,11 @@ import sog.core.xml.XML;
  *
  */
 public class XMLTest extends Test.Container {
+	
+	public XMLTest() {
+		super( XML.class );
+	}
+	
 
 	// Test implementations
 	

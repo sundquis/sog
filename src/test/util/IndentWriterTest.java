@@ -18,6 +18,11 @@ import sog.util.IndentWriter;
  *
  */
 public class IndentWriterTest extends Test.Container {
+	
+	public IndentWriterTest() {
+		super( IndentWriter.class );
+	}
+	
 
 	// Test implementations
 	

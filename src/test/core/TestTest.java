@@ -18,6 +18,13 @@ import sog.core.Test;
  */
 public class TestTest extends Test.Container{
 
+	
+	public TestTest() {
+		super( Test.class );
+	}
+	
+	
+	
 	// Test implementations
 	
 	@Test.Impl( member = "Test", description = "Loads correctly" )

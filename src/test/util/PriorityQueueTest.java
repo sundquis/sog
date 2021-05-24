@@ -24,6 +24,11 @@ public class PriorityQueueTest extends Test.Container {
 
 	
 	private Queue<String> queue;
+	
+	public PriorityQueueTest() {
+		super( PriorityQueue.class );
+	}
+	
 
 	@Override
 	public Procedure beforeEach() {

@@ -21,6 +21,10 @@ import sog.util.Macro;
  *
  */
 public class MacroTest extends Test.Container {
+	
+	public MacroTest() {
+		super( Macro.class );
+	}
 
 	// Test implementations
 

@@ -37,14 +37,14 @@ public class SoftStringTest extends Test.Container {
 	private int ORIG_THRESHOLD;
 	private int threshold = 5;
 	
-	@Override
-	public Procedure beforeAll() {
-		return () -> {
-			this.ORIG_THRESHOLD = this.getSubjectField( null,  "THRESHOLD",  0 );
-			this.setSubjectField( null,  "THRESHOLD",  this.threshold );
-		};
+	public SoftStringTest() {
+		super( SoftString.class );
+		
+		this.ORIG_THRESHOLD = this.getSubjectField( null,  "THRESHOLD",  0 );
+		this.setSubjectField( null,  "THRESHOLD",  this.threshold );
 	}
 	
+
 	@Override
 	public Procedure afterAll() {
 		return () -> this.setSubjectField( null,  "THRESHOLD",  this.ORIG_THRESHOLD );

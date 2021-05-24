@@ -97,6 +97,10 @@ public class CacheTest extends Test.Container {
 	private Cache<Integer, Value> cache;
 	private Builder<Integer, Value> builder = new MyBuilder();
 	
+	public CacheTest() {
+		super( Cache.class );
+	}
+	
 	@Override
 	public Procedure beforeEach() {
 		return () -> cache = new Cache<>( this.builder );

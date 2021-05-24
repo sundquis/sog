@@ -18,7 +18,6 @@ import java.util.List;
 import sog.core.App;
 import sog.core.AppException;
 import sog.core.ByteFile;
-import sog.core.Procedure;
 import sog.core.Property;
 import sog.core.Test;
 
@@ -29,18 +28,16 @@ import sog.core.Test;
 public class AppTest extends Test.Container {
 
 
-		public Path mySource; 
-		
-		public Path myDir;
-		
-		public Procedure beforeAll() {
-			return new Procedure() {
-				public void exec () {
-					mySource = App.get().sourceFile( AppTest.class );
-					myDir = App.get().sourceDir( AppTest.class );
-				}
-			};
-		}
+	public Path mySource; 
+	
+	public Path myDir;
+	
+	public AppTest() {
+		super( App.class );
+		this.mySource = App.get().sourceFile( AppTest.class );
+		this.myDir = App.get().sourceDir( AppTest.class );
+	}
+
 
 		
 		@Test.Impl( member = "public App App.get()", description = "Is not null" )

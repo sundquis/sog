@@ -16,7 +16,7 @@ package sog.util;
 public interface Printable {
 
 	/**
-	 * Pretty print in the given IndentWriter
+	 * Pretty print on the given IndentWriter
 	 * 
 	 * Write immediate state
 	 * For nested Printable components,

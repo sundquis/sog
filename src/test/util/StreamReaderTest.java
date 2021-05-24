@@ -28,6 +28,11 @@ public class StreamReaderTest extends Test.Container {
 	private StreamReader reader;
 	
 	private char[] buffer = new char[100];
+	
+	public StreamReaderTest() {
+		super( StreamReader.class );
+	}
+	
 
 	@Override public Procedure beforeEach() { return () -> reader = new StreamReader( Stream.of( lines ) ); }
 	

@@ -22,6 +22,11 @@ public class FixedWidthTest extends Test.Container {
 
 	private FixedWidth formatter;
 	
+	public FixedWidthTest() {
+		super( FixedWidth.class );
+	}
+
+	
 	@Override
 	public Procedure beforeEach() {
 		return () -> formatter = new FixedWidth();
