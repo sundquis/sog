@@ -213,7 +213,8 @@ public class App implements Runnable {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
 			.map( Location::new )
 			.map( Location::toString )
-		);
+			.collect( Collectors.toList() )
+		).stream();
 	}
 	
 	
@@ -223,7 +224,8 @@ public class App implements Runnable {
 			.filter( sf -> sf.getClassName().startsWith( prefix ) )
 			.map( Location::new )
 			.map( Location::toString )
-		);
+			.collect( Collectors.toList() )
+		).stream();
 	}
 	
 	
