@@ -25,12 +25,13 @@ import sog.util.IndentWriter;
 public class TestResult extends Test.Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
-		String label = Assert.nonNull( subjectClass ).getName();
-		TestResult result = new TestResult( label );
+		TestResult result = new TestResult( Assert.nonNull( subjectClass ).getName() );
 		
 		if ( !result.loadSubject( subjectClass ) ) { return result; }
 		
 		if ( !result.scanSubject() ) { return result; }
+		
+		if ( !result.loadContainer()  ) { return result; }
 		
 		
 		return result;
@@ -38,22 +39,54 @@ public class TestResult extends Test.Result {
 
 
 
-	
-	private final List<String> errors = new ArrayList<String>();
-	private final List<String> skips = new ArrayList<String>();
-	
-	private final List<TestMember> members = new ArrayList<TestMember>();
-	private final Set<TestDecl> decls = new HashSet<TestDecl>();
-	
+
+	/** The subject class for which this TestResult holds results. Set by loadSubject(). */
 	private Class<?> subjectClass;
+	
+	/**
+	 * Identifies the location of the Test.Container holding the test implementations for this
+	 * subject class. Read from the Test.Subject annotation. The value determines the location 
+	 * according to the following rules:
+	 *   1. If the string starts with a dot (.Member) it is treated as the name of a member Test.Container class
+	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name
+	 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
+	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
+	 */
 	private String containerLocation;
 
+	/**
+	 * Errors represent fatal misconfigurations of test information. When encountered
+	 * the framework fails fast and marks all passed tests as failed. Errors
+	 * are reported by the print( IndentWriter ) method.
+	 */
+	private final List<String> errors = new ArrayList<String>();
+	
+	/**
+	 * When Test.Skip is used to bypass testing of a class or member an item is added
+	 * to this list. Skips are reported by the print( IndentWriter ) method.
+	 */
+	private final List<String> skips = new ArrayList<String>();
+	
+	/** The recursive search in scanClass( ... ) fills in this list. */
+	private final List<TestMember> members = new ArrayList<TestMember>();
+	
+	/** scanMember( ... ) converts a legal TestMember instance into a TestDecl. */
+	private final Set<TestDecl> decls = new HashSet<TestDecl>();
+	
+	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
+	private Test.Container container;
+	
+	
 	public TestResult( String label ) {
 		super( label );
 	}
 	
 	
+	
 	private void addError( Object... details ) {
+		int pass = this.getPassCount();
+		this.incPassCount( -pass );
+		this.incFailCount( pass );
 		this.errors.add( Arrays.stream( details ).map( Strings::toString ).collect( Collectors.joining() ) );
 	}
 	
@@ -65,6 +98,16 @@ public class TestResult extends Test.Result {
 	/** Return true if processing should continue */
 	private boolean loadSubject( Class<?> subjectClass ) {
 		this.subjectClass = Assert.nonNull( subjectClass );
+		
+		/*
+		 * Leaving this around for now, but not sure anything is gained by disallowing direct
+		 * testing of nested classes
+		 * 
+		if ( subjectClass.isSynthetic() || subjectClass.getEnclosingClass() != null ) {
+			this.addError( "Subject class ", subjectClass, " is not a top-level class." );
+			return false;
+		}
+		 */
 		
 		Test.Skip skip = this.subjectClass.getDeclaredAnnotation( Test.Skip.class );
 		Test.Subject subj = this.subjectClass.getDeclaredAnnotation( Test.Subject.class );
@@ -84,7 +127,7 @@ public class TestResult extends Test.Result {
 				this.containerLocation = subj.value();
 				return true;
 			} else {
-				this.addError( this.subjectClass, " is unmarked." );
+				this.addError( this.subjectClass, " is not marked as a subject class." );
 				return false;
 			}
 		}
@@ -111,7 +154,7 @@ public class TestResult extends Test.Result {
 			if ( member.hasDecls() ) {
 				this.addError( "Member ", member, " is marked for skipping and has ", member.getDecls().length, " declarations."  );
 			} else {
-				this.addSkip( "Skipping ", member, ": ", member.getSkipReason() );
+				this.addSkip( "Skipping member ", member, ": ", member.getSkipReason() );
 			}
 		} else {
 			if ( member.hasDecls() ) {
@@ -126,6 +169,45 @@ public class TestResult extends Test.Result {
 				}
 			}
 		}
+	}
+	
+	
+
+	/*
+	 *   1. If the string starts with a dot (.Member) it is treated as the name of a member Test.Container class
+	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name
+	 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
+	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
+	 */
+	private boolean loadContainer() {
+		String containerClassName = "";
+		
+		if ( this.containerLocation.startsWith( "." ) ) {
+			containerClassName = this.subjectClass.getName() + this.containerLocation.replaceAll( "\\.", "\\$" );
+		} else if ( this.containerLocation.endsWith( "." ) ) {
+			containerClassName = this.containerLocation + this.subjectClass.getName();
+		} else if ( !this.containerLocation.contains( "." ) ) {
+			containerClassName = this.subjectClass.getPackageName() + "." + this.containerLocation;
+		} else {
+			containerClassName = this.containerLocation;
+		}
+		
+		try {
+			Class<?> clazz = Class.forName( containerClassName );
+			this.container = (Test.Container) clazz.getDeclaredConstructor().newInstance();
+		} catch ( Exception e ) {
+			this.addError( "Cannot construct container for ", this.subjectClass,
+				", container name: ", containerClassName, ", exception: ", e );
+			return false;
+		}
+		
+		if ( !this.container.getSubjectClass().equals( this.subjectClass ) ) {
+			this.addError( "Container ", this.container.getClass(), " names the wrong subject: ", 
+				"Should be ", this.subjectClass, ", got: ", this.container.getSubjectClass() );
+			return false;
+		}
+		
+		return true;
 	}
 	
 
@@ -155,13 +237,30 @@ public class TestResult extends Test.Result {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( Foo.class );
+		Test.eval( Foo2.class );
+		
 		
 		System.out.println( "Done!" );
 	}
 	
+	@Test.Subject( ".Nested.Inner" )
+	//@Test.Subject( "test.one." )
+	//@Test.Subject( "SomeContainer" )
+	private static class Foo2 {
+		private static class Nested{
+			private static class Inner extends Test.Container {
+				@Test.Skip( "test" )
+				public Inner() {
+					super( Foo2.class );
+				}
+				
+			}
+		}
+		
+	}
+	
 	//@Test.Skip( "Just because" )
-	@Test.Subject( ".FooMemberClass" )
+	//@Test.Subject( ".FooMemberClass" )
 	private static class Foo {
 		
 		private static String myString = "Hi";
