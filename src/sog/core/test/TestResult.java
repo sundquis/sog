@@ -68,9 +68,6 @@ public class TestResult extends Test.Result {
 	 */
 	private final List<String> skips = new ArrayList<String>();
 	
-	/** scanMember( ... ) converts a legal TestMember instance into a TestDecl. */
-	private final Set<TestDecl> decls = new HashSet<TestDecl>();
-	
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
 	private Test.Container container;
 	
@@ -133,20 +130,20 @@ public class TestResult extends Test.Result {
 		return this.errors.size() == 0;
 	}
 	
-	private Stream<TestMember> scanClass( Class<?> clazz ) {
+	private Stream<TestDecl> scanClass( Class<?> clazz ) {
 		return Stream.concat(
 			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::new ),
-				Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::new )
+				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestDecl::new ),
+				Arrays.stream( clazz.getDeclaredFields() ).map( TestDecl::new )
 			), 
 			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::new ),
+				Arrays.stream( clazz.getDeclaredMethods() ).map( TestDecl::new ),
 				Arrays.stream( clazz.getDeclaredClasses() ).flatMap( this::scanClass )
 			)
 		);
 	}
 	
-	private void scanMember( TestMember member ) {
+	private void scanMember( TestDecl member ) {
 		if ( member.isSkipped() ) {
 			if ( member.hasDecls() ) {
 				this.addError( "Member ", member, " is marked for skipping and has ", member.getDecls().length, " declarations."  );
