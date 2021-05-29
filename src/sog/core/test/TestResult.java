@@ -22,6 +22,7 @@ import sog.util.IndentWriter;
 /**
  * 
  */
+@Test.Subject( ".SomMember" )
 public class TestResult extends Test.Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
@@ -67,9 +68,6 @@ public class TestResult extends Test.Result {
 	 */
 	private final List<String> skips = new ArrayList<String>();
 	
-	/** The recursive search in scanClass( ... ) fills in this list. */
-	private final List<TestMember> members = new ArrayList<TestMember>();
-	
 	/** scanMember( ... ) converts a legal TestMember instance into a TestDecl. */
 	private final Set<TestDecl> decls = new HashSet<TestDecl>();
 	
@@ -99,15 +97,10 @@ public class TestResult extends Test.Result {
 	private boolean loadSubject( Class<?> subjectClass ) {
 		this.subjectClass = Assert.nonNull( subjectClass );
 		
-		/*
-		 * Leaving this around for now, but not sure anything is gained by disallowing direct
-		 * testing of nested classes
-		 * 
 		if ( subjectClass.isSynthetic() || subjectClass.getEnclosingClass() != null ) {
 			this.addError( "Subject class ", subjectClass, " is not a top-level class." );
 			return false;
 		}
-		 */
 		
 		Test.Skip skip = this.subjectClass.getDeclaredAnnotation( Test.Skip.class );
 		Test.Subject subj = this.subjectClass.getDeclaredAnnotation( Test.Subject.class );
@@ -135,18 +128,22 @@ public class TestResult extends Test.Result {
 	
 	
 	private boolean scanSubject() {
-		this.scanClass( this.subjectClass );
-		this.members.stream().forEach( this::scanMember );
+		this.scanClass( this.subjectClass ).forEach( this::scanMember );
 		
 		return this.errors.size() == 0;
 	}
 	
-	private void scanClass( Class<?> clazz ) {
-		Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::build ).forEach( this.members::add );
-		Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::build ).forEach( this.members::add );
-		Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::build ).forEach( this.members::add );
-		
-		Arrays.stream( clazz.getDeclaredClasses() ).forEach( this::scanClass );
+	private Stream<TestMember> scanClass( Class<?> clazz ) {
+		return Stream.concat(
+			Stream.concat( 
+				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::new ),
+				Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::new )
+			), 
+			Stream.concat( 
+				Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::new ),
+				Arrays.stream( clazz.getDeclaredClasses() ).flatMap( this::scanClass )
+			)
+		);
 	}
 	
 	private void scanMember( TestMember member ) {
@@ -158,17 +155,18 @@ public class TestResult extends Test.Result {
 			}
 		} else {
 			if ( member.hasDecls() ) {
-				for ( Test.Decl decl : member.getDecls() ) {
-					if ( !this.decls.add( new TestDecl( member, decl.value() ) ) ) {
-						this.addError( "Duplicate test declaration: ", member, ": ", decl.value() );
-					}
-				}
+				this.addCases( member.toString(), member.getDecls() );
 			} else {
 				if ( member.isRequired() ) {
 					this.addError( "Untested member ", member, " is required by the current policy." );
 				}
 			}
 		}
+	}
+	
+
+	private void addCases( String memberName, Test.Decl[] decls ) {
+		
 	}
 	
 	
@@ -237,7 +235,7 @@ public class TestResult extends Test.Result {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( Foo2.class );
+		Test.eval( TestResult.class );
 		
 		
 		System.out.println( "Done!" );
@@ -260,7 +258,7 @@ public class TestResult extends Test.Result {
 	}
 	
 	//@Test.Skip( "Just because" )
-	//@Test.Subject( ".FooMemberClass" )
+	@Test.Subject( ".FooMemberClass" )
 	private static class Foo {
 		
 		private static String myString = "Hi";

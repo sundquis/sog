@@ -6,6 +6,7 @@
  */
 package sog.core.test;
 
+import sog.core.Assert;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Test.Case;
@@ -14,12 +15,17 @@ import sog.core.Test.Case;
  * 
  */
 public class TestCase implements Test.Case {
+	
+	
+	private final String memberName;
+	private final String description;
 
 	/**
 	 * 
 	 */
-	public TestCase() {
-		// TODO Auto-generated constructor stub
+	public TestCase( String memberName, String description ) {
+		this.memberName = Assert.nonEmpty( memberName );
+		this.description = Assert.nonEmpty( description );
 	}
 
 	@Override

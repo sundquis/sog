@@ -11,11 +11,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import sog.core.Test;
 
@@ -69,84 +66,63 @@ public class TestMember {
 			.toString();
 	}
 	
-	private static boolean isSkipped( Member m, AnnotatedElement e ) {
-		Test.Skip skip = e.getDeclaredAnnotation( Test.Skip.class );		
-		return skip != null || m.isSynthetic() || "main".equals( m.getName() );
-	}
-	
-	private static String skipReason( Member m, AnnotatedElement e ) {
-		Test.Skip skip = e.getDeclaredAnnotation( Test.Skip.class );				
-		return (skip != null) ? skip.value() :
-			m.isSynthetic() ? "Synthetic" :
-				"main".equals(  m.getName() ) ? "main" : "";
-	}
-
-	
-	public static TestMember build( Constructor<?> constructor ) {
-		return new TestMember( 
-			TestMember.getSimpleName( constructor ),
-			TestMember.isSkipped( constructor, constructor ),
-			TestMember.skipReason( constructor, constructor ),
-			Policy.get().required( constructor ),
-			constructor.getDeclaredAnnotationsByType( Test.Decl.class )
-		);
-	}
-
-	
-	public static TestMember build( Field field ) {
-		return new TestMember( 
-			TestMember.getSimpleName( field ),
-			TestMember.isSkipped( field, field ),
-			TestMember.skipReason( field, field ),
-			Policy.get().required( field ),
-			field.getDeclaredAnnotationsByType( Test.Decl.class )
-		);
-	}
-
-	
-	public static TestMember build( Method method ) {
-		return new TestMember( 
-			TestMember.getSimpleName( method ),
-			TestMember.isSkipped( method, method ),
-			TestMember.skipReason( method, method ),
-			Policy.get().required( method ),
-			method.getDeclaredAnnotationsByType( Test.Decl.class )
-		);
-	}
-
 	
 	
 	
-	private final String name;
-	private final boolean isSkipped;
-	private final String skipReason;
-	private final boolean isRequired;
+	private final String memberName;
+	private final Member member;
+	private final Test.Skip skip;
 	private final Test.Decl[] decls;
+	private boolean isRequired;
 	
-	private TestMember( String name, boolean isSkipped, String skipReason, boolean isRequired, Test.Decl[] decls ) {
-		this.name = name;
-		this.isSkipped = isSkipped;
-		this.skipReason = skipReason;
+	private TestMember( String memberName, Member member, AnnotatedElement element, boolean isRequired ) {
+		this.memberName = memberName;
+		this.member = member;
+		this.skip = element.getDeclaredAnnotation( Test.Skip.class );
+		this.decls = element.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = isRequired;
-		this.decls = decls;
+	}
+	
+	public TestMember( Constructor<?> constructor ) {
+		this( TestMember.getSimpleName( constructor ), constructor, constructor, Policy.get().required( constructor ) );
+	}
+	
+	public TestMember( Field field ) {
+		this( TestMember.getSimpleName( field ), field, field, Policy.get().required( field ) );
+	}
+	
+	public TestMember( Method method ) {
+		this( TestMember.getSimpleName( method ), method, method, Policy.get().required( method ) );
 	}
 	
 		
 	
-	public boolean isSkipped() { return this.isSkipped; }
+	public boolean isSkipped() { 
+		return this.skip != null || this.member.isSynthetic();
+	}
 	
-	public String getSkipReason() { return this.skipReason; }
+	public String getSkipReason() { 
+		return (this.skip != null) ? this.skip.value() : "Synthetic";
+	}
 	
-	public boolean isRequired() { return this.isRequired; }
+	public boolean isRequired() { 
+		return this.isRequired; 
+	}
 	
-	public boolean hasDecls() { return this.decls.length > 0; }
+	public boolean hasDecls() { 
+		return this.decls.length > 0; 
+	}
 	
-	public Test.Decl[] getDecls() { return this.decls; }
+	public Test.Decl[] getDecls() { 
+		return this.decls; 
+	}
 	
 
 	
 	
 	@Override
-	public String toString() { return this.name; }
+	public String toString() {
+		return this.memberName;
+	}
 
 }
