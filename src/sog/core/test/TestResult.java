@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +25,8 @@ import sog.util.IndentWriter;
  * 
  */
 @Test.Subject( ".SomMember" )
-public class TestResult extends Test.Result {
+//@Test.Skip( "Skip this class" )
+public class TestResult extends Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
 		TestResult result = new TestResult( Assert.nonNull( subjectClass ).getName() );
@@ -68,6 +71,8 @@ public class TestResult extends Test.Result {
 	 */
 	private final List<String> skips = new ArrayList<String>();
 	
+	private final Map<String, TestCase> caseMap = new TreeMap<String, TestCase>();
+	
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
 	private Test.Container container;
 	
@@ -78,15 +83,27 @@ public class TestResult extends Test.Result {
 	
 	
 	
-	private void addError( Object... details ) {
+	private void addError( int xxx, Object... details ) {
 		int pass = this.getPassCount();
 		this.incPassCount( -pass );
 		this.incFailCount( pass );
 		this.errors.add( Arrays.stream( details ).map( Strings::toString ).collect( Collectors.joining() ) );
 	}
 	
-	private void addSkip( Object... details ) {
-		this.skips.add( Arrays.stream( details ).map( Strings::toString ).collect( Collectors.joining() ) );
+	private class Err {
+		private Err addDetail( String description, Object target ) {
+			TestResult.this.errors.add( "    " + description + ": " + target.toString() );
+			return this;
+		}
+	}
+	
+	private Err addError( String description, Object target ) {
+		this.errors.add( description +": " + target );
+		return new Err();
+	}
+	
+	private void addSkip( Object target, String reason ) {
+		this.skips.add(  target.toString() + ": " + reason );
 	}
 		
 	
@@ -95,7 +112,7 @@ public class TestResult extends Test.Result {
 		this.subjectClass = Assert.nonNull( subjectClass );
 		
 		if ( subjectClass.isSynthetic() || subjectClass.getEnclosingClass() != null ) {
-			this.addError( "Subject class ", subjectClass, " is not a top-level class." );
+			this.addError( "Subject class is not a top-level class", subjectClass );
 			return false;
 		}
 		
@@ -107,9 +124,9 @@ public class TestResult extends Test.Result {
 		
 		if ( isSkipped ) {
 			if ( isSubject ) {
-				this.addError( "Subject ", this.subjectClass, " is marked to be skipped." );
+				this.addError( "Subject is also marked to be skipped", this.subjectClass );
 			} else {
-				this.addSkip( "Skipping ", this.subjectClass, ": ", skip.value() );
+				this.addSkip( this.subjectClass, skip.value() );
 			}
 			return false;
 		} else {
@@ -117,7 +134,7 @@ public class TestResult extends Test.Result {
 				this.containerLocation = subj.value();
 				return true;
 			} else {
-				this.addError( this.subjectClass, " is not marked as a subject class." );
+				this.addError( "Subject class is not annotated", this.subjectClass );
 				return false;
 			}
 		}
@@ -146,16 +163,17 @@ public class TestResult extends Test.Result {
 	private void scanMember( TestDecl member ) {
 		if ( member.isSkipped() ) {
 			if ( member.hasDecls() ) {
-				this.addError( "Member ", member, " is marked for skipping and has ", member.getDecls().length, " declarations."  );
+				this.addError( "Member is marked for skipping", member)
+					.addDetail( "Has test declarations", member.getDecls().length );
 			} else {
-				this.addSkip( "Skipping member ", member, ": ", member.getSkipReason() );
+				this.addSkip( member, member.getSkipReason() );
 			}
 		} else {
 			if ( member.hasDecls() ) {
 				this.addCases( member.toString(), member.getDecls() );
 			} else {
 				if ( member.isRequired() ) {
-					this.addError( "Untested member ", member, " is required by the current policy." );
+					this.addError( "Untested member required by the current policy", member );
 				}
 			}
 		}
@@ -163,7 +181,9 @@ public class TestResult extends Test.Result {
 	
 
 	private void addCases( String memberName, Test.Decl[] decls ) {
-		
+		for ( Test.Decl decl : decls ) {
+			//if ( !this.caseMap.put(  , value ))
+		}
 	}
 	
 	
@@ -191,14 +211,16 @@ public class TestResult extends Test.Result {
 			Class<?> clazz = Class.forName( containerClassName );
 			this.container = (Test.Container) clazz.getDeclaredConstructor().newInstance();
 		} catch ( Exception e ) {
-			this.addError( "Cannot construct container for ", this.subjectClass,
-				", container name: ", containerClassName, ", exception: ", e );
+			this.addError( "Cannot construct container", this.subjectClass )
+				.addDetail( "Container name", containerClassName )
+				.addDetail( "Exception", e );
 			return false;
 		}
 		
 		if ( !this.container.getSubjectClass().equals( this.subjectClass ) ) {
-			this.addError( "Container ", this.container.getClass(), " names the wrong subject: ", 
-				"Should be ", this.subjectClass, ", got: ", this.container.getSubjectClass() );
+			this.addError( "Container names the wrong subject", this.container.getClass() )
+				.addDetail( "Should be", this.subjectClass )
+				.addDetail( "Got", this.container.getSubjectClass() );
 			return false;
 		}
 		

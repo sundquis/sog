@@ -16,6 +16,7 @@ import sog.core.Test.Case;
  */
 public class TestCase implements Test.Case {
 	
+		
 	
 	private final String memberName;
 	private final String description;

@@ -30,6 +30,7 @@ public class TestDecl {
 	// Naming policy for constructors
 	private static String getSimpleName( Constructor<?> constructor ) {
 		return new StringBuilder()
+			.append( "constructor: " )
 			.append( getSimpleName( constructor.getDeclaringClass() ) )
 			.append( "(" )
 			.append( Arrays.stream( constructor.getParameterTypes() )
@@ -42,6 +43,7 @@ public class TestDecl {
 	// Naming policy for member fields
 	private static String getSimpleName( Field field ) {
 		return new StringBuilder()
+			.append( "field: " )
 			.append( getSimpleName( field.getType() ) )
 			.append( " " )
 			.append( getSimpleName( field.getDeclaringClass() ) )
@@ -53,6 +55,7 @@ public class TestDecl {
 	// Naming policy for member methods
 	private static String getSimpleName( Method method ) {
 		return new StringBuilder()
+			.append( "method: " )
 			.append( getSimpleName( method.getReturnType() ) )
 			.append( " " )
 			.append( getSimpleName( method.getDeclaringClass() ) )
