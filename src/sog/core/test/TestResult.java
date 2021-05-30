@@ -8,34 +8,31 @@ package sog.core.test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
-import sog.core.Strings;
 import sog.core.Test;
 import sog.util.IndentWriter;
 
 /**
  * 
  */
-@Test.Subject( ".SomMember" )
+@Test.Subject( ".SomeMember" )
 //@Test.Skip( "Skip this class" )
 public class TestResult extends Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
 		TestResult result = new TestResult( Assert.nonNull( subjectClass ).getName() );
 		
-		if ( !result.loadSubject( subjectClass ) ) { return result; }
-		
-		if ( !result.scanSubject() ) { return result; }
-		
-		if ( !result.loadContainer()  ) { return result; }
+		result.loadSubject( subjectClass );
+		result.scanSubject();
+
+		result.loadContainer();
+		result.scanContainer();
+
 		
 		
 		return result;
@@ -71,7 +68,7 @@ public class TestResult extends Result {
 	 */
 	private final List<String> skips = new ArrayList<String>();
 	
-	private final Map<String, TestCase> caseMap = new TreeMap<String, TestCase>();
+	private final Map<String, TestDecl> declMap = new TreeMap<String, TestDecl>();
 	
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
 	private Test.Container container;
@@ -82,13 +79,6 @@ public class TestResult extends Result {
 	}
 	
 	
-	
-	private void addError( int xxx, Object... details ) {
-		int pass = this.getPassCount();
-		this.incPassCount( -pass );
-		this.incFailCount( pass );
-		this.errors.add( Arrays.stream( details ).map( Strings::toString ).collect( Collectors.joining() ) );
-	}
 	
 	private class Err {
 		private Err addDetail( String description, Object target ) {
@@ -107,13 +97,12 @@ public class TestResult extends Result {
 	}
 		
 	
-	/** Return true if processing should continue */
-	private boolean loadSubject( Class<?> subjectClass ) {
+
+	private void loadSubject( Class<?> subjectClass ) {
 		this.subjectClass = Assert.nonNull( subjectClass );
 		
 		if ( subjectClass.isSynthetic() || subjectClass.getEnclosingClass() != null ) {
 			this.addError( "Subject class is not a top-level class", subjectClass );
-			return false;
 		}
 		
 		Test.Skip skip = this.subjectClass.getDeclaredAnnotation( Test.Skip.class );
@@ -128,49 +117,43 @@ public class TestResult extends Result {
 			} else {
 				this.addSkip( this.subjectClass, skip.value() );
 			}
-			return false;
 		} else {
 			if ( isSubject ) {
 				this.containerLocation = subj.value();
-				return true;
 			} else {
 				this.addError( "Subject class is not annotated", this.subjectClass );
-				return false;
 			}
 		}
 	}
 	
 	
-	private boolean scanSubject() {
+	private void scanSubject() {
 		this.scanClass( this.subjectClass ).forEach( this::scanMember );
-		
-		return this.errors.size() == 0;
 	}
 	
-	private Stream<TestDecl> scanClass( Class<?> clazz ) {
+	private Stream<TestMember> scanClass( Class<?> clazz ) {
 		return Stream.concat(
 			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestDecl::new ),
-				Arrays.stream( clazz.getDeclaredFields() ).map( TestDecl::new )
+				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::new ),
+				Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::new )
 			), 
 			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredMethods() ).map( TestDecl::new ),
+				Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::new ),
 				Arrays.stream( clazz.getDeclaredClasses() ).flatMap( this::scanClass )
 			)
 		);
 	}
 	
-	private void scanMember( TestDecl member ) {
+	private void scanMember( TestMember member ) {
 		if ( member.isSkipped() ) {
 			if ( member.hasDecls() ) {
-				this.addError( "Member is marked for skipping", member)
-					.addDetail( "Has test declarations", member.getDecls().length );
+				this.addError( "Member has declarations and is marked for skipping", member);
 			} else {
 				this.addSkip( member, member.getSkipReason() );
 			}
 		} else {
 			if ( member.hasDecls() ) {
-				this.addCases( member.toString(), member.getDecls() );
+				member.getDecls().forEach( this::addDecl );
 			} else {
 				if ( member.isRequired() ) {
 					this.addError( "Untested member required by the current policy", member );
@@ -178,13 +161,17 @@ public class TestResult extends Result {
 			}
 		}
 	}
-	
 
-	private void addCases( String memberName, Test.Decl[] decls ) {
-		for ( Test.Decl decl : decls ) {
-			//if ( !this.caseMap.put(  , value ))
+	private void addDecl( TestDecl decl ) {
+		if ( this.declMap.containsKey( decl.getKey() ) ) {
+			this.addError( "Duplicate declaration", "" )
+				.addDetail( "Member", decl.getMemberName() )
+				.addDetail( "Description", decl.getDescription() );
+		} else {
+			this.declMap.put( decl.getKey(), decl );
 		}
 	}
+
 	
 	
 
@@ -194,7 +181,7 @@ public class TestResult extends Result {
 	 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
 	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
 	 */
-	private boolean loadContainer() {
+	private void loadContainer() {
 		String containerClassName = "";
 		
 		if ( this.containerLocation.startsWith( "." ) ) {
@@ -214,17 +201,38 @@ public class TestResult extends Result {
 			this.addError( "Cannot construct container", this.subjectClass )
 				.addDetail( "Container name", containerClassName )
 				.addDetail( "Exception", e );
-			return false;
+			return;
 		}
 		
 		if ( !this.container.getSubjectClass().equals( this.subjectClass ) ) {
 			this.addError( "Container names the wrong subject", this.container.getClass() )
 				.addDetail( "Should be", this.subjectClass )
 				.addDetail( "Got", this.container.getSubjectClass() );
-			return false;
 		}
-		
-		return true;
+	}
+	
+	
+	private void scanContainer() {
+		Arrays.stream(  this.container.getClass().getDeclaredMethods() )
+			.map( TestImpl::new )
+			.filter( TestImpl::hasImpl )
+			.forEach( this::addImpl );
+	}
+	
+	private void addImpl( TestImpl impl ) {
+		if ( this.declMap.containsKey( impl.getKey() ) ) {
+			if ( this.declMap.get( impl.getKey() ).setImpl( impl ) != null ) {
+				this.addError( "Duplicate test implementation", this.containerLocation )
+				.addDetail( "Member", impl.getMemberName() )
+				.addDetail( "Description", impl.getDescription() );
+			} else {
+				
+			}
+		} else {
+			this.addError( "Orphaned test implementation", this.containerLocation )
+				.addDetail( "Member", impl.getMemberName() )
+				.addDetail( "Description", impl.getDescription() );
+		}
 	}
 	
 

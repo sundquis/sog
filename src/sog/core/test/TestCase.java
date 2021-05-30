@@ -14,12 +14,11 @@ import sog.core.Test.Case;
 /**
  * 
  */
-public class TestCase implements Test.Case {
+public class TestCase implements Test.Case, Comparable<TestCase>, Runnable {
 	
 		
-	
-	private final String memberName;
-	private final String description;
+
+	private final 
 
 	/**
 	 * 
@@ -93,6 +92,18 @@ public class TestCase implements Test.Case {
 	public <T> Case assertEqual(T expected, T actual) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int compareTo( TestCase o ) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
