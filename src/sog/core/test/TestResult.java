@@ -259,6 +259,54 @@ public class TestResult extends Result {
 		out.decreaseIndent();
 	}
 	
+	@Override
+	public long getElapsedTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incElapsedTime( long time ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getPassCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incPassCount( int pass ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getFailCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incFailCount( int fail ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getUnimplementedCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incUnimplementedCount( int unimpl ) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	
 	
 	public static void main( String[] args ) {
@@ -311,6 +359,6 @@ public class TestResult extends Result {
 		
 		
 	}
-	
+
 
 }

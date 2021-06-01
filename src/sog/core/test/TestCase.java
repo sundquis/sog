@@ -10,22 +10,22 @@ import sog.core.Assert;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Test.Case;
+import sog.util.IndentWriter;
 
 /**
  * 
  */
-public class TestCase implements Test.Case, Comparable<TestCase>, Runnable {
+public class TestCase extends Result implements Test.Case, Comparable<TestCase>, Runnable {
 	
 		
 
-	private final 
+	private final Test.Impl impl;
+	private final Test.Container container;
 
-	/**
-	 * 
-	 */
-	public TestCase( String memberName, String description ) {
-		this.memberName = Assert.nonEmpty( memberName );
-		this.description = Assert.nonEmpty( description );
+	public TestCase( Test.Impl impl, Test.Container container ) {
+		super( Assert.nonNull( impl ).description() );
+		this.impl = Assert.nonNull( impl );
+		this.container = Assert.nonNull( container );
 	}
 
 	@Override
@@ -104,6 +104,60 @@ public class TestCase implements Test.Case, Comparable<TestCase>, Runnable {
 	public int compareTo( TestCase o ) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public long getElapsedTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incElapsedTime( long time ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getPassCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incPassCount( int pass ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getFailCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incFailCount( int fail ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getUnimplementedCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void incUnimplementedCount( int unimpl ) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void print( IndentWriter out ) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
