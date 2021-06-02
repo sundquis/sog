@@ -9,7 +9,6 @@ package sog.core.test;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -74,35 +73,35 @@ public class TestMember {
 	
 	
 	private final String memberName;
-	private final Member member;
 	private final Test.Skip skip;
 	private final Test.Decl[] decls;
-	private boolean isRequired;
+	private final boolean isSynthetic;
+	private final boolean isRequired;
 	
-	private TestMember( String memberName, Member member, AnnotatedElement element, boolean isRequired ) {
+	private TestMember( String memberName, AnnotatedElement element, boolean isSynthetic, boolean isRequired ) {
 		this.memberName = memberName;
-		this.member = member;
 		this.skip = element.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = element.getDeclaredAnnotationsByType( Test.Decl.class );
+		this.isSynthetic = isSynthetic;
 		this.isRequired = isRequired;
 	}
 	
 	public TestMember( Constructor<?> constructor ) {
-		this( TestMember.getSimpleName( constructor ), constructor, constructor, Policy.get().required( constructor ) );
+		this( TestMember.getSimpleName( constructor ), constructor, constructor.isSynthetic(), Policy.get().required( constructor ) );
 	}
 	
 	public TestMember( Field field ) {
-		this( TestMember.getSimpleName( field ), field, field, Policy.get().required( field ) );
+		this( TestMember.getSimpleName( field ), field, field.isSynthetic(), Policy.get().required( field ) );
 	}
 	
 	public TestMember( Method method ) {
-		this( TestMember.getSimpleName( method ), method, method, Policy.get().required( method ) );
+		this( TestMember.getSimpleName( method ), method, method.isSynthetic(), Policy.get().required( method ) );
 	}
 	
 		
 	
 	public boolean isSkipped() { 
-		return this.skip != null || this.member.isSynthetic();
+		return this.skip != null || this.isSynthetic;
 	}
 	
 	public String getSkipReason() { 

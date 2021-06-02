@@ -20,15 +20,10 @@ public abstract class Result implements Printable {
 
 	public abstract long getElapsedTime();
 
-	public abstract void incElapsedTime( long time );
-
 	public abstract int getPassCount();
-
-	public abstract void incPassCount( int pass );
 
 	public abstract int getFailCount();
 
-	public abstract void incFailCount( int fail );
 
 	@Override
 	public String toString() {

@@ -39,5 +39,13 @@ public class TestImpl implements TestIdentifier {
 	public String getDescription() {
 		return this.impl == null ? "NONE" : this.impl.description();
 	}
+	
+	public int getPriority() {
+		return this.impl.priority();
+	}
+	
+	public int getWeight() {
+		return this.impl.weight();
+	}
 
 }

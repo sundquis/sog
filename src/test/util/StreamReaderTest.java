@@ -100,7 +100,6 @@ public class StreamReaderTest extends Test.Container {
 	public void close_CloseAfterCloseIsNoOp( Test.Case tc ) {
 		this.reader.close();
 		this.reader.close();
-		tc.pass();
 	}
 
 

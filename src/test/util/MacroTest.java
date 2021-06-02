@@ -32,13 +32,11 @@ public class MacroTest extends Test.Container {
 	@Test.Impl( member = "public Macro Macro.expand(String, List)", description = "Any value may be empty" )
 	public void expand_AnyValueMayBeEmpty( Test.Case tc ) {
 		new Macro().expand( "X",  Arrays.asList( "A", "", "B" ) );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro Macro.expand(String, List)", description = "Empty value collection allowed" )
 	public void expand_EmptyValueCollectionAllowed( Test.Case tc ) {
 		new Macro().expand( "A",  new ArrayList<String>() );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro Macro.expand(String, List)", description = "Returns this instance" )
@@ -63,7 +61,6 @@ public class MacroTest extends Test.Container {
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Any value may be empty" )
 	public void expand_AnyValueMayBeEmpty_( Test.Case tc ) {
 		new Macro().expand( "X",  new String[] { "A", "", "B" } );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Dollar wihtin key not allowed" )
@@ -75,7 +72,6 @@ public class MacroTest extends Test.Container {
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Empty value sequence allowed" )
 	public void expand_EmptyValueSequenceAllowed( Test.Case tc ) {
 		new Macro().expand( "A",  new String[] {} );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Key does not end with white space" )
@@ -120,7 +116,6 @@ public class MacroTest extends Test.Container {
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Special characters in key allowed" )
 	public void expand_SpecialCharactersInKeyAllowed( Test.Case tc ) {
 		new Macro().expand( "a!@##%^&*()-_=+[];:',<.>/?",  "a", "b" );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Throws AssertionError for empty key" )
@@ -139,7 +134,6 @@ public class MacroTest extends Test.Container {
 	@Test.Impl( member = "public Macro Macro.expand(String, String[])", description = "Whitespace in key is allowed" )
 	public void expand_WhitespaceInKeyIsAllowed( Test.Case tc ) {
 		new Macro().expand( "SPA  CE",  "A", "A" );
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public Macro()", description = "Stateless instance acts as identity function" )

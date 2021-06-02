@@ -146,8 +146,6 @@ public class MultiQueueTest extends Test.Container {
 		for ( Thread t : threads ) {
 			t.join();
 		}
-		
-		tc.pass();
 	}
 
 	@Test.Impl( member = "public MultiQueue(Queue)", description = "is closed if queue is closed" )

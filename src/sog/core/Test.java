@@ -195,7 +195,7 @@ public class Test {
 		}
 		
 		/** Calling location in a concrete Container. */
-		public static String getFileLocation() {
+		public String getFileLocation() {
 			Predicate<StackWalker.StackFrame> sfp = sf -> 
 				Test.Container.class.isAssignableFrom( sf.getDeclaringClass() ) 
 				&& !sf.getDeclaringClass().equals( Test.Container.class );
@@ -288,15 +288,6 @@ public class Test {
 		
 
 		/**
-		 * Mark the current case as passed.
-		 * 
-		 * @return
-		 * 		this Test.Case
-		 */
-		public Test.Case pass();
-		
-
-		/**
 		 * Assert that the given object is not null.
 		 * 
 		 * @param obj
@@ -346,7 +337,7 @@ public class Test {
 		
 		
 		/**
-		 * Test for equality using Object.equals().
+		 * Test for equality using Objobject.equals().
 		 * If T is a compound type (array or collection) then the components are shallowly tested.
 		 * 
 		 * @param expected

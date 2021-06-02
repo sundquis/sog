@@ -271,21 +271,9 @@ public class TestResult extends Result {
 	}
 
 	@Override
-	public void incElapsedTime( long time ) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public int getPassCount() {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public void incPassCount( int pass ) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -294,11 +282,6 @@ public class TestResult extends Result {
 		return 0;
 	}
 
-	@Override
-	public void incFailCount( int fail ) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 	
