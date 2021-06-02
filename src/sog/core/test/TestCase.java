@@ -19,11 +19,11 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 		
 
-	private final Test.Impl impl;
+	private final TestImpl impl;
 	private final Test.Container container;
 
-	public TestCase( Test.Impl impl, Test.Container container ) {
-		super( Assert.nonNull( impl ).description() );
+	public TestCase( TestImpl impl, Test.Container container ) {
+		super( Assert.nonNull( impl ).getDescription() );
 		this.impl = Assert.nonNull( impl );
 		this.container = Assert.nonNull( container );
 	}
@@ -142,17 +142,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		
 	}
 
-	@Override
-	public int getUnimplementedCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void incUnimplementedCount( int unimpl ) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void print( IndentWriter out ) {

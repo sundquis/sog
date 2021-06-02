@@ -37,9 +37,10 @@ public class TestDecl implements TestIdentifier {
 		return this.description;
 	}
 	
-	public TestImpl setImpl( TestImpl impl ) {
-		TestImpl result = this.impl;
-		this.impl = impl;
+	/** Return true if the impl was not previously set */
+	public boolean setImpl( TestImpl impl ) {
+		boolean result = this.impl == null;
+		this.impl = Assert.nonNull( impl );
 		return result;
 	}
 

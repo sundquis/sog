@@ -30,17 +30,13 @@ public abstract class Result implements Printable {
 
 	public abstract void incFailCount( int fail );
 
-	public abstract int getUnimplementedCount();
-
-	public abstract void incUnimplementedCount( int unimpl );
-
 	@Override
 	public String toString() {
-		int totalCount = this.getPassCount() + this.getFailCount() + this.getUnimplementedCount();
+		int totalCount = this.getPassCount() + this.getFailCount();
 		double success = (double) 100 * this.getPassCount() / (totalCount == 0 ? 1 : totalCount);
 		double seconds = (double) this.getElapsedTime() / 1000.0;
-		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d, U = %d)", this.label,
-				success, seconds, totalCount, this.getPassCount(), this.getFailCount(), this.getUnimplementedCount() );
+		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d)", this.label,
+				success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
 
 	/** Implementations first print this instance, then indent for details. */

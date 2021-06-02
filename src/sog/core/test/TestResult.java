@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.IndentWriter;
+import sog.util.PriorityQueue;
+import sog.util.Queue;
 
 /**
  * 
@@ -73,8 +75,10 @@ public class TestResult extends Result {
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
 	private Test.Container container;
 	
+	private final Queue<TestCase> testCaseQueue = new PriorityQueue<TestCase>();
 	
-	public TestResult( String label ) {
+	
+	private TestResult( String label ) {
 		super( label );
 	}
 	
@@ -220,19 +224,20 @@ public class TestResult extends Result {
 	}
 	
 	private void addImpl( TestImpl impl ) {
-		if ( this.declMap.containsKey( impl.getKey() ) ) {
-			if ( this.declMap.get( impl.getKey() ).setImpl( impl ) != null ) {
-				this.addError( "Duplicate test implementation", this.containerLocation )
-				.addDetail( "Member", impl.getMemberName() )
-				.addDetail( "Description", impl.getDescription() );
-			} else {
-				
-			}
-		} else {
+		TestDecl decl = this.declMap.get( impl.getKey() );
+		if ( decl == null ) {
 			this.addError( "Orphaned test implementation", this.containerLocation )
 				.addDetail( "Member", impl.getMemberName() )
-				.addDetail( "Description", impl.getDescription() );
-		}
+				.addDetail( "Description", impl.getDescription() );		
+		} else {
+			if ( decl.setImpl( impl ) ) {
+				this.testCaseQueue.put( new TestCase( impl, this.container ) );
+			} else {
+				this.addError( "Duplicate test implementation", this.containerLocation )
+					.addDetail( "Member", impl.getMemberName() )
+					.addDetail( "Description", impl.getDescription() );
+			}
+		}		
 	}
 	
 
@@ -295,17 +300,6 @@ public class TestResult extends Result {
 		
 	}
 
-	@Override
-	public int getUnimplementedCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void incUnimplementedCount( int unimpl ) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	
 	
