@@ -32,7 +32,7 @@ public class Property {
 	// The system.dir property must be defined, for example as a JVM arg:
 	//     -Dsystem.dir=...
 	private static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
-	
+
 	private static final String SYSTEM_NAME = "system.xml";
 
 	private static final Property INSTANCE = new Property();
@@ -59,7 +59,7 @@ public class Property {
 		String className = Property.getClassName();
 		String key = className + "." + name;
 		String stringValue = Property.INSTANCE.getStringValue( key );
-		
+
 		if ( stringValue == null ) {
 			System.err.println( "WARNING: Property not found:" );
 			System.err.println( "<class fullname=\"" + className + "\">" );

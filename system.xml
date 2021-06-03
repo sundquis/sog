@@ -2,6 +2,7 @@
 <!DOCTYPE system SYSTEM "system.dtd" >
 <system description="Developmental demonstration version.">
 
+
     <!-- Properties for App -->
     <class fullname="sog.core.App">
         <property name="description" value="Developmental version of applicatoin framework" />

@@ -6,3 +6,4 @@
 + test: Ignored test files.
 + bin: Compiled java resources. 
 + html: Book in html format.
++ foo

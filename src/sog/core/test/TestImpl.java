@@ -29,15 +29,27 @@ public class TestImpl implements TestIdentifier {
 	public boolean hasImpl() {
 		return this.impl != null;
 	}
+	
+	
+	
+	
+	public Method getMethod() {
+		return this.method;
+	}
+	
+	@Override
+	public String toString() {
+		return this.getMemberName() + " # " + this.getDescription();
+	}
 
 	@Override
 	public String getMemberName() {
-		return this.impl == null ? "NONE" : this.impl.member();
+		return this.impl.member();
 	}
 
 	@Override
 	public String getDescription() {
-		return this.impl == null ? "NONE" : this.impl.description();
+		return this.impl.description();
 	}
 	
 	public int getPriority() {

@@ -11,13 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.SortedSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.IndentWriter;
-import sog.util.PriorityQueue;
-import sog.util.Queue;
 
 /**
  * 
@@ -34,8 +36,8 @@ public class TestResult extends Result {
 
 		result.loadContainer();
 		result.scanContainer();
-
 		
+		result.runTests();
 		
 		return result;
 	}
@@ -75,7 +77,13 @@ public class TestResult extends Result {
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
 	private Test.Container container;
 	
-	private final Queue<TestCase> testCaseQueue = new PriorityQueue<TestCase>();
+	private final SortedSet<TestCase> testCases = new TreeSet<TestCase>();
+	
+	private int passCount = 0;
+	
+	private int failCount = 0;
+	
+	private long elapsedTime = 0L;
 	
 	
 	private TestResult( String label ) {
@@ -217,6 +225,10 @@ public class TestResult extends Result {
 	
 	
 	private void scanContainer() {
+		if ( this.container == null ) {
+			return;
+		}
+		
 		Arrays.stream(  this.container.getClass().getDeclaredMethods() )
 			.map( TestImpl::new )
 			.filter( TestImpl::hasImpl )
@@ -231,7 +243,7 @@ public class TestResult extends Result {
 				.addDetail( "Description", impl.getDescription() );		
 		} else {
 			if ( decl.setImpl( impl ) ) {
-				this.testCaseQueue.put( new TestCase( impl, this.container ) );
+				this.testCases.add( new TestCase( impl, this.container ) );
 			} else {
 				this.addError( "Duplicate test implementation", this.containerLocation )
 					.addDetail( "Member", impl.getMemberName() )
@@ -240,12 +252,36 @@ public class TestResult extends Result {
 		}		
 	}
 	
+	
+	private void runTests() {
+		if ( this.errors.size() > 0 ) {
+			return;
+		}
+		
+		Consumer<TestCase> process = tc -> {
+			tc.run();
+			this.elapsedTime += tc.getElapsedTime();
+			this.passCount += tc.getPassCount();
+			this.failCount += tc.getFailCount();
+		};
+		this.testCases.forEach( process );
+
+		this.container.afterAll().exec();
+	}
+	
 
 	@Override
 	public void print( IndentWriter out ) {
 		out.println( this );
 
 		out.increaseIndent();
+		
+		if ( this.testCases.size() > 0 ) {
+			out.println( "RESULTS:" );
+			out.increaseIndent();
+			this.testCases.stream().forEach( tc -> tc.print( out ) );
+			out.decreaseIndent();
+		}
 
 		if ( this.errors.size() > 0 ) {
 			out.println( "ERRORS:" );
@@ -260,26 +296,32 @@ public class TestResult extends Result {
 			this.skips.stream().forEach( out::println );
 			out.decreaseIndent();
 		}
+		
+		List<TestDecl> decls = this.declMap.values().stream()
+			.filter( TestDecl::unimplemented ).collect( Collectors.toList() );
+		if ( decls.size() > 0 ) {
+			out.println( "STUBS:" );
+			out.increaseIndent();
+			decls.stream().forEach( d -> d.print( out ) );
+			out.decreaseIndent();
+		}
 
 		out.decreaseIndent();
 	}
 	
 	@Override
 	public long getElapsedTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.elapsedTime;
 	}
 
 	@Override
 	public int getPassCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.passCount;
 	}
 
 	@Override
 	public int getFailCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.failCount;
 	}
 
 
@@ -292,6 +334,17 @@ public class TestResult extends Result {
 		
 		System.out.println( "Done!" );
 	}
+	
+	
+	private static class SomeMember extends Test.Container {
+
+		protected SomeMember() {
+			super( TestResult.class );
+		}
+		
+	}
+	
+	
 	
 	@Test.Subject( ".Nested.Inner" )
 	//@Test.Subject( "test.one." )

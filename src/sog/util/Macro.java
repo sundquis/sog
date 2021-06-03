@@ -212,7 +212,7 @@ public class Macro implements Function<String, Stream<String>> {
 				String head = current.substring( 0,  this.matcher.start() );
 				String key = this.matcher.group( 1 );
 				String tail = current.substring( this.matcher.end() );
-				this.getExpansions( key).forEach( s -> pending.put( head + s + tail ) );
+				this.getExpansions( key ).forEach( s -> pending.put( head + s + tail ) );
 			} else {
 				results.add( current );
 			}

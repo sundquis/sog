@@ -73,13 +73,16 @@ public class TestMember {
 	
 	
 	private final String memberName;
+	private final String subject;
 	private final Test.Skip skip;
 	private final Test.Decl[] decls;
 	private final boolean isSynthetic;
 	private final boolean isRequired;
 	
-	private TestMember( String memberName, AnnotatedElement element, boolean isSynthetic, boolean isRequired ) {
+	private TestMember( String memberName, String subject, AnnotatedElement element, 
+			boolean isSynthetic, boolean isRequired ) {
 		this.memberName = memberName;
+		this.subject = subject;
 		this.skip = element.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = element.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isSynthetic = isSynthetic;
@@ -87,15 +90,18 @@ public class TestMember {
 	}
 	
 	public TestMember( Constructor<?> constructor ) {
-		this( TestMember.getSimpleName( constructor ), constructor, constructor.isSynthetic(), Policy.get().required( constructor ) );
+		this( TestMember.getSimpleName( constructor ), constructor.getDeclaringClass().getSimpleName(), 
+				constructor, constructor.isSynthetic(), Policy.get().required( constructor ) );
 	}
 	
 	public TestMember( Field field ) {
-		this( TestMember.getSimpleName( field ), field, field.isSynthetic(), Policy.get().required( field ) );
+		this( TestMember.getSimpleName( field ), field.getName(), 
+				field, field.isSynthetic(), Policy.get().required( field ) );
 	}
 	
 	public TestMember( Method method ) {
-		this( TestMember.getSimpleName( method ), method, method.isSynthetic(), Policy.get().required( method ) );
+		this( TestMember.getSimpleName( method ), method.getName(),
+				method, method.isSynthetic(), Policy.get().required( method ) );
 	}
 	
 		
@@ -117,7 +123,7 @@ public class TestMember {
 	}
 	
 	public Stream<TestDecl> getDecls() { 
-		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, d.value() ) );
+		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, TestMember.this.subject, d.value() ) );
 	}
 	
 
