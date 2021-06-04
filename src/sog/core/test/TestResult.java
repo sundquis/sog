@@ -24,8 +24,6 @@ import sog.util.IndentWriter;
 /**
  * 
  */
-@Test.Subject( ".SomeMember" )
-//@Test.Skip( "Skip this class" )
 public class TestResult extends Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
@@ -194,6 +192,10 @@ public class TestResult extends Result {
 	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
 	 */
 	private void loadContainer() {
+		if ( this.containerLocation == null ) {
+			return;
+		}
+		
 		String containerClassName = "";
 		
 		if ( this.containerLocation.startsWith( "." ) ) {
@@ -330,65 +332,11 @@ public class TestResult extends Result {
 	
 	public static void main( String[] args ) {
 		Test.eval( TestResult.class );
-		
-		
+
 		System.out.println( "Done!" );
 	}
 	
 	
-	private static class SomeMember extends Test.Container {
-
-		protected SomeMember() {
-			super( TestResult.class );
-		}
-		
-	}
-	
-	
-	
-	@Test.Subject( ".Nested.Inner" )
-	//@Test.Subject( "test.one." )
-	//@Test.Subject( "SomeContainer" )
-	private static class Foo2 {
-		private static class Nested{
-			private static class Inner extends Test.Container {
-				@Test.Skip( "test" )
-				public Inner() {
-					super( Foo2.class );
-				}
-				
-			}
-		}
-		
-	}
-	
-	//@Test.Skip( "Just because" )
-	@Test.Subject( ".FooMemberClass" )
-	private static class Foo {
-		
-		private static String myString = "Hi";
-		public static String fieldViolation = "foo";
-		private Foo( String s, int i) {}
-		void string(int i, double d, Foo[] foos, Stream<Foo> stream) {}
-		
-		@Test.Skip( "With decls"  )
-		@Test.Decl( "Test 1" )
-		@Test.Decl( "Test 2"  )
-		void run() {}
-		
-		@Test.Skip( "Good skip"  )
-		void run2() {}
-		
-		void main() {}
-		
-		class Nested {}
-		
-		@Test.Decl( "Duplicate declaration" )
-		@Test.Decl( "Duplicate declaration" )
-		public Foo(int i) {}
-		
-		
-	}
 
 
 }

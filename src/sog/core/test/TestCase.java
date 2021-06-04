@@ -66,7 +66,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 				this.fail();
 			}
 		} catch ( InvocationTargetException ex ) {
-			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getCause() ) ) {
+			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getCause().getClass() ) ) {
 				this.addMessage( "Expected " + this.expectedError + " but got " + ex.getCause() );
 				this.unexpectedError = ex;
 				this.fail();

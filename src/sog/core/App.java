@@ -60,8 +60,7 @@ public class App implements Runnable {
 			.map( Paths::get )
 			.collect( Collectors.toList() );
 		Assert.isTrue( ! this.sourceDirs.isEmpty() );
-System.out.println(">>> source dirs = ");
-this.sourceDirs.forEach( System.out::println );
+
 		this.objectsForShutdown = new LinkedList<OnShutdown>();
 		Runtime.getRuntime().addShutdownHook( new Thread( this ) );
 	}

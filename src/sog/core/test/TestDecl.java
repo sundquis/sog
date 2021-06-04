@@ -20,6 +20,7 @@ import sog.util.Printable;
 /**
  * Represents a single test declaration as specified by a Test.Decl annotation
  */
+@Test.Skip( "FIXME" )
 public class TestDecl implements TestIdentifier, Commented, Printable {
 
 	
@@ -58,7 +59,7 @@ public class TestDecl implements TestIdentifier, Commented, Printable {
 	public boolean unimplemented() {
 		return this.impl == null;
 	}
-	
+
 	//	STUB	
 	//	STUB	@Test.Impl( 
 	//	STUB		member = "${memberName}", 

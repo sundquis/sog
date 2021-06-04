@@ -6,21 +6,16 @@
  */
 package sog.core.test;
 
-import java.lang.StackWalker.Option;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Predicate;
+//import java.util.Map;
+//import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import sog.core.App;
-import sog.core.AppException;
-import sog.core.Assert;
+//import sog.core.Assert;
 import sog.core.Fatal;
-import sog.core.Procedure;
 import sog.core.Test;
 
 /**
@@ -71,7 +66,7 @@ public class TestContainer {
 	}
 	
 	protected void setSubjectClass( Class<?> subjectClass ) {
-		this.subjectClass = Assert.nonNull( subjectClass );
+//		this.subjectClass = Assert.nonNull( subjectClass );
 	}
 	
 	// Naming policy for constructors
@@ -116,21 +111,21 @@ public class TestContainer {
 
 	
 	
-	private Class<?> subjectClass;
+//	private Class<?> subjectClass;
 	
-	private final Map<String, TestCase> testCases;
+//	private final Map<String, TestCase> testCases;
 
-	private Test.Container container;
+//	private Test.Container container;
 
 	// Created empty
 	private TestContainer() {
-		this.testCases = new TreeMap<String, TestCase>();
+//		this.testCases = new TreeMap<String, TestCase>();
 	}
 	
-	private void setContainer( Test.Container container ) {
+//	private void setContainer( Test.Container container ) {
 		//this.container = Assert.nonNull( container );
 		// load methods -> cases
-	}
+//	}
 	
 	
 	public TestCase getCases( Constructor<?> constructor, Test.Decl decl ) {

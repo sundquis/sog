@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE system SYSTEM "system.dtd" >
+
+<!-- Either need to hard-code location of DTD or use internal. -->
+<!-- <!DOCTYPE system SYSTEM "/home/sundquis/book/sog/system.dtd">  -->
+
+<!DOCTYPE system [
+	<!ELEMENT system (class)* >
+	<!ATTLIST system
+		description	CDATA	#REQUIRED
+	>
+	
+	<!ELEMENT class (property | text)* >
+	<!ATTLIST class
+		fullname	CDATA	#REQUIRED
+	>
+	
+	<!ELEMENT property EMPTY >
+	<!ATTLIST property
+		name	CDATA	#REQUIRED
+		value	CDATA	#REQUIRED
+	>
+	
+	<!ELEMENT text (#PCDATA) >
+	<!ATTLIST text
+		name	CDATA	#REQUIRED
+	>
+]>
+
 <system description="Developmental demonstration version.">
 
 
     <!-- Properties for App -->
     <class fullname="sog.core.App">
-        <property name="description" value="Developmental version of applicatoin framework" />
-        <property name="root" value="/home/sundquis/book/Dropbox/java/projects/DEV" />
-        <property name="source.dirs" 
-            value="/home/sundquis/book/Dropbox/java/projects/DEV/devsrc" />
+        <property name="description" value="Developmental version of application framework" />
+        <property name="root" value="/home/sundquis/book/sog" />
+        <property name="source.dirs" value="/home/sundquis/book/sog/src" />
     </class>
 
     <!-- Tracing properties -->

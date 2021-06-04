@@ -19,6 +19,7 @@ public interface TestIdentifier {
 	
 	public String getDescription();
 		
+	@Test.Decl( "FIXME" )
 	public default String getKey() {
 		return this.getMemberName() + "#" + this.getDescription();
 	}
