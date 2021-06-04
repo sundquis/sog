@@ -77,15 +77,22 @@ public class TestMember {
 	private final Test.Skip skip;
 	private final Test.Decl[] decls;
 	private final boolean isSynthetic;
+	private final boolean isMain;
 	private final boolean isRequired;
 	
 	private TestMember( String memberName, String subject, AnnotatedElement element, 
 			boolean isSynthetic, boolean isRequired ) {
+		this( memberName, subject, element, isSynthetic, false, isRequired );
+	}
+	
+	private TestMember( String memberName, String subject, AnnotatedElement element, 
+			boolean isSynthetic, boolean isMain, boolean isRequired ) {
 		this.memberName = memberName;
 		this.subject = subject;
 		this.skip = element.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = element.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isSynthetic = isSynthetic;
+		this.isMain = isMain;
 		this.isRequired = isRequired;
 	}
 	
@@ -101,17 +108,18 @@ public class TestMember {
 	
 	public TestMember( Method method ) {
 		this( TestMember.getSimpleName( method ), method.getName(),
-				method, method.isSynthetic(), Policy.get().required( method ) );
+				method, method.isSynthetic(), "main".equals( method.getName() ), Policy.get().required( method ) );
 	}
 	
 		
 	
 	public boolean isSkipped() { 
-		return this.skip != null || this.isSynthetic;
+		return this.skip != null || this.isSynthetic || this.isMain;
 	}
 	
 	public String getSkipReason() { 
-		return (this.skip != null) ? this.skip.value() : "Synthetic";
+		return this.skip != null ? this.skip.value() : 
+			this.isSynthetic ? "Synthetic" : "main() method";
 	}
 	
 	public boolean isRequired() { 

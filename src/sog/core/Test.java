@@ -353,7 +353,7 @@ public class Test {
 	
 	/** Convenience method to evaluate and print results for one subject class */
 	public static void eval( Class<?> subjectClass ) {
-		TestResult.forSubject( subjectClass ).print( new IndentWriter( System.out ) );
+		TestResult.forSubject( subjectClass ).print( new IndentWriter( System.err ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */

@@ -1,8 +1,20 @@
 /**
- * Copyright (C) 2017, 2018, 2019, 2020 by TS Sundquist
- * *** *** * 
- * All rights reserved.
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 package sog.core.test;
 
@@ -10,11 +22,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import sog.core.Test;
 import sog.util.Protection;
 
 /**
  * 
  */
+@Test.Subject( ".TC" )
 public class Policy implements Protection {
 
 	
@@ -59,7 +73,7 @@ public class Policy implements Protection {
 	
 	
 	
-	private static Policy current = Policy.DEFAULT;
+	private static Policy current = Policy.ALL;
 	
 	public static Policy get() {
 		return Policy.current;
@@ -149,6 +163,20 @@ public class Policy implements Protection {
 				return this.requirePrivateMethod();
 			default:
 				return false;
+		}
+	}
+	
+	
+	
+	public static void main( String[] args ) {
+		Test.eval();
+	}
+	
+	
+	@Test.Skip( "Test container" )
+	public static class TC extends Test.Container {
+		public TC() {
+			super( Policy.class );
 		}
 	}
 
