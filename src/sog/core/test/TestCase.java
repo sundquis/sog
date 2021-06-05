@@ -37,7 +37,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	private long elapsedTime = 0L;
 
 	public TestCase( TestImpl impl, Test.Container container ) {
-		super( Assert.nonNull( impl ).getDescription() );
+		//super( Assert.nonNull( impl ).getDescription() );
+		super( Assert.nonNull( impl ).toString() );
 		this.impl = Assert.nonNull( impl );
 		this.container = Assert.nonNull( container );
 	}
@@ -66,7 +67,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 				this.fail();
 			}
 		} catch ( InvocationTargetException ex ) {
-			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getCause().getClass() ) ) {
+			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getClass() ) ) {
 				this.addMessage( "Expected " + this.expectedError + " but got " + ex.getCause() );
 				this.unexpectedError = ex;
 				this.fail();
@@ -113,48 +114,54 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	public Case notNull( Object obj ) {
 		if ( obj == null ) {
 			this.addMessage( "Expected non-null object" );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override
 	public Case notEmpty( String s ) {
 		if ( s == null || s.isEmpty() ) {
 			this.addMessage( "Expected non-empty string" );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override
 	public Case isNull( Object obj ) {
 		if ( obj != null ) {
 			this.addMessage( "Expected null, got: " + Strings.toString( obj ) );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override
 	public Case assertTrue( boolean passIfTrue ) {
 		if ( !passIfTrue ) {
 			this.addMessage( "Expected true" );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override
 	public Case assertFalse( boolean passIfFalse ) {
 		if ( passIfFalse ) {
 			this.addMessage( "Expected false" );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override
 	public <T> Case assertEqual( T expected, T actual ) {
 		if ( !Objects.shallowEquals( expected, actual ) ) {
 			this.addMessage( "Expected: " + Strings.toString( expected ) + ", Got: " + Strings.toString( actual ) );
+			this.fail();
 		}
-		return this.fail();
+		return this;
 	}
 
 	@Override

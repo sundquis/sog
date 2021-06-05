@@ -51,7 +51,9 @@ public class TestResult extends Result {
 	 * subject class. Read from the Test.Subject annotation. The value determines the location 
 	 * according to the following rules:
 	 *   1. If the string starts with a dot (.Member) it is treated as the name of a member Test.Container class
-	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name
+	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name,
+	 *   	creating a parallel test package. To prevent name confusion in test code, in this case
+	 *   	the name of the container class has suffix "Test" appended.
 	 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
 	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
 	 */
@@ -187,7 +189,9 @@ public class TestResult extends Result {
 
 	/*
 	 *   1. If the string starts with a dot (.Member) it is treated as the name of a member Test.Container class
-	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name
+	 *   2. If the string ends with a dot (package.) it is prepended to the subject full class name,
+	 *   	creating a parallel test package. To prevent name confusion in test code, in this case
+	 *   	the name of the container class has suffix "Test" appended.
 	 *   3. If the string contains no dots (ClassName) it is treated as the name of a class in the same package
 	 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
 	 */
@@ -201,7 +205,7 @@ public class TestResult extends Result {
 		if ( this.containerLocation.startsWith( "." ) ) {
 			containerClassName = this.subjectClass.getName() + this.containerLocation.replaceAll( "\\.", "\\$" );
 		} else if ( this.containerLocation.endsWith( "." ) ) {
-			containerClassName = this.containerLocation + this.subjectClass.getName();
+			containerClassName = this.containerLocation + this.subjectClass.getName() + "Test";
 		} else if ( !this.containerLocation.contains( "." ) ) {
 			containerClassName = this.subjectClass.getPackageName() + "." + this.containerLocation;
 		} else {
