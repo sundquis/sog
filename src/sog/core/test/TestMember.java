@@ -10,6 +10,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,14 +80,15 @@ public class TestMember {
 	private final boolean isSynthetic;
 	private final boolean isMain;
 	private final boolean isRequired;
+	private final boolean isAbstract;
 	
 	private TestMember( String memberName, String subject, AnnotatedElement element, 
 			boolean isSynthetic, boolean isRequired ) {
-		this( memberName, subject, element, isSynthetic, false, isRequired );
+		this( memberName, subject, element, isSynthetic, false, isRequired, false );
 	}
 	
 	private TestMember( String memberName, String subject, AnnotatedElement element, 
-			boolean isSynthetic, boolean isMain, boolean isRequired ) {
+			boolean isSynthetic, boolean isMain, boolean isRequired, boolean isAbstract ) {
 		this.memberName = memberName;
 		this.subject = subject;
 		this.skip = element.getDeclaredAnnotation( Test.Skip.class );
@@ -94,6 +96,7 @@ public class TestMember {
 		this.isSynthetic = isSynthetic;
 		this.isMain = isMain;
 		this.isRequired = isRequired;
+		this.isAbstract = isAbstract;
 	}
 	
 	public TestMember( Constructor<?> constructor ) {
@@ -108,18 +111,20 @@ public class TestMember {
 	
 	public TestMember( Method method ) {
 		this( TestMember.getSimpleName( method ), method.getName(),
-				method, method.isSynthetic(), "main".equals( method.getName() ), Policy.get().required( method ) );
+			method, method.isSynthetic(), "main".equals( method.getName() ), 
+			Policy.get().required( method ), Modifier.isAbstract( method.getModifiers() ) );
 	}
 	
 		
 	
 	public boolean isSkipped() { 
-		return this.skip != null || this.isSynthetic || this.isMain;
+		return this.skip != null || this.isSynthetic || this.isMain || this.isAbstract;
 	}
 	
 	public String getSkipReason() { 
 		return this.skip != null ? this.skip.value() : 
-			this.isSynthetic ? "Synthetic" : "main() method";
+			this.isSynthetic ? "Synthetic" : 
+				this.isMain ? "main() method" : "Abstract method";
 	}
 	
 	public boolean isRequired() { 

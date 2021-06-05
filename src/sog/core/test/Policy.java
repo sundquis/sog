@@ -21,37 +21,70 @@ package sog.core.test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import sog.core.Property;
 import sog.core.Test;
 import sog.util.Protection;
 
 /**
- * 
+ * This class has the responsibility of defining and enforcing the policy regarding which
+ * class members should be flagged as needing test validation. A Policy is defined by the twelve
+ * boolean methods, four each (corresponding to the four protection levels) for constructors,
+ * fields, and methods. The test framework generates an error whenever it encounters an untested member 
+ * that is required by the current policy. Errors can be eliminated by relaxing the policy,
+ * declaring one or more tests, or marking the member with the Test.Skip annotation.
  */
-@Test.Subject( ".TC" )
-public class Policy implements Protection {
-
+@Test.Subject( "test." )
+public enum Policy implements Protection {
 	
-	// Require non-private executable, public fields
-	public static final Policy DEFAULT = new Policy() {
+	/** The default policy requires all executables except private, and public fields. */
+	@Test.Decl( "Non-private executables are required" )
+	@Test.Decl( "Private executables are exempt" )
+	@Test.Decl( "Public fields are required" )
+	@Test.Decl( "Non-public fields are exempt" )
+	DEFAULT {
+		@Override public boolean requirePublicConstructor() { return true; }
+		@Override public boolean requireProtectedConstructor() { return true; }
+		@Override public boolean requirePackageConstructor() { return true; }
 		@Override public boolean requirePrivateConstructor() { return false; }
+		@Override public boolean requirePublicField() { return true; }
 		@Override public boolean requireProtectedField() { return false; }
 		@Override public boolean requirePackageField() { return false; }
 		@Override public boolean requirePrivateField() { return false; }
-		@Override public boolean requirePrivateMethod() { return false; }		
-	};
-	
-	
-	// All non-private
-	public static final Policy STRICT = new Policy() {
+		@Override public boolean requirePublicMethod() { return true; }
+		@Override public boolean requireProtectedMethod() { return true; }
+		@Override public boolean requirePackageMethod() { return true; }
+		@Override public boolean requirePrivateMethod() { return false; }
+	},
+
+	/** Require all non-private members. */
+	@Test.Decl( "Non-private constructors are required" )
+	@Test.Decl( "Non-private fields are required" )
+	@Test.Decl( "Non-private methods are required" )
+	STRICT {
+		@Override public boolean requirePublicConstructor() { return true; }
+		@Override public boolean requireProtectedConstructor() { return true; }
+		@Override public boolean requirePackageConstructor() { return true; }
 		@Override public boolean requirePrivateConstructor() { return false; }
+		@Override public boolean requirePublicField() { return true; }
+		@Override public boolean requireProtectedField() { return true; }
+		@Override public boolean requirePackageField() { return true; }
 		@Override public boolean requirePrivateField() { return false; }
-		@Override public boolean requirePrivateMethod() { return false; }		
-	};
+		@Override public boolean requirePublicMethod() { return true; }
+		@Override public boolean requireProtectedMethod() { return true; }
+		@Override public boolean requirePackageMethod() { return true; }
+		@Override public boolean requirePrivateMethod() { return false; }
+	},
 	
-	
-	// Require nothing
-	public static final Policy EMPTY = new Policy() {
+	/** No testing required. */
+	@Test.Decl( "Constructors are not required" )
+	@Test.Decl( "Fields are not required" )
+	@Test.Decl( "Methods are not required" )
+	NONE {
 		@Override public boolean requirePublicConstructor() { return false; }
 		@Override public boolean requirePackageConstructor() { return false; }
 		@Override public boolean requireProtectedConstructor() { return false; }
@@ -64,57 +97,80 @@ public class Policy implements Protection {
 		@Override public boolean requirePackageMethod() { return false; }
 		@Override public boolean requireProtectedMethod() { return false; }
 		@Override public boolean requirePrivateMethod() { return false; }
+	},
+	
+	/** Require all 12 types of members. */
+	@Test.Decl( "Constructors are required" )
+	@Test.Decl( "Fields are required" )
+	@Test.Decl( "Methods are required" )
+	ALL {	
+		@Override public boolean requirePublicConstructor() { return true; }
+		@Override public boolean requireProtectedConstructor() { return true; }
+		@Override public boolean requirePackageConstructor() { return true; }
+		@Override public boolean requirePrivateConstructor() { return true; }
+		@Override public boolean requirePublicField() { return true; }
+		@Override public boolean requireProtectedField() { return true; }
+		@Override public boolean requirePackageField() { return true; }
+		@Override public boolean requirePrivateField() { return true; }
+		@Override public boolean requirePublicMethod() { return true; }
+		@Override public boolean requireProtectedMethod() { return true; }
+		@Override public boolean requirePackageMethod() { return true; }
+		@Override public boolean requirePrivateMethod() { return true; }
 	};
+		
+
+	public abstract boolean requirePublicConstructor();
+	public abstract boolean requireProtectedConstructor();
+	public abstract boolean requirePackageConstructor();
+	public abstract boolean requirePrivateConstructor();
+	public abstract boolean requirePublicField();
+	public abstract boolean requireProtectedField();
+	public abstract boolean requirePackageField();
+	public abstract boolean requirePrivateField();
+	public abstract boolean requirePublicMethod();
+	public abstract boolean requireProtectedMethod();
+	public abstract boolean requirePackageMethod();
+	public abstract boolean requirePrivateMethod();
 	
 	
-	// Require everyhting
-	public static final Policy ALL = new Policy();
-	
-	
-	
-	
-	private static Policy current = Policy.ALL;
-	
+	/** Allows Policy instances to be set by name as a PROPERTY. */
+	@Test.Decl( "Map inlcudes DEFAULT" )
+	@Test.Decl( "Map include ALL" )
+	private final static Map<String, Policy> INSTANCES = Arrays.stream( Policy.values() )
+		.collect( Collectors.toMap( Policy::name, Function.identity() ) );
+		
+	/** The current Policy being enforced. */
+	@Test.Decl( "Current Policy is no null" )
+	private static Policy currentPolicy = Property.get( "current.policy", Policy.DEFAULT, Policy.INSTANCES::get );
+
+	/** Public access to the current Policy. */
+	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Return is consistent with previous set(Policy)" )
 	public static Policy get() {
-		return Policy.current;
+		Class<?> c = Enum.class;
+		return Policy.currentPolicy;
 	}
 	
+	/**
+	 * Set the global testing Policy.
+	 * 
+	 * @param policy
+	 */
+	@Test.Decl( "Throws AssertionError for null policy" )
+	@Test.Decl( "Changes current policy" )
 	public static void set( Policy policy ) {
-		Policy.current = policy;
+		Policy.currentPolicy = policy;
 	}
 	
-	
-	
-	private Policy() {}
-	
-	
-	
-	public boolean requirePublicConstructor() { return true; }
-	
-	public boolean requireProtectedConstructor() { return true; }
 
-	public boolean requirePackageConstructor() { return true; }
-
-	public boolean requirePrivateConstructor() { return true; }
-
-	public boolean requirePublicField() { return true; }
-	
-	public boolean requireProtectedField() { return true; }
-
-	public boolean requirePackageField() { return true; }
-
-	public boolean requirePrivateField() { return true; }
-
-	public boolean requirePublicMethod() { return true; }
-	
-	public boolean requireProtectedMethod() { return true; }
-
-	public boolean requirePackageMethod() { return true; }
-
-	public boolean requirePrivateMethod() { return true; }
-	
-	
-	
+	/**
+	 * Determine if testing of the given Constructor is required by the current Policy.
+	 * 
+	 * @param constructor
+	 * @return
+	 */
+	@Test.Decl( "Throws AssertionError for null constructor" )
+	@Test.Decl( "Results correct for constructors" )
 	final public boolean required( Constructor<?> constructor ) {
 		Protection.Level level = this.getProtectionLevel( constructor );
 
@@ -132,6 +188,14 @@ public class Policy implements Protection {
 		}
 	}
 
+	/**
+	 * Determine if testing of the given Field is required by the current Policy.
+	 * 
+	 * @param field
+	 * @return
+	 */
+	@Test.Decl( "Throws AssertionError for null field" )
+	@Test.Decl( "Results correct for fields" )
 	final public boolean required( Field field ) {
 		Protection.Level level = this.getProtectionLevel( field );
 		
@@ -149,6 +213,14 @@ public class Policy implements Protection {
 		}
 	}
 
+	/**
+	 * Determine if testing of the given Method is required by the current Policy.
+	 * 
+	 * @param method
+	 * @return
+	 */
+	@Test.Decl( "Throws AssertionError for null method" )
+	@Test.Decl( "Results correct for methods" )
 	final public boolean required( Method method ) {
 		Protection.Level level = this.getProtectionLevel( method );
 		
@@ -172,12 +244,5 @@ public class Policy implements Protection {
 		Test.eval();
 	}
 	
-	
-	@Test.Skip( "Test container" )
-	public static class TC extends Test.Container {
-		public TC() {
-			super( Policy.class );
-		}
-	}
 
 }

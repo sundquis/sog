@@ -278,21 +278,22 @@ public class TestResult extends Result {
 
 		out.increaseIndent();
 		
-		if ( this.testCases.size() > 0 ) {
+		if ( this.errors.size() > 0 ) {
+			out.println();
+			out.println( "ERRORS:" );
+			out.increaseIndent();
+			this.errors.stream().forEach( out::println );
+			out.decreaseIndent();
+		} else {
+			out.println();
 			out.println( "RESULTS:" );
 			out.increaseIndent();
 			this.testCases.stream().forEach( tc -> tc.print( out ) );
 			out.decreaseIndent();
 		}
-
-		if ( this.errors.size() > 0 ) {
-			out.println( "ERRORS:" );
-			out.increaseIndent();
-			this.errors.stream().forEach( out::println );
-			out.decreaseIndent();
-		}
 		
 		if ( this.skips.size() > 0 ) {
+			out.println();
 			out.println( "SKIPS:" );
 			out.increaseIndent();
 			this.skips.stream().forEach( out::println );
@@ -302,6 +303,7 @@ public class TestResult extends Result {
 		List<TestDecl> decls = this.declMap.values().stream()
 			.filter( TestDecl::unimplemented ).collect( Collectors.toList() );
 		if ( decls.size() > 0 ) {
+			out.println();
 			out.println( "STUBS:" );
 			out.increaseIndent();
 			decls.stream().forEach( d -> d.print( out ) );
