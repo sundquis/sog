@@ -19,109 +19,188 @@
 
 package test.sog.core.test;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.test.TestCase;
+import sog.core.test.TestImpl;
+import sog.util.IndentWriter;
+import sog.util.StringOutputStream;
 
 public class TestCaseTest extends Test.Container {
+	
+	private final Test.Container container;
+	private final Map<String,TestImpl> impls;
 
 	public TestCaseTest() {
 		super( TestCase.class );
+		
+		this.container = new SomeContainer();
+		this.impls = Arrays.stream( this.container.getClass().getDeclaredMethods() )
+			.collect( Collectors.toMap( Method::getName, TestImpl::new ) );
 	}
+	
+	
+	private TestCase getTestCase( String methodName ) {
+		return new TestCase( impls.get(  methodName ), this.container );
+	}
+	
+	private int messageCount( TestCase tc ) {
+		List<?> list = null;
+		return this.getSubjectField( tc, "messages", list ).size();
+	}
+	
 
 	
+	static class SomeContainer extends Test.Container {
+		protected SomeContainer() { super( TestCase.class ); }
+		@Test.Impl( member = "MEMBER NAME", description = "DESCRIPTION" ) public void method1() {}
+	}
+	
+	
+
+	@Test.Impl( member = "constructor: TestCase(TestImpl, Test.Container)", description = "Label includes member name and description", weight = 2 )
+	public void TestCase_LabelIncludesMemberNameAndDescription( Test.Case tc ) {
+		tc.assertTrue( this.getTestCase( "method1" ).toString().contains( "MEMBER NAME" ) );
+		tc.assertTrue( this.getTestCase( "method1" ).toString().contains( "DESCRIPTION" ) );
+	}
+
+	@Test.Impl( member = "constructor: TestCase(TestImpl, Test.Container)", description = "Marked as passed at creation" )
+	public void TestCase_MarkedAsPassedAtCreation( Test.Case tc ) {
+		tc.assertTrue( this.getSubjectField( this.getTestCase( "method1" ), "passed", Boolean.TRUE ) );
+	}
+
 	@Test.Impl( member = "constructor: TestCase(TestImpl, Test.Container)", description = "Throws AssertionError for null Test.Container" )
 	public void TestCase_ThrowsAssertionerrorForNullTestContainer( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.expectError( AssertionError.class );
+		new TestCase( this.impls.get( "method1" ), null );
 	}
 
 	@Test.Impl( member = "constructor: TestCase(TestImpl, Test.Container)", description = "Throws AssertionError for null TestImpl" )
 	public void TestCase_ThrowsAssertionerrorForNullTestimpl( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.expectError( AssertionError.class );
+		new TestCase( null, this.container );
 	}
 
 	@Test.Impl( member = "method: String TestCase.toString()", description = "Starts with FAIL if failed" )
 	public void toString_StartsWithFailIfFailed( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.assertTrue( this.getTestCase( "method1" ).fail().toString().startsWith( "FAIL" ) );
 	}
 
 	@Test.Impl( member = "method: String TestCase.toString()", description = "Starts with PASS if passed" )
 	public void toString_StartsWithPassIfPassed( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.assertTrue( this.getTestCase( "method1" ).toString().startsWith( "PASS" ) );
+	}
+
+	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Does not alter pass/fail status", weight = 2 )
+	public void addMessage_DoesNotAlterPassFailStatus( Test.Case tc ) {
+		Test.Case passed = this.getTestCase( "method1" );
+		tc.assertEqual( passed.toString(), passed.addMessage( "foo" ).toString() );
+		Test.Case failed = this.getTestCase( "method1" ).fail();
+		tc.assertEqual( failed.toString(), failed.addMessage( "foo" ).toString() );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Message is included in details." )
 	public void addMessage_MessageIsIncludedInDetails( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase withMsg = this.getTestCase( "method1" );
+		withMsg.addMessage( "One" ).addMessage( "FOO" ).addMessage( "Two" );
+		StringOutputStream sos = new StringOutputStream();
+		withMsg.print( new IndentWriter( sos ) );
+		tc.assertTrue( sos.toString().contains( "FOO" ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Return is this" )
 	public void addMessage_ReturnIsThis( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase withMsg = this.getTestCase( "method1" );
+		tc.assertTrue( withMsg == withMsg.addMessage( "FOO" ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Throws AssertionError for empty message" )
 	public void addMessage_ThrowsAssertionerrorForEmptyMessage( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.expectError( AssertionError.class );
+		this.getTestCase( "method1" ).addMessage( "" );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Throws AssertionError for null message" )
 	public void addMessage_ThrowsAssertionerrorForNullMessage( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.expectError( AssertionError.class );
+		this.getTestCase( "method1" ).addMessage( null );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.afterThis(Procedure)", description = "Return is this" )
 	public void afterThis_ReturnIsThis( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		tc.assertTrue( test == test.afterThis( Procedure.NOOP ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.afterThis(Procedure)", description = "Throws AssertionError for null procedure" )
 	public void afterThis_ThrowsAssertionerrorForNullProcedure( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		tc.expectError( AssertionError.class );
+		this.getTestCase( "method1" ).afterThis( null );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertEqual(Object, Object)", description = "Message added on failure" )
 	public void assertEqual_MessageAddedOnFailure( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		int before = this.messageCount( test );
+		test.assertEqual( 1, 2 );
+		int after = this.messageCount( test );
+		tc.assertTrue( after > before );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertEqual(Object, Object)", description = "Return is this" )
 	public void assertEqual_ReturnIsThis( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		tc.assertTrue( test == test.assertEqual( 1, 2 ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertEqual(Object, Object)", description = "Test fails for inequivalent" )
 	public void assertEqual_TestFailsForInequivalent( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		test.assertEqual( "fourty-two", "42" );
+		tc.assertTrue( test.getFailCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertEqual(Object, Object)", description = "Test passes for equivalent objects" )
 	public void assertEqual_TestPassesForEquivalentObjects( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
-	}
-
-	@Test.Impl( member = "method: Test.Case TestCase.assertEqual(Object, Object)", description = "Test passes for shallow but not deep equal" )
-	public void assertEqual_TestPassesForShallowButNotDeepEqual( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		test.assertEqual( new String[] {"A", "B", "C"}, new String[] {"A", "B", "C"} );
+		tc.assertTrue( test.getPassCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertFalse(boolean)", description = "Case fails for true" )
 	public void assertFalse_CaseFailsForTrue( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		test.assertFalse( true );
+		tc.assertTrue( test.getFailCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertFalse(boolean)", description = "Case passes for false" )
 	public void assertFalse_CasePassesForFalse( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		test.assertFalse( false );
+		tc.assertTrue( test.getPassCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertFalse(boolean)", description = "Message added on failure" )
 	public void assertFalse_MessageAddedOnFailure( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		int before = this.messageCount( test );
+		test.assertFalse( true );
+		int after = this.messageCount( test );
+		tc.assertTrue( after > before );
 	}
 
-	@Test.Impl( member = "method: Test.Case TestCase.assertFalse(boolean)", description = "Return is this" )
+	@Test.Impl( member = "method: Test.Case TestCase.assertFalse(boolean)", description = "Return is this", weight = 2 )
 	public void assertFalse_ReturnIsThis( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" ).fail();
+		TestCase test = this.getTestCase( "method1" );
+		tc.assertTrue( test == test.assertFalse( false ) );
+		tc.assertTrue( test == test.assertFalse( true ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.assertTrue(boolean)", description = "Case fails for false" )
@@ -144,6 +223,11 @@ public class TestCaseTest extends Test.Container {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
+	@Test.Impl( member = "method: Test.Case TestCase.expectError(Class)", description = "Does not alter pass/fail status" )
+	public void expectError_DoesNotAlterPassFailStatus( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" ).fail();
+	}
+
 	@Test.Impl( member = "method: Test.Case TestCase.expectError(Class)", description = "Return is this" )
 	public void expectError_ReturnIsThis( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
@@ -154,13 +238,18 @@ public class TestCaseTest extends Test.Container {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
-	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks case as failed" )
-	public void fail_MarksCaseAsFailed( Test.Case tc ) {
+	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks failed case as failed" )
+	public void fail_MarksFailedCaseAsFailed( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks location of failure" )
 	public void fail_MarksLocationOfFailure( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" ).fail();
+	}
+
+	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks passed case as failed" )
+	public void fail_MarksPassedCaseAsFailed( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
@@ -294,6 +383,16 @@ public class TestCaseTest extends Test.Container {
 		tc.addMessage( "GENERATED STUB" ).fail();
 	}
 
+	@Test.Impl( member = "method: long TestCase.getElapsedTime()", description = "Set after expected exception" )
+	public void getElapsedTime_SetAfterExpectedException( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" ).fail();
+	}
+
+	@Test.Impl( member = "method: long TestCase.getElapsedTime()", description = "Set after unexpected exception" )
+	public void getElapsedTime_SetAfterUnexpectedException( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" ).fail();
+	}
+
 	@Test.Impl( member = "method: long TestCase.getElapsedTime()", description = "Set if case fails" )
 	public void getElapsedTime_SetIfCaseFails( Test.Case tc ) {
 		tc.addMessage( "GENERATED STUB" ).fail();
@@ -371,7 +470,8 @@ public class TestCaseTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( TestCase.class );
+		//Test.eval( TestCase.class );
+		Test.evalPackage( TestCase.class );
 	}
 	
 }

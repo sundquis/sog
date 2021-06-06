@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 
 import sog.util.IndentWriter;
 import sog.core.test.TestResult;
+import sog.core.test.TestResultSet;
 
 /**
  * All classes import Test as the single public access to the testing framework.
@@ -360,5 +361,11 @@ public class Test {
 	public static void eval() {
 		Test.eval( App.get().getCallingClass( 2 ) );
 	}
+	
+	/** Convenience method to evaluate and print results for the package containing the given subject */
+	public static void evalPackage( Class<?> subjectClass ) {
+		TestResultSet.testPackage( subjectClass );
+	}
+	
 	
 }

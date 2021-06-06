@@ -33,7 +33,7 @@ import sog.util.IndentWriter;
 
 /**
  * This class has two responsibilities. First, it implements the Test.Case interface and is
- * passed to each of the test method implementations. Second, it extends Result and serves
+ * passed to test method implementations. Second, it extends Result and serves
  * as the holder of test results for this test case. The implementation of Comparable is
  * based on the priority, if defined, in the Test.Impl annotation. The Runnable.run()
  * method executes the test.
@@ -71,8 +71,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 	/*
 	 * TestCase is created in the state passed == true. If any error is encountered 
-	 * passed is set to false. Once in the failed state it does not transition to 
-	 * passed. A multi-part test fails if any one of its parts fails.
+	 * passed is set to false. Once in the failed state the test case does not transition to 
+	 * passed. A multi-part test case fails if any one of its parts fails.
 	 */
 	private boolean passed = true;
 	
@@ -85,6 +85,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 	@Test.Decl( "Throws AssertionError for null TestImpl" )
 	@Test.Decl( "Throws AssertionError for null Test.Container" )
+	@Test.Decl( "Marked as passed at creation" )
+	@Test.Decl( "Label includes member name and description" )
 	public TestCase( TestImpl impl, Test.Container container ) {
 		super( Assert.nonNull( impl ).toString() );
 		this.impl = impl;
@@ -160,6 +162,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Throws AssertionError for null message" )
 	@Test.Decl( "Message is included in details." )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "Does not alter pass/fail status" )
 	public Case addMessage( String message ) {
 		this.messages.add( Assert.nonEmpty( message ) );
 		return this;
@@ -176,6 +179,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Throws AssertionError for null error" )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "Does not alter pass/fail status" )
 	public Case expectError( Class<? extends Throwable> expectedError ) {
 		this.expectedError = Assert.nonNull( expectedError );
 		return this;
@@ -204,7 +208,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 * 		this Test.Case
 	 */
 	@Override
-	@Test.Decl( "Marks case as failed" )
+	@Test.Decl( "Marks passed case as failed" )
+	@Test.Decl( "Marks failed case as failed" )
 	@Test.Decl( "Marks location of failure" )
 	@Test.Decl( "Return is this" )
 	public Case fail() {
@@ -326,7 +331,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Test passes for equivalent objects" )
 	@Test.Decl( "Test fails for inequivalent" )
-	@Test.Decl( "Test passes for shallow but not deep equal" )
 	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
 	public <T> Case assertEqual( T expected, T actual ) {
@@ -341,6 +345,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Elapsed time is consistent with execution time" )
 	@Test.Decl( "Set if case fails" )
+	@Test.Decl( "Set after expected exception" )
+	@Test.Decl( "Set after unexpected exception" )
 	public long getElapsedTime() {
 		return this.elapsedTime;
 	}

@@ -25,6 +25,11 @@ import sog.util.IndentWriter;
  * @author sundquis
  *
  */
+/*
+ * FIXME:
+ * Refactor adding streams of classes to a TestResultSet
+ * Find bug in source dir method
+ */
 public class TestResultSet extends Result {
 	
 	private long elapsedTime = 0L;
@@ -105,7 +110,7 @@ public class TestResultSet extends Result {
 	public static void testSourceDir( String ... components ) {
 		Path sourcePath = Paths.get( "/", components );
 		TestResultSet result = new TestResultSet( "DIR: " + sourcePath );
-		
+
 		try {
 			Files.walk( sourcePath )
 				.filter( p -> Files.isRegularFile( p ) )
@@ -117,6 +122,10 @@ public class TestResultSet extends Result {
 		}
 		
 		result.print( new IndentWriter( System.out ) );
+	}
+	
+	public static void testPackage( Class<?> clazz ) {
+		testPackage( clazz.getPackage().getName().split( "\\." ) );
 	}
 	
 	/*
@@ -184,11 +193,11 @@ public class TestResultSet extends Result {
 		System.out.println();
 		
 		// TESTS
-		//
 
-		//testPackage( "sog", "core" );
-		testPackages( "sog", "core" );
-		//testSourceDir( "home", "sundquis", "book", "sog", "src" );
+		//testPackage( "sog", "core", "test" );
+		//testPackages( "sog", "core", "test" );
+		//testSourceDir( "home", "sundquis", "book", "sog", "src", "sog", "core", "test" );
+		testPackage( Test.class );
 
 
 		System.out.println("\nDone!");
