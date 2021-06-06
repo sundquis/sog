@@ -260,7 +260,7 @@ public class Test {
 		 * Type of Throwable that subsequent code is expected to throw
 		 * 
 		 * @param expectedError
-		 * 		Throwable tpye
+		 * 		Throwable type
 		 * @return
 		 * 		this Test.Case
 		 */

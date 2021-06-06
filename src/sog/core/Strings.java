@@ -236,10 +236,16 @@ public final class Strings {
 		return result.replace( ".java",  "" );
 	}
 	
+	public static String relativePathToPackage( Path relativePath ) {
+		return StreamSupport.stream( Assert.nonNull( relativePath ).spliterator(), false )
+			.map( Path::toString ).collect( Collectors.joining( "." ) );
+	}
+	
 	
 	public static String toHex( int n ) {
 		return "0x" + Strings.rightJustify( Integer.toHexString(n).toUpperCase(),  4,  '0' );
 	}
+	
 		
 	
 	

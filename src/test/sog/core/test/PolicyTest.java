@@ -34,7 +34,7 @@ public class PolicyTest extends Test.Container {
 
 
 	public PolicyTest() {
-		super( sog.core.test.Policy.class );
+		super( Policy.class );
 	}
 
 	
