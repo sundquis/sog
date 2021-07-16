@@ -42,7 +42,7 @@ public class TestCaseTest extends Test.Container {
 		
 		this.container = new SomeContainer();
 		this.impls = Arrays.stream( this.container.getClass().getDeclaredMethods() )
-			.collect( Collectors.toMap( Method::getName, TestImpl::new ) );
+			.collect( Collectors.toMap( Method::getName, TestImpl::forMethod ) );
 	}
 	
 	
@@ -470,8 +470,8 @@ public class TestCaseTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( TestCase.class );
-		Test.evalPackage( TestCase.class );
+		Test.eval( TestCase.class );
+		//Test.evalPackage( TestCase.class );
 	}
 	
 }

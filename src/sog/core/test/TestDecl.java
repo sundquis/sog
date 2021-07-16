@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import sog.core.AppException;
 import sog.core.Assert;
-import sog.core.Strings;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.IndentWriter;
@@ -20,35 +19,16 @@ import sog.util.Printable;
 /**
  * Represents a single test declaration as specified by a Test.Decl annotation
  */
-@Test.Skip( "FIXME" )
-public class TestDecl implements TestIdentifier, Commented, Printable {
+@Test.Subject( ".test" )
+public class TestDecl extends TestIdentifier implements Commented, Printable {
 
-	
-	private final String memberName;
-		
-	private final String description;
-	
-	private final String methodName;
 	
 	private TestImpl impl = null;
 
-
-	public TestDecl( String memberName, String subject, String description ) {
-		this.memberName = Assert.nonEmpty( memberName );
-		this.methodName = subject + "_" + Strings.toCamelCase( description );
-		this.description = Assert.nonEmpty( description );
+	public TestDecl( String memberName, String description ) {
+		super( memberName, description );
 	}
 
-	@Override
-	public String getMemberName() {
-		return this.memberName;
-	}
-
-	@Override
-	public String getDescription() {
-		return this.description;
-	}
-	
 	/** Return true if the impl was not previously set */
 	public boolean setImpl( TestImpl impl ) {
 		boolean result = this.impl == null;
@@ -72,9 +52,9 @@ public class TestDecl implements TestIdentifier, Commented, Printable {
 	@Override
 	public void print( IndentWriter out ) {
 		Macro macro = new Macro()
-			.expand( "memberName", this.memberName )
-			.expand( "description", this.description )
-			.expand( "methodName", this.methodName );
+			.expand( "memberName", this.getMemberName() )
+			.expand( "description", this.getDescription() )
+			.expand( "methodName", this.getMethodName() );
 		try {
 			this.getCommentedLines( "STUB" ).flatMap( macro ).forEach( out::println );
 		} catch ( IOException ex ) {

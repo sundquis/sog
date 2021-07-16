@@ -29,45 +29,193 @@ import sog.core.test.TestResultSet;
  * implemented in a "container class." 
  * 
  * 
- * 	SUBJECT
- * 		A class that is the subject of one or more tests.
- * 		A class identifies as a subject using Test.Subject, which indicates the test container.
- * 		Container name conventions:
- * 			.MemberName		Search for a member class Test.Container in the subject
- * 			packages.		Prepend packages to full subject class name
- * 			ClassName		Look in the same package as the subject for ClassName
- * 			Otherwise		Name is a fully qualified class name
- * 		A subject class declares test cases using Test.Decl annotations on members
- * 		The framework represents each Test.Decl annotation with an instance of test.TestDecl.
- * 		Test declarations serve as additional documentation of behavior
- * 		Policy specifies which members should have cases declared
- * 		A class may also use Test.Skip to declare no testing is required
+ *	SUBJECT: A class that is the subject of one or more tests.
  * 
- * 	CONTAINER
- * 		A class that holds test method implementations for a specified subject class
- * 		Extends the abstract base class Test.Container
- * 		Subject indicates container through the Test.Subject annotation; Container indicates subject
- * 			through the class supplied to the Container constructor; the framework checks consistency.
- * 		Framework generates stubs for test methods and marks with Test.Impl annotations
- * 		The framework represents each Test.Impl annotation with an instance of test.TestImpl.
- * 		Test method implementations use the Test.Case interface to interact with the framework
- * 		Provides convenience instance methods for getting and setting values on the subject
- * 		Provides static convenience method for finding the file location in the concrete Container
+ * 		@Test.Subject( container )
+ * 			A class identifies itself as a subject by using the Test.Subject annotation, 
+ * 			which indicates the test container class using the following naming conventions:
+ * 				.MemberName		Search for a member Test.Container class in the subject.
+ * 				packagePrefix.	Prepend packagePrefix to the full subject class name and append "Test".
+ * 				ClassName		Look in the same package as the subject for ClassName.
+ * 				Otherwise		The name, which must contain a ".", is a fully qualified class name.
+ * 			Each valid subject is represented by a sog.core.test.TestResult instance.
+ * 			Members in a subject are represented by sog.core.test.TestMember instances.
  * 
- * 	CASE
- * 		The Test.Case interface specifies how test methods interact with the framework to report results.
- * 		The test.TestCase implementation facilitates communication between the TestDecl, method, and test.TestResult
+ * 		@Test.Skip( rationale )
+ * 			A subject may declare itself or any of its members as being exempt from testing by using 
+ * 			this annotation. The given rationale should explain why the member is not being tested.
+ * 			Certain members (such as the "public static void main" method, synthetic members, and 
+ * 			Enum special methods) are automatically skipped. Non-skipped members generate testing 
+ * 			obligations as specified by the sog.core.test.Policy.
  * 
- * 	RESULT
- * 		The abstract class Test.Result specifies the information available after completion of tests 
- * 			for one or more subject classes
- * 		Extends and refines the Printable interface
- * 		Specifies that Object.toString() should return summary information
- * 		Provides accessors for elapsed time, pass count, fail cunt, and unimplemented count.
- * 		Concrete class test.TestResult handles testing for a single subject class.
- * 		Concrete class test.TestSetResult handles results for sets of subject classes
- * 		The convenience method Test.testSubject(...) prints the Test.Result from a single test.TestResult
- * 		Various methods in TestRunner print results from testing sets of subject classes
+ * 		@Test.Decl( description )
+ * 			A subject class declares test cases using Test.Decl annotations on members. The declaration
+ * 			gives a description which serves as additional documentation of behavior and properties
+ * 			associated with the member. Each Test.Decl annotation is represented by an
+ * 			sog.core.test.TestDecl instance.
+ * 
+ * 		@Test.Decls
+ * 			The required container annotation allowing declaration annotations to be repeated.
+ * 
+ * 		public static void eval()
+ * 			A subject can use this entry point to evaluate its own test cases. The results are 
+ * 			automatically printed.
+ * 				<code>public static void main( String[] args ) { Test.eval(); }</code>
+ * 
+ * 
+ * 
+ *	CONTAINER: A class that holds test method implementations for a specified subject class.
+ * 
+ * 		class Test.Container
+ * 			The abstract base class for all concrete container classes. The constructor requires
+ * 			the Class object for the corresponding subject. The framework checks for consistency
+ * 			between the subject class given in the constructor and the subject's identification
+ * 			of container in its Test.Subject annotation. The base class provides default
+ * 			noop implementations of the procedures run before and after each test case. Concrete
+ * 			containers override these as necessary. In addition, the base class provides convenience
+ * 			methods for getting and setting values on a subject, and for producing a file
+ * 			location identifier that can used for debugging.
+ * 
+ * 		@Test.Impl
+ * 			Methods in the container with this annotation are the implementations of tests declared
+ * 			in the corresponding subject class. Each subject Test.Decl should have a corresponding
+ * 			container Test.Impl method, and the pair is identified with a single Test.Case. The
+ * 			correspondence with the subject declaration is through the Test.Impl "method" and
+ * 			"description" attributes. These values are generated by the framework and should not be 
+ * 			altered. The framework also generates a method stub that should be copied into the
+ * 			container. The generated method names can be changed if needed or desired. Test.Impl 
+ * 			also has the three attributes "priority", "timeout", and "weight" which can be used to 
+ * 			refine the behavior of the test. Each Test.Impl annotation is represented by a
+ * 			sog.core.test.TestImpl instance.
+ * 
+ * 		interface Test.Case
+ * 			The Test.Case interface specifies how test methods interact with the framework to report 
+ * 			results. The signature of each Test.Impl test method includes a reference to a
+ * 			Test.Case instance. Each (Test.Decl, Test.Impl) pair corresponds to a Test.Case 
+ * 			that is implemented by a sog.core.test.TestCase instance. 
+ * 
+ * 
+ * 
+ * 	WORKFLOW
+ * 
+ * 		In the subject class:
+ * 			+ import sog.core.Test;
+ * 			+ For non-tested class, annotate with @Test.Skip( reason ). Done.
+ * 			+ @Test.Subject( container )
+ * 			+ public static void main( String[] args ) { Test.eval(); }
+ * 			+ Run main.
+ * 			+ Confirm error regarding missing container.
+ * 			+ Create stub container class.
+ * 			+ Rerun main to confirm correct configuration with container.
+ * 			+ Consult Policy or review errors for untested members that require testing.
+ * 			+ Use @Test.Decl( description ) annotations to describe test cases.
+ * 			+ Rerun main to confirm no errors due to untested members.
+ * 			+ Review SKIPS and fix any ERRORS.
+ * 
+ * 		In the container class:
+ * 			+ import sog.core.Test;
+ * 			+ public static void main( String[] args ) { Test.eval( SubjectClass.class ); }
+ * 			+ Run main.
+ * 			+ Copy subs into container body.
+ * 			+ Rerun main to confirm no ERRORS, no STUBS, and all cases fail.
+ * 			+ Implement test methods, run, and debug subject code.
+ * 			+ Goal: 100% pass rate, no ERRORS, no STUBS, reasonable SKIPS.
+ * 			+ Run tests for the entire package using Test.evalPackage( SubjectClass.class )
+ * 
+ * 
+ * 
+ * 
+ * 	FRAMEWORK COMPONENTS: Classes in sog.core.test
+ * 
+ * 		sog.core.test.Policy
+ * 			Responsibilities: This class has the responsibility of defining and enforcing the policy 
+ * 				regarding which class members should be flagged as needing test validation.
+ * 			Structure: An enumeration of all defined policies. Each policy is defined by the status 
+ * 				of the 12 types of members: constructors, fields, and methods from the four
+ * 				protection levels.
+ * 			Services: Convenience methods for determining if a given method is required.
+ * 				public boolean required( ... )
+ * 				
+ * 		sog.core.test.Result
+ * 			Responsibilities: Base class for all test results. This class defines the standard output
+ * 				format for test results including the success rate, time, and pass/fail counts.
+ * 			Structure: Holds the required label identifying the test.
+ * 			Services: The toString() implementation is taken to be the canonical format for test results.	
+ * 
+ * 		sog.core.test.TestCase
+ * 			Responsibilities: Represents one test case as determined by a TestImpl instance.
+ * 				Allows a test method to interact with the testing framework and records results.
+ * 			Structure:
+ * 				Extends Result to represent the results after running the test case.
+ * 				Holds a TestContainer and TestImpl.
+ * 				Implements Test.Case and is given to the TestImpl test method to interact with the testing framework.
+ * 				Implements Runnable be executing the given test method and recording results.
+ * 				Implements Comparable by using the priority (if any) of the given TestImpl.
+ * 			Services: Implements Printable.print( ... ) to include details for failing test cases.
+ * 
+ * 		sog.core.test.TestDecl
+ * 			Responsibilities: Represents a single test declaration as determined by a @Test.Decl annotation
+ * 				on a member in a subject class. 
+ * 				Maintains the template code for test method stubs.
+ * 				Knows when the TestDecl has been matched with a corresponding TestImpl. 
+ * 			Structure:
+ * 				Extends TestIdentifier, the common base class for TestDecl and TestImpl.
+ * 				Holds onto the corresponding TestImpl instance.
+ * 				Implements Commented by maintaining the template for stub code.
+ * 				Implements Printable by printing the stub code.
+ * 			Services:
+ * 				public boolean unimplemented() to detect declared cases that do not have test method implementations.
+ * 
+ * 		sog.core.test.TestIdentifier
+ * 			Responsibilities: Define the unique key identifier associated with TestDecl and TestImpl, and define
+ * 				the member naming policy for test methods.
+ * 			Structure:
+ * 				Abstract base class for TestDecl and TestImpl.
+ * 				Holds the member name and test case description. This pair must be unique across the test
+ * 				cases in a single subject class.
+ * 			Services:
+ * 				public String getKey(): the unique identifier.
+ * 				public String getMethodName(): the generated test method name.
+ * 
+ * 		sog.core.test.TestImpl
+ * 			Responsibilities: Hold information about a single test case.
+ * 			Structure: 
+ * 				Extends TestIdentifier, the common base class for TestDecl and TestImpl.
+ * 				Holds the executable test method corresponding to this case.
+ * 			Services: Static factory for constructing from a given method, or return null if not a test method.
+ * 
+ * 		sog.core.test.TestMember
+ * 			Responsibilities: Represents a single member in a subject class.
+ * 				Define the naming policy for classes, constructors, fields, and methods.
+ * 				Provide logic for handling special cases such as synthetic members.
+ * 			Structure:
+ * 				Constructors (one for each type of member) determine and record basic properties.
+ * 			Services:
+ * 				public boolean isSkipped()
+ * 				public boolean ieRequired()
+ * 				public Stream<TestDec> getDecls()
+ * 
+ * 		sog.core.test.TestResult
+ * 			Responsibilities: Given a subject class, assemble and execute the set of test cases associated
+ * 				with the subject.
+ * 				Defines error reporting logic for mis-configured tests.
+ * 			Structure:
+ * 				Extends Result.
+ * 				Holds the subject class and container name.
+ * 				Holds lists of errors and skips.
+ * 				Holds collections for declared tests and their corresponding test cases.
+ * 			Services: 
+ * 				Public static factory method builds the Result: Given a subject class, examine the class
+ * 					for test declarations, match them with corresponding implementations in a container,
+ * 					and run the tests.
+ * 				Implements Printable.print( ... ) to include details on errors, skips, stubs, and failed cases.
+ * 
+ * 		sog.core.test.TestResultSet
+ * 			Responsibilities: FIXME
+ * 			Structure: FIXME
+ * 			Services: FIXME
+ * 
+ * 
  * 		
  */
 public class Test {
@@ -88,9 +236,8 @@ public class Test {
 	
 	
 	/**
-	 * Subject classes use to identify as a class needing testing.
-	 * The value identifies the location of the 
-	 * Test.Container that holds test method implementations.
+	 * Subject classes use to identify as a class needing testing. The value identifies 
+	 * the location of the Test.Container that holds test method implementations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
 	@Target( ElementType.TYPE )

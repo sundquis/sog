@@ -6,6 +6,7 @@
  */
 package sog.core.test;
 
+import sog.core.Assert;
 import sog.core.Test;
 
 /**
@@ -13,15 +14,36 @@ import sog.core.Test;
  * uniquely identify a single test case. These strings are used to form a
  * unique key for mapping.
  */
-public interface TestIdentifier {
+@Test.Subject( ".test" )
+public abstract class TestIdentifier {
 	
-	public String getMemberName();
+	private final String memberName;
+	private final String description;
 	
-	public String getDescription();
-		
-	@Test.Decl( "FIXME" )
-	public default String getKey() {
-		return this.getMemberName() + "#" + this.getDescription();
+	protected TestIdentifier( String memberName, String description ) {
+		this.memberName = Assert.nonEmpty( memberName );
+		this.description = Assert.nonEmpty( description );
+	}
+	
+	final public String getMemberName() {
+		return this.memberName;
+	}
+	
+	final public String getDescription() {
+		return this.description;
+	}
+	
+	final public String getKey() {
+		return this.getMemberName() + " # " + this.getDescription();
+	}
+	
+	@Override
+	public String toString() {
+		return this.getKey();
 	}
 
+	final public String getMethodName() {
+		return "M_" + this.getKey().hashCode();
+	}
+		
 }

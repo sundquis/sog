@@ -72,6 +72,7 @@ public class TestResult extends Result {
 	 */
 	private final List<String> skips = new ArrayList<String>();
 	
+	/**  */
 	private final Map<String, TestDecl> declMap = new TreeMap<String, TestDecl>();
 	
 	/** The Test.Container holding implementations of test methods. Constructed by loadContainer() */
@@ -236,8 +237,8 @@ public class TestResult extends Result {
 		}
 		
 		Arrays.stream(  this.container.getClass().getDeclaredMethods() )
-			.map( TestImpl::new )
-			.filter( TestImpl::hasImpl )
+			.map( TestImpl::forMethod )
+			.filter( ti -> ti != null )
 			.forEach( this::addImpl );
 	}
 	

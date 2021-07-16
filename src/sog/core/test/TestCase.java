@@ -52,7 +52,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 	/*
 	 * When test failure occurs a message is added to this list. Messages are printed
-	 * if Printable.prin() is called to give details.
+	 * if Printable.print() is called to give details.
 	 */
 	private final List<String> messages = new LinkedList<String>();
 	
@@ -95,7 +95,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 	
 	/**
-	 * Cast this TestCase as a Test.Case for passing to the test Method.
+	 * Downcast this TestCase as a Test.Case for passing to the test Method.
 	 * @return
 	 */
 	@Test.Decl( "Physically equal to this" )

@@ -45,7 +45,7 @@ public class ResultTest extends Test.Container {
 
 	@Test.Impl( member = "constructor: Result(String)", description = "Label is included in the toString() value" )
 	public void Result_LabelIsIncludedInTheTostringValue( Test.Case tc ) {
-		String label = "LABEL";
+		String label = "LABEL_XXX";
 		MyResult r = new MyResult( label );
 		tc.assertTrue( r.toString().startsWith( label ) );
 	}

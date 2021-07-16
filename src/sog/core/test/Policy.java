@@ -287,9 +287,5 @@ public enum Policy implements Protection {
 	
 	
 	
-	public static void main( String[] args ) {
-		Test.eval();
-	}
-	
 
 }

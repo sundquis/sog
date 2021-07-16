@@ -14,22 +14,39 @@ import sog.core.Test;
 /**
  * 
  */
-public class TestImpl implements TestIdentifier {
+public class TestImpl extends TestIdentifier {
+	
+	
+	public static TestImpl forMethod( Method method ) {
+		TestImpl result = null;
+		
+		Test.Impl impl = method.getDeclaredAnnotation( Test.Impl.class );
+		if ( impl != null ) {
+			result = new TestImpl( impl.member(), impl.description(), method, 
+				impl.priority(), impl.weight(), impl.timeout() );
+		}
+		
+		return result;
+	}
 
 	
 	private final Method method;
 	
-	private final Test.Impl impl;
+	private final int priority;
+	
+	private final int weight;
 
-	public TestImpl( Method method ) {
+	@SuppressWarnings( "unused" )
+	private final long timeout;
+	
+	private TestImpl( String memberName, String description, Method method, int priority, int weight, long timeout ) {
+		super( memberName, description );
+
 		this.method = Assert.nonNull( method );
-		this.impl = method.getDeclaredAnnotation( Test.Impl.class );
+		this.priority = priority;
+		this.weight = weight;
+		this.timeout = timeout;
 	}
-	
-	public boolean hasImpl() {
-		return this.impl != null;
-	}
-	
 	
 	
 	
@@ -37,27 +54,12 @@ public class TestImpl implements TestIdentifier {
 		return this.method;
 	}
 	
-	@Override
-	public String toString() {
-		return this.getMemberName() + " # " + this.getDescription();
-	}
-
-	@Override
-	public String getMemberName() {
-		return this.impl.member();
-	}
-
-	@Override
-	public String getDescription() {
-		return this.impl.description();
-	}
-	
 	public int getPriority() {
-		return this.impl.priority();
+		return this.priority;
 	}
 	
 	public int getWeight() {
-		return this.impl.weight();
+		return this.weight;
 	}
 
 }

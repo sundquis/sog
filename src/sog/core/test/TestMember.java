@@ -74,7 +74,6 @@ public class TestMember {
 	
 	
 	private final String memberName;
-	private final String subject;
 	private final Test.Skip skip;
 	private final Test.Decl[] decls;
 	private final boolean isRequired;
@@ -85,7 +84,6 @@ public class TestMember {
 	
 	public TestMember( Constructor<?> constructor ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( constructor ) );
-		this.subject = constructor.getDeclaringClass().getSimpleName();
 		this.skip = constructor.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = constructor.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = Policy.get().required( constructor );
@@ -104,7 +102,6 @@ public class TestMember {
 	
 	public TestMember( Field field ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( field ) );
-		this.subject = field.getName();
 		this.skip = field.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = field.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = Policy.get().required( field );
@@ -116,7 +113,6 @@ public class TestMember {
 	
 	public TestMember( Method method ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( method ) );
-		this.subject = method.getName();
 		this.skip = method.getDeclaredAnnotation( Test.Skip.class );
 		this.decls = method.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = Policy.get().required( method );
@@ -161,7 +157,7 @@ public class TestMember {
 	}
 	
 	public Stream<TestDecl> getDecls() { 
-		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, TestMember.this.subject, d.value() ) );
+		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, d.value() ) );
 	}
 	
 
