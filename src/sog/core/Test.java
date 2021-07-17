@@ -128,22 +128,30 @@ import sog.core.test.TestResultSet;
  * 	FRAMEWORK COMPONENTS: Classes in sog.core.test
  * 
  * 		sog.core.test.Policy
- * 			Responsibilities: This class has the responsibility of defining and enforcing the policy 
- * 				regarding which class members should be flagged as needing test validation.
- * 			Structure: An enumeration of all defined policies. Each policy is defined by the status 
- * 				of the 12 types of members: constructors, fields, and methods from the four
- * 				protection levels.
- * 			Services: Convenience methods for determining if a given method is required.
- * 				public boolean required( ... )
+ * 			Responsibilities: 
+ * 				Defines and enforces the policy regarding which class members should be flagged 
+ * 				as needing test validation.
+ * 			Structure: 
+ * 				An enumeration of all defined policies. 
+ * 				Each policy is defined by the status of the 12 types of members: constructors, fields, 
+ * 				and methods from the four protection levels.
+ * 			Services: 
+ * 				Convenience methods for determining if a given method is required.
  * 				
  * 		sog.core.test.Result
- * 			Responsibilities: Base class for all test results. This class defines the standard output
- * 				format for test results including the success rate, time, and pass/fail counts.
- * 			Structure: Holds the required label identifying the test.
- * 			Services: The toString() implementation is taken to be the canonical format for test results.	
+ * 			Responsibilities: 
+ * 				Base class for all test results. 
+ * 				Defines the standard output format for test results including the success rate, 
+ * 				time, and pass/fail counts.
+ * 			Structure: 
+ * 				Holds the required label identifying the test.
+ * 			Services: 
+ * 				The toString() implementation is taken to be the canonical format for test results.	
  * 
  * 		sog.core.test.TestCase
- * 			Responsibilities: Represents one test case as determined by a TestImpl instance.
+ * 			Responsibilities: 
+ * 				Represents one test case as determined by a TestImpl instance.
+ * 				After the test case has been executed, represents the results of the test case.
  * 				Allows a test method to interact with the testing framework and records results.
  * 			Structure:
  * 				Extends Result to represent the results after running the test case.
@@ -151,10 +159,12 @@ import sog.core.test.TestResultSet;
  * 				Implements Test.Case and is given to the TestImpl test method to interact with the testing framework.
  * 				Implements Runnable be executing the given test method and recording results.
  * 				Implements Comparable by using the priority (if any) of the given TestImpl.
- * 			Services: Implements Printable.print( ... ) to include details for failing test cases.
+ * 			Services: 
+ * 				Implements Printable.print( ... ) to include details for failing test cases.
  * 
  * 		sog.core.test.TestDecl
- * 			Responsibilities: Represents a single test declaration as determined by a @Test.Decl annotation
+ * 			Responsibilities: 
+ * 				Represents a single test declaration as determined by a @Test.Decl annotation
  * 				on a member in a subject class. 
  * 				Maintains the template code for test method stubs.
  * 				Knows when the TestDecl has been matched with a corresponding TestImpl. 
@@ -167,8 +177,9 @@ import sog.core.test.TestResultSet;
  * 				public boolean unimplemented() to detect declared cases that do not have test method implementations.
  * 
  * 		sog.core.test.TestIdentifier
- * 			Responsibilities: Define the unique key identifier associated with TestDecl and TestImpl, and define
- * 				the member naming policy for test methods.
+ * 			Responsibilities: 
+ * 				Defines the unique key identifier associated with TestDecl and TestImpl
+ * 				Defines the member naming policy for test methods.
  * 			Structure:
  * 				Abstract base class for TestDecl and TestImpl.
  * 				Holds the member name and test case description. This pair must be unique across the test
@@ -178,16 +189,19 @@ import sog.core.test.TestResultSet;
  * 				public String getMethodName(): the generated test method name.
  * 
  * 		sog.core.test.TestImpl
- * 			Responsibilities: Hold information about a single test case.
+ * 			Responsibilities: 
+ * 				Holds information about a single test case.
  * 			Structure: 
  * 				Extends TestIdentifier, the common base class for TestDecl and TestImpl.
  * 				Holds the executable test method corresponding to this case.
- * 			Services: Static factory for constructing from a given method, or return null if not a test method.
+ * 			Services: 
+ * 				Static factory for constructing from a given method, or return null if not a test method.
  * 
  * 		sog.core.test.TestMember
- * 			Responsibilities: Represents a single member in a subject class.
- * 				Define the naming policy for classes, constructors, fields, and methods.
- * 				Provide logic for handling special cases such as synthetic members.
+ * 			Responsibilities: 
+ * 				Represents a single member in a subject class.
+ * 				Defines the naming policy for classes, constructors, fields, and methods.
+ * 				Provides logic for handling special cases such as synthetic members.
  * 			Structure:
  * 				Constructors (one for each type of member) determine and record basic properties.
  * 			Services:
@@ -196,8 +210,8 @@ import sog.core.test.TestResultSet;
  * 				public Stream<TestDec> getDecls()
  * 
  * 		sog.core.test.TestResult
- * 			Responsibilities: Given a subject class, assemble and execute the set of test cases associated
- * 				with the subject.
+ * 			Responsibilities: 
+ * 				Given a subject class, assembles and executes the set of test cases associated with the subject.
  * 				Defines error reporting logic for mis-configured tests.
  * 			Structure:
  * 				Extends Result.

@@ -70,7 +70,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	private Procedure afterThis = Procedure.NOOP;
 	
 	/*
-	 * TestCase is created in the state passed == true. If any error is encountered 
+	 * TestCase is created in the state passed = true. If any error is encountered 
 	 * passed is set to false. Once in the failed state the test case does not transition to 
 	 * passed. A multi-part test case fails if any one of its parts fails.
 	 */
@@ -99,7 +99,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 * @return
 	 */
 	@Test.Decl( "Physically equal to this" )
-	private Test.Case getTestCase() {
+	public Test.Case getTestCase() {
 		return this;
 	}
 	
@@ -114,13 +114,20 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Graceful exit on an expected error" )
 	@Test.Decl( "Graceful exit on an unexpected error" )
+	@Test.Decl( "Graceful exit on an post processing error" )
 	@Test.Decl( "Test fails if expected error is not thrown" )
 	@Test.Decl( "Test passes if expected error is thrown" )
 	@Test.Decl( "Test fails if unexpected error is thrown" )
 	@Test.Decl( "Test fails if wrong error is thrown" )
-	@Test.Decl( "Message added if test fails" )
+	@Test.Decl( "Message added for no exception when expected" )
+	@Test.Decl( "Message added for wrong exception when expected" )
+	@Test.Decl( "Message added for unexpected exception" )
+	@Test.Decl( "Message added for exception in afterThis" )
+	@Test.Decl( "Message added for exception in afterEach" )
 	@Test.Decl( "afterThis always executed" )
 	@Test.Decl( "afterEach always executed" )
+	@Test.Decl( "Test fails if afterThis throws exception" )
+	@Test.Decl( "Test fails if afterEach throws exception" )
 	@Test.Decl( "elapsedTime greater than zero" )
 	public void run() {
 		long start = System.currentTimeMillis();
@@ -142,8 +149,14 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 			this.addMessage( "Unexpected error" );
 			this.fail();
 		} finally {
-			this.afterThis.exec();
-			this.container.afterEach().exec();
+			try {
+				this.afterThis.exec();
+				this.container.afterEach().exec();
+			} catch ( Throwable err ) {
+				this.unexpectedError = err;
+				this.addMessage( "Post-processing exception." );
+				this.fail();
+			}
 			this.elapsedTime = System.currentTimeMillis() - start;
 		}
 	}
@@ -180,7 +193,11 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Throws AssertionError for null error" )
 	@Test.Decl( "Return is this" )
 	@Test.Decl( "Does not alter pass/fail status" )
+	@Test.Decl( "Throws  AssertionError if expected error already set" )
 	public Case expectError( Class<? extends Throwable> expectedError ) {
+		if ( this.expectedError != null ) {
+			throw new AssertionError( "expectedError already set" );
+		}
 		this.expectedError = Assert.nonNull( expectedError );
 		return this;
 	}
@@ -195,6 +212,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 */
 	@Override
 	@Test.Decl( "Throws AssertionError for null procedure" )
+	@Test.Decl( "Default is NOOP" )
 	@Test.Decl( "Return is this" )
 	public Case afterThis( Procedure afterThis ) {
 		this.afterThis = Assert.nonNull( afterThis );

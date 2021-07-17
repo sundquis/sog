@@ -7,6 +7,7 @@
 package sog.core.test;
 
 import sog.core.Assert;
+import sog.core.Strings;
 import sog.core.Test;
 
 /**
@@ -43,7 +44,7 @@ public abstract class TestIdentifier {
 	}
 
 	final public String getMethodName() {
-		return "M_" + this.getKey().hashCode();
+		return "tm_" + Strings.rightJustify( Integer.toHexString( this.getKey().hashCode() ).toUpperCase(),  9,  '0' );
 	}
 		
 }
