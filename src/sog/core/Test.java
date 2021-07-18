@@ -108,6 +108,10 @@ import sog.core.test.TestResultSet;
  * 			+ Create stub container class.
  * 			+ Rerun main to confirm correct configuration with container.
  * 			+ Consult Policy or review errors for untested members that require testing.
+ * 			+ For private/package members requiring tests, either provide well-documented
+ * 				Test.Skip annotation together with description of how obligations are met through
+ * 				alternate testing, OR, arrange for testing through an internal member container
+ * 				so that the private members can be accessed via a nest-mate.
  * 			+ Use @Test.Decl( description ) annotations to describe test cases.
  * 			+ Rerun main to confirm no errors due to untested members.
  * 			+ Review SKIPS and fix any ERRORS.

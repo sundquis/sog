@@ -39,17 +39,26 @@ public class TestDecl extends TestIdentifier implements Commented, Printable {
 	
 	private TestImpl impl = null;
 
+	@Test.Decl( "Throws AssertionError for null member name" )
+	@Test.Decl( "Throws AssertionError for emtpy member name" )
+	@Test.Decl( "Throws AssertionError for null description" )
+	@Test.Decl( "Throws AssertionError for emtpy description" )
 	public TestDecl( String memberName, String description ) {
 		super( memberName, description );
 	}
 
 	/** Return true if the impl was not previously set */
+	@Test.Decl( "Throws AssertionError for null TestImpl" )
+	@Test.Decl( "First call returns true" )
+	@Test.Decl( "Second call returns false" )
 	public boolean setImpl( TestImpl impl ) {
 		boolean result = this.impl == null;
 		this.impl = Assert.nonNull( impl );
 		return result;
 	}
-	
+
+	@Test.Decl( "Before setImpl returns true" )
+	@Test.Decl( "After setImpl returns false" )
 	public boolean unimplemented() {
 		return this.impl == null;
 	}
@@ -64,7 +73,13 @@ public class TestDecl extends TestIdentifier implements Commented, Printable {
 	//	STUB	}
 
 	@Override
+	@Test.Decl( "Throws AssertionError for null IndentWriter" )
+	@Test.Decl( "Output includes Test.Impl" )
+	@Test.Decl( "Output includes member name" )
+	@Test.Decl( "Output includes description" )
+	@Test.Decl( "Output includes method name" )
 	public void print( IndentWriter out ) {
+		Assert.nonNull( out );
 		Macro macro = new Macro()
 			.expand( "memberName", this.getMemberName() )
 			.expand( "description", this.getDescription() )
