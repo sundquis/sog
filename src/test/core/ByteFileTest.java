@@ -89,7 +89,7 @@ public class ByteFileTest extends Test.Container {
 	@Test.Impl( member = "public void ByteFile.write(int, byte[], int, int)", description = "At warn limit issues warning" )
 	public void write_AtWarnLimitIssuesWarning( Test.Case tc ) {
 		// TOGGLE
-		/* */	tc.addMessage( "Manually tested" );	/*
+		//* */	tc.addMessage( "Manually tested" );	/*
 		// SHOULD SEE: "WARNING: Total bytes stored exceeds 100" ...
 		this.setWarnLimit( 100L );
 		bf.write( 90,  BYTES, 0, 12 );

@@ -19,6 +19,7 @@
 
 package test.sog.core.test;
 
+import sog.core.App;
 import sog.core.Test;
 import sog.core.test.Result;
 import sog.util.IndentWriter;

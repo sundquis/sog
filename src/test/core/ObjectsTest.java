@@ -33,7 +33,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.deepArrayEquals(Object, Object)", 
 		description = "Is symmetric" )
 	public void deepArrayEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
@@ -119,7 +119,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.deepCollectionEquals(Collection, Collection)", 
 		description = "Is symmetric" )
 	public void deepCollectionEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
@@ -193,7 +193,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.deepEquals(Object, Object)", 
 		description = "Is symmetric" )
 	public void deepEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
@@ -230,21 +230,21 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.equals(Object, Object)", 
 		description = "Is symmetric" )
 	public void equals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
 		member = "public boolean Objects.equals(Object, Object)", 
 		description = "Sample cases for equals" )
 	public void equals_SampleCasesForEquals( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
 		member = "public boolean Objects.equals(Object, Object)", 
 		description = "Sample cases for not equals" )
 	public void equals_SampleCasesForNotEquals( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl(
@@ -267,7 +267,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.shallowArrayEquals(Object, Object)", 
 		description = "Is symmetric" )
 	public void shallowArrayEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
@@ -393,7 +393,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.shallowCollectionEquals(Collection, Collection)", 
 		description = "Is symmetric" )
 	public void shallowCollectionEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 
@@ -510,7 +510,7 @@ public class ObjectsTest extends Test.Container {
 		member = "public boolean Objects.shallowEquals(Object, Object)", 
 		description = "Is symmetric" )
 	public void shallowEquals_IsSymmetric( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( 

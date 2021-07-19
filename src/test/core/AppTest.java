@@ -53,7 +53,7 @@ public class AppTest extends Test.Container {
 		@Test.Impl( member = "public void App.run()", description = "Calls terminate on shutdown" )
 		public void run_CallsTerminateOnShutdown( Test.Case tc ) {
 			// TOGGLE
-			/* */ tc.addMessage( "Manually tested" ); /*
+			//* */ tc.addMessage( "Manually tested" ); /*
 			// SHOULD SEE:
 			//		Terminating [0] Thread[ ... ]
 			//		...
@@ -69,7 +69,7 @@ public class AppTest extends Test.Container {
 			for ( int i = 0; i < 10; i++ ) {
 				App.get().terminateOnShutdown( new OS(i) );
 			}
-			tc.pass();
+			//tc.pass();
 			// */
 		}
 

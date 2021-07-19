@@ -128,7 +128,7 @@ public class TestCaseTest extends Test.Container {
 
 	@Test.Impl( member = "method: String TestCase.toString()", description = "Starts with FAIL if failed" )
 	public void toString_StartsWithFailIfFailed( Test.Case tc ) {
-		tc.assertTrue( this.test.fail().toString().startsWith( "FAIL" ) );
+		tc.assertTrue( this.test.fail( "Reason" ).toString().startsWith( "FAIL" ) );
 	}
 
 	@Test.Impl( member = "method: String TestCase.toString()", description = "Starts with PASS if passed" )
@@ -139,13 +139,13 @@ public class TestCaseTest extends Test.Container {
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Does not alter pass/fail status", weight = 2 )
 	public void addMessage_DoesNotAlterPassFailStatus( Test.Case tc ) {
 		tc.assertEqual( this.test.toString(), this.test.addMessage( "foo" ).toString() );
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.assertEqual( this.test.toString(), this.test.addMessage( "foo" ).toString() );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.addMessage(String)", description = "Message is included in details." )
 	public void addMessage_MessageIsIncludedInDetails( Test.Case tc ) {
-		this.test.addMessage( "One" ).addMessage( "FOO" ).addMessage( "Two" );
+		//this.test.addMessage( "One" ).addMessage( "FOO" ).addMessage( "Two" );
 		StringOutputStream sos = new StringOutputStream();
 		this.test.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( "FOO" ) );
@@ -260,7 +260,7 @@ public class TestCaseTest extends Test.Container {
 	public void expectError_DoesNotAlterPassFailStatus( Test.Case tc ) {
 		tc.assertEqual( this.test.toString(), this.test.expectError( Exception.class ).toString() );
 		this.beforeEach().exec();
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.assertEqual( this.test.toString(), this.test.expectError( Exception.class ).toString() );
 	}
 
@@ -278,29 +278,29 @@ public class TestCaseTest extends Test.Container {
 	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks failed case as failed" )
 	public void fail_MarksFailedCaseAsFailed( Test.Case tc ) {
 		tc.assertTrue( this.test.getFailCount() == 0 );
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.assertTrue( this.test.getFailCount() > 0 );
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.assertTrue( this.test.getFailCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks location of failure", weight = 2 )
 	public void fail_MarksLocationOfFailure( Test.Case tc ) {
 		tc.isNull( this.container.getSubjectField( this.test, "fileLocation", "" ) );
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.notNull( this.container.getSubjectField( this.test, "fileLocation", "" ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Marks passed case as failed" )
 	public void fail_MarksPassedCaseAsFailed( Test.Case tc ) {
 		tc.assertTrue( this.test.getFailCount() == 0 );
-		this.test.fail();
+		this.test.fail( "Reason" );
 		tc.assertTrue( this.test.getFailCount() > 0 );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.fail()", description = "Return is this" )
 	public void fail_ReturnIsThis( Test.Case tc ) {
-		tc.assertTrue( this.test == this.test.fail() );
+		tc.assertTrue( this.test == this.test.fail( "Reason" ) );
 	}
 
 	@Test.Impl( member = "method: Test.Case TestCase.getTestCase()", description = "Physically equal to this" )
@@ -423,7 +423,7 @@ public class TestCaseTest extends Test.Container {
 	@Test.Impl( member = "method: int TestCase.getFailCount()", description = "Equal to Test.Impl.weight if case fails" )
 	public void getFailCount_EqualToTestImplWeightIfCaseFails( Test.Case tc ) {
 		TestCase weighted = this.getTestCase( "weighted" );
-		weighted.fail();
+		weighted.fail( "Reason" );
 		tc.assertEqual( weighted.getFailCount(), SomeContainer.WT );
 	}
 
@@ -442,7 +442,7 @@ public class TestCaseTest extends Test.Container {
 	@Test.Impl( member = "method: int TestCase.getPassCount()", description = "Zero if case fails" )
 	public void getPassCount_ZeroIfCaseFails( Test.Case tc ) {
 		TestCase weighted = this.getTestCase( "weighted" );
-		weighted.fail();
+		weighted.fail( "Reason" );
 		tc.assertEqual( weighted.getPassCount(), 0 );
 	}
 
@@ -485,7 +485,7 @@ public class TestCaseTest extends Test.Container {
 	public void getElapsedTime_SetIfCaseFails( Test.Case tc ) {
 		TestCase error = this.getTestCase( "error" );
 		error.expectError( AssertionError.class );
-		error.fail();
+		error.fail( "Reason" );
 		error.run();
 		tc.assertTrue( error.getElapsedTime() > 0L );
 	}

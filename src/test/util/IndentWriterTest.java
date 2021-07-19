@@ -137,20 +137,6 @@ public class IndentWriterTest extends Test.Container {
 		tc.assertTrue( result.startsWith( "XXXXXXXXFOO" ) );
 	}
 	
-	@Test.Impl( member = "public void IndentWriter.decreaseIndent()", description = "Custom indent removed" )
-	public void decreaseIndent_CustomIndentRemoved( Test.Case tc ) {
-		tc.addMessage( "Unimplemented" ).fail();
-	}
-
-	@Test.Impl( member = "public void IndentWriter.increaseIndent(String)", description = "Custom indent used" )
-	public void increaseIndent_CustomIndentUsed( Test.Case tc ) {
-		tc.addMessage( "Unimplemented" ).fail();
-	}
-
-	@Test.Impl( member = "public void IndentWriter.increaseIndent(String)", description = "Custom indent used after default" )
-	public void increaseIndent_CustomIndentUsedAfterDefault( Test.Case tc ) {
-		tc.addMessage( "Unimplemented" ).fail();
-	}
 	
 	
 }

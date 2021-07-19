@@ -54,7 +54,7 @@ public class TraceTest extends Test.Container {
 	@Test.Impl( member = "public void Trace.write(String)", description = "Warning issued when count exceeds warn limit", priority = -2 )
 	public void write_WarningIssuedWhenCountExceedsWarnLimit( Test.Case tc ) {
 		// TOGGLE
-		/* */	tc.addMessage( "Manually tested" );	/*
+		//* */	tc.addMessage( "Manually tested" );	/*
 		int orig = this.getSubjectField( null,  "WARN_LIMIT",  0 );
 		this.setSubjectField( null,  "WARN_LIMIT",  10 );
 		Trace t = new Trace( "Test" );
@@ -62,9 +62,9 @@ public class TraceTest extends Test.Container {
 			t.write( "" + i );
 		}
 		this.setSubjectField( null,  "WARN_LIMIT",  orig );
-		tc.addMessage( "SHOULD SEE:" );
-		tc.addMessage( "sundquis.core.AppException: WARNING: Trace file ..." );
-		tc.fail();
+		//tc.addMessage( "SHOULD SEE:" );
+		//tc.addMessage( "sundquis.core.AppException: WARNING: Trace file ..." );
+		//tc.fail();
 		// */
 	}
 
@@ -145,12 +145,12 @@ public class TraceTest extends Test.Container {
 	@Test.Impl( member = "public void Trace.write(String)", description = "Message printed if echo enabled" )
 	public void write_MessagePrintedIfEchoEnabled( Test.Case tc ) {
 		// TOGGLE
-		/* */	tc.addMessage( "Manually tested" );	/*
+		//* */	tc.addMessage( "Manually tested" );	/*
 		// SHOULD SEE:
 		// SEQ NO TOPIC           THREAD     CLASS NAME                     METHOD                    MESSAGE
 		//	    1 TEST            main       test.core.TraceTest            write_MessagePrintedIfEch FOO
 		new Trace( "TEST", true ).write( "FOO" );
-		tc.pass();
+		//tc.pass();
 		// */
 	}
 
@@ -187,7 +187,7 @@ public class TraceTest extends Test.Container {
 
 	@Test.Impl( member = "public Trace(String)", description = "Default does not echo messages" )
 	public void Trace_DefaultDoesNotEchoMessages( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( member = "public void Trace.disable()", description = "Not enabled after" )

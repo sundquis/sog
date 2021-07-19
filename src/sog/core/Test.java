@@ -411,6 +411,7 @@ public class Test {
 	 */
 	public interface Case {
 		
+		
 		/**
 		 * Only displayed for non-passing cases
 		 * 
@@ -444,15 +445,6 @@ public class Test {
 		public Test.Case afterThis( Procedure callafter );
 
 		
-		/**
-		 * Mark the current case as failed.
-		 * 
-		 * @return
-		 * 		this Test.Case
-		 */
-		public Test.Case fail();
-		
-
 		/**
 		 * Assert that the given object is not null.
 		 * 

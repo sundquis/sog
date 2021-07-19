@@ -29,14 +29,14 @@ public class PropertyTest extends Test.Container {
 	@Test.Impl( member = "public Object Property.get(String, Object, Function)", description = "Prints declaration for missing property" )
 	public void get_PrintsDeclarationForMissingProperty( Test.Case tc ) {
 		// TOGGLE
-		/* */ tc.addMessage( "Manually verified" ); /*
-		tc.addMessage( "SHOULD SEE:" );
-		tc.addMessage( "WARNING: Property not found:" );
-		tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
-		tc.addMessage( "<text name=\"FOO\" value=\"Foo\" />" );
-		tc.addMessage( "</class>" );
+		//* */ tc.addMessage( "Manually verified" ); /*
+		//tc.addMessage( "SHOULD SEE:" );
+		//tc.addMessage( "WARNING: Property not found:" );
+		//tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
+		//tc.addMessage( "<text name=\"FOO\" value=\"Foo\" />" );
+		//tc.addMessage( "</class>" );
 		Property.get( "FOO",  "Foo",  Property.STRING );
-		tc.fail();
+		//tc.fail();
 		// */
 	}
 
@@ -150,14 +150,14 @@ public class PropertyTest extends Test.Container {
 	@Test.Impl( member = "public String Property.getText(String)", description = "Prints declaration for missing property" )
 	public void getText_PrintsDeclarationForMissingProperty( Test.Case tc ) {
 		// TOGGLE
-		/* */ tc.addMessage( "Manually verified" ); /*
-		tc.addMessage( "SHOULD SEE:" );
-		tc.addMessage( "WARNING: Text not found:" );
-		tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
-		tc.addMessage( "<text name=\"FOO\">Text value</text>" );
-		tc.addMessage( "</class>" );
+		//* */ tc.addMessage( "Manually verified" ); /*
+		//tc.addMessage( "SHOULD SEE:" );
+		//tc.addMessage( "WARNING: Text not found:" );
+		//tc.addMessage( "<class fullname=\"test.core.PropertyTest\">" );
+		//tc.addMessage( "<text name=\"FOO\">Text value</text>" );
+		//tc.addMessage( "</class>" );
 		Property.getText( "FOO" );
-		tc.fail();
+		//tc.fail();
 		// */
 	}
 

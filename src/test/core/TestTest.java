@@ -29,17 +29,17 @@ public class TestTest extends Test.Container{
 	
 	@Test.Impl( member = "Test", description = "Loads correctly" )
 	public void Test_LoadsCorrectly( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( member = "private void Test.addAnnotations(MemberResult)", description = "Can change name of generated method" )
 	public void addAnnotations_CanChangeNameOfGeneratedMethod( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	@Test.Impl( member = "private void Test.addAnnotations(MemberResult)", description = "Description's with; puc-tuation! handled... right?" )
 	public void addAnnotations_DescriptionSWithPucTuationHandledRight( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 	
 	@Test.Impl( member = "public Test(Class)", description = "Fails for containers with illegal constructors" )
@@ -91,7 +91,7 @@ public class TestTest extends Test.Container{
 
 	@Test.Impl( member = "private void Test.evaluateTests()", description = "Handles cases in priority order." )
 	public void evaluateTests_HandlesCasesInPriorityOrder( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
+		//tc.addMessage( "Manually verified" );
 	}
 
 	

@@ -69,7 +69,7 @@ public class TestDecl extends TestIdentifier implements Commented, Printable {
 	//	STUB		description = "${description}" 
 	//	STUB	)
 	//	STUB	public void ${methodName}( Test.Case tc ) {
-	//	STUB		tc.addMessage( "GENERATED STUB" ).fail();
+	//	STUB		tc.addMessage( "GENERATED STUB" ).assertTrue( false );
 	//	STUB	}
 
 	@Override
