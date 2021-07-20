@@ -218,7 +218,7 @@ public class TraceTest extends Test.Container {
 	public void close_ReturnsNonNullWhenDisabled( Test.Case tc ) {
 		Trace.disable();
 		Path path = Trace.close();
-		tc.notNull( path );
+		tc.assertNonNull( path );
 		Trace.enable();
 		this.delete( path );;
 	}
@@ -227,7 +227,7 @@ public class TraceTest extends Test.Container {
 	public void close_ReturnsNonNullWhenEnabled( Test.Case tc ) {
 		Trace.enable();
 		Path path = Trace.close();
-		tc.notNull( path );
+		tc.assertNonNull( path );
 		Trace.enable();
 		this.delete( path );;
 	}

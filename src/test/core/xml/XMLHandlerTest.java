@@ -58,6 +58,7 @@ public class XMLHandlerTest extends Test.Container {
 			super( Adapter.getReader( label ) );
 			this.container = container;
 		}
+		
 
 		@Override public void accept( T result ) { this.result = result; }
 		
@@ -69,6 +70,11 @@ public class XMLHandlerTest extends Test.Container {
 		
 		private void out( Object ... msg ) {
 			if ( !FEEDBACK ) { return; }
+			
+			// REMOVE
+			if ( this.container == null ) {
+				
+			}
 			
 			String message = ">>> " + this.getLocation(); // + " IN " + this.container.getFileLocation();
 			for ( int i = 0; i < msg.length; i++ ) {
@@ -132,12 +138,12 @@ public class XMLHandlerTest extends Test.Container {
 				if ( "child".equals( name ) ) { this.accept( attributes ); }
 			}
 		}.get();
-		tc.notNull( result );
+		tc.assertNonNull( result );
 	}
 	
 	@Test.Impl( member = "public void XMLHandler.startElement(String, String, String, Attributes)", description = "Attributes is not null" )
 	public void startElement_AttributesIsNotNull( Test.Case tc ) {
-		tc.notNull( new Adapter<Object>( "ATTRIBUTE", this ) {
+		tc.assertNonNull( new Adapter<Object>( "ATTRIBUTE", this ) {
 			@Override
 			public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
 				if ( "child".equals( qName ) ) { this.accept( atts ); }
@@ -234,7 +240,7 @@ public class XMLHandlerTest extends Test.Container {
 
 	@Test.Impl( member = "public XMLHandler.Location XMLHandler.getLocation()", description = "Is not null" )
 	public void getLocation_IsNotNull( Test.Case tc ) {
-		tc.notNull( new Adapter<Object>( "LOCATION", this ) {}.getLocation() );
+		tc.assertNonNull( new Adapter<Object>( "LOCATION", this ) {}.getLocation() );
 	}
 
 	@Test.Impl( member = "public XMLHandler.Location XMLHandler.getLocation()", description = "Location is unknown after parsing" )
@@ -509,7 +515,7 @@ public class XMLHandlerTest extends Test.Container {
 		new Adapter<Object>( "ELEMENT", this ) {
 			@Override
 			public void startElement( String name, Map<String, String> attributes ) {
-				tc.notEmpty( name );
+				tc.assertNotEmpty( name );
 			}
 		}.get();
 	}
@@ -519,7 +525,7 @@ public class XMLHandlerTest extends Test.Container {
 		new Adapter<Object>( "ELEMENT", this ) {
 			@Override
 			public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
-				tc.notEmpty( qName );
+				tc.assertNotEmpty( qName );
 			}
 		}.get();
 	}
@@ -529,7 +535,7 @@ public class XMLHandlerTest extends Test.Container {
 		new Adapter<Object>( "ELEMENT", this ) {
 			@Override
 			public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
-				tc.notEmpty( qName );
+				tc.assertNotEmpty( qName );
 			}
 		}.get();
 	}
@@ -549,7 +555,7 @@ public class XMLHandlerTest extends Test.Container {
 		new Adapter<Boolean>( "ELEMENT", this ) {
 			@Override
 			public void endElement( String name ) {
-				tc.notEmpty( name );
+				tc.assertNotEmpty( name );
 			}
 		}.get();
 	}
@@ -568,7 +574,7 @@ public class XMLHandlerTest extends Test.Container {
 		new Adapter<Object>( "ELEMENT", this ) {
 			@Override
 			public void endElement( String uri, String localName, String qName ) throws SAXException {
-				tc.notEmpty( qName );
+				tc.assertNotEmpty( qName );
 			}
 		}.get();
 	}
@@ -596,7 +602,7 @@ public class XMLHandlerTest extends Test.Container {
 	@Test.Impl( member = "public void XMLHandler.setDocumentLocator(Locator)", description = "Parser registers non-null locator" )
 	public void setDocumentLocator_ParserRegistersNonNullLocator( Test.Case tc ) {
 		new Adapter<Object>( "STRUCTURE", this ) {
-			@Override public void setDocumentLocator( Locator locator ) { tc.notNull( locator ); }
+			@Override public void setDocumentLocator( Locator locator ) { tc.assertNonNull( locator ); }
 		};
 	}
 	
@@ -679,7 +685,7 @@ public class XMLHandlerTest extends Test.Container {
 	public void error_TrigeredForChangingFixedAttribute( Test.Case tc ) {
 		// ERR-FIXED	<!DOCTYPE root [ <!ELEMENT root EMPTY> <!ATTLIST root id CDATA #FIXED "42"> ]>
 		// ERR-FIXED	<root id="43" />
-		tc.notNull( new Adapter<SAXException>( "ERR-FIXED", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-FIXED", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}
@@ -687,7 +693,7 @@ public class XMLHandlerTest extends Test.Container {
 	@Test.Impl( member = "public void XMLHandler.error(SAXParseException)", description = "Trigered for missing DTD" )
 	public void error_TrigeredForMissingDtd( Test.Case tc ) {
 		// ERR-NO-DTD	<root></root>
-		tc.notNull( new Adapter<SAXException>( "ERR-NO-DTD", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-NO-DTD", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}
@@ -696,7 +702,7 @@ public class XMLHandlerTest extends Test.Container {
 	public void error_TrigeredWhenElementDoesNotMatchDeclaredType( Test.Case tc ) {
 		// ERR-MISMATCH	<!DOCTYPE root [ <!ELEMENT root (child)*> <!ELEMENT child ANY> ]>
 		// ERR-MISMATCH	<root>Illegal</root>
-		tc.notNull( new Adapter<SAXException>( "ERR-MISMATCH", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-MISMATCH", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}
@@ -705,7 +711,7 @@ public class XMLHandlerTest extends Test.Container {
 	public void error_TrigeredForMissingRequiuredAttribute( Test.Case tc ) {
 		// ERR-REQUIRED	<!DOCTYPE root [ <!ELEMENT root ANY> <!ATTLIST root id CDATA #REQUIRED> ]>
 		// ERR-REQUIRED	<root />
-		tc.notNull( new Adapter<SAXException>( "ERR-REQUIRED", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-REQUIRED", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}
@@ -714,7 +720,7 @@ public class XMLHandlerTest extends Test.Container {
 	public void error_TrigeredForUndeclaredAttributes( Test.Case tc ) {
 		// ERR-UNDECLARED-ATT	<!DOCTYPE root [ <!ELEMENT root ANY> ]>
 		// ERR-UNDECLARED-ATT	<root not="allowed"></root>
-		tc.notNull( new Adapter<SAXException>( "ERR-UNDECLARED-ATT", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-UNDECLARED-ATT", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}
@@ -723,7 +729,7 @@ public class XMLHandlerTest extends Test.Container {
 	public void error_TrigeredForUndeclaredElements( Test.Case tc ) {
 		// ERR-UNDECLARED-ELT	<!DOCTYPE root [ <!ELEMENT root ANY> ]>
 		// ERR-UNDECLARED-ELT	<root><illegal></illegal></root>
-		tc.notNull( new Adapter<SAXException>( "ERR-UNDECLARED-ELT", this ) {
+		tc.assertNonNull( new Adapter<SAXException>( "ERR-UNDECLARED-ELT", this ) {
 			@Override public void error( SAXParseException exception ) { this.accept( exception ); }
 		}.get() );
 	}

@@ -100,7 +100,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_0ADDB51FC( Test.Case tc ) {
-    	tc.notEmpty( this.id.getDescription() );
+    	tc.assertNotEmpty( this.id.getDescription() );
     }
         
     @Test.Impl( 
@@ -178,7 +178,7 @@ public class TestIdentifierTest extends Test.Container {
     	TestIdentifier id;
     	for ( int i = 0; i < 4; i++ ) {
     		id = new TestIdentifier( names[i], descriptions[i] ) {};
-    		tc.notEmpty( id.getKey() );
+    		tc.assertNotEmpty( id.getKey() );
     	}
     }
         
@@ -195,7 +195,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_083C7B53B( Test.Case tc ) {
-    	tc.notEmpty( this.id.getMemberName() );
+    	tc.assertNotEmpty( this.id.getMemberName() );
     }
         
     @Test.Impl( 
@@ -203,7 +203,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_07EEE5B02( Test.Case tc ) {
-    	tc.notEmpty( this.id.getMethodName() );
+    	tc.assertNotEmpty( this.id.getMethodName() );
     }
         
     @Test.Impl( 
@@ -211,7 +211,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_000A913E2( Test.Case tc ) {
-    	tc.notEmpty( this.id.toString() );
+    	tc.assertNotEmpty( this.id.toString() );
     }
 
 	

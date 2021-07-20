@@ -50,7 +50,7 @@ public class CommentedTest extends Test.Container implements Commented {
 
 	@Test.Impl( member = "public Stream Commented.getCommentedLines(String)", description = "Return is not null" )
 	public void getCommentedLines_ReturnIsNotNull( Test.Case tc ) throws IOException {
-		tc.notNull( this.getCommentedLines("Bogus tag") );
+		tc.assertNonNull( this.getCommentedLines("Bogus tag") );
 	}
 
 	@Test.Impl( member = "public Stream Commented.getCommentedLines(String)", description = "Returned line can be empty" )

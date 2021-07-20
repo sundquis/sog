@@ -413,28 +413,6 @@ public class Test {
 		
 		
 		/**
-		 * Only displayed for non-passing cases
-		 * 
-		 * @param message
-		 * 		Failure message
-		 * @return
-		 * 		this Test.Case
-		 */
-		public Test.Case addMessage( String message );
-
-
-		/**
-		 * Type of Throwable that subsequent code is expected to throw
-		 * 
-		 * @param expectedError
-		 * 		Throwable type
-		 * @return
-		 * 		this Test.Case
-		 */
-		public Test.Case expectError( Class<? extends Throwable> expectedError );
-
-
-		/**
 		 * Procedure to call after the current method (in a Test.Container) completes
 		 * Will be called even if the method throws an exception.
 		 * 
@@ -446,13 +424,46 @@ public class Test {
 
 		
 		/**
+		 * Only displayed for non-passing cases. 
+		 * 
+		 * @param message
+		 * 		Failure message
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case addMessage( String message );
+
+
+		/**
+		 * Type of Throwable that subsequent code is expected to throw. The Test.Case
+		 * fails if the expected Throwable is not thrown.
+		 * 
+		 * @param expectedError
+		 * 		Throwable type
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case expectError( Class<? extends Throwable> expectedError );
+
+
+		/**
 		 * Assert that the given object is not null.
 		 * 
 		 * @param obj
 		 * @return
 		 * 		this Test.Case
 		 */
-		public Test.Case notNull( Object obj );
+		public Test.Case assertNonNull( Object obj );
+		
+		/**
+		 * Assert that the given object is null.
+		 * 
+		 * @param obj
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case assertIsNull( Object obj );
+		
 		
 		/**
 		 * Assert that the given string is non-null and not empty
@@ -461,17 +472,7 @@ public class Test {
 		 * @return
 		 * 		this Test.Case
 		 */
-		public Test.Case notEmpty( String s );
-		
-		
-		/**
-		 * Assert that the given object is not null.
-		 * 
-		 * @param obj
-		 * @return
-		 * 		this Test.Case
-		 */
-		public Test.Case isNull( Object obj );
+		public Test.Case assertNotEmpty( String s );
 		
 		
 		/**

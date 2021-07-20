@@ -42,7 +42,7 @@ public class AppTest extends Test.Container {
 		
 		@Test.Impl( member = "public App App.get()", description = "Is not null" )
 		public void get_IsNotNull( Test.Case tc ) {
-			tc.notNull( App.get() );
+			tc.assertNonNull( App.get() );
 		}
 
 		@Test.Impl( member = "public String App.description()", description = "Is not empty" )
@@ -75,7 +75,7 @@ public class AppTest extends Test.Container {
 
 		@Test.Impl( member = "public Path App.root()", description = "Is not null" )
 		public void root_IsNotNull( Test.Case tc ) {
-			tc.notNull( App.get().root() );
+			tc.assertNonNull( App.get().root() );
 		}
 
 		@Test.Impl( member = "public Path App.root()", description = "Is readable" )
@@ -90,7 +90,7 @@ public class AppTest extends Test.Container {
 		
 		@Test.Impl( member = "public String App.description()", description = "Is not null" )
 		public void description_IsNotNull( Test.Case tc ) {
-			tc.notNull( App.get().description() );
+			tc.assertNonNull( App.get().description() );
 		}
 
 		@Test.Impl( member = "public List App.sourceDirs()", description = "Is not empty" )
@@ -100,7 +100,7 @@ public class AppTest extends Test.Container {
 
 		@Test.Impl( member = "public List App.sourceDirs()", description = "Is not null" )
 		public void sourceDirs_IsNotNull( Test.Case tc ) {
-			tc.notNull( App.get().sourceDirs() );
+			tc.assertNonNull( App.get().sourceDirs() );
 		}
 		
 		@Test.Impl( 
@@ -166,7 +166,7 @@ public class AppTest extends Test.Container {
 			member = "public Path App.sourceFile(Class)", 
 			description = "Returns non null" )
 		public void sourceFile_ReturnsNonNull( Test.Case tc ) {
-			tc.notNull( App.get().sourceFile( Property.class ) );
+			tc.assertNonNull( App.get().sourceFile( Property.class ) );
 		}
 					
 		@Test.Impl( 
@@ -234,7 +234,7 @@ public class AppTest extends Test.Container {
 		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns non null" )
 		public void sourceDir_ReturnsNonNull( Test.Case tc ) {
 			Object obj = new Object() {};
-			tc.notNull( App.get().sourceDir( obj.getClass() ) );
+			tc.assertNonNull( App.get().sourceDir( obj.getClass() ) );
 		}
 
 		@Test.Impl( member = "public Path App.sourceDir(Class)", description = "Returns readable" )

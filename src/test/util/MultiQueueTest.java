@@ -200,8 +200,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertTrue( priority.isEmpty() );
 		tc.assertTrue( fifo.isClosed() );
 		tc.assertTrue( priority.isClosed() );
-		tc.isNull( fm.get() );
-		tc.isNull( pm.get() );
+		tc.assertIsNull( fm.get() );
+		tc.assertIsNull( pm.get() );
 	}
 
 	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on closed non empty returns non null" )
@@ -214,8 +214,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertFalse( priority.isEmpty() );
 		tc.assertTrue( fifo.isClosed() );
 		tc.assertTrue( priority.isClosed() );
-		tc.notNull( fm.get() );
-		tc.notNull( pm.get() );
+		tc.assertNonNull( fm.get() );
+		tc.assertNonNull( pm.get() );
 	}
 
 	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on open empty blocks awaiting notification" )
@@ -259,8 +259,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertFalse( priority.isEmpty() );
 		tc.assertTrue( fifo.isOpen() );
 		tc.assertTrue( priority.isOpen() );
-		tc.notNull( fm.get() );
-		tc.notNull( pm.get() );
+		tc.assertNonNull( fm.get() );
+		tc.assertNonNull( pm.get() );
 	}
 
 	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on terminated empty returns null" )
@@ -271,8 +271,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertTrue( priority.isEmpty() );
 		tc.assertTrue( fifo.isTerminated() );
 		tc.assertTrue( priority.isTerminated() );
-		tc.isNull( fm.get() );
-		tc.isNull( pm.get() );
+		tc.assertIsNull( fm.get() );
+		tc.assertIsNull( pm.get() );
 	}
 
 	@Test.Impl( member = "public Object MultiQueue.get()", description = "Get on terminated non empty returns null" )
@@ -285,8 +285,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertFalse( priority.isEmpty() );
 		tc.assertTrue( fifo.isTerminated() );
 		tc.assertTrue( priority.isTerminated() );
-		tc.isNull( fm.get() );
-		tc.isNull( pm.get() );
+		tc.assertIsNull( fm.get() );
+		tc.assertIsNull( pm.get() );
 	}
 
 	@Test.Impl( member = "public boolean MultiQueue.isClosed()", description = "is closed if queue is closed" )
@@ -399,8 +399,8 @@ public class MultiQueueTest extends Test.Container {
 		tc.assertTrue( this.pm.isTerminated() );
 		tc.assertFalse( this.fm.put( "B" ) );
 		tc.assertFalse( this.pm.put( "A" ) );
-		tc.isNull( this.fm.get() );
-		tc.isNull( this.pm.get() );
+		tc.assertIsNull( this.fm.get() );
+		tc.assertIsNull( this.pm.get() );
 	}
 
 	@Test.Impl( member = "public void MultiQueue.close()", description = "Can close if open" )

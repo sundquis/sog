@@ -224,7 +224,7 @@ public class CacheTest extends Test.Container {
 
 	@Test.Impl( member = "public String Cache.toString()", description = "Result is not null" )
 	public void toString_ResultIsNotNull( Test.Case tc ) {
-		tc.notNull( this.cache.toString() );
+		tc.assertNonNull( this.cache.toString() );
 	}
 
 	@Test.Impl( member = "public int Cache.size()", description = "Created empty" )

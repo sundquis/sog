@@ -92,7 +92,6 @@ public enum Policy implements Protection {
 
 	private final int code;
 	
-	@Test.Skip( "No testing required" )
 	private Policy( int code ) {
 		this.code = code;
 	}

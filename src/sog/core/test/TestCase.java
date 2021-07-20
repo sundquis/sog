@@ -47,30 +47,44 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	
 	/***
 	 * A TestCase is created in the OPEN state and remains OPEN until the PASS/FAIL status
-	 * can be determined. This happens in Container code when one of the Tst.Case.assertXXXX() methods is
+	 * can be determined. This happens in Container code when one of the Test.Case.assertXXXX() methods is
 	 * called, directly signaling a pass or fail, or it can happen in TestCase.run() after
 	 * Container code has called Test.Case.expectError().
+	 * 
+	 * When detailed results are displayed using Printable.print(...), the name of the State is used
+	 * to tag the toString() result.
+	 * 
+	 * The Test.Case is considered to have passed if and only if the ending State is PASS.
+	 * 
+	 * The allowed State transitions are:
+	 * 		After State.fail(), the new State must be FAIL.
+	 * 		After State.pass(), if the old State was FAIL it remains FAIL, otherwise the new State is PASS.
 	 */
-	private enum State {
+	public enum State {
+		@Test.Decl( "OPEN cases are test fails" )
 		OPEN { 
-			boolean passed() { return false; } 
-			State pass() { return PASS; }
-			State fail() { return FAIL; }
+			public boolean passed() { return false; } 
+			public State pass() { return PASS; }
+			public State fail() { return FAIL; }
 		},
+
+		@Test.Decl( "PASS cases are test passes" )
 		PASS { 
-			boolean passed() { return true; } 
-			State pass() { return PASS; }
-			State fail() { return FAIL; }
+			public boolean passed() { return true; } 
+			public State pass() { return PASS; }
+			public State fail() { return FAIL; }
 		},
-		FAIL { 
-			boolean passed() { return false; } 
-			State pass() { return FAIL; }
-			State fail() { return FAIL; }
-		};
 		
-		abstract boolean passed();
-		abstract State pass();
-		abstract State fail();
+		@Test.Decl( "FAIL cases are test fails" )
+		FAIL { 
+			public boolean passed() { return false; } 
+			public State pass() { return FAIL; }
+			public State fail() { return FAIL; }
+		};
+
+		public abstract boolean passed();
+		public abstract State pass();
+		public abstract State fail();
 	}
 
 	
@@ -78,61 +92,78 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 * Holds the Method and its corresponding Test.Impl annotation. The label associated
 	 * with this test case is taken from the TestImpl member and description.
 	 */
+	@Test.Decl( "Not null" )
 	private final TestImpl impl;
 	
 	/* The container instance that holds the test Method. */
+	@Test.Decl( "Not null" )
 	private final Test.Container container;
 	
 	/*
 	 * When test failure occurs a message is added to this list. Messages are printed
 	 * if Printable.print() is called to give details.
 	 */
-	private final List<String> messages = new LinkedList<String>();
+	@Test.Decl( "Not null" )
+	private final List<String> messages;
 	
 	/*
 	 * Test implementations that need to trigger an exception can register the expected
 	 * type of exception that is thrown. When an exception is encountered, the type is
 	 * checked against this registered type.
 	 */
-	private Class<? extends Throwable> expectedError = null;
+	@Test.Decl( "Initially null" )
+	private Class<? extends Throwable> expectedError;
 	
 	/* If an unexpected error occurs it is saved for Printable.print() details. */
-	private Throwable unexpectedError = null;
+	@Test.Decl( "Initially null" )
+	private Throwable unexpectedError;
 	
-	/* Guaranteed to be executed after the Method runs. */
-	private Procedure afterThis = Procedure.NOOP;
+	/* 
+	 * Guaranteed to be executed after the Method runs. 
+	 * Initialized as Procedure.NOOP, but Container test methods 
+	 * may specify a custom Procedure using Test.Case.afterThis(...)
+	 */
+	@Test.Decl( "Initially NOOP" )
+	private Procedure afterThis;
 	
 	/*
-	 * A TestCase is created with indeterminate State, indicating that the test method has
+	 * A TestCase is created with OPEN State, indicating that the test method has
 	 * not called pass() or fail(...).
 	 * 
-	 * When fail() is called the state transitions to FAIL regardless of the current state.
+	 * When fail() is called the State transitions to FAIL regardless of the current State.
 	 * 
-	 * When pass() is called, if the current state is not FAIL (state is INDETERMINATE or PASS)
-	 * then the new stat is PASS. If the current state is FAIL, the call to pass() is ignored.
+	 * When pass() is called, if the current State is not FAIL (State is OPEN or PASS)
+	 * then the new State is PASS. If the current State is FAIL, the call to pass() is ignored.
 	 */
-	private State state = State.OPEN;
+	@Test.Decl( "Initially OPEN" )
+	private State state;
 	
 	
 	/* 
 	 * A printable link to the file location of this test case. Filled in by setFileLocation 
-	 * when expectError or one of the assert methods is called.
+	 * when a Container test method calls any Test.Case method.
 	 */
-	private String fileLocation = null;
+	@Test.Decl( "Initially null" )
+	private String fileLocation;
 	
 	/* Total execution time for the test method and test framework monitoring. */
-	private long elapsedTime = 0L;
+	@Test.Decl( "Initially zero" )
+	private long elapsedTime;
 
 	
 	@Test.Decl( "Throws AssertionError for null TestImpl" )
 	@Test.Decl( "Throws AssertionError for null Test.Container" )
-	@Test.Decl( "Marked as passed at creation" )
-	@Test.Decl( "Label includes member name and description" )
-	@Test.Decl( "Created with OPEN State" )
 	public TestCase( TestImpl impl, Test.Container container ) {
 		super( Assert.nonNull( impl ).toString() );
 		this.impl = impl;
 		this.container = Assert.nonNull( container );
+		this.messages = new LinkedList<String>();
+		this.expectedError = null;
+		this.unexpectedError = null;
+		this.afterThis = Procedure.NOOP;
+		this.state = State.OPEN;
+		this.fileLocation = null;
+		this.elapsedTime = 0L;
 	}
 	
 	
@@ -152,26 +183,69 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 * NOTE: Should not be run by multi-threaded workers since Test.Container implementations
 	 * generally will not be thread-safe. BUT: Could be run in a separate thread and monitored 
 	 * for timely termination. In that case the implementation should consult Test.Impl.timeout.
+	 * 
+	 * The execution of a Container test method falls into one of the following categories:
+	 *   + Error in beforeEach: Initialization code generates an error. The Test.Case fails.
+	 *   + No error: Method executes as expected, with no exception. The Test.Case passes or fails, depending on assertions.
+	 *   + Got expected error: Method generates an anticipated exception. The Test.Case passes.
+	 *   + Got wrong error: Method generates an exception but not of the type expected. The Test.Case fails.
+	 *   + Got unexpected error: Method generates an unanticipated exception. The Test.Case fails.
+	 *   + No expected error: Method completes, but an exception was expected. The Test.Case fails.
+	 * 
+	 * Additionally, the finally clause may alter the final status:
+	 *   + Error afterThis: Exception generated by the afterThis Procedure. The Test.Case fails.
+	 *   + Error afterEach: Exception generated by the afterEach Procedure. The Test.Case fails.
 	 */
+	@Test.Decl( "Error in beforeEach: State is FAIL" )
+	@Test.Decl( "Error in beforeEach: elapsedTime recorded" )
+	@Test.Decl( "Error in beforeEach: unexpectedError is not null" )
+	@Test.Decl( "Error in beforeEach: afterThis called" )
+	// Potential issue: afterEach might assume beforeEach completed
+	@Test.Decl( "Error in beforeEach: afterEach called" ) 
+
+	@Test.Decl( "No error: State is PASS if assertion succeeds" )
+	@Test.Decl( "No error: State is FAIL if assertion fails" )
+	@Test.Decl( "No error: elapsedTime recorded" )
+	@Test.Decl( "No error: unexpectedError is null" )
+	@Test.Decl( "No error: afterThis called" )
+	@Test.Decl( "No error: afterEach called" )
+
+	@Test.Decl( "Got expected error: State is PASS" )
+	@Test.Decl( "Got expected error: elapsedTime recorded" )
+	@Test.Decl( "Got expected error: unexpectedError is null" )
+	@Test.Decl( "Got expected error: afterThis called" )
+	@Test.Decl( "Got expected error: afterEach called" )
+	
+	@Test.Decl( "Got wrong error: State is FAIL" )
+	@Test.Decl( "Got wrong error: elapsedTime recorded" )
+	@Test.Decl( "Got wrong error: unexpectedError is not null" )
+	@Test.Decl( "Got wrong error: unexpectedError is different from expected" )
+	@Test.Decl( "Got wrong error: afterThis called" )
+	@Test.Decl( "Got wrong error: afterEach called" )
+	
+	@Test.Decl( "Got unexpected error: State is FAIL" )
+	@Test.Decl( "Got unexpected error: elapsedTime recorded" )
+	@Test.Decl( "Got unexpected error: unexpectedError is not null" )
+	@Test.Decl( "Got unexpected error: afterThis called" )
+	@Test.Decl( "Got unexpected error: afterEach called" )
+	
+	@Test.Decl( "No expected error: State is FAIL" )
+	@Test.Decl( "No expected error: elapsedTime recorded" )
+	@Test.Decl( "No expected error: unexpectedError is null" )
+	@Test.Decl( "No expected error: afterThis called" )
+	@Test.Decl( "No expected error: afterEach called" )
+
+	@Test.Decl( "Error in afterThis: State is FAIL" )
+	@Test.Decl( "Error in afterThis: elapsedTime recorded" )
+	@Test.Decl( "Error in afterThis: unexpectedError is null" )
+	@Test.Decl( "Error in afterThis: afterEach called" )
+
+	@Test.Decl( "Error in afterEach: State is FAIL" )
+	@Test.Decl( "Error in afterEach: elapsedTime recorded" )
+	@Test.Decl( "Error in afterEach: unexpectedError is null" )
+	@Test.Decl( "Error in afterEach: afterThis called" )
+
 	@Override
-	@Test.Decl( "Marks file location of test method" )
-	@Test.Decl( "Graceful exit on an expected error" )
-	@Test.Decl( "Graceful exit on an unexpected error" )
-	@Test.Decl( "Graceful exit on an post processing error" )
-	@Test.Decl( "Test fails if expected error is not thrown" )
-	@Test.Decl( "Test passes if expected error is thrown" )
-	@Test.Decl( "Test fails if unexpected error is thrown" )
-	@Test.Decl( "Test fails if wrong error is thrown" )
-	@Test.Decl( "Message added for no exception when expected" )
-	@Test.Decl( "Message added for wrong exception when expected" )
-	@Test.Decl( "Message added for unexpected exception" )
-	@Test.Decl( "Message added for exception in afterThis" )
-	@Test.Decl( "Message added for exception in afterEach" )
-	@Test.Decl( "afterThis always executed" )
-	@Test.Decl( "afterEach always executed" )
-	@Test.Decl( "Test fails if afterThis throws exception" )
-	@Test.Decl( "Test fails if afterEach throws exception" )
-	@Test.Decl( "elapsedTime greater than zero" )
 	public void run() {
 		long start = System.currentTimeMillis();
 		try {
@@ -209,24 +283,62 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 
 
 	/**
+	 * Mark the current case as failed.
+	 * 
+	 * If a test has multiple parts, the failure of any single part means the Test.Case fails.
+	 * 
+	 * @return
+	 * 		this Test.Case
+	 */
+	@Test.Decl( "The message must not be empty" )
+	@Test.Decl( "The message must not be null" )
+	@Test.Decl( "The message is retained" )
+	@Test.Decl( "If old state is OPEN, new state is FAIL" )
+	@Test.Decl( "If old state is PASS, new state is FAIL" )
+	@Test.Decl( "If old state is FAIL, new state is FAIL" )
+	private void fail( String message ) {
+		this.state = this.state.fail();
+		this.addMessage( message + ": " + this.getFileLocation() );
+	}
+	
+
+	/**
+	 * Mark the current case as passed.
+	 * 
+	 * If a test has multiple parts, all parts must pass for the Test.Case to pass.
+	 * 
+	 * @return
+	 * 		this Test.Case
+	 */
+	@Test.Decl( "If old state is OPEN, new state is PASS" )
+	@Test.Decl( "If old state is PASS, new state is PASS" )
+	@Test.Decl( "If old state is FAIL, new state is FAIL" )
+	private void pass() {
+		this.state = this.state.pass();
+	}
+	
+
+	/**
 	 * When called from a test method in a Test.Container this method will store a printable
 	 * link to the location of the current test case.
 	 * 
 	 * @return
 	 * 		this Test.Case
 	 */
-	public Test.Case setFileLocation() {
+	private String getFileLocation() {
+		Predicate<StackWalker.StackFrame> sfp = 
+			sf -> Test.Container.class.isAssignableFrom( sf.getDeclaringClass() );
+		Function<StackWalker.StackFrame, String> sfm = 
+			sf -> new App.Location( sf ).toString();
+		return this.fileLocation = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
+			s -> s.filter( sfp ).map( sfm ).findFirst().orElse( null )
+		);
+	}
+	
+	private void setFileLocation() {
 		if ( this.fileLocation == null ) {
-			Predicate<StackWalker.StackFrame> sfp = 
-				sf -> Test.Container.class.isAssignableFrom( sf.getDeclaringClass() );
-			Function<StackWalker.StackFrame, String> sfm = 
-				sf -> new App.Location( sf ).toString();
-			this.fileLocation = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
-				s -> s.filter( sfp ).map( sfm ).findFirst().orElse( null )
-			);
+			this.fileLocation = this.getFileLocation();
 		}
-		
-		return this;
 	}
 	
 	
@@ -244,7 +356,9 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Message is included in details." )
 	@Test.Decl( "Return is this" )
 	@Test.Decl( "Does not alter State" )
+	@Test.Decl( "File location is set" )
 	public Case addMessage( String message ) {
+		this.setFileLocation();
 		this.messages.add( Assert.nonEmpty( message ) );
 		return this;
 	}
@@ -260,14 +374,15 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Throws AssertionError for null error" )
 	@Test.Decl( "Return is this" )
-	@Test.Decl( "Does not alter State" )
-	@Test.Decl( "Throws  AssertionError if expected error already set" )
+	@Test.Decl( "File location is set" )
+	@Test.Decl( "Test.Case fails if expected error already set" )
 	public Case expectError( Class<? extends Throwable> expectedError ) {
+		this.setFileLocation();
 		if ( this.expectedError != null ) {
 			this.fail( "expectedError already set" + this.expectedError );
 		}
 		this.expectedError = Assert.nonNull( expectedError );
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
@@ -280,53 +395,15 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 */
 	@Override
 	@Test.Decl( "Throws AssertionError for null procedure" )
-	@Test.Decl( "Default is NOOP" )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "Does not alter State" )
+	@Test.Decl( "File location is set" )
 	public Case afterThis( Procedure afterThis ) {
+		this.setFileLocation();
 		this.afterThis = Assert.nonNull( afterThis );
 		return this;
 	}
 
-	
-
-	/**
-	 * Mark the current case as failed.
-	 * 
-	 * If a test has multiple parts, the failure of any single part means the Test.Case fails.
-	 * 
-	 * @return
-	 * 		this Test.Case
-	 */
-	@Test.Decl( "The message must not be empty" )
-	@Test.Decl( "The message must not be null" )
-	@Test.Decl( "Marks passed case as failed" )
-	@Test.Decl( "Marks failed case as failed" )
-	@Test.Decl( "Marks indeterminate case as failed" )
-	@Test.Decl( "Marks location of failure" )
-	@Test.Decl( "Return is this" )
-	public Test.Case fail( String message ) {
-		this.state = this.state.fail();
-		this.addMessage( message );
-		return this;
-	}
-	
-
-	/**
-	 * Mark the current case as passed.
-	 * 
-	 * If a test has multiple parts, all parts must pass for the Test.Case to pass.
-	 * 
-	 * @return
-	 * 		this Test.Case
-	 */
-	@Test.Decl( "If old State is INDETERMINATE then new state is PASS" )
-	@Test.Decl( "If old State is PASS then new state is PASS" )
-	@Test.Decl( "If old State is FAIL then new state is FAIL" )
-	@Test.Decl( "Return is this" )
-	public Test.Case pass() {
-		this.state = this.state.pass();
-		return this;
-	}
 	
 
 	/**
@@ -339,15 +416,16 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Case fails for null" )
 	@Test.Decl( "Case passes for non-null" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
-	public Case notNull( Object obj ) {
+	@Test.Decl( "File location is set" )
+	public Case assertNonNull( Object obj ) {
+		this.setFileLocation();
 		if ( obj != null ) {
 			this.pass();
 		} else {
-			this.fail( "Expected non-null object" );
+			this.fail( "Expected non-null object but got null" );
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
@@ -361,15 +439,16 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Case fails for null string" )
 	@Test.Decl( "Case fails for empty string" )
 	@Test.Decl( "Case passes for non-empty string" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
-	public Case notEmpty( String s ) {
+	@Test.Decl( "File location is set" )
+	public Case assertNotEmpty( String s ) {
+		this.setFileLocation();
 		if ( s == null || s.isEmpty() ) {
 			this.fail( "Expected non-empty string" );
 		} else {
 			this.pass();
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
@@ -382,15 +461,16 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Case passes for null object" )
 	@Test.Decl( "Case fails for non-null object" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
-	public Case isNull( Object obj ) {
+	@Test.Decl( "File location is set" )
+	public Case assertIsNull( Object obj ) {
+		this.setFileLocation();
 		if ( obj == null ) {
 			this.pass();
 		} else {
 			this.fail( "Expected null, got: " + Strings.toString( obj ) );
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
@@ -403,15 +483,16 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Case passes for true" )
 	@Test.Decl( "Case fails for false" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
 	public Case assertTrue( boolean passIfTrue ) {
+		this.setFileLocation();
 		if ( passIfTrue ) {
 			this.pass();
 		} else {
 			this.fail( "Expected true" );
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
@@ -424,19 +505,20 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Case fails for true" )
 	@Test.Decl( "Case passes for false" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
 	public Case assertFalse( boolean passIfFalse ) {
+		this.setFileLocation();
 		if ( passIfFalse ) {
 			this.fail( "Expected false" );
 		} else {
 			this.pass();
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/**
-	 * Test for equality using Objobject.equals().
+	 * Test for equality using Object.equals().
 	 * If T is a compound type (array or collection) then the components are shallowly tested.
 	 * 
 	 * @param expected
@@ -447,30 +529,28 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Override
 	@Test.Decl( "Test passes for equivalent objects" )
 	@Test.Decl( "Test fails for inequivalent" )
-	@Test.Decl( "Message added on failure" )
 	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
 	public <T> Case assertEqual( T expected, T actual ) {
+		this.setFileLocation();
 		if ( Objects.shallowEquals( expected, actual ) ) {
 			this.pass();
 		} else {
 			this.fail( "Expected: " + Strings.toString( expected ) + ", Got: " + Strings.toString( actual ) );
 		}
-		return this.setFileLocation();
+		return this;
 	}
 
 	/** Total execution time for Method and framework monitoring. */
 	@Override
 	@Test.Decl( "Elapsed time is consistent with execution time" )
-	@Test.Decl( "Set if case fails" )
-	@Test.Decl( "Set after expected exception" )
-	@Test.Decl( "Set after unexpected exception" )
 	public long getElapsedTime() {
 		return this.elapsedTime;
 	}
 
 	/** The total weight of all components if the case passed, otherwise zero. */
 	@Override
-	@Test.Decl( "Return is zero when State is INDETERMINATE" )
+	@Test.Decl( "Return is zero when State is OPEN" )
 	@Test.Decl( "Return is zero when State is FAIL" )
 	@Test.Decl( "Return is Test.Impl.weight when State is PASS" )
 	public int getPassCount() {
@@ -479,8 +559,9 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 
 	/** The total weight of all components if the case failed, otherwise zero. */
 	@Override
-	@Test.Decl( "Zero if case passes" )
-	@Test.Decl( "Equal to Test.Impl.weight if case fails" )
+	@Test.Decl( "Return is Test.Impl.weight when State is OPEN" )
+	@Test.Decl( "Return is Test.Impl.weight when State is FAIL" )
+	@Test.Decl( "Return is zero when State is PASS" )
 	public int getFailCount() {
 		return this.state.passed() ? 0 : this.impl.getWeight();
 	}
@@ -502,12 +583,14 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	 * Implementations first print this instance, then indent for details. 
 	 */
 	@Override
+	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Prints summary line" )
 	@Test.Decl( "Includes file location on failure" )
-	@Test.Decl( "Includes messages on failure" )
+	@Test.Decl( "Includes fail messages on failure" )
+	@Test.Decl( "Includes additional messages on failure" )
 	@Test.Decl( "Includes error information on failure" )
 	public void print( IndentWriter out ) {
-		out.println( this.toString() );
+		Assert.nonNull( out ).println( this.toString() );
 		
 		out.increaseIndent();
 		

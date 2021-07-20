@@ -104,7 +104,7 @@
 	</class>
 	
 	<class fullname="sog.core.test.Policy">
-		<property name="current.policy" value="VERY_STRICT" />
+		<property name="current.policy" value="STRICT" />
 	</class>
 
 </system>

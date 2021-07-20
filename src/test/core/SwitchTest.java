@@ -83,7 +83,7 @@ public class SwitchTest extends Test.Container {
 		member = "public Switch Switch.addCase(Object, Function)", 
 		description = "Returns non null" )
 	public void addCase_ReturnsNonNull( Test.Case tc ) {
-		tc.notNull( this.sw.addCase( State.OPEN, ID ) );
+		tc.assertNonNull( this.sw.addCase( State.OPEN, ID ) );
 	}
 
 	@Test.Impl( 
@@ -115,7 +115,7 @@ public class SwitchTest extends Test.Container {
 		member = "public Switch Switch.addDefault(Function)", 
 		description = "Returns non null" )
 	public void addDefault_ReturnsNonNull( Test.Case tc ) {
-		tc.notNull( this.sw.addDefault( ID ) );
+		tc.assertNonNull( this.sw.addDefault( ID ) );
 	}
 
 	@Test.Impl( 

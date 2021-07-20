@@ -31,7 +31,7 @@ public class XMLTest extends Test.Container {
 
 	@Test.Impl( member = "public XML XML.get()", description = "Is not null" )
 	public void get_IsNotNull( Test.Case tc ) {
-		tc.notNull( XML.get() );
+		tc.assertNonNull( XML.get() );
 	}
 
 	@Test.Impl( member = "public String XML.getDeclaration()", description = "starts correct" )

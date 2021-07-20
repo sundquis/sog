@@ -43,6 +43,7 @@ public abstract class Result implements Printable {
 	 * 
 	 * @param label
 	 */
+	@Test.Decl( "Throws AssertionError for null label" )
 	@Test.Decl( "Throws AssertionError for empty label" )
 	@Test.Decl( "Label is included in the toString() value" )
 	protected Result( String label ) {

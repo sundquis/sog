@@ -19,7 +19,6 @@
 
 package test.sog.core.test;
 
-import sog.core.App;
 import sog.core.Test;
 import sog.core.test.Result;
 import sog.util.IndentWriter;
@@ -37,51 +36,77 @@ public class ResultTest extends Test.Container {
 	static class MyResult extends Result {
 		protected MyResult( String label ) { super( label ); }
 		@Override public long getElapsedTime() { return 1000L; }
-		@Override public int getPassCount() { return 2000; }
-		@Override public int getFailCount() { return 3000; }
+		@Override public int getFailCount() { return 2000; }
+		@Override public int getPassCount() { return 3000; }
 		@Override public void print( IndentWriter out ) {}
 	}
 	
 	
-
-	@Test.Impl( member = "constructor: Result(String)", description = "Label is included in the toString() value" )
-	public void Result_LabelIsIncludedInTheTostringValue( Test.Case tc ) {
+	
+	// TEST CASES
+	
+	
+    @Test.Impl( 
+    	member = "constructor: Result(String)", 
+    	description = "Label is included in the toString() value" 
+    )
+    public void tm_03FCE4C8D( Test.Case tc ) {
 		String label = "LABEL_XXX";
 		MyResult r = new MyResult( label );
 		tc.assertTrue( r.toString().startsWith( label ) );
-	}
-
-    @Test.Impl( member = "constructor: Result(String)", description = "Throws AssertionError for empty label" )
-	public void Result_ThrowsAssertionerrorForEmptyLabel( Test.Case tc ) {
+    }
+        
+    @Test.Impl( 
+    	member = "constructor: Result(String)", 
+    	description = "Throws AssertionError for empty label" 
+    )
+    public void tm_0408E29A2( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
     	new MyResult( "" );
-	}
+    }
+        
+    @Test.Impl( 
+    	member = "constructor: Result(String)", 
+    	description = "Throws AssertionError for null label" 
+    )
+    public void tm_0FF8B7910( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	new MyResult( null );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String Result.toString()", 
+    	description = "Includes elapsed time" 
+    )
+    public void tm_09DDBEA84( Test.Case tc ) {
+    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "1.0s" ) );
+    }
+        
+    @Test.Impl( 
+    	member = "method: String Result.toString()", 
+    	description = "Includes the fail count" 
+    )
+    public void tm_0287CBB6F( Test.Case tc ) {
+    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "2000" ) );
+    }
+        
+    @Test.Impl( 
+    	member = "method: String Result.toString()", 
+    	description = "Includes the pass count" 
+    )
+    public void tm_00E2AA562( Test.Case tc ) {
+    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "3000" ) );
+    }
+        
+    @Test.Impl( 
+    	member = "method: String Result.toString()", 
+    	description = "Includes the total count" 
+    )
+    public void tm_094635D27( Test.Case tc ) {
+    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "5000" ) );
+    }
 
-	@Test.Impl( member = "method: String Result.toString()", description = "Includes elapsed time" )
-	public void toString_IncludesElapsedTime( Test.Case tc ) {
-		MyResult res = new MyResult( "foo" );
-		tc.assertTrue( res.toString().contains( "1.0s" ) );
-	}
 
-	@Test.Impl( member = "method: String Result.toString()", description = "Includes the fail count" )
-	public void toString_IncludesTheFailCount( Test.Case tc ) {
-		MyResult res = new MyResult( "foo" );
-		tc.assertTrue( res.toString().contains( "F = 3000" ) );
-	}
-
-	@Test.Impl( member = "method: String Result.toString()", description = "Includes the pass count" )
-	public void toString_IncludesThePassCount( Test.Case tc ) {
-		MyResult res = new MyResult( "foo" );
-		tc.assertTrue( res.toString().contains( "P = 2000" ) );
-	}
-
-	@Test.Impl( member = "method: String Result.toString()", description = "Includes the total count" )
-	public void toString_IncludesTheTotalCount( Test.Case tc ) {
-		MyResult res = new MyResult( "foo" );
-		tc.assertTrue( res.toString().contains( "Count = 5000" ) );
-	}
-	
-	
 	
 	public static void main( String[] args ) {
 		Test.eval( Result.class );

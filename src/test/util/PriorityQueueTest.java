@@ -66,7 +66,7 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.close();
 		tc.assertTrue( this.queue.isClosed() );
 		tc.assertTrue( this.queue.isEmpty() );
-		tc.isNull( this.queue.get() );
+		tc.assertIsNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected Comparable PriorityQueue.getImpl()", description = "Get on closed non empty returns non null" )
@@ -75,14 +75,14 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.close();
 		tc.assertTrue( this.queue.isClosed() );
 		tc.assertFalse( this.queue.isEmpty() );
-		tc.notNull( this.queue.get() );
+		tc.assertNonNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected Comparable PriorityQueue.getImpl()", description = "Get on open empty returns null" )
 	public void getImpl_GetOnOpenEmptyReturnsNull( Test.Case tc ) {
 		tc.assertTrue( this.queue.isOpen() );
 		tc.assertTrue( this.queue.isEmpty() );
-		tc.isNull( this.queue.get() );
+		tc.assertIsNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected Comparable PriorityQueue.getImpl()", description = "Get on open non empty returns non null" )
@@ -90,7 +90,7 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.put( "A" );
 		tc.assertTrue( this.queue.isOpen() );
 		tc.assertFalse( this.queue.isEmpty() );
-		tc.notNull( this.queue.get() );
+		tc.assertNonNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected Comparable PriorityQueue.getImpl()", description = "Get on terminated empty returns null" )
@@ -98,7 +98,7 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
 		tc.assertTrue( this.queue.isEmpty() );
-		tc.isNull( this.queue.get() );
+		tc.assertIsNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected Comparable PriorityQueue.getImpl()", description = "Get on terminated non empty returns null" )
@@ -107,7 +107,7 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
 		tc.assertFalse( this.queue.isEmpty() );
-		tc.isNull( this.queue.get() );
+		tc.assertIsNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "protected boolean PriorityQueue.putImpl(Comparable)", description = "Put on closed is ignored" )
@@ -131,7 +131,7 @@ public class PriorityQueueTest extends Test.Container {
 		this.queue.terminate();
 		tc.assertTrue( this.queue.isTerminated() );
 		tc.assertFalse( this.queue.put( "A" ) );
-		tc.isNull( this.queue.get() );
+		tc.assertIsNull( this.queue.get() );
 	}
 
 	@Test.Impl( member = "public PriorityQueue()", description = "Can be created empty" )
