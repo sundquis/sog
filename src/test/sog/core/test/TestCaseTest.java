@@ -23,10 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import sog.core.Assert;
 import sog.core.Procedure;
 import sog.core.Strings;
 import sog.core.Test;
@@ -76,8 +78,11 @@ public class TestCaseTest extends Test.Container {
 	public TestCase getCase( String name ) {
 		return new TestCase( this.TEST_IMPLS.get( name ), this.container );
 	}
-
 	
+	public String getFileLocation() {
+		return this.getSubjectField( this.noop, "fileLocation", "" );
+	}
+
 	public static class MyContainer extends Test.Container {
 		
 		public static final String MEMBER_NAME = "This is the member name";
@@ -303,11 +308,9 @@ public class TestCaseTest extends Test.Container {
     	description = "File location is set" 
     )
     public void tm_0A4F69A10( Test.Case tc ) {
-    	String fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     	this.noop.addMessage( "Hi" );
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertNonNull( fileLocation );
+    	tc.assertNonNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -383,11 +386,9 @@ public class TestCaseTest extends Test.Container {
     	description = "File location is set" 
     )
     public void tm_0CFA62742( Test.Case tc ) {
-    	String fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     	this.noop.afterThis( () -> {} );
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertNonNull( fileLocation );
+    	tc.assertNonNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -412,11 +413,9 @@ public class TestCaseTest extends Test.Container {
     	description = "File location is set" 
     )
     public void tm_08D3ED115( Test.Case tc ) {
-    	String fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     	this.noop.assertEqual( "A", "B" );
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertNonNull( fileLocation );
+    	tc.assertNonNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -472,11 +471,9 @@ public class TestCaseTest extends Test.Container {
     	description = "File location is set" 
     )
     public void tm_086BBAB1A( Test.Case tc ) {
-    	String fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     	this.noop.assertFalse( false );
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertNonNull( fileLocation );
+    	tc.assertNonNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -510,11 +507,9 @@ public class TestCaseTest extends Test.Container {
     	description = "File location is set" 
     )
     public void tm_00032EECD( Test.Case tc ) {
-    	String fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     	this.noop.assertIsNull( "" );
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", "" );
-    	tc.assertNonNull( fileLocation );
+    	tc.assertNonNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -530,152 +525,170 @@ public class TestCaseTest extends Test.Container {
     	description = "Case fails for null" 
     )
     public void tm_0FE31D5E0( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	this.noop.assertNonNull( null );
+    	tc.assertTrue( this.noop.getFailCount() > 0 );
     }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-        	description = "Case passes for non-null" 
-        )
-        public void tm_0E1846FBE( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNonNull(Object)", 
+    	description = "Case passes for non-null" 
+    )
+    public void tm_0E1846FBE( Test.Case tc ) {
+    	this.noop.assertNonNull( "hi" );
+    	tc.assertTrue( this.noop.getPassCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-        	description = "File location is set" 
-        )
-        public void tm_0D6483642( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNonNull(Object)", 
+    	description = "File location is set" 
+    )
+    public void tm_0D6483642( Test.Case tc ) {
+    	tc.assertIsNull( this.getFileLocation() );
+    	this.noop.assertNonNull( "" );
+    	tc.assertNonNull( this.getFileLocation() );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-        	description = "Return is this" 
-        )
-        public void tm_07E07E553( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNonNull(Object)", 
+    	description = "Return is this" 
+    )
+    public void tm_07E07E553( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.assertNonNull( "hi" ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-        	description = "Case fails for empty string" 
-        )
-        public void tm_07F303449( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
+    	description = "Case fails for empty string" 
+    )
+    public void tm_07F303449( Test.Case tc ) {
+    	this.noop.assertNotEmpty( "" );
+    	tc.assertTrue( this.noop.getFailCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-        	description = "Case fails for null string" 
-        )
-        public void tm_0A6C47EFB( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
+    	description = "Case fails for null string" 
+    )
+    public void tm_0A6C47EFB( Test.Case tc ) {
+    	this.noop.assertNotEmpty( null );
+    	tc.assertTrue( this.noop.getFailCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-        	description = "Case passes for non-empty string" 
-        )
-        public void tm_095428DCF( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
+    	description = "Case passes for non-empty string" 
+    )
+    public void tm_095428DCF( Test.Case tc ) {
+    	this.noop.assertNotEmpty( "hi" );
+    	tc.assertTrue( this.noop.getPassCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-        	description = "File location is set" 
-        )
-        public void tm_0742FACD6( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
+    	description = "File location is set" 
+    )
+    public void tm_0742FACD6( Test.Case tc ) {
+    	tc.assertIsNull( this.getFileLocation() );
+    	this.noop.assertNotEmpty( "hi" );
+    	tc.assertNonNull( this.getFileLocation() );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-        	description = "Return is this" 
-        )
-        public void tm_0A220DAE7( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
+    	description = "Return is this" 
+    )
+    public void tm_0A220DAE7( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.assertNotEmpty( "" ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-        	description = "Case fails for false" 
-        )
-        public void tm_0A7538BBB( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertTrue(boolean)", 
+    	description = "Case fails for false" 
+    )
+    public void tm_0A7538BBB( Test.Case tc ) {
+    	this.noop.assertTrue( false );
+    	tc.assertTrue( this.noop.getFailCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-        	description = "Case passes for true" 
-        )
-        public void tm_0D709B1C0( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertTrue(boolean)", 
+    	description = "Case passes for true" 
+    )
+    public void tm_0D709B1C0( Test.Case tc ) {
+    	this.noop.assertTrue( true );
+    	tc.assertTrue( this.noop.getPassCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-        	description = "File location is set" 
-        )
-        public void tm_07EE17EFD( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertTrue(boolean)", 
+    	description = "File location is set" 
+    )
+    public void tm_07EE17EFD( Test.Case tc ) {
+    	tc.assertIsNull( this.getFileLocation() );
+    	this.noop.assertTrue( true );
+    	tc.assertNonNull( this.getFileLocation() );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-        	description = "Return is this" 
-        )
-        public void tm_04289164E( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertTrue(boolean)", 
+    	description = "Return is this" 
+    )
+    public void tm_04289164E( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.assertTrue( true ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.expectError(Class)", 
-        	description = "File location is set" 
-        )
-        public void tm_0F32873BC( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.expectError(Class)", 
+    	description = "File location is set" 
+    )
+    public void tm_0F32873BC( Test.Case tc ) {
+    	tc.assertIsNull( this.getFileLocation() );
+    	this.noop.expectError( Error.class );
+    	tc.assertNonNull( this.getFileLocation() );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.expectError(Class)", 
-        	description = "Return is this" 
-        )
-        public void tm_0E15A464D( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.expectError(Class)", 
+    	description = "Return is this" 
+    )
+    public void tm_0E15A464D( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.expectError( Error.class ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.expectError(Class)", 
-        	description = "Test.Case fails if expected error already set" 
-        )
-        public void tm_06699588B( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.expectError(Class)", 
+    	description = "Test.Case fails if expected error already set" 
+    )
+    public void tm_06699588B( Test.Case tc ) {
+    	this.noop.expectError( Error.class );
+    	this.noop.expectError( Error.class );
+    	tc.assertTrue( this.noop.getFailCount() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.expectError(Class)", 
-        	description = "Throws AssertionError for null error" 
-        )
-        public void tm_0C09C3B16( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.expectError(Class)", 
+    	description = "Throws AssertionError for null error" 
+    )
+    public void tm_0C09C3B16( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	this.noop.expectError( null );
+    }
         
-        @Test.Impl( 
-        	member = "method: Test.Case TestCase.getTestCase()", 
-        	description = "Physically equal to this" 
-        )
-        public void tm_00096BC01( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.getTestCase()", 
+    	description = "Physically equal to this" 
+    )
+    public void tm_00096BC01( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.getTestCase() );
+    }
         
-        @Test.Impl( 
-        	member = "method: boolean TestCase.equals(Object)", 
-        	description = "If compareTo not zero then not equal" 
-        )
-        public void tm_010BB0742( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: boolean TestCase.equals(Object)", 
+    	description = "If compareTo not zero then not equal" 
+    )
+    public void tm_010BB0742( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
         
         @Test.Impl( 
         	member = "method: boolean TestCase.equals(Object)", 
