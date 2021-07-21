@@ -15,7 +15,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import sog.util.IndentWriter;
 import sog.core.test.TestResult;
@@ -236,7 +240,15 @@ import sog.core.test.TestResultSet;
  * 
  * 		
  */
+@Test.Subject( "test." )
 public class Test {
+	
+	/**
+	 * Not intended to be instantiated.
+	 * 
+	 * The class defines the components of the testing framework.
+	 */
+	private Test() {}
 	
 	
 	/**
@@ -310,32 +322,49 @@ public class Test {
 	public static abstract class Container {
 		
 		private final Class<?> subjectClass;
-		
+
+		@Test.Decl( "Throws AssertionError for null subject" )
 		protected Container( Class<?> subjectClass ) {
-			this.subjectClass = subjectClass;
+			this.subjectClass = Assert.nonNull( subjectClass );
 		}
 		
 		/** The named class must be annotated as a subject naming this Test.Container */
+		@Test.Decl( "Return is not null" )
+		@Test.Decl( "Value is consistent with constructed value" )
 		public Class<?> getSubjectClass() {
 			return this.subjectClass;
 		}
 		
 		/** The procedure to be called before each method invocation. */
+		@Test.Decl( "Default is NOOP" )
 		public Procedure beforeEach() {
 			return Procedure.NOOP;
 		}
 		
 		/** The procedure to be called after each method invocation. */
+		@Test.Decl( "Default is NOOP" )
 		public Procedure afterEach() {
 			return Procedure.NOOP;
 		}
 		
 		/** The procedure to be called after all method invocations have completed. */
+		@Test.Decl( "Default is NOOP" )
 		public Procedure afterAll() {
 			return Procedure.NOOP;
 		}
 
 		/** Set the value of a subject's field. */
+		@Test.Decl( "Throws AppExcpetion for null subject and non-static field" )
+		@Test.Decl( "Throws AssertionEror for null field name" )
+		@Test.Decl( "Throws AssertionEror for empty field name" )
+		@Test.Decl( "Sets public instance values" )
+		@Test.Decl( "Sets protected instance values" )
+		@Test.Decl( "Sets package instance values" )
+		@Test.Decl( "Sets private instance values" )
+		@Test.Decl( "Sets public static values" )
+		@Test.Decl( "Sets protected static values" )
+		@Test.Decl( "Sets package static values" )
+		@Test.Decl( "Sets private static values" )
 		public void setSubjectField( Object subject, String fieldName, Object fieldValue ) {
 			try {
 				Field field = this.getSubjectClass().getDeclaredField( fieldName );
@@ -348,6 +377,18 @@ public class Test {
 
 		/** Retrieve the value of a subject's field. */
 		@SuppressWarnings("unchecked")
+		@Test.Decl( "Throws AppExcpetion for null subject and non-static field" )
+		@Test.Decl( "Throws AssertionEror for null field name" )
+		@Test.Decl( "Throws AssertionEror for empty field name" )
+		@Test.Decl( "Throws ??Exception for wrong witness type" )
+		@Test.Decl( "Gets public instance values" )
+		@Test.Decl( "Gets protected instance values" )
+		@Test.Decl( "Gets package instance values" )
+		@Test.Decl( "Gets private instance values" )
+		@Test.Decl( "Gets public static values" )
+		@Test.Decl( "Gets protected static values" )
+		@Test.Decl( "Gets package static values" )
+		@Test.Decl( "Gets private static values" )
 		public <T> T getSubjectField( Object subject, String fieldName, T witness ) {
 			T result = null;
 			try {
@@ -360,18 +401,71 @@ public class Test {
 			return result;
 		}
 		
-		/** Calling location in a concrete Container. */
-		public String getFileLocation() {
-			Predicate<StackWalker.StackFrame> sfp = sf -> 
-				Test.Container.class.isAssignableFrom( sf.getDeclaringClass() ) 
-				&& !sf.getDeclaringClass().equals( Test.Container.class );
-			StackWalker.StackFrame sf = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
-				s -> s.filter( sfp ).findFirst().orElse( null )
-			);
+		@SuppressWarnings( "unchecked" )
+		@Test.Decl( "Throws NullPointerExcpetion for null subject and non-static method" )
+		@Test.Decl( "Throws AssertionEror for null method name" )
+		@Test.Decl( "Throws AssertionEror for empty method name" )
+		@Test.Decl( "Throws AppException for no matching method" )
+		@Test.Decl( "Throws ClassCastException for wrong witness type" )
+		@Test.Decl( "Evaluates public instance methods" )
+		@Test.Decl( "Evaluates protected instance methods" )
+		@Test.Decl( "Evaluates package instance methods" )
+		@Test.Decl( "Evaluates private instance methods" )
+		@Test.Decl( "Evaluates public static methods" )
+		@Test.Decl( "Evaluates protected static methods" )
+		@Test.Decl( "Evaluates package static methods" )
+		@Test.Decl( "Evaluates private static methods" )
+		@Test.Decl( "Evaluates no-arg instance methods" )
+		@Test.Decl( "Evaluates no-arg static methods" )
+		@Test.Decl( "Evaluates instance methods with object arguments" )
+		@Test.Decl( "Evaluates instance methods with primitive arguments" )
+		@Test.Decl( "Evaluates instance methods with mixed arguments" )
+		@Test.Decl( "Evaluates static methods with object arguments" )
+		@Test.Decl( "Evaluates static methods with primitive arguments" )
+		@Test.Decl( "Evaluates static methods with mixed arguments" )
+		@Test.Decl( "Evaluates overloaded instance methods" )
+		@Test.Decl( "Evaluates overloaded static methods" )
+		public <T> T evalSubjectMethod( Object subject, String methodName, T returnWitness, Object... args ) {
+			Assert.nonEmpty( methodName );
+			Assert.nonNull( args );
 			
-			return sf == null ? "UNKNOWN" : new App.Location( sf ).toString();
+			Iterator<Method> methods = Stream.of( this.getSubjectClass().getDeclaredMethods() )
+				.filter( m -> m.getName().equals( methodName ) )
+				.filter( m -> m.getParameterCount() == args.length )
+				.iterator();
+
+			boolean searching = true;
+			Method method = null;
+			T result = null;
+			
+			// Need to better understand reflecting for methods by parameter types...
+			// This looks for the first matching, which might not be the most specific match
+			while ( searching && methods.hasNext() ) {
+				method = methods.next();
+				method.setAccessible( true );
+				try {
+					result = (T) method.invoke( subject, args );
+					searching = false;
+				} catch ( IllegalAccessException | IllegalArgumentException e ) {
+				} catch ( InvocationTargetException e ) {
+					// this means we found and executed a method, but it raised an exception
+					Throwable t = e.getCause();
+					if ( t instanceof Error ) {
+						throw (Error) t;
+					} else {
+						throw new AppException( t );
+					}
+				}
+			}
+			
+			if ( searching ) {
+				throw new AppException( "No matching method: " + methodName );
+			}
+						
+			return result;
 		}
 		
+
 	}
 	
 	
@@ -511,16 +605,19 @@ public class Test {
 	
 	
 	/** Convenience method to evaluate and print results for one subject class */
+	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
 		TestResult.forSubject( subjectClass ).print( new IndentWriter( System.err ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */
+	@Test.Skip( "FIXME" )
 	public static void eval() {
 		Test.eval( App.get().getCallingClass( 2 ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the package containing the given subject */
+	@Test.Skip( "FIXME" )
 	public static void evalPackage( Class<?> subjectClass ) {
 		TestResultSet.testPackage( subjectClass );
 	}

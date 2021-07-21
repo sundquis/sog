@@ -244,6 +244,14 @@ public class App implements Runnable {
 	}
 	
 	
+	public String getCallingMethod( int offset ) {
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
+			s -> s.skip( offset ).findFirst().get()
+		).getMethodName();
+	}
+	
+	
+	
 	
 	// FIXME: Convert to proper testing
 	public static class Inner {

@@ -23,11 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Procedure;
 import sog.core.Strings;
@@ -76,21 +78,37 @@ public class TestCaseTest extends Test.Container {
 	}
 	
 	public TestCase getCase( String name ) {
+		return this.getTimed( name, 0L );
+	}
+	
+	public TestCase getTimed( String name, long time ) {
+		TestCaseTest.setTime( name, time );
 		return new TestCase( this.TEST_IMPLS.get( name ), this.container );
 	}
 	
 	public String getFileLocation() {
 		return this.getSubjectField( this.noop, "fileLocation", "" );
 	}
+	
+	public long getElapsedTime( TestCase tc ) {
+		return this.getSubjectField( tc, "elapsedTime", 0L );
+	}
+	
+	
+	public static final Map<String, Long> TEST_CASE_TIMES = new TreeMap<>();
+	
+	public static void setTime( String name, Long time ) { TEST_CASE_TIMES.put( name, time ); }
+	
+	public static long getTime( String name ) { return TEST_CASE_TIMES.get( name ); }
 
 	public static class MyContainer extends Test.Container {
 		
 		public static final String MEMBER_NAME = "This is the member name";
-		public static final String DESCRIPTION = "This is the descriptoin";
+		public static final String DESCRIPTION = "This is the description";
 		public static final int WEIGHT = 123;
 		public static final int PRIORITY = 7;
 		public static final long TIMEOUT = 57L;
-
+		
 		public MyContainer() { super( TestCase.class ); }
 		
 		@Test.Impl( member = MEMBER_NAME, description = DESCRIPTION, weight = WEIGHT, priority = PRIORITY, timeout = TIMEOUT )
@@ -104,7 +122,27 @@ public class TestCaseTest extends Test.Container {
 		
 		@Test.Impl( member = "member", description = "description" )
 		public void failMethod( Test.Case tc ) { tc.assertTrue( false  ); }
-				
+
+		@Test.Impl( member = "A", description = "D", priority = 0 ) public void ordered0() {}
+		@Test.Impl( member = "A", description = "D", priority = 1 ) public void ordered1() {}
+		@Test.Impl( member = "B", description = "D", priority = 0 ) public void ordered2() {}
+		@Test.Impl( member = "A", description = "E", priority = 0 ) public void ordered3() {}
+		@Test.Impl( member = "A", description = "D", priority = 0 ) public void ordered4() {}
+		
+		@Test.Impl( member = "member", description = "description" )
+		private void sleep() {
+			try {
+				Thread.sleep( TestCaseTest.getTime( App.get().getCallingMethod( 2 ) ) );
+			} catch ( InterruptedException e1 ) {
+			}
+		}
+		
+		@Test.Impl( member = "member", description = "description" )
+		public void noErrorPASS( Test.Case tc ) { 
+			this.sleep();
+			tc.addMessage( "No errors, passes" ).assertTrue( true ); 
+		}
+						
 	}
 	
 	
@@ -684,219 +722,335 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean TestCase.equals(Object)", 
-    	description = "If compareTo not zero then not equal" 
+    	description = "If compareTo not zero then not equal",
+    	weight = 4
     )
     public void tm_010BB0742( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	TestCase tc1, tc2;
+    	// IF NOT tc1.compareTo( tc2 ) == 0 THEN NOT tc1.equals( tc2 )
+    	// tc1.compareTo( tc2 ) == 0  OR  ! tc1.equals( tc2 )
+
+    	// Same priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered4" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) == 0 || !tc1.equals( tc2 ) );
+    	
+    	// Same priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) == 0 || !tc1.equals( tc2 ) );
+    	
+    	// Diff priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered1" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) == 0 || !tc1.equals( tc2 ) );
+    	
+    	// Diff priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered1" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) == 0 || !tc1.equals( tc2 ) );
     }
         
-        @Test.Impl( 
-        	member = "method: boolean TestCase.equals(Object)", 
-        	description = "If compareTo zero then equal" 
-        )
-        public void tm_0130B2F9C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: boolean TestCase.equals(Object)", 
+    	description = "If compareTo zero then equal",
+    	weight = 4
+    )
+    public void tm_0130B2F9C( Test.Case tc ) {
+    	TestCase tc1, tc2;
+    	// IF tc1.compareTo( tc2 ) == 0 THEN tc1.equals( tc2 )
+    	// tc1.compareTo( tc2 ) != 0  OR  tc1.equals( tc2 )
+
+    	// Same priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered4" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) != 0 || tc1.equals( tc2 ) );
+    	
+    	// Same priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) != 0 || tc1.equals( tc2 ) );
+    	
+    	// Diff priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered1" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) != 0 || tc1.equals( tc2 ) );
+    	
+    	// Diff priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered1" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) != 0 || tc1.equals( tc2 ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.compareTo(TestCase)", 
-        	description = "For equal priority and member ordered by description" 
-        )
-        public void tm_0EC4EAD2D( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.compareTo(TestCase)", 
+    	description = "For equal priority and member ordered by description" 
+    )
+    public void tm_0EC4EAD2D( Test.Case tc ) {
+    	TestCase tc1 = this.getCase( "ordered0" );
+    	TestCase tc2 = this.getCase( "ordered3" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) < 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.compareTo(TestCase)", 
-        	description = "For equal priority ordered by member" 
-        )
-        public void tm_0864954FA( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.compareTo(TestCase)", 
+    	description = "For equal priority ordered by member" 
+    )
+    public void tm_0864954FA( Test.Case tc ) {
+    	TestCase tc1 = this.getCase( "ordered0" );
+    	TestCase tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) < 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.compareTo(TestCase)", 
-        	description = "Respects Test.Impl.priority" 
-        )
-        public void tm_0DF73B7DC( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.compareTo(TestCase)", 
+    	description = "Respects Test.Impl.priority" 
+    )
+    public void tm_0DF73B7DC( Test.Case tc ) {
+    	TestCase tc1 = this.getCase( "ordered0" );
+    	TestCase tc2 = this.getCase( "ordered1" );
+    	tc.assertTrue( tc1.compareTo( tc2 ) < 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getFailCount()", 
-        	description = "Return is Test.Impl.weight when State is FAIL" 
-        )
-        public void tm_069B1FAD1( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getFailCount()", 
+    	description = "Return is Test.Impl.weight when State is FAIL" 
+    )
+    public void tm_069B1FAD1( Test.Case tc ) {
+    	this.noop.assertTrue( false );
+    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( MyContainer.WEIGHT, this.noop.getFailCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getFailCount()", 
-        	description = "Return is Test.Impl.weight when State is OPEN" 
-        )
-        public void tm_079DF2EFD( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getFailCount()", 
+    	description = "Return is Test.Impl.weight when State is OPEN" 
+    )
+    public void tm_079DF2EFD( Test.Case tc ) {
+    	tc.assertEqual( TestCase.State.OPEN, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( MyContainer.WEIGHT, this.noop.getFailCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getFailCount()", 
-        	description = "Return is zero when State is PASS" 
-        )
-        public void tm_0EAD20B46( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getFailCount()", 
+    	description = "Return is zero when State is PASS" 
+    )
+    public void tm_0EAD20B46( Test.Case tc ) {
+    	this.noop.assertTrue( true );
+    	tc.assertEqual( TestCase.State.PASS, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( 0, this.noop.getFailCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getPassCount()", 
-        	description = "Return is Test.Impl.weight when State is PASS" 
-        )
-        public void tm_044F4FD71( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getPassCount()", 
+    	description = "Return is Test.Impl.weight when State is PASS" 
+    )
+    public void tm_044F4FD71( Test.Case tc ) {
+    	this.noop.assertTrue( true );
+    	tc.assertEqual( TestCase.State.PASS, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( MyContainer.WEIGHT, this.noop.getPassCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getPassCount()", 
-        	description = "Return is zero when State is FAIL" 
-        )
-        public void tm_07E275100( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getPassCount()", 
+    	description = "Return is zero when State is FAIL" 
+    )
+    public void tm_07E275100( Test.Case tc ) {
+    	this.noop.assertTrue( false );
+    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( 0, this.noop.getPassCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.getPassCount()", 
-        	description = "Return is zero when State is OPEN" 
-        )
-        public void tm_08E54852C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.getPassCount()", 
+    	description = "Return is zero when State is OPEN" 
+    )
+    public void tm_08E54852C( Test.Case tc ) {
+    	tc.assertEqual( TestCase.State.OPEN, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( 0, this.noop.getPassCount() );
+    }
         
-        @Test.Impl( 
-        	member = "method: int TestCase.hashCode()", 
-        	description = "If equal then same hashCode" 
-        )
-        public void tm_08B7DB543( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: int TestCase.hashCode()", 
+    	description = "If equal then same hashCode",
+    	weight = 4
+    )
+    public void tm_08B7DB543( Test.Case tc ) {
+    	TestCase tc1, tc2;
+    	// IF tc1.equals( tc2 ) THEN tc1.hashCode == tc2.hashCode( tc2 )
+    	// !tc1.equals( tc2 ) OR tc1.hashCode == tc2.hashCode( tc2 )
+
+    	// Same priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered4" );
+    	tc.assertTrue( !tc1.equals( tc2 ) || tc1.hashCode() == tc2.hashCode() );
+    	
+    	// Same priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( !tc1.equals( tc2 ) || tc1.hashCode() == tc2.hashCode() );
+    	
+    	// Diff priority, same (member, desc)
+    	tc1 = this.getCase( "ordered0" );
+    	tc2 = this.getCase( "ordered1" );
+    	tc.assertTrue( !tc1.equals( tc2 ) || tc1.hashCode() == tc2.hashCode() );
+    	
+    	// Diff priority, diff (member, desc)
+    	tc1 = this.getCase( "ordered1" );
+    	tc2 = this.getCase( "ordered2" );
+    	tc.assertTrue( !tc1.equals( tc2 ) || tc1.hashCode() == tc2.hashCode() );
+    }
         
-        @Test.Impl( 
-        	member = "method: long TestCase.getElapsedTime()", 
-        	description = "Elapsed time is consistent with execution time" 
-        )
-        public void tm_0F6E3A253( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: long TestCase.getElapsedTime()", 
+    	description = "Elapsed time is consistent with execution time" 
+    )
+    public void tm_0F6E3A253( Test.Case tc ) {
+    	TestCase timed = this.getTimed( "noErrorPASS", 5L );
+    	timed.run();
+    	tc.assertTrue( this.getElapsedTime( timed ) >= 5L );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "If old state is FAIL, new state is FAIL" 
-        )
-        public void tm_0EBA3BDE5( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "If old state is FAIL, new state is FAIL"
+    )
+    public void tm_0EBA3BDE5( Test.Case tc ) {
+    	this.noop.assertTrue( false );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "If old state is OPEN, new state is FAIL" 
-        )
-        public void tm_039B2E239( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "If old state is OPEN, new state is FAIL" 
+    )
+    public void tm_039B2E239( Test.Case tc ) {
+    	tc.assertEqual( TestCase.State.OPEN, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "If old state is PASS, new state is FAIL" 
-        )
-        public void tm_0A91ED6D2( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "If old state is PASS, new state is FAIL" 
+    )
+    public void tm_0A91ED6D2( Test.Case tc ) {
+    	this.noop.assertTrue( true );
+    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "The message is retained" 
-        )
-        public void tm_0C8BE02CF( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "The message is retained" 
+    )
+    public void tm_0C8BE02CF( Test.Case tc ) {
+    	tc.assertEqual( List.of(), this.container.getSubjectField( this.noop, "messages", null ) );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
+    	List<String> msgs = null;
+    	msgs = this.container.getSubjectField( this.noop, "messages", null );
+    	tc.assertTrue( msgs.size() > 0 );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "The message must not be empty" 
-        )
-        public void tm_0CCE2B4C9( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "The message must not be empty" 
+    )
+    public void tm_0CCE2B4C9( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, "" );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.fail(String)", 
-        	description = "The message must not be null" 
-        )
-        public void tm_0A2C96DE1( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.fail(String)", 
+    	description = "The message must not be null" 
+    )
+    public void tm_0A2C96DE1( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	this.container.evalSubjectMethod( this.noop, "fail", null, new Object[] {null} );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.pass()", 
-        	description = "If old state is FAIL, new state is FAIL" 
-        )
-        public void tm_03BA40429( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.pass()", 
+    	description = "If old state is FAIL, new state is FAIL" 
+    )
+    public void tm_03BA40429( Test.Case tc ) {
+    	this.noop.assertTrue( false );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "pass", null );
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.pass()", 
-        	description = "If old state is OPEN, new state is PASS" 
-        )
-        public void tm_09AC844B0( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.pass()", 
+    	description = "If old state is OPEN, new state is PASS" 
+    )
+    public void tm_09AC844B0( Test.Case tc ) {
+    	tc.assertEqual( TestCase.State.OPEN, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "pass", null );
+    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.pass()", 
-        	description = "If old state is PASS, new state is PASS" 
-        )
-        public void tm_00A343949( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.pass()", 
+    	description = "If old state is PASS, new state is PASS" 
+    )
+    public void tm_00A343949( Test.Case tc ) {
+    	this.noop.assertTrue( true );
+    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	this.container.evalSubjectMethod( this.noop, "pass", null );
+    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Includes additional messages on failure" 
-        )
-        public void tm_06503EAF3( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.print(IndentWriter)", 
+    	description = "Includes additional messages on failure" 
+    )
+    public void tm_06503EAF3( Test.Case tc ) {
+    	this.noop.addMessage( "ONE" ).addMessage( "TWO" ).assertTrue( false ).addMessage( "THREE" );
+    	StringOutputStream sos = new StringOutputStream();
+    	this.noop.print( new IndentWriter( sos ) );
+    	tc.assertTrue( sos.toString().contains( "ONE" ) );
+    	tc.assertTrue( sos.toString().contains( "TWO" ) );
+    	tc.assertTrue( sos.toString().contains( "THREE" ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Includes error information on failure" 
-        )
-        public void tm_0F3370A64( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.print(IndentWriter)", 
+    	description = "Includes fail messages on failure" 
+    )
+    public void tm_0DA55B5AA( Test.Case tc ) {
+    	StringOutputStream sos = new StringOutputStream();
+    	this.noop.assertEqual( "foo", "bar" );
+    	this.noop.print( new IndentWriter( sos ) );
+    	tc.assertTrue( sos.toString().contains( "foo" ) );
+    	tc.assertTrue( sos.toString().contains( "bar" ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Includes fail messages on failure" 
-        )
-        public void tm_0DA55B5AA( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.print(IndentWriter)", 
+    	description = "Includes file location on failure" 
+    )
+    public void tm_0144F6DBF( Test.Case tc ) {
+    	StringOutputStream sos = new StringOutputStream();
+    	this.noop.assertEqual( "foo", "bar" ); String location = App.get().getLocation( "test.sog.core.test.TestCaseTest" ).findFirst().get();
+    	this.noop.print( new IndentWriter( sos ) ); 
+    	tc.assertTrue( sos.toString().contains( location ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Includes file location on failure" 
-        )
-        public void tm_0144F6DBF( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Prints summary line" 
-        )
-        public void tm_0EC920742( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.print(IndentWriter)", 
+    	description = "Prints summary line" 
+    )
+    public void tm_0EC920742( Test.Case tc ) {
+    	StringOutputStream sos = new StringOutputStream();
+    	this.noop.assertEqual( "foo", "foo" ); 
+    	this.noop.print( new IndentWriter( sos ) ); 
+    	tc.assertTrue( sos.toString().contains( this.noop.toString() ) );
+    }
         
         @Test.Impl( 
         	member = "method: void TestCase.print(IndentWriter)", 
@@ -1153,6 +1307,14 @@ public class TestCaseTest extends Test.Container {
         public void tm_00A82C0B2( Test.Case tc ) {
         	tc.addMessage( "GENERATED STUB" );
         }
+
+        @Test.Impl( 
+        	member = "method: void TestCase.run()", 
+        	description = "No error: State is OPEN if no assertions" 
+        )
+        public void tm_0914BABEA( Test.Case tc ) {
+        	tc.addMessage( "GENERATED STUB" );
+        }        
         
         @Test.Impl( 
         	member = "method: void TestCase.run()", 
@@ -1224,14 +1386,27 @@ public class TestCaseTest extends Test.Container {
         )
         public void tm_0351B4D2E( Test.Case tc ) {
         	tc.addMessage( "GENERATED STUB" );
-        }
-	
-
-
-	public static void main( String[] args ) {
+    }
+    
+        
+    public static void test( String s, Object o, String... rest ) {
+    	System.out.println( ">>> s = " + s );
+    	System.out.println( ">>> o = " + o );
+    	System.out.println( ">>> rest = " + Strings.toString( rest ) );
+    	System.out.println( ">>> rest length = " + rest.length );
+    }
+        
+    public static void main( String[] args ) {
+		//Stream.of( TestCase.class.getDeclaredMethods() )
+		//	.filter( m -> m.getName().equals( "fail" ) )
+		//	.map( m -> m.getReturnType() )
+		//	.forEach( System.out::println );
+		//test( "Hi", 42, "a", "B" );
+		//test( "Hi", 42, new String[] {"A", "B", "C"} );
+		//test( "HI", 5, "a", "", "b" );
+		//test( "hey", 0, "" );
+		
 		Test.eval( TestCase.class );
 		//Test.evalPackage( TestCase.class );
-		//TestCaseTest tct = new TestCaseTest();
-		//System.out.println( Strings.toString( tct.TEST_CASES ));
 	}
 }

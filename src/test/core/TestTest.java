@@ -93,6 +93,11 @@ public class TestTest extends Test.Container{
 	public void evaluateTests_HandlesCasesInPriorityOrder( Test.Case tc ) {
 		//tc.addMessage( "Manually verified" );
 	}
+	
+	
+	public static void main( String[] args ) {
+		Test.eval( Test.class );
+	}
 
 	
 	

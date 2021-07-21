@@ -205,6 +205,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 
 	@Test.Decl( "No error: State is PASS if assertion succeeds" )
 	@Test.Decl( "No error: State is FAIL if assertion fails" )
+	@Test.Decl( "No error: State is OPEN if no assertions" )
 	@Test.Decl( "No error: elapsedTime recorded" )
 	@Test.Decl( "No error: unexpectedError is null" )
 	@Test.Decl( "No error: afterThis called" )
@@ -298,7 +299,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "If old state is FAIL, new state is FAIL" )
 	private void fail( String message ) {
 		this.state = this.state.fail();
-		this.addMessage( message + ": " + this.getFileLocation() );
+		this.addMessage( Assert.nonEmpty( message ) + ": " + this.getFileLocation() );
 	}
 	
 
@@ -359,7 +360,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "File location is set" )
 	public Case addMessage( String message ) {
 		this.setFileLocation();
-		this.messages.add( Assert.nonEmpty( message ) );
+		this.messages.add( Assert.nonEmpty( message ) + ": " + this.getFileLocation() );
 		return this;
 	}
 
@@ -588,7 +589,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Includes file location on failure" )
 	@Test.Decl( "Includes fail messages on failure" )
 	@Test.Decl( "Includes additional messages on failure" )
-	@Test.Decl( "Includes error information on failure" )
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out ).println( this.toString() );
 		

@@ -17,6 +17,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.IndentWriter;
@@ -96,6 +97,11 @@ public class TestResult extends Result {
 	private class Err {
 		private Err addDetail( String description, Object target ) {
 			TestResult.this.errors.add( "    " + description + ": " + target.toString() );
+			return this;
+		}
+		private Err addDetail( String description, Throwable t ) {
+			this.addDetail( description, t.toString() );
+			App.get().getLocation( t ).map( s -> "        " + s ).forEach( TestResult.this.errors::add );
 			return this;
 		}
 	}
