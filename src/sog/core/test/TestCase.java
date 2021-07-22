@@ -331,7 +331,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 			sf -> Test.Container.class.isAssignableFrom( sf.getDeclaringClass() );
 		Function<StackWalker.StackFrame, String> sfm = 
 			sf -> new App.Location( sf ).toString();
-		return this.fileLocation = StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
 			s -> s.filter( sfp ).map( sfm ).findFirst().orElse( null )
 		);
 	}
@@ -360,7 +360,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "File location is set" )
 	public Case addMessage( String message ) {
 		this.setFileLocation();
-		this.messages.add( Assert.nonEmpty( message ) + ": " + this.getFileLocation() );
+		this.messages.add( Assert.nonEmpty( message ) );
 		return this;
 	}
 
@@ -576,7 +576,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Starts with FAIL if failed" )
 	@Test.Decl( "Statrs with OPEN if pass/fail is unknown" )
 	public String toString() {
-		return this.state + ": " + super.toString();
+		return this.state + " [" + this.fileLocation +"]: " + super.toString();
 	}
 
 
@@ -593,10 +593,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		Assert.nonNull( out ).println( this.toString() );
 		
 		out.increaseIndent();
-		
-		if ( !this.state.passed() ) {
-			out.println( "Location: " + this.fileLocation );
-		}
 		
 		if ( this.messages.size() > 0 ) {
 			out.println( "Messages:" );

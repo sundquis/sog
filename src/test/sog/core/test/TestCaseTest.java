@@ -45,7 +45,7 @@ import sog.util.StringOutputStream;
 public class TestCaseTest extends Test.Container {
 
 	
-	public final Test.Container container;
+	public final MyContainer container;
 	public final Map<String, TestImpl> TEST_IMPLS;
 	
 	public TestCase noop = null;
@@ -75,6 +75,20 @@ public class TestCaseTest extends Test.Container {
 		return () -> {
 			this.noop = null;
 		};
+	}
+	
+	/* Returns a procedure whose exec sleeps for the given time and then raises an exception. */
+	public Procedure getErrorProcedure( final long time ) {
+		return () -> {
+			try { Thread.sleep( time ); } catch ( InterruptedException e ) {}
+			throw new RuntimeException();
+		};
+	}
+	
+	public static class VerifiedProcedure implements Procedure {
+		private boolean executed = false;
+		public boolean executed() { return this.executed; }
+		@Override public void exec() { this.executed = true; }
 	}
 	
 	public TestCase getCase( String name ) {
@@ -110,6 +124,9 @@ public class TestCaseTest extends Test.Container {
 		public static final long TIMEOUT = 57L;
 		
 		public MyContainer() { super( TestCase.class ); }
+		
+		@Test.Impl( member = "member", description = "description" )
+		@Override public Procedure beforeEach() { return Procedure.NOOP; }
 		
 		@Test.Impl( member = MEMBER_NAME, description = DESCRIPTION, weight = WEIGHT, priority = PRIORITY, timeout = TIMEOUT )
 		public void noopMethod( Test.Case tc ) {}
@@ -1052,21 +1069,23 @@ public class TestCaseTest extends Test.Container {
     	tc.assertTrue( sos.toString().contains( this.noop.toString() ) );
     }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.print(IndentWriter)", 
-        	description = "Throws AssertionError for null writer" 
-        )
-        public void tm_0AEE2C608( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.print(IndentWriter)", 
+    	description = "Throws AssertionError for null writer" 
+    )
+    public void tm_0AEE2C608( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	this.noop.print( null );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterEach: State is FAIL" 
-        )
-        public void tm_0DAA1815C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterEach: State is FAIL" 
+    )
+    public void tm_0DAA1815C( Test.Case tc ) {
+    	//this.container
+    	tc.addMessage( "GENERATED STUB" );
+    }
         
         @Test.Impl( 
         	member = "method: void TestCase.run()", 
