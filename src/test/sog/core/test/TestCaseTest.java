@@ -45,6 +45,19 @@ import sog.util.StringOutputStream;
 public class TestCaseTest extends Test.Container {
 
 	
+	/*
+	 * Potentially confusing!
+	 * 
+	 * Dealing with two levels of (Container, TestCase) pairs. 
+	 * 
+	 * TestCaseTest is the Container for the top-level test methods which deal only with
+	 * Test.Case tc test cases.
+	 * 
+	 * MyContainer is the Container for TestCase as a subject class.
+	 */
+	
+	
+	
 	public final MyContainer container;
 	public final Map<String, TestImpl> TEST_IMPLS;
 	
@@ -76,19 +89,37 @@ public class TestCaseTest extends Test.Container {
 			this.noop = null;
 		};
 	}
+
 	
-	/* Returns a procedure whose exec sleeps for the given time and then raises an exception. */
-	public Procedure getErrorProcedure( final long time ) {
-		return () -> {
-			try { Thread.sleep( time ); } catch ( InterruptedException e ) {}
-			throw new RuntimeException();
-		};
-	}
 	
-	public static class VerifiedProcedure implements Procedure {
-		private boolean executed = false;
+	
+	
+	/* The exec method sleeps the given time then throws the given error if not null */
+	public static class TestProcedure implements Procedure {
+		
+		private final long sleepTime;
+		private final Error error;
+		private boolean executed;
+		
+		public TestProcedure( long sleepTime, Error error ) {
+			this.sleepTime = sleepTime;
+			this.error = error;
+			this.executed = false;
+		}
+		
 		public boolean executed() { return this.executed; }
-		@Override public void exec() { this.executed = true; }
+
+		@Override 
+		public void exec() { 
+			this.executed = true;
+			if ( this.sleepTime > 0 ) {
+				try { Thread.sleep( this.sleepTime ); } catch ( InterruptedException e ) {}
+			}
+			if ( this.error != null ) {
+				throw this.error;
+			}
+		}
+		
 	}
 	
 	public TestCase getCase( String name ) {
@@ -97,7 +128,7 @@ public class TestCaseTest extends Test.Container {
 	
 	public TestCase getTimed( String name, long time ) {
 		TestCaseTest.setTime( name, time );
-		return new TestCase( this.TEST_IMPLS.get( name ), this.container );
+		return new TestCase( Assert.nonNull( this.TEST_IMPLS.get( name ) ), this.container );
 	}
 	
 	public String getFileLocation() {
@@ -106,6 +137,10 @@ public class TestCaseTest extends Test.Container {
 	
 	public long getElapsedTime( TestCase tc ) {
 		return this.getSubjectField( tc, "elapsedTime", 0L );
+	}
+	
+	public Throwable getUnexpectedError( TestCase tc ) {
+		return this.getSubjectField( tc, "unexpectedError", null );
 	}
 	
 	
@@ -123,10 +158,18 @@ public class TestCaseTest extends Test.Container {
 		public static final int PRIORITY = 7;
 		public static final long TIMEOUT = 57L;
 		
+		private Procedure currentBeforeEach = Procedure.NOOP;
+		private Procedure currentAfterEach = Procedure.NOOP;
+		
 		public MyContainer() { super( TestCase.class ); }
 		
-		@Test.Impl( member = "member", description = "description" )
-		@Override public Procedure beforeEach() { return Procedure.NOOP; }
+		public void setBeforeEach( Procedure beforeEach ) { this.currentBeforeEach = beforeEach; }
+		
+		public void setAfterEach( Procedure afterEach ) { this.currentAfterEach = afterEach; }
+		
+		@Override public Procedure beforeEach() { return this.currentBeforeEach; }
+		
+		@Override public Procedure afterEach() { return this.currentAfterEach; }
 		
 		@Test.Impl( member = MEMBER_NAME, description = DESCRIPTION, weight = WEIGHT, priority = PRIORITY, timeout = TIMEOUT )
 		public void noopMethod( Test.Case tc ) {}
@@ -1083,104 +1126,189 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterEach: State is FAIL" 
     )
     public void tm_0DAA1815C( Test.Case tc ) {
-    	//this.container
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
+    	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
+    	TestCase tst = this.getCase( "noErrorPASS" );
+    	tst.run();
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( tst, "state", null ) );
     }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterEach: afterThis called" 
-        )
-        public void tm_0614CCB82( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterEach: afterThis called" 
+    )
+    public void tm_0614CCB82( Test.Case tc ) {
+    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
+    	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
+    	TestCase tst = this.getCase( "noErrorPASS" );
+    	TestProcedure proc = new TestProcedure( 0L, null );
+    	tst.afterThis( proc );
+    	tst.run();
+    	tc.assertTrue( proc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterEach: elapsedTime recorded" 
-        )
-        public void tm_02BC82946( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterEach: elapsedTime recorded" 
+    )
+    public void tm_02BC82946( Test.Case tc ) {
+    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
+    	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
+    	TestCase noErr = this.getTimed( "noErrorPASS", 3L );
+    	noErr.run();
+    	tc.assertTrue( this.getElapsedTime( noErr ) >= 5L );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterEach: unexpectedError is null" 
-        )
-        public void tm_06CA682CB( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterEach: unexpectedError is not null" 
+    )
+    public void tm_06CA682CB( Test.Case tc ) {
+    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
+    	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
+    	TestCase noErr = this.getCase( "noErrorPASS" );
+    	noErr.run();
+    	tc.assertNonNull( this.getUnexpectedError( noErr ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterThis: State is FAIL" 
-        )
-        public void tm_03147C25F( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterThis: State is FAIL" 
+    )
+    public void tm_03147C25F( Test.Case tc ) {
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	noError.afterThis( errProc );
+    	noError.run();
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( noError, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterThis: afterEach called" 
-        )
-        public void tm_0B267539C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterThis: afterEach called" 
+    )
+    public void tm_0B267539C( Test.Case tc ) {
+    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
+    	TestProcedure verify = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verify );
+    	
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	noError.afterThis( errProc );
+    	noError.run();
+    	tc.assertTrue( verify.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterThis: elapsedTime recorded" 
-        )
-        public void tm_0926A4EE3( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterThis: elapsedTime recorded" 
+    )
+    public void tm_0926A4EE3( Test.Case tc ) {
+    	TestCase noError = this.getTimed( "noErrorPASS", 2L );
+    	TestProcedure errProc = new TestProcedure( 1L, new Error() );
+    	noError.afterThis( errProc );
+    	noError.run();
+    	tc.assertTrue( this.getElapsedTime( noError ) >= 3L );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in afterThis: unexpectedError is null" 
-        )
-        public void tm_0FBDD9C0E( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in afterThis: unexpectedError is not null" 
+    )
+    public void tm_0FBDD9C0E( Test.Case tc ) {
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	noError.afterThis( errProc );
+    	noError.run();
+    	tc.assertNonNull( this.getUnexpectedError( noError ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in beforeEach: State is FAIL" 
-        )
-        public void tm_0F60D2DFB( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in beforeEach: State is FAIL" 
+    )
+    public void tm_0F60D2DFB( Test.Case tc ) {
+    	tc.afterThis( () -> { this.container.setBeforeEach( Procedure.NOOP );} );
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	this.container.setBeforeEach( errProc );
+    	
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	noError.run();
+    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( noError, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in beforeEach: afterEach called" 
-        )
-        public void tm_02C6CF280( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in beforeEach: afterEach called" 
+    )
+    public void tm_02C6CF280( Test.Case tc ) {
+    	tc.afterThis( () -> { 
+    		this.container.setBeforeEach( Procedure.NOOP );
+    		this.container.setAfterEach( Procedure.NOOP );
+    	} );
+
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	this.container.setBeforeEach( errProc );
+    	
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	noError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in beforeEach: afterThis called" 
-        )
-        public void tm_05879E683( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in beforeEach: afterThis called" 
+    )
+    public void tm_05879E683( Test.Case tc ) {
+    	tc.afterThis( () -> { 
+    		this.container.setBeforeEach( Procedure.NOOP );
+    	} );
+
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	this.container.setBeforeEach( errProc );
+    	
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	noError.afterThis( verifyProc );
+    	noError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in beforeEach: elapsedTime recorded" 
-        )
-        public void tm_040FDDBC7( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in beforeEach: elapsedTime recorded" 
+    )
+    public void tm_040FDDBC7( Test.Case tc ) {
+    	tc.afterThis( () -> { 
+    		this.container.setBeforeEach( Procedure.NOOP );
+    	} );
+
+    	TestProcedure errProc = new TestProcedure( 3L, new Error() );
+    	this.container.setBeforeEach( errProc );
+    	
+    	TestCase noError = this.getTimed( "noErrorPASS", 4L );
+    	noError.run();
+    	tc.assertTrue( this.getElapsedTime( noError ) >= 3L );
+    }
         
         @Test.Impl( 
         	member = "method: void TestCase.run()", 
         	description = "Error in beforeEach: unexpectedError is not null" 
         )
         public void tm_0EFE23A97( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
+        	tc.afterThis( () -> { 
+        		this.container.setBeforeEach( Procedure.NOOP );
+        	} );
+
+        	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+        	this.container.setBeforeEach( errProc );
+        	
+        	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+        	noError.run();
+        	tc.assertNonNull( this.getUnexpectedError( noError ) );
         }
         
         @Test.Impl( 

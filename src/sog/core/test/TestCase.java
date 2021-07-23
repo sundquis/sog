@@ -238,12 +238,12 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 
 	@Test.Decl( "Error in afterThis: State is FAIL" )
 	@Test.Decl( "Error in afterThis: elapsedTime recorded" )
-	@Test.Decl( "Error in afterThis: unexpectedError is null" )
+	@Test.Decl( "Error in afterThis: unexpectedError is not null" )
 	@Test.Decl( "Error in afterThis: afterEach called" )
 
 	@Test.Decl( "Error in afterEach: State is FAIL" )
 	@Test.Decl( "Error in afterEach: elapsedTime recorded" )
-	@Test.Decl( "Error in afterEach: unexpectedError is null" )
+	@Test.Decl( "Error in afterEach: unexpectedError is not null" )
 	@Test.Decl( "Error in afterEach: afterThis called" )
 
 	@Override

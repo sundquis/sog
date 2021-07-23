@@ -244,7 +244,7 @@ public class TestResult extends Result {
 		
 		Arrays.stream(  this.container.getClass().getDeclaredMethods() )
 			.map( TestImpl::forMethod )
-			.filter( ti -> ti != null )
+			.filter( TestImpl::isValid )
 			.forEach( this::addImpl );
 	}
 	

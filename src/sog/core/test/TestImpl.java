@@ -29,6 +29,13 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class TestImpl extends TestIdentifier {
 	
+	
+	private static final TestImpl INVALID = new TestImpl();
+	
+	public static boolean isValid( TestImpl testImpl ) {
+		return testImpl != TestImpl.INVALID;
+	}
+	
 
 	/**
 	 * A public factory method for constructing a TestImpl corresponding to the given method.
@@ -42,7 +49,7 @@ public class TestImpl extends TestIdentifier {
 	@Test.Decl( "Result is non-null for test methods" )
 	@Test.Decl( "Constructor only called with non-null arguments" )
 	public static TestImpl forMethod( Method method ) {
-		TestImpl result = null;
+		TestImpl result = TestImpl.INVALID;
 		
 		Test.Impl impl = Assert.nonNull( method ).getDeclaredAnnotation( Test.Impl.class );
 		if ( impl != null ) {
@@ -66,6 +73,13 @@ public class TestImpl extends TestIdentifier {
 		
 		this.impl = impl;
 		this.method = method;
+	}
+
+	
+	private TestImpl() {
+		super( "INVALID_MEMBER", "INVALID_DESCRIPTION" );
+		this.impl = null;
+		this.method = null;
 	}
 	
 	
