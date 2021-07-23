@@ -189,7 +189,6 @@ public class TestCaseTest extends Test.Container {
 		@Test.Impl( member = "A", description = "E", priority = 0 ) public void ordered3() {}
 		@Test.Impl( member = "A", description = "D", priority = 0 ) public void ordered4() {}
 		
-		@Test.Impl( member = "member", description = "description" )
 		private void sleep() {
 			try {
 				Thread.sleep( TestCaseTest.getTime( App.get().getCallingMethod( 2 ) ) );
@@ -202,6 +201,22 @@ public class TestCaseTest extends Test.Container {
 			this.sleep();
 			tc.addMessage( "No errors, passes" ).assertTrue( true ); 
 		}
+		
+		@Test.Impl( member = "member", description = "description" )
+		public void gotExpectedError( Test.Case tc ) {
+			tc.expectError( AssertionError.class );
+			tc.assertTrue( true );
+			this.sleep();
+			throw new AssertionError();
+		}
+
+		@Test.Impl( member = "member", description = "description" )
+		public void gotUnexpectedError( Test.Case tc ) {
+			tc.assertTrue( true );
+			this.sleep();
+			throw new AssertionError();
+		}
+
 						
 	}
 	
@@ -1294,70 +1309,90 @@ public class TestCaseTest extends Test.Container {
     	tc.assertTrue( this.getElapsedTime( noError ) >= 3L );
     }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Error in beforeEach: unexpectedError is not null" 
-        )
-        public void tm_0EFE23A97( Test.Case tc ) {
-        	tc.afterThis( () -> { 
-        		this.container.setBeforeEach( Procedure.NOOP );
-        	} );
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Error in beforeEach: unexpectedError is not null" 
+    )
+    public void tm_0EFE23A97( Test.Case tc ) {
+    	tc.afterThis( () -> { 
+    		this.container.setBeforeEach( Procedure.NOOP );
+    	} );
 
-        	TestProcedure errProc = new TestProcedure( 0L, new Error() );
-        	this.container.setBeforeEach( errProc );
-        	
-        	TestCase noError = this.getTimed( "noErrorPASS", 0L );
-        	noError.run();
-        	tc.assertNonNull( this.getUnexpectedError( noError ) );
-        }
+    	TestProcedure errProc = new TestProcedure( 0L, new Error() );
+    	this.container.setBeforeEach( errProc );
+    	
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	noError.run();
+    	tc.assertNonNull( this.getUnexpectedError( noError ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got expected error: State is PASS" 
-        )
-        public void tm_0C16BBBF5( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got expected error: State is PASS" 
+    )
+    public void tm_0C16BBBF5( Test.Case tc ) {
+    	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
+    	expectedError.run();
+    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( expectedError, "state", null ) );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got expected error: afterEach called" 
-        )
-        public void tm_0953C5759( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got expected error: afterEach called" 
+    )
+    public void tm_0953C5759( Test.Case tc ) {
+    	tc.afterThis( () -> { 
+    		this.container.setAfterEach( Procedure.NOOP );
+    	} );
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	
+    	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
+    	expectedError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got expected error: afterThis called" 
-        )
-        public void tm_0C1494B5C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got expected error: afterThis called" 
+    )
+    public void tm_0C1494B5C( Test.Case tc ) {
+    	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	expectedError.afterThis( verifyProc );
+    	expectedError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got expected error: elapsedTime recorded" 
-        )
-        public void tm_0376D2C20( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got expected error: elapsedTime recorded" 
+    )
+    public void tm_0376D2C20( Test.Case tc ) {
+    	TestCase expectedError = this.getTimed( "gotExpectedError", 3L );
+    	expectedError.run();
+    	tc.assertTrue( this.getElapsedTime( expectedError ) >= 3L );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got expected error: unexpectedError is null" 
-        )
-        public void tm_0842D59B1( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got unexpected error: State is FAIL" 
-        )
-        public void tm_035A5C409( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got expected error: unexpectedError is null" 
+    )
+    public void tm_0842D59B1( Test.Case tc ) {
+    	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
+    	expectedError.run();
+    	tc.assertIsNull( this.getUnexpectedError( expectedError ) );
+    }
+
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got unexpected error: State is FAIL" 
+    )
+    public void tm_035A5C409( Test.Case tc ) {
+    	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
+    	unexpectedError.run();
+    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( unexpectedError, "state", null ) );
+    }
         
         @Test.Impl( 
         	member = "method: void TestCase.run()", 
