@@ -257,7 +257,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 			} 
 		} catch ( InvocationTargetException ex ) {
 			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getClass() ) ) {
-				this.unexpectedError = ex;
+				this.unexpectedError = ex.getCause();
 				this.fail( "Expected " + this.expectedError + " but got " + ex.getCause() );
 			} else {
 				this.pass();
@@ -542,6 +542,32 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		return this;
 	}
 
+	/**
+	 * Test for non-equality using Object.equals().
+	 * If T is a compound type (array or collection) then the components are shallowly tested.
+	 * 
+	 * @param expected
+	 * @param actual
+	 * @return
+	 * 		this Test.Case
+	 */
+	@Override
+	@Test.Decl( "Test fails for equivalent objects" )
+	@Test.Decl( "Test passes for inequivalent" )
+	@Test.Decl( "Test passes for one null and one not null" )
+	@Test.Decl( "Test fails when both null" )
+	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
+	public <T> Test.Case assertNotEqual( T first, T second ) {
+		this.setFileLocation();
+		if ( Objects.shallowEquals( first, second ) ) {
+			this.fail( "First: " + Strings.toString( first ) + ", Second: " + Strings.toString( second ) );
+		} else {
+			this.pass();
+		}
+		return this;
+	}
+	
 	/** Total execution time for Method and framework monitoring. */
 	@Override
 	@Test.Decl( "Elapsed time is consistent with execution time" )

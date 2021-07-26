@@ -612,7 +612,7 @@ public class Test {
 		
 		
 		/**
-		 * Test for equality using Objobject.equals().
+		 * Test for equality using Object.equals().
 		 * If T is a compound type (array or collection) then the components are shallowly tested.
 		 * 
 		 * @param expected
@@ -621,6 +621,17 @@ public class Test {
 		 * 		this Test.Case
 		 */
 		public <T> Test.Case assertEqual( T expected, T actual );
+		
+		/**
+		 * Test for non-equality using Object.equals().
+		 * If T is a compound type (array or collection) then the components are shallowly tested.
+		 * 
+		 * @param expected
+		 * @param actual
+		 * @return
+		 * 		this Test.Case
+		 */
+		public <T> Test.Case assertNotEqual( T expected, T actual );
 		
 	}
 	

@@ -199,7 +199,9 @@ public class App implements Runnable {
 		@Override
 		public String toString() {
 			String[] comps = this.className.split("\\.");
-			comps[comps.length-1] = ".";
+			//comps[comps.length-1] = ".";  // This stopped working 7/25/21
+			//return String.join(".",  comps) + "(" + this.fileName + ":" + this.lineNo + ") in " + this.methodName;
+			comps[comps.length-1] = " ";
 			return String.join(".",  comps) + "(" + this.fileName + ":" + this.lineNo + ") in " + this.methodName;
 		}
 	}

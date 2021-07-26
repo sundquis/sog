@@ -24,15 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Procedure;
-import sog.core.Strings;
 import sog.core.Test;
 import sog.core.test.TestCase;
 import sog.core.test.TestImpl;
@@ -64,6 +61,8 @@ public class TestCaseTest extends Test.Container {
 	public TestCase noop = null;
 	public TestImpl impl = null;
 	
+	private TestCase current;
+	
 	public TestCaseTest() {
 		super( TestCase.class );
 		
@@ -71,22 +70,21 @@ public class TestCaseTest extends Test.Container {
 
 		this.TEST_IMPLS = Arrays.stream( MyContainer.class.getDeclaredMethods() )
 			.collect( Collectors.toMap( Method::getName, TestImpl::forMethod ) );
-		
-		this.noop = this.getCase( "noopMethod" );
-		this.impl = this.getSubjectField( this.noop, "impl", impl );
 	}
 	
 	@Override
 	public Procedure beforeEach() {
 		return () -> {
 			this.noop = this.getCase( "noopMethod" );
+			this.impl = this.getSubjectField( this.noop, "impl", impl );
 		};
 	}
 	
 	@Override
 	public Procedure afterEach() {
 		return () -> {
-			this.noop = null;
+			this.container.setBeforeEach( Procedure.NOOP );
+			this.container.setAfterEach( Procedure.NOOP );
 		};
 	}
 
@@ -128,19 +126,32 @@ public class TestCaseTest extends Test.Container {
 	
 	public TestCase getTimed( String name, long time ) {
 		TestCaseTest.setTime( name, time );
-		return new TestCase( Assert.nonNull( this.TEST_IMPLS.get( name ) ), this.container );
+		this.current = new TestCase( Assert.nonNull( this.TEST_IMPLS.get( name ) ), this.container );
+		return this.current;
 	}
 	
 	public String getFileLocation() {
-		return this.getSubjectField( this.noop, "fileLocation", "" );
+		return this.getSubjectField( this.current, "fileLocation", "" );
 	}
 	
-	public long getElapsedTime( TestCase tc ) {
-		return this.getSubjectField( tc, "elapsedTime", 0L );
+	public List<String> getMessages() {
+		return this.getSubjectField( this.current, "messages", List.of( "" ) );
+	}
+		
+	public long getElapsedTime() {
+		return this.getSubjectField( this.current, "elapsedTime", 0L );
 	}
 	
-	public Throwable getUnexpectedError( TestCase tc ) {
-		return this.getSubjectField( tc, "unexpectedError", null );
+	public Throwable getUnexpectedError() {
+		return this.getSubjectField( this.current, "unexpectedError", null );
+	}
+	
+	public Class<?> getExpectedError() {
+		return this.getSubjectField( this.current, "expectedError", Object.class );
+	}
+	
+	public TestCase.State getState() {
+		return this.getSubjectField( this.current, "state", TestCase.State.OPEN );
 	}
 	
 	
@@ -203,6 +214,18 @@ public class TestCaseTest extends Test.Container {
 		}
 		
 		@Test.Impl( member = "member", description = "description" )
+		public void noErrorFAIL( Test.Case tc ) { 
+			this.sleep();
+			tc.addMessage( "No errors, fails" ).assertTrue( false ); 
+		}
+		
+		@Test.Impl( member = "member", description = "description" )
+		public void noErrorOPEN( Test.Case tc ) { 
+			this.sleep();
+			tc.addMessage( "No errors, open" ); 
+		}
+		
+		@Test.Impl( member = "member", description = "description" )
 		public void gotExpectedError( Test.Case tc ) {
 			tc.expectError( AssertionError.class );
 			tc.assertTrue( true );
@@ -215,6 +238,21 @@ public class TestCaseTest extends Test.Container {
 			tc.assertTrue( true );
 			this.sleep();
 			throw new AssertionError();
+		}
+
+		@Test.Impl( member = "member", description = "description" )
+		public void gotWrongError( Test.Case tc ) {
+			tc.expectError( Exception.class );
+			tc.assertTrue( true );
+			this.sleep();
+			throw new AssertionError();
+		}
+
+		@Test.Impl( member = "member", description = "description" )
+		public void noExpectedError( Test.Case tc ) {
+			tc.expectError( AssertionError.class );
+			tc.assertTrue( true );
+			this.sleep();
 		}
 
 						
@@ -246,9 +284,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Initially null" 
     )
     public void tm_0345429AE( Test.Case tc ) {
-    	Class<?> expectedError = null;
-    	expectedError = this.getSubjectField( this.noop, "expectedError", expectedError );
-    	tc.assertIsNull( expectedError );
+    	tc.assertIsNull( this.getExpectedError() );
     }
         
     @Test.Impl( 
@@ -256,9 +292,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Not null" 
     )
     public void tm_034D5CAE2( Test.Case tc ) {
-    	List<?> messages = null;
-    	messages = this.getSubjectField( this.noop, "messages", messages );
-    	tc.assertNonNull( messages );
+    	tc.assertNonNull( this.getMessages() );
     }
         
     @Test.Impl( 
@@ -276,9 +310,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Initially null" 
     )
     public void tm_0CAEB0C6C( Test.Case tc ) {
-    	String fileLocation = null;
-    	fileLocation = this.getSubjectField( this.noop, "fileLocation", fileLocation );
-    	tc.assertIsNull( fileLocation );
+    	tc.assertIsNull( this.getFileLocation() );
     }
         
     @Test.Impl( 
@@ -320,9 +352,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Initially OPEN" 
     )
     public void tm_000E7B607( Test.Case tc ) {
-    	TestCase.State state = null;
-    	state = this.getSubjectField( this.noop, "state", state );
-    	tc.assertEqual( TestCase.State.OPEN, state );
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     }
         
     @Test.Impl( 
@@ -340,9 +370,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Initially null" 
     )
     public void tm_0A35AA6CF( Test.Case tc ) {
-    	Throwable unexpectedError = null;
-    	unexpectedError = this.getSubjectField( this.noop, "unexpectedError", unexpectedError );
-    	tc.assertIsNull( unexpectedError );
+    	tc.assertIsNull( this.getUnexpectedError() );
     }
         
     @Test.Impl( 
@@ -350,9 +378,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Initially zero" 
     )
     public void tm_0B8A918C4( Test.Case tc ) {
-    	long elapsedTime = 0L;
-    	elapsedTime = this.getSubjectField( this.noop, "elapsedTime", elapsedTime );
-    	tc.assertEqual( 0L, elapsedTime );
+    	tc.assertEqual( 0L, this.getElapsedTime() );
     }
         
     @Test.Impl( 
@@ -396,23 +422,23 @@ public class TestCaseTest extends Test.Container {
     public void tm_0928753F0( Test.Case tc ) {
     	TestCase tstCase = this.getCase( "openMethod" );
     	tstCase.run();
-    	TestCase.State before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	TestCase.State before = this.getState();
     	tstCase.addMessage( "Hello world!" );
-    	TestCase.State after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	TestCase.State after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "passMethod" );
     	tstCase.run();
-    	before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	before = this.getState();
     	tstCase.addMessage( "Hello world!" );
-    	after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "failMethod" );
     	tstCase.run();
-    	before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	before = this.getState();
     	tstCase.addMessage( "Hello world!" );
-    	after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	after = this.getState();
     	tc.assertEqual( before, after );
     }
         
@@ -474,23 +500,23 @@ public class TestCaseTest extends Test.Container {
     	
     	TestCase tstCase = this.getCase( "openMethod" );
     	tstCase.run();
-    	TestCase.State before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	TestCase.State before = this.getState();
     	tstCase.afterThis( p );
-    	TestCase.State after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	TestCase.State after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "passMethod" );
     	tstCase.run();
-    	before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	before = this.getState();
     	tstCase.afterThis( p );
-    	after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "failMethod" );
     	tstCase.run();
-    	before = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	before = this.getState();
     	tstCase.afterThis( p );
-    	after = this.getSubjectField( tstCase, "state", TestCase.State.OPEN );
+    	after = this.getState();
     	tc.assertEqual( before, after );
     }
         
@@ -893,7 +919,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_069B1FAD1( Test.Case tc ) {
     	this.noop.assertTrue( false );
-    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     	tc.assertEqual( MyContainer.WEIGHT, this.noop.getFailCount() );
     }
         
@@ -902,7 +928,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Return is Test.Impl.weight when State is OPEN" 
     )
     public void tm_079DF2EFD( Test.Case tc ) {
-    	tc.assertEqual( TestCase.State.OPEN, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     	tc.assertEqual( MyContainer.WEIGHT, this.noop.getFailCount() );
     }
         
@@ -912,7 +938,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0EAD20B46( Test.Case tc ) {
     	this.noop.assertTrue( true );
-    	tc.assertEqual( TestCase.State.PASS, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     	tc.assertEqual( 0, this.noop.getFailCount() );
     }
         
@@ -922,7 +948,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_044F4FD71( Test.Case tc ) {
     	this.noop.assertTrue( true );
-    	tc.assertEqual( TestCase.State.PASS, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     	tc.assertEqual( MyContainer.WEIGHT, this.noop.getPassCount() );
     }
         
@@ -932,7 +958,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_07E275100( Test.Case tc ) {
     	this.noop.assertTrue( false );
-    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     	tc.assertEqual( 0, this.noop.getPassCount() );
     }
         
@@ -941,7 +967,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Return is zero when State is OPEN" 
     )
     public void tm_08E54852C( Test.Case tc ) {
-    	tc.assertEqual( TestCase.State.OPEN, this.getSubjectField( this.noop, "state", TestCase.State.OPEN ) );
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     	tc.assertEqual( 0, this.noop.getPassCount() );
     }
         
@@ -983,7 +1009,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0F6E3A253( Test.Case tc ) {
     	TestCase timed = this.getTimed( "noErrorPASS", 5L );
     	timed.run();
-    	tc.assertTrue( this.getElapsedTime( timed ) >= 5L );
+    	tc.assertTrue( this.getElapsedTime() >= 5L );
     }
         
     @Test.Impl( 
@@ -992,9 +1018,9 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0EBA3BDE5( Test.Case tc ) {
     	this.noop.assertTrue( false );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1002,9 +1028,9 @@ public class TestCaseTest extends Test.Container {
     	description = "If old state is OPEN, new state is FAIL" 
     )
     public void tm_039B2E239( Test.Case tc ) {
-    	tc.assertEqual( TestCase.State.OPEN, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1013,9 +1039,9 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0A91ED6D2( Test.Case tc ) {
     	this.noop.assertTrue( true );
-    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1023,11 +1049,9 @@ public class TestCaseTest extends Test.Container {
     	description = "The message is retained" 
     )
     public void tm_0C8BE02CF( Test.Case tc ) {
-    	tc.assertEqual( List.of(), this.container.getSubjectField( this.noop, "messages", null ) );
+    	tc.assertEqual( List.of(), this.getMessages() );
     	this.container.evalSubjectMethod( this.noop, "fail", null, "message" );
-    	List<String> msgs = null;
-    	msgs = this.container.getSubjectField( this.noop, "messages", null );
-    	tc.assertTrue( msgs.size() > 0 );
+    	tc.assertTrue( this.getMessages().size() > 0 );
     }
         
     @Test.Impl( 
@@ -1054,9 +1078,9 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_03BA40429( Test.Case tc ) {
     	this.noop.assertTrue( false );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "pass", null );
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1064,9 +1088,9 @@ public class TestCaseTest extends Test.Container {
     	description = "If old state is OPEN, new state is PASS" 
     )
     public void tm_09AC844B0( Test.Case tc ) {
-    	tc.assertEqual( TestCase.State.OPEN, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "pass", null );
-    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
         
     @Test.Impl( 
@@ -1075,9 +1099,9 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_00A343949( Test.Case tc ) {
     	this.noop.assertTrue( true );
-    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     	this.container.evalSubjectMethod( this.noop, "pass", null );
-    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( this.noop, "state", null ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
         
     @Test.Impl( 
@@ -1141,11 +1165,10 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterEach: State is FAIL" 
     )
     public void tm_0DAA1815C( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
     	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
     	TestCase tst = this.getCase( "noErrorPASS" );
     	tst.run();
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( tst, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1153,7 +1176,6 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterEach: afterThis called" 
     )
     public void tm_0614CCB82( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
     	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
     	TestCase tst = this.getCase( "noErrorPASS" );
     	TestProcedure proc = new TestProcedure( 0L, null );
@@ -1167,11 +1189,10 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterEach: elapsedTime recorded" 
     )
     public void tm_02BC82946( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
     	TestCase noErr = this.getTimed( "noErrorPASS", 3L );
     	noErr.run();
-    	tc.assertTrue( this.getElapsedTime( noErr ) >= 5L );
+    	tc.assertTrue( this.getElapsedTime() >= 5L );
     }
         
     @Test.Impl( 
@@ -1179,11 +1200,10 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterEach: unexpectedError is not null" 
     )
     public void tm_06CA682CB( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
     	TestCase noErr = this.getCase( "noErrorPASS" );
     	noErr.run();
-    	tc.assertNonNull( this.getUnexpectedError( noErr ) );
+    	tc.assertNonNull( this.getUnexpectedError() );
     }
         
     @Test.Impl( 
@@ -1195,7 +1215,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	noError.afterThis( errProc );
     	noError.run();
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( noError, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1203,7 +1223,6 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in afterThis: afterEach called" 
     )
     public void tm_0B267539C( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setAfterEach( Procedure.NOOP ); } );
     	TestProcedure verify = new TestProcedure( 0L, null );
     	this.container.setAfterEach( verify );
     	
@@ -1223,7 +1242,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure errProc = new TestProcedure( 1L, new Error() );
     	noError.afterThis( errProc );
     	noError.run();
-    	tc.assertTrue( this.getElapsedTime( noError ) >= 3L );
+    	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
     @Test.Impl( 
@@ -1235,7 +1254,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	noError.afterThis( errProc );
     	noError.run();
-    	tc.assertNonNull( this.getUnexpectedError( noError ) );
+    	tc.assertNonNull( this.getUnexpectedError() );
     }
         
     @Test.Impl( 
@@ -1243,13 +1262,12 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in beforeEach: State is FAIL" 
     )
     public void tm_0F60D2DFB( Test.Case tc ) {
-    	tc.afterThis( () -> { this.container.setBeforeEach( Procedure.NOOP );} );
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	noError.run();
-    	tc.assertEqual( TestCase.State.FAIL, this.getSubjectField( noError, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
     @Test.Impl( 
@@ -1257,11 +1275,6 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in beforeEach: afterEach called" 
     )
     public void tm_02C6CF280( Test.Case tc ) {
-    	tc.afterThis( () -> { 
-    		this.container.setBeforeEach( Procedure.NOOP );
-    		this.container.setAfterEach( Procedure.NOOP );
-    	} );
-
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	this.container.setBeforeEach( errProc );
     	
@@ -1278,10 +1291,6 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in beforeEach: afterThis called" 
     )
     public void tm_05879E683( Test.Case tc ) {
-    	tc.afterThis( () -> { 
-    		this.container.setBeforeEach( Procedure.NOOP );
-    	} );
-
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	this.container.setBeforeEach( errProc );
     	
@@ -1297,16 +1306,12 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in beforeEach: elapsedTime recorded" 
     )
     public void tm_040FDDBC7( Test.Case tc ) {
-    	tc.afterThis( () -> { 
-    		this.container.setBeforeEach( Procedure.NOOP );
-    	} );
-
     	TestProcedure errProc = new TestProcedure( 3L, new Error() );
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 4L );
     	noError.run();
-    	tc.assertTrue( this.getElapsedTime( noError ) >= 3L );
+    	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
     @Test.Impl( 
@@ -1314,16 +1319,12 @@ public class TestCaseTest extends Test.Container {
     	description = "Error in beforeEach: unexpectedError is not null" 
     )
     public void tm_0EFE23A97( Test.Case tc ) {
-    	tc.afterThis( () -> { 
-    		this.container.setBeforeEach( Procedure.NOOP );
-    	} );
-
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	noError.run();
-    	tc.assertNonNull( this.getUnexpectedError( noError ) );
+    	tc.assertNonNull( this.getUnexpectedError() );
     }
         
     @Test.Impl( 
@@ -1333,7 +1334,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0C16BBBF5( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
     	expectedError.run();
-    	tc.assertEqual( TestCase.State.PASS, this.container.getSubjectField( expectedError, "state", null ) );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
         
     @Test.Impl( 
@@ -1341,9 +1342,6 @@ public class TestCaseTest extends Test.Container {
     	description = "Got expected error: afterEach called" 
     )
     public void tm_0953C5759( Test.Case tc ) {
-    	tc.afterThis( () -> { 
-    		this.container.setAfterEach( Procedure.NOOP );
-    	} );
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	this.container.setAfterEach( verifyProc );
     	
@@ -1371,7 +1369,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0376D2C20( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 3L );
     	expectedError.run();
-    	tc.assertTrue( this.getElapsedTime( expectedError ) >= 3L );
+    	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
     @Test.Impl( 
@@ -1381,7 +1379,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0842D59B1( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
     	expectedError.run();
-    	tc.assertIsNull( this.getUnexpectedError( expectedError ) );
+    	tc.assertIsNull( this.getUnexpectedError() );
     }
 
     @Test.Impl( 
@@ -1391,203 +1389,301 @@ public class TestCaseTest extends Test.Container {
     public void tm_035A5C409( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
     	unexpectedError.run();
-    	tc.assertEqual( TestCase.State.FAIL, this.container.getSubjectField( unexpectedError, "state", null ) );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got unexpected error: afterEach called" 
-        )
-        public void tm_0EA0AF9B2( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got unexpected error: afterEach called" 
+    )
+    public void tm_0EA0AF9B2( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	
+    	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
+    	unexpectedError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got unexpected error: afterThis called" 
-        )
-        public void tm_01617EDB5( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got unexpected error: afterThis called" 
+    )
+    public void tm_01617EDB5( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	
+    	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
+    	unexpectedError.afterThis( verifyProc );
+    	unexpectedError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got unexpected error: elapsedTime recorded" 
-        )
-        public void tm_06500F9F9( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got unexpected error: elapsedTime recorded" 
+    )
+    public void tm_06500F9F9( Test.Case tc ) {
+    	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
+    	unexpectedError.run();
+    	tc.assertTrue( this.getElapsedTime() >= 2L );
+    }
         
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got unexpected error: unexpectedError is not null" 
-        )
-        public void tm_07FBC2025( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: State is FAIL" 
-        )
-        public void tm_0116ED75D( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: afterEach called" 
-        )
-        public void tm_0966B35DE( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: afterThis called" 
-        )
-        public void tm_0C27829E1( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: elapsedTime recorded" 
-        )
-        public void tm_0314F4025( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: unexpectedError is different from expected" 
-        )
-        public void tm_046BDB9F8( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "Got wrong error: unexpectedError is not null" 
-        )
-        public void tm_04CA6D079( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: State is FAIL if assertion fails" 
-        )
-        public void tm_0BAA5AB1D( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: State is PASS if assertion succeeds" 
-        )
-        public void tm_00A82C0B2( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got unexpected error: unexpectedError is not null" 
+    )
+    public void tm_07FBC2025( Test.Case tc ) {
+    	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
+    	unexpectedError.run();
+    	tc.assertNonNull( this.getUnexpectedError() );
+    }
 
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: State is OPEN if no assertions" 
-        )
-        public void tm_0914BABEA( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }        
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: afterEach called" 
-        )
-        public void tm_075818E0E( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: afterThis called" 
-        )
-        public void tm_0A18E8211( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: elapsedTime recorded" 
-        )
-        public void tm_0701E0055( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No error: unexpectedError is null" 
-        )
-        public void tm_0ADF41D5C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No expected error: State is FAIL" 
-        )
-        public void tm_0DD9A5B7F( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No expected error: afterEach called" 
-        )
-        public void tm_01270A67C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No expected error: afterThis called" 
-        )
-        public void tm_03E7D9A7F( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No expected error: elapsedTime recorded" 
-        )
-        public void tm_055CF31C3( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: void TestCase.run()", 
-        	description = "No expected error: unexpectedError is null" 
-        )
-        public void tm_0351B4D2E( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: State is FAIL" 
+    )
+    public void tm_0116ED75D( Test.Case tc ) {
+    	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
+    	gotWrongError.run();
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: afterEach called" 
+    )
+    public void tm_0966B35DE( Test.Case tc ) {
+    	TestProcedure verifyProc= new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	
+    	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
+    	gotWrongError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: afterThis called" 
+    )
+    public void tm_0C27829E1( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
+    	gotWrongError.afterThis( verifyProc );
+    	gotWrongError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: elapsedTime recorded" 
+    )
+    public void tm_0314F4025( Test.Case tc ) {
+    	TestCase gotWrongError = this.getTimed( "gotWrongError", 3L );
+    	gotWrongError.run();
+    	tc.assertTrue( this.getElapsedTime() >= 3L );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: unexpectedError is different from expected" 
+    )
+    public void tm_046BDB9F8( Test.Case tc ) {
+    	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
+    	gotWrongError.run();
+    	tc.assertNotEqual( 
+    		this.getUnexpectedError().getClass(),
+    		this.getExpectedError()
+    	);
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "Got wrong error: unexpectedError is not null" 
+    )
+    public void tm_04CA6D079( Test.Case tc ) {
+       	this.getTimed( "gotWrongError", 0L ).run();
+    	tc.assertNonNull( this.getUnexpectedError() );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: State is FAIL if assertion fails" 
+    )
+    public void tm_0BAA5AB1D( Test.Case tc ) {
+    	this.getTimed( "noErrorFAIL", 0L ).run();
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: State is PASS if assertion succeeds" 
+    )
+    public void tm_00A82C0B2( Test.Case tc ) {
+    	this.getTimed( "noErrorPASS", 0L ).run();
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
+    }
+
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: State is OPEN if no assertions" 
+    )
+    public void tm_0914BABEA( Test.Case tc ) {
+    	this.getTimed( "noErrorOPEN", 0L ).run();
+    	tc.assertEqual( TestCase.State.OPEN, this.getState() );
+    }        
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: afterEach called" 
+    )
+    public void tm_075818E0E( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	this.getTimed( "noErrorPASS", 0L ).run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: afterThis called" 
+    )
+    public void tm_0A18E8211( Test.Case tc ) {
+    	TestCase noError = this.getTimed( "noErrorPASS", 0L );
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	noError.afterThis( verifyProc );
+    	noError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: elapsedTime recorded" 
+    )
+    public void tm_0701E0055( Test.Case tc ) {
+    	this.getTimed( "noErrorPASS", 6L ).run();
+    	tc.assertTrue( this.getElapsedTime() >= 6L );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No error: unexpectedError is null" 
+    )
+    public void tm_0ADF41D5C( Test.Case tc ) {
+    	this.getTimed( "noErrorPASS", 0L ).run();
+    	tc.assertIsNull( this.getUnexpectedError() );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No expected error: State is FAIL" 
+    )
+    public void tm_0DD9A5B7F( Test.Case tc ) {
+    	this.getTimed( "noExpectedError", 0L ).run();
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No expected error: afterEach called" 
+    )
+    public void tm_01270A67C( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	this.container.setAfterEach( verifyProc );
+    	this.getTimed( "noExpectedError", 0L ).run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No expected error: afterThis called" 
+    )
+    public void tm_03E7D9A7F( Test.Case tc ) {
+    	TestProcedure verifyProc = new TestProcedure( 0L, null );
+    	TestCase noExpectedError = this.getTimed( "noExpectedError", 0L );
+    	noExpectedError.afterThis( verifyProc );
+    	noExpectedError.run();
+    	tc.assertTrue( verifyProc.executed );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No expected error: elapsedTime recorded" 
+    )
+    public void tm_055CF31C3( Test.Case tc ) {
+    	this.getTimed( "noExpectedError", 4L ).run();
+    	tc.assertTrue( this.getElapsedTime() >= 4L );
+    }
+        
+    @Test.Impl( 
+    	member = "method: void TestCase.run()", 
+    	description = "No expected error: unexpectedError is null" 
+    )
+    public void tm_0351B4D2E( Test.Case tc ) {
+    	this.getTimed( "noExpectedError", 0L ).run();
+    	tc.assertIsNull( this.getUnexpectedError() );
+    }
+
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "File location is set" 
+    )
+    public void tm_0BEAD9B90( Test.Case tc ) {
+    	this.noop.assertNotEqual( "one", "two" );
+    	tc.assertNonNull( this.getFileLocation() );
+    }
+            
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "Return is this" 
+    )
+    public void tm_0627EDD21( Test.Case tc ) {
+    	tc.assertEqual( this.noop, this.noop.assertNotEqual( 1, 2 ) );
+    }
+            
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "Test fails for equivalent objects" 
+    )
+    public void tm_01E192747( Test.Case tc ) {
+    	Set<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toSet() );
+    	Set<String> acb = Stream.of( "A", "C", "B" ).collect( Collectors.toSet() );
+    	this.noop.assertNotEqual( abc, acb );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
+    }
+            
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "Test fails when both null" 
+    )
+    public void tm_017A9D2D2( Test.Case tc ) {
+    	this.noop.assertNotEqual( null, null );
+    	tc.assertEqual( TestCase.State.FAIL, this.getState() );
+    }
+            
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "Test passes for inequivalent" 
+    )
+    public void tm_084F36AB6( Test.Case tc ) {
+    	List<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toList() );
+    	List<String> acb = Stream.of( "A", "C", "B" ).collect( Collectors.toList() );
+    	this.noop.assertNotEqual( abc, acb );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
+    }
+            
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
+    	description = "Test passes for one null and one not null" 
+    )
+    public void tm_0E7A5D7E5( Test.Case tc ) {
+    	this.noop.assertNotEqual( null, "hey" );
+    	tc.assertEqual( TestCase.State.PASS, this.getState() );
+    }
+
+
     
         
-    public static void test( String s, Object o, String... rest ) {
-    	System.out.println( ">>> s = " + s );
-    	System.out.println( ">>> o = " + o );
-    	System.out.println( ">>> rest = " + Strings.toString( rest ) );
-    	System.out.println( ">>> rest length = " + rest.length );
-    }
-        
     public static void main( String[] args ) {
-		//Stream.of( TestCase.class.getDeclaredMethods() )
-		//	.filter( m -> m.getName().equals( "fail" ) )
-		//	.map( m -> m.getReturnType() )
-		//	.forEach( System.out::println );
-		//test( "Hi", 42, "a", "B" );
-		//test( "Hi", 42, new String[] {"A", "B", "C"} );
-		//test( "HI", 5, "a", "", "b" );
-		//test( "hey", 0, "" );
-		
 		Test.eval( TestCase.class );
 		//Test.evalPackage( TestCase.class );
 	}
