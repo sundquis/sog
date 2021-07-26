@@ -1,8 +1,20 @@
 /**
- * Copyright (C) 2017 -- 2021 by TS Sundquist
- * *** *** * 
- * All rights reserved.
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 package sog.core.test;
 
@@ -18,17 +30,29 @@ import sog.core.Assert;
 import sog.core.Test;
 
 /**
- * 
+ * Responsibilities: 
+ * 		Represents a single member in a subject class.
+ * 		Defines the naming policy for classes, constructors, fields, and methods.
+ * 		Provides logic for handling special cases such as synthetic members.
+ * 	Structure:
+ * 		Constructors (one for each type of member) determine and record basic properties.
  */
+@Test.Subject( "test." )
 public class TestMember {
 
 	
-	// Naming policy for member classes
+	/* Naming policy for member classes. */
+	@Test.Decl( "Name is non-empty" )
+	@Test.Decl( "Name should be short and descriptive" )
+	@Test.Decl( "Names for nested classes indicate enclosure" )
 	private static String getSimpleName( Class<?> clazz ) {
 		return (clazz.isMemberClass() ? getSimpleName(clazz.getEnclosingClass()) + "." : "") + clazz.getSimpleName();
 	}
 	
-	// Naming policy for constructors
+	/* Naming policy for constructors. */
+	@Test.Decl( "Name is non-empty" )
+	@Test.Decl( "Name should be short and descriptive" )
+	@Test.Decl( "Name includes information about arguments" )
 	private static String getSimpleName( Constructor<?> constructor ) {
 		return new StringBuilder()
 			.append( "constructor: " )
@@ -41,7 +65,10 @@ public class TestMember {
 			.toString();
 	}
 	
-	// Naming policy for member fields
+	/* Naming policy for member fields. */
+	@Test.Decl( "Name is non-empty" )
+	@Test.Decl( "Name should be short and descriptive" )
+	@Test.Decl( "Name includes information about type" )
 	private static String getSimpleName( Field field ) {
 		return new StringBuilder()
 			.append( "field: " )
@@ -53,7 +80,11 @@ public class TestMember {
 			.toString();
 	}
 	
-	// Naming policy for member methods
+	/* Naming policy for member methods. */
+	@Test.Decl( "Return is non-empty" )
+	@Test.Decl( "Return should be short and descriptive" )
+	@Test.Decl( "Name includes information about arguments" )
+	@Test.Decl( "Name includes information about return type" )
 	private static String getSimpleName( Method method ) {
 		return new StringBuilder()
 			.append( "method: " )
@@ -81,7 +112,8 @@ public class TestMember {
 	private final boolean isMain;
 	private final boolean isAbstract;
 	private final boolean isEnumSpecial;
-	
+
+	@Test.Decl( "Throws AssertionError for null constructor" )
 	public TestMember( Constructor<?> constructor ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( constructor ) );
 		this.skip = constructor.getDeclaredAnnotation( Test.Skip.class );
@@ -92,7 +124,8 @@ public class TestMember {
 		this.isAbstract = false;
 		this.isEnumSpecial = this.isEnumConstructor( constructor );
 	}
-	
+
+	@Test.Decl( "False for custom enum constructors" )
 	private boolean isEnumConstructor( Constructor<?> constructor ) {
 		return Enum.class.isAssignableFrom( constructor.getDeclaringClass() )
 			&& constructor.getParameterCount() == 2
@@ -100,6 +133,7 @@ public class TestMember {
 			&& int.class.equals( constructor.getParameterTypes()[1] );
 	}
 	
+	@Test.Decl( "Throws AssertionError for null field" )
 	public TestMember( Field field ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( field ) );
 		this.skip = field.getDeclaredAnnotation( Test.Skip.class );
@@ -111,6 +145,7 @@ public class TestMember {
 		this.isEnumSpecial = false;
 	}
 	
+	@Test.Decl( "Throws AssertionError for null method" )
 	public TestMember( Method method ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( method ) );
 		this.skip = method.getDeclaredAnnotation( Test.Skip.class );
@@ -121,7 +156,8 @@ public class TestMember {
 		this.isAbstract = Modifier.isAbstract( method.getModifiers() );
 		this.isEnumSpecial = this.isEnumValues( method ) || this.isEnumValueOf( method );
 	}
-	
+
+	@Test.Decl( "False for custom valueOf methods" )
 	private boolean isEnumValueOf( Method method ) {
 		return Enum.class.isAssignableFrom( method.getDeclaringClass() )
 			&& "valueOf".equals(  method.getName() ) 
@@ -129,6 +165,7 @@ public class TestMember {
 			&& String.class.equals( method.getParameterTypes()[0] );
 	}
 	
+	@Test.Decl( "False for custom values methods" )
 	private boolean isEnumValues( Method method ) {
 		return Enum.class.isAssignableFrom( method.getDeclaringClass() )
 			&& "values".equals(  method.getName() ) 
@@ -136,26 +173,47 @@ public class TestMember {
 	}
 	
 		
-	
+	@Test.Decl( "True if annotated with Test.Skip" )
+	@Test.Decl( "True for synthetic constructors" )
+	@Test.Decl( "True for synthetic fields" )
+	@Test.Decl( "True for synthetic methods" )
+	@Test.Decl( "True for methods named main" )
+	@Test.Decl( "True for abstract methods" )
+	@Test.Decl( "True for enum constructor" )
+	@Test.Decl( "True for enum values method" )
+	@Test.Decl( "True for enum valueOf method" )
 	public boolean isSkipped() { 
 		return this.skip != null || this.isSynthetic || this.isMain || this.isAbstract || this.isEnumSpecial;
 	}
-	
+
+	@Test.Decl( "Configured reason reported for skipped elements" )
+	@Test.Decl( "Descriptive reason given for synthetic members" )
+	@Test.Decl( "Descriptive reason given for main method" )
+	@Test.Decl( "Descriptive reason given for abstract methods" )
+	@Test.Decl( "Descriptive reason given for enum generated members" )
 	public String getSkipReason() { 
 		return this.skip != null ? this.skip.value() : 
 			this.isSynthetic ? "Synthetic" : 
 				this.isMain ? "main() method" : 
 					this.isAbstract ? "Abstract method" : "Enum Special";
 	}
-	
-	public boolean isRequired() { 
+
+	@Test.Decl( "Constructors: True iff required by Policy" )
+	@Test.Decl( "Fields: True iff required by Policy" )
+	@Test.Decl( "Methods: True iff required by Policy" )
+	public boolean isRequired() {
 		return this.isRequired; 
 	}
 	
+	@Test.Decl( "Constructors: True iff member has one or more Test.Decl" )
+	@Test.Decl( "Fields: True iff member has one or more Test.Decl" )
+	@Test.Decl( "Methods: True iff member has one or more Test.Decl" )
 	public boolean hasDecls() { 
 		return this.decls.length > 0; 
 	}
-	
+
+	@Test.Decl( "Returns one TestDecl for each Test.Decl" )
+	@Test.Decl( "Each TestDecl has the correct member name" )
 	public Stream<TestDecl> getDecls() { 
 		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, d.value() ) );
 	}
@@ -164,6 +222,7 @@ public class TestMember {
 	
 	
 	@Override
+	@Test.Decl( "Return is not empty" )
 	public String toString() {
 		return this.memberName;
 	}

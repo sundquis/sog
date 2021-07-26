@@ -199,7 +199,7 @@ public class TestDeclTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		//Test.eval( TestDecl.class );
-		Test.evalPackage( TestDecl.class );
+		Test.eval( TestDecl.class );
+		//Test.evalPackage( TestDecl.class );
 	}
 }

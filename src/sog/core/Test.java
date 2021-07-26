@@ -640,7 +640,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for one subject class */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
-		TestResult.forSubject( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.err ) );
+		TestResult.forSubject( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.err, "\t" ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */

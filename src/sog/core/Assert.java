@@ -28,6 +28,13 @@ public class Assert {
 	 */
 	private Assert() {}
 
+	public static <T> T nonNull( T obj, String errMsg ) {
+		if ( obj == null ) {
+			Assert.fail( errMsg );
+		}
+		return obj;
+	}
+	
 	public static <T> T nonNull( T obj ) {
 		if ( obj == null ) {
 			Assert.fail();
@@ -151,6 +158,10 @@ public class Assert {
 	
 	private static void fail() {
 		throw new AssertionError();
+	}
+	
+	private static void fail( String errMsg ) {
+		throw new AssertionError( errMsg );
 	}
 	
 

@@ -30,24 +30,22 @@ import sog.core.Test;
 public class TestImpl extends TestIdentifier {
 	
 	
+	/**
+	 * Factory returns this value for non test methods (not annotated with Test.Impl)
+	 */
 	private static final TestImpl INVALID = new TestImpl();
-	
-	public static boolean isValid( TestImpl testImpl ) {
-		return testImpl != TestImpl.INVALID;
-	}
 	
 
 	/**
 	 * A public factory method for constructing a TestImpl corresponding to the given method.
-	 * If the method does not have a Test.Impl annotation then the return is null.
+	 * If the method does not have a Test.Impl annotation then the return is the constant INVALID.
 	 * 
 	 * @param method
 	 * @return
 	 */
 	@Test.Decl( "Throws AssertionError for null method" )
-	@Test.Decl( "Result is null for non-test methods" )
+	@Test.Decl( "Result is non-null for non-test methods" )
 	@Test.Decl( "Result is non-null for test methods" )
-	@Test.Decl( "Constructor only called with non-null arguments" )
 	public static TestImpl forMethod( Method method ) {
 		TestImpl result = TestImpl.INVALID;
 		
@@ -75,13 +73,19 @@ public class TestImpl extends TestIdentifier {
 		this.method = method;
 	}
 
-	
+	@Test.Skip( "One instance used to indiacte non-test method TestImpl" )
 	private TestImpl() {
 		super( "INVALID_MEMBER", "INVALID_DESCRIPTION" );
 		this.impl = null;
 		this.method = null;
 	}
 	
+	
+	@Test.Decl( "TestImpl from Test.Impl method is valid" )
+	@Test.Decl( "TestImpl from non Test.Impl method is not valid" )
+	public boolean isValid() {
+		return this.method != null;
+	}
 	
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is consistent with value supplied to factory" )
