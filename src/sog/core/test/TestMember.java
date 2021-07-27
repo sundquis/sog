@@ -195,7 +195,8 @@ public class TestMember {
 		return this.skip != null ? this.skip.value() : 
 			this.isSynthetic ? "Synthetic" : 
 				this.isMain ? "main() method" : 
-					this.isAbstract ? "Abstract method" : "Enum Special";
+					this.isAbstract ? "Abstract method" : 
+						this.isEnumSpecial ? "Enum Special" : null;
 	}
 
 	@Test.Decl( "Constructors: True iff required by Policy" )

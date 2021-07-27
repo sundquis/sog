@@ -23,8 +23,22 @@ import sog.core.Test;
 import sog.util.IndentWriter;
 
 /**
+ * 		Responsibilities: 
+ * 			Given a subject class, assembles and executes the set of test cases associated with the subject.
+ * 			Defines error reporting logic for mis-configured tests.
+ * 		Structure:
+ * 			Extends Result.
+ * 			Holds the subject class and container name.
+ * 			Holds lists of errors and skips.
+ * 			Holds collections for declared tests and their corresponding test cases.
+ * 		Services: 
+ * 			Public static factory method builds the Result: Given a subject class, examine the class
+ * 				for test declarations, match them with corresponding implementations in a container,
+ * 				and run the tests.
+ * 			Implements Printable.print( ... ) to include details on errors, skips, stubs, and failed cases.
  * 
  */
+@Test.Subject( "test." )
 public class TestResult extends Result {
 	
 	public static TestResult forSubject( Class<?> subjectClass ) {
@@ -338,18 +352,5 @@ public class TestResult extends Result {
 	public int getFailCount() {
 		return this.failCount;
 	}
-
-
-	
-	
-	
-	public static void main( String[] args ) {
-		Test.eval( TestResult.class );
-
-		System.out.println( "Done!" );
-	}
-	
-	
-
 
 }
