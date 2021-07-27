@@ -547,6 +547,17 @@ public class Test {
 		 * @return
 		 * 		this Test.Case
 		 */
+		// Can be used with the following "toggle block" pattern to manually check cases via visual inspection
+		// 
+		//		// TOGGLE:
+		//		//* */ tc.assertTrue( false ); /*
+		//		tc.assertTrue( true );
+		//		/* */
+		// 
+		// When the first line starts "/* */" the first assertion is live, causing the case to fail.
+		// When the first line starts "//* */" the second assertion is live, causing the case to pass.
+		// 
+		// Before the toggle block, messages explain how to visually check the test case.
 		public Test.Case addMessage( String message );
 
 

@@ -620,7 +620,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		
 		out.increaseIndent();
 		
-		if ( this.messages.size() > 0 ) {
+		if ( this.getFailCount() > 0 && this.messages.size() > 0 ) {
 			out.println( "Messages:" );
 			out.increaseIndent();
 			this.messages.forEach( out::println );
@@ -671,5 +671,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	public int hashCode() {
 		return this.impl.toString().hashCode();
 	}
+	
+	
 
 }

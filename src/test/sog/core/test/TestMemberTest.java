@@ -22,14 +22,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sog.core.Assert;
 import sog.core.Test;
 import sog.core.test.TestIdentifier;
 import sog.core.test.TestMember;
+import sog.util.Printable;
 
 /**
  * 
@@ -38,25 +41,54 @@ public class TestMemberTest extends Test.Container {
 
 	private final Map<String, Field> FIELDS;
 	
+	private final Map<Integer, Constructor<?>> CONSTRUCTORS;
+	
 	public TestMemberTest() {
 		super( TestMember.class );
 		
 		this.FIELDS = Arrays.stream( MySubject.class.getDeclaredFields() )
 			.collect( Collectors.toMap( Field::getName, Function.identity() ) );
+		this.CONSTRUCTORS = Arrays.stream( MySubject.class.getDeclaredConstructors() )
+			.collect( Collectors.toMap( Constructor::getParameterCount, Function.identity() ) );
 	}
 
 	public Field getField( String name ) {
 		return Assert.nonNull( this.FIELDS.get( name ), "Missing field: " + name );
 	}
 	
+	public Constructor<?> getConstructor( int argumentCount ) {
+		return Assert.nonNull( this.CONSTRUCTORS.get( argumentCount ), "Missing constructor: " + argumentCount );
+	}
+	
+	
+	
 	
 	
 	public static class MySubject {
+
+		@Test.Decl( "Constructor 1" )
+		public MySubject( String s ) {}
+		
+		@Test.Decl( "Constructor 2" )
+		public MySubject( String s, Integer i ) {}
+
+		@Test.Decl( "Constructor 3" )
+		public MySubject( Test t, Integer i, List<String> args ) {}
+
+		
+		public static final int FIELD1_DECL_COUNT = 4;
 		
 		@Test.Decl( "Description 1" )
 		@Test.Decl( "Description 2" )
 		@Test.Decl( "Description 3" )
+		@Test.Decl( "Description 4" )
 		public String field1;
+		
+		@Test.Decl( "Field 2" )
+		public Integer field2;
+		
+		@Test.Decl( "Field 3" )
+		public Class<?> field3;
 		
 	}
 	
@@ -106,69 +138,125 @@ public class TestMemberTest extends Test.Container {
 			.forEach( s -> tc.assertEqual( tm.toString(), s ) );
 	}
 		
-		@Test.Impl( 
-			member = "method: Stream TestMember.getDecls()", 
-			description = "Returns one TestDecl for each Test.Decl" 
-		)
-		public void tm_098316090( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream TestMember.getDecls()", 
+		description = "Returns one TestDecl for each Test.Decl" 
+	)
+	public void tm_098316090( Test.Case tc ) {
+		final TestMember tm = new TestMember( this.getField( "field1" ) );
+		tc.assertEqual( MySubject.FIELD1_DECL_COUNT, (int) tm.getDecls().count() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Class)", 
-			description = "Name is non-empty" 
-		)
-		public void tm_0C93EED34( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Class)", 
+		description = "Name is non-empty" 
+	)
+	public void tm_0C93EED34( Test.Case tc ) {
+		Function<Class<?>, String> mapper = c ->
+			this.evalSubjectMethod( null, "getSimpleName", "", c );
+		Stream.of( Test.Case.class, Object.class, Printable.class, List.of(1).getClass() )
+			.map( mapper ).forEach( tc::assertNotEmpty );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Class)", 
-			description = "Name should be short and descriptive" 
-		)
-		public void tm_07F846BE8( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Class)", 
+		description = "Name should be short and descriptive" 
+	)
+	public void tm_07F846BE8( Test.Case tc ) {
+		tc.addMessage( "Visual inspection of the following names:" );
+		tc.addMessage( "=========================================" );
+		Function<Class<?>, String> mapper = c ->
+			this.evalSubjectMethod( null, "getSimpleName", "", c );
+		Stream.of( Test.Case.class, Object.class, Printable.class, List.of(1).getClass() )
+			.map( mapper ).forEach( tc::addMessage );
+		// TOGGLE:
+		//* */ tc.assertTrue( false ); /*
+		tc.assertTrue( true );
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Class)", 
-			description = "Names for nested classes indicate enclosure" 
-		)
-		public void tm_092A54F47( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Class)", 
+		description = "Names for nested classes indicate enclosure" 
+	)
+	public void tm_092A54F47( Test.Case tc ) {
+		class Local {
+			class Nested {
+				class Inner {}
+			}
 		}
+		String name = this.evalSubjectMethod( null, "getSimpleName", "", Local.Nested.Inner.class );
+		tc.assertTrue( name.contains( "Local" ) );
+		tc.assertTrue( name.contains( "Nested" ) );
+		tc.assertTrue( name.contains( "Inner" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Constructor)", 
-			description = "Name includes information about arguments" 
-		)
-		public void tm_068CBE115( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Constructor)", 
+		description = "Name includes information about arguments" 
+	)
+	public void tm_068CBE115( Test.Case tc ) {
+		Constructor<?> c = this.getConstructor( 1 ); // String
+		String name = this.evalSubjectMethod( null, "getSimpleName", "", c );
+		tc.assertTrue( name.contains( "String" ) );
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Constructor)", 
-			description = "Name is non-empty" 
-		)
-		public void tm_07EBAFCF2( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+		c = this.getConstructor( 2 ); // String, Integer
+		name = this.evalSubjectMethod( null, "getSimpleName", "", c );
+		tc.assertTrue( name.contains( "String" ) );
+		tc.assertTrue( name.contains( "Integer" ) );
+
+		c = this.getConstructor( 3 ); // Test, Integer, List<String>
+		name = this.evalSubjectMethod( null, "getSimpleName", "", c );
+		tc.assertTrue( name.contains( "Test" ) );
+		tc.assertTrue( name.contains( "Integer" ) );
+		tc.assertTrue( name.contains( "List" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Constructor)", 
-			description = "Name should be short and descriptive" 
-		)
-		public void tm_0E635176A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Constructor)", 
+		description = "Name is non-empty" 
+	)
+	public void tm_07EBAFCF2( Test.Case tc ) {
+		Function<Constructor<?>, String> mapper = c -> this.evalSubjectMethod( null, "getSimpleName", "", c );
+		Stream.of( 1, 2, 3 ).map( this::getConstructor ).map( mapper )
+			.forEach( tc::assertNotEmpty );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getSimpleName(Field)", 
-			description = "Name includes information about type" 
-		)
-		public void tm_0B134AB71( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Constructor)", 
+		description = "Name should be short and descriptive" 
+	)
+	public void tm_0E635176A( Test.Case tc ) {
+		tc.addMessage( "Visual inspection of constructor names:" );
+		tc.addMessage( "=======================================" );
+		Function<Constructor<?>, String> mapper = c ->
+			this.evalSubjectMethod( null, "getSimpleName", "", c );
+		Stream.of( 1, 2, 3 ).map( this::getConstructor ).map( mapper )
+			.forEach( tc::addMessage );
+		// TOGGLE:
+		//* */ tc.assertTrue( false ); /*
+		tc.assertTrue( true );
+		/* */
+	}
+		
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Field)", 
+		description = "Name includes information about type" 
+	)
+	public void tm_0B134AB71( Test.Case tc ) {
+		Field f = this.getField( "field1" ); // String
+		String name = this.evalSubjectMethod( null, "getSimpleName", "", f );
+		tc.assertTrue( name.contains( "String" ) );
+		
+		f = this.getField( "field2" ); // Integer
+		name = this.evalSubjectMethod( null, "getSimpleName", "", f );
+		tc.assertTrue( name.contains( "Integer" ) );
+		
+		
+		f = this.getField( "field3" ); // Class<?>
+		name = this.evalSubjectMethod( null, "getSimpleName", "", f );
+		tc.assertTrue( name.contains( "Class" ) );
+	}
 		
 		@Test.Impl( 
 			member = "method: String TestMember.getSimpleName(Field)", 
