@@ -18,8 +18,17 @@
  */
 package test.sog.core.test;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import sog.core.Test;
+import sog.core.test.TestCase;
+import sog.core.test.TestDecl;
 import sog.core.test.TestResult;
+import sog.util.IndentWriter;
+import sog.util.StringOutputStream;
 
 /**
  * 
@@ -30,11 +39,469 @@ public class TestResultTest extends Test.Container {
 		super( TestResult.class );
 	}
 	
+	public int declarationCount( TestResult tr ) {
+		Map<String, TestDecl> declMap = null;
+		return this.getSubjectField( tr, "declMap", declMap ).size();
+	}
+	
+	public int testCaseCount( TestResult tr ) {
+		Set<TestCase> testCases = null;
+		return this.getSubjectField( tr, "testCases", testCases ).size();
+	}
+	
+	public void print( TestResult tr ) {
+		tr.print( new IndentWriter( System.out, "\t" ) );
+	}
+	
+	public String skipMessages( TestResult tr ) {
+		List<String> skips = null;
+		return this.getSubjectField( tr, "skips", skips ).stream().collect( Collectors.joining( ", " ) );
+	}
+	
+	public String messages( TestResult tr ) {
+		StringOutputStream sos = new StringOutputStream();
+		tr.print( new IndentWriter( sos, "" ) );
+		return sos.toString();
+	}
+	
 	
 	
 	
 	// TEST CASES
 	
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Each valid test declaration is recorded in the declaration mapping" 
+	)
+	public void tm_06E84278C( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertEqual( 9, this.declarationCount( tr ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Each valid test method implementation has a corresponding TestCase saved" 
+	)
+	public void tm_0D219DD38( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertEqual( 9, this.testCaseCount( tr ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has a skip message if member is marked as skipped and does not have test declarations",
+		weight = 4
+	)
+	public void tm_0DFF844E5( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		String skipMessages = this.skipMessages( tr );
+		tc.assertTrue( skipMessages.contains( "Skip member class for testing" ) );
+		tc.assertTrue( skipMessages.contains( "Skip constructor for testing" ) );
+		tc.assertTrue( skipMessages.contains( "Skip field for testing" ) );
+		tc.assertTrue( skipMessages.contains( "Skip method for testing" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has a skip message if subject is marked as skipped and not marked as subject" 
+	)
+	public void tm_0276B3961( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( SkippedSubject.class );
+		String skipMessages = this.skipMessages( tr );
+		tc.assertTrue( skipMessages.contains( "Skip this subject" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error if the test container does not name the correct subject class" 
+	)
+	public void tm_06466FC21( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ContainerNamesTheWrongSubject.class );
+		tc.assertTrue( this.messages( tr ).contains( "Container names the wrong subject" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message for non-skipped members that do not have declarations and are required by the current policy" 
+	)
+	public void tm_082C22D5C( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( UntestedMemberRequiredByTheCurrentPolicy.class );
+		tc.assertTrue( this.messages( tr ).contains( "Untested member required by the current policy" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message for test method implementations without a corresponding test declaration" 
+	)
+	public void tm_0550BC710( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( OrphanedTestImplementation.class );
+		tc.assertTrue( this.messages( tr ).contains( "Orphaned test implementation" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message if a member is marked as skipped and has test declaration(s)" 
+	)
+	public void tm_09AD22058( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( MemberHasDeclarationsAndAsMarkedForSkipping.class );
+		tc.assertTrue( this.messages( tr ).contains( "Member has declarations and is marked for skipping" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message if a memeber has two identical test declarations" 
+	)
+	public void tm_00DC5F430( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TwoIdenticalTestDeclarations.class );
+		tc.assertTrue( this.messages( tr ).contains( "Duplicate declaration" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message if an instance of the test container can not be constructed" 
+	)
+	public void tm_068B56D8B( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( BadContainer.class  );
+		tc.assertTrue( this.messages( tr ).contains( "Cannot construct container" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message if one test declaration has multiple test method implementations" 
+	)
+	public void tm_08C2EB022( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TwoTestImplementations.class );
+		tc.assertTrue( this.messages( tr ).contains( "Duplicate test implementation" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Has an error message if subject is marked as subject and marked skipped" 
+	)
+	public void tm_002F2CD43( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( SubjectAndSkipped.class );
+		tc.assertTrue( this.messages( tr ).contains( "Subject is also marked to be skipped" ) );
+	}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Has an error message if subject is not a top-level class" 
+		)
+		public void tm_0D820B0FE( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Has an error message if subject is not marked as subject and not marked skipped" 
+		)
+		public void tm_0863481DD( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Has an error message if the container location in the Test.Subject annotation is empty" 
+		)
+		public void tm_0FAF3F88D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If a parallel test container class is used the classname has 'Test' appended" 
+		)
+		public void tm_067B2BCB1( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If a test container was constructed afterAll is called after all cases have run" 
+		)
+		public void tm_0C883E562( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If not marked as skipped and has valid subject annotation then container location is not empty" 
+		)
+		public void tm_08BCB74C6( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If subject is marked as skipped and not marked as subject there are no test cases" 
+		)
+		public void tm_05A5284F2( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If the container location has internal dots the named test container class is used" 
+		)
+		public void tm_065FF5F4A( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If the container location has no dots a test container class in the same package is used" 
+		)
+		public void tm_0E1E1B12D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If the container location starts with a dot a member class test container is used" 
+		)
+		public void tm_0F3E8A40D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If there are any errors all test cases are counted as failures" 
+		)
+		public void tm_0CE25B846( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If there are any errors no test cases are run" 
+		)
+		public void tm_0CADCECD0( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "If there are no errors all test cases are run" 
+		)
+		public void tm_08A2F76A7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Members of skipped member classes are ignored" 
+		)
+		public void tm_088C372EB( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Return is not null" 
+		)
+		public void tm_0FD93921D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Subject constructors are scanned for test obligations" 
+		)
+		public void tm_0E5F0A2C0( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Subject fields are scanned for test obligations" 
+		)
+		public void tm_0282D26C0( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Subject member classes are recursively scanned" 
+		)
+		public void tm_07D880F1A( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Subject methods are scanned for test obligations" 
+		)
+		public void tm_05FC179DF( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Test container class is scanned for test method implementations" 
+		)
+		public void tm_04818361B( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Test container methods without Test.Impl annotations are ignored" 
+		)
+		public void tm_03E79E116( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Throws AssertionError for null subject" 
+		)
+		public void tm_05A0636B4( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "Unimplemented test declarations count as test failures" 
+		)
+		public void tm_05E38A64D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestResult TestResult.forSubject(Class)", 
+			description = "if the container location ends with a dot a test container class in a parallel package is used" 
+		)
+		public void tm_090A089C9( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: int TestResult.getFailCount()", 
+			description = "Return is the sum of the weights of all failing cases" 
+		)
+		public void tm_0F73C8FE7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: int TestResult.getPassCount()", 
+			description = "Return is the sum of the weights of all passing cases" 
+		)
+		public void tm_0EAD3A681( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: long TestResult.getElapsedTime()", 
+			description = "Reported time is the sum of the times of all test cases" 
+		)
+		public void tm_03A708E7D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addError(Throwable, String, Object[])", 
+			description = "Detail objects are included in message" 
+		)
+		public void tm_0CFB722F7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addError(Throwable, String, Object[])", 
+			description = "Error messages include description" 
+		)
+		public void tm_0E40BFC36( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addError(Throwable, String, Object[])", 
+			description = "If error is not null includes information on cause(s)" 
+		)
+		public void tm_00804D5A6( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addError(Throwable, String, Object[])", 
+			description = "If error is not null location information is printed" 
+		)
+		public void tm_0B12B5572( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addError(Throwable, String, Object[])", 
+			description = "If error is null no location information is printed" 
+		)
+		public void tm_0630247DC( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addSkip(Object, String)", 
+			description = "Skip message includes the reason" 
+		)
+		public void tm_0A8E65AEF( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.addSkip(Object, String)", 
+			description = "Skip message includes the source member" 
+		)
+		public void tm_0F7103BCA( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "If no errors then result details are included" 
+		)
+		public void tm_01937DAA6( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "If there are errors then details are included" 
+		)
+		public void tm_074B4DD86( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "Includes details on members that have been skipped" 
+		)
+		public void tm_023D7CCFF( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "Includes global summary statistics" 
+		)
+		public void tm_0C9B26B94( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "Includes stubs for unimplemented methods" 
+		)
+		public void tm_0F59F5383( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void TestResult.print(IndentWriter)", 
+			description = "Throws AssertionError for null writer" 
+		)
+		public void tm_0A4F4F335( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
 
 		
 		
@@ -46,6 +513,106 @@ public class TestResultTest extends Test.Container {
 	}
 }
 
-class Foo {
+@Test.Subject( ".TEST" )
+class ValidSubject {
+
+	@Test.Skip( "Skip field for testing" ) public boolean field0 = false;
+	@Test.Decl( "Test description" ) public int field1 = 1;
+	@Test.Decl( "Test description" ) public String field2 = "hi";
+	@Test.Decl( "Test description" ) public List<Integer> field3 = List.of(1, 2, 3);
 	
+	@Test.Skip( "Skip constructor for testing" ) ValidSubject() {}
+	@Test.Decl( "Test description" ) ValidSubject( int i ) {}
+	@Test.Decl( "Test description" ) ValidSubject( int i, String s ) {}
+	@Test.Decl( "Test description" ) ValidSubject( int i, String s, List<Integer> l ) {}
+
+	@Test.Skip( "Skip method for testing" ) public void method0() {}
+	@Test.Decl( "Test description" ) public void method1() {}
+	@Test.Decl( "Test description" ) public void method2() {}
+	@Test.Decl( "Test description" ) public void method3() {}
+	
+	@Test.Skip( "Skip member class for testing" )
+	public static class TEST extends Test.Container {
+		TEST() { super( ValidSubject.class ); }
+
+		@Test.Impl( member = "constructor: ValidSubject(int)", description = "Test description" )
+		public void tm_1( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "constructor: ValidSubject(int, String)", description = "Test description" )
+		public void tm_2( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "constructor: ValidSubject(int, String, List)", description = "Test description" )
+		public void tm_3( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "field: List ValidSubject.field3", description = "Test description" )
+		public void tm_4( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "field: String ValidSubject.field2", description = "Test description" )
+		public void tm_5( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "field: int ValidSubject.field1", description = "Test description" )
+		public void tm_6( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "method: void ValidSubject.method1()", description = "Test description" )
+		public void tm_7( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "method: void ValidSubject.method2()", description = "Test description" )
+		public void tm_8( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+
+		@Test.Impl( member = "method: void ValidSubject.method3()", description = "Test description" )
+		public void tm_9( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+	}
 }
+
+@Test.Skip( "Skip this subject" )
+class SkippedSubject{}
+
+@Test.Subject( ".TEST" )
+class ContainerNamesTheWrongSubject {
+	public static class TEST extends Test.Container {
+		TEST() { super(SkippedSubject.class); }
+	}
+}
+
+class UntestedMemberRequiredByTheCurrentPolicy {
+	public int i = 0;
+}
+
+@Test.Subject( ".TEST" )
+class OrphanedTestImplementation {
+	@Test.Skip( "skip" ) public static class TEST extends Test.Container {
+		TEST() { super( OrphanedTestImplementation.class ); }
+		@Test.Impl( member = "member", description = "description" ) public void orphan( Test.Case tc ) {}
+	}
+}
+
+class MemberHasDeclarationsAndAsMarkedForSkipping {
+	@Test.Decl( "A test" ) @Test.Skip( "skip" ) public int i = 0;
+}
+
+class TwoIdenticalTestDeclarations {
+	@Test.Decl( "test" ) @Test.Decl( "test" ) public int i = 0;
+}
+
+@Test.Subject( ".TEST" )
+class BadContainer {
+	public static class TEST extends Test.Container {
+		TEST( int i ) { super( BadContainer.class ); }
+	}
+}
+
+@Test.Subject( ".TEST" )
+class TwoTestImplementations {
+	@Test.Decl( "test" ) TwoTestImplementations() {}
+	@Test.Skip( "skip" ) public static class TEST extends Test.Container {
+		TEST() { super( TwoTestImplementations.class ); }
+		@Test.Impl( member = "constructor: TwoTestImplementations()", description = "test" )
+		public void tm_impl1( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+		@Test.Impl( member = "constructor: TwoTestImplementations()", description = "test" )
+		public void tm_impl2( Test.Case tc ) { tc.addMessage( "GENERATED STUB" ); }
+	}
+}
+
+@Test.Subject( ".TEST" )
+@Test.Skip( "skip" )
+class SubjectAndSkipped {}

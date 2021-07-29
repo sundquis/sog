@@ -1728,7 +1728,7 @@ public class TestCaseTest extends Test.Container {
     
         
     public static void main( String[] args ) {
-		Test.eval( TestCase.class );
-		//Test.evalPackage( TestCase.class );
+		//Test.eval( TestCase.class );
+		Test.evalPackage( TestCase.class );
 	}
 }

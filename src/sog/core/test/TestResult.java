@@ -18,6 +18,7 @@
  */
 package sog.core.test;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,14 +65,51 @@ public class TestResult extends Result {
 	 */
 	// General Assertions;
 	@Test.Decl( "Throws AssertionError for null subject" )
-	@Test.Decl( "If TestResult has errors then all tests fail" )
 	@Test.Decl( "Return is not null" )
 
 	// Properties from loadSubject()
+	@Test.Decl( "Has an error message if subject is not a top-level class" )
+	@Test.Decl( "Has an error message if subject is marked as subject and marked skipped" )
+	@Test.Decl( "Has an error message if subject is not marked as subject and not marked skipped" )
+	@Test.Decl( "Has a skip message if subject is marked as skipped and not marked as subject" )
+	@Test.Decl( "If subject is marked as skipped and not marked as subject there are no test cases" )
+	@Test.Decl( "Has an error message if the container location in the Test.Subject annotation is empty" )
+	@Test.Decl( "If not marked as skipped and has valid subject annotation then container location is not empty" )
+	
 	// Properties from scanSubject()
+	@Test.Decl( "Subject fields are scanned for test obligations" )
+	@Test.Decl( "Subject constructors are scanned for test obligations" )
+	@Test.Decl( "Subject methods are scanned for test obligations" )
+	@Test.Decl( "Subject member classes are recursively scanned" )
+	@Test.Decl( "Members of skipped member classes are ignored" )
+	@Test.Decl( "Has a skip message if member is marked as skipped and does not have test declarations" )
+	@Test.Decl( "Has an error message if a member is marked as skipped and has test declaration(s)" )
+	@Test.Decl( "Has an error message for non-skipped members that do not have declarations and are required by the current policy" )
+	@Test.Decl( "Has an error message if a memeber has two identical test declarations" )
+	@Test.Decl( "Each valid test declaration is recorded in the declaration mapping" )
+
 	// Properties from loadContainer()
+	@Test.Decl( "If the container location starts with a dot a member class test container is used" )
+	@Test.Decl( "if the container location ends with a dot a test container class in a parallel package is used" )
+	@Test.Decl( "If a parallel test container class is used the classname has 'Test' appended" )
+	@Test.Decl( "If the container location has no dots a test container class in the same package is used" )
+	@Test.Decl( "If the container location has internal dots the named test container class is used" )
+	@Test.Decl( "Has an error message if an instance of the test container can not be constructed" )
+	@Test.Decl( "Has an error if the test container does not name the correct subject class" )
+	
 	// Properties from scanContainer()
+	@Test.Decl( "Test container class is scanned for test method implementations" )
+	@Test.Decl( "Test container methods without Test.Impl annotations are ignored" )
+	@Test.Decl( "Has an error message for test method implementations without a corresponding test declaration" )
+	@Test.Decl( "Has an error message if one test declaration has multiple test method implementations" )
+	@Test.Decl( "Each valid test method implementation has a corresponding TestCase saved" )
+	
 	// Properties from runTests()
+	@Test.Decl( "Unimplemented test declarations count as test failures" )
+	@Test.Decl( "If there are any errors no test cases are run" )
+	@Test.Decl( "If there are any errors all test cases are counted as failures" )
+	@Test.Decl( "If there are no errors all test cases are run" )
+	@Test.Decl( "If a test container was constructed afterAll is called after all cases have run" )
 	public static TestResult forSubject( Class<?> subjectClass ) {
 		TestResult result = new TestResult( Assert.nonNull( subjectClass ).getName() );
 		
@@ -207,11 +245,6 @@ public class TestResult extends Result {
 	}
 		
 	
-	@Test.Decl( "Generates an error if subject is not a top-level class" )
-	@Test.Decl( "Generates an error if class is marked as subject and skipped" )
-	@Test.Decl( "Generates an error if class is not marked as subject and not skipped" )
-	@Test.Decl( "Generates a skip message if marked as skipped and not marked as subject" )
-	@Test.Decl( "If " )
 	private void loadSubject( Class<?> subjectClass ) {
 		this.subjectClass = Assert.nonNull( subjectClass );
 		
@@ -233,7 +266,11 @@ public class TestResult extends Result {
 			}
 		} else {
 			if ( isSubject ) {
-				this.containerLocation = subj.value();
+				if ( subj.value().isEmpty() ) {
+					this.addError( null, "Subject annotation has empty container location", this.subjectClass );
+				} else {
+					this.containerLocation = subj.value();
+				}
 			} else {
 				this.addError( null, "Subject class is not annotated", this.subjectClass );
 			}
@@ -246,20 +283,26 @@ public class TestResult extends Result {
 	}
 	
 	private Stream<TestMember> scanClass( Class<?> clazz ) {
-		if ( clazz.getDeclaredAnnotation( Test.Skip.class ) != null ) {
-			return Stream.of();
+		Stream<TestMember> result = null;
+		Test.Skip skip = clazz.getDeclaredAnnotation( Test.Skip.class );
+		
+		if ( skip == null ) {
+			result = Stream.concat(
+				Stream.concat( 
+					Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::new ),
+					Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::new )
+				), 
+				Stream.concat( 
+					Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::new ),
+					Arrays.stream( clazz.getDeclaredClasses() ).flatMap( this::scanClass )
+				)
+			);
+		} else {
+			result = Stream.of();
+			this.addSkip( clazz, skip.value() );
 		}
 		
-		return Stream.concat(
-			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredConstructors() ).map( TestMember::new ),
-				Arrays.stream( clazz.getDeclaredFields() ).map( TestMember::new )
-			), 
-			Stream.concat( 
-				Arrays.stream( clazz.getDeclaredMethods() ).map( TestMember::new ),
-				Arrays.stream( clazz.getDeclaredClasses() ).flatMap( this::scanClass )
-			)
-		);
+		return result;
 	}
 	
 	private void scanMember( TestMember member ) {
@@ -319,8 +362,10 @@ public class TestResult extends Result {
 		
 		try {
 			Class<?> clazz = Class.forName( containerClassName );
-			this.container = (Test.Container) clazz.getDeclaredConstructor().newInstance();
-		} catch ( Exception e ) {
+			Constructor<?> cons = clazz.getDeclaredConstructor();
+			cons.setAccessible( true );
+			this.container = (Test.Container) cons.newInstance();
+		} catch ( Throwable e ) {
 			this.addError( e, "Cannot construct container", this.subjectClass, "Container name", containerClassName );
 			return;
 		}
@@ -331,7 +376,7 @@ public class TestResult extends Result {
 		}
 	}
 	
-	
+
 	private void scanContainer() {
 		if ( this.container == null ) {
 			return;
