@@ -615,6 +615,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Includes file location on failure" )
 	@Test.Decl( "Includes fail messages on failure" )
 	@Test.Decl( "Includes additional messages on failure" )
+	@Test.Decl( "Prints stack trace when excpetion is thrown" )
+	@Test.Decl( "Prints causes when excpetion is thrown" )
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out ).println( this.toString() );
 		
@@ -628,10 +630,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		}
 		
 		if ( this.unexpectedError != null ) {
-			out.println( "Error:" + this.unexpectedError );
-			out.increaseIndent();
-			App.get().getLocation( this.unexpectedError ).forEach( out::println );
-			out.decreaseIndent();
+			out.printErr( this.unexpectedError );
 		}
 		
 		out.decreaseIndent();

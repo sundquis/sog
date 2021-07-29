@@ -35,10 +35,17 @@ public class TestResultTest extends Test.Container {
 	
 	// TEST CASES
 	
-	
+
+		
+		
+		
 
 	public static void main( String[] args ) {
 		Test.eval( TestResult.class );
-		// Test.evalPackage( TestResult.class );
+		//Test.evalPackage( TestResult.class );
 	}
+}
+
+class Foo {
+	
 }

@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Strings;
 import sog.core.Test;
@@ -74,6 +75,13 @@ public class IndentWriter {
 		this.out.println( this.prefix.peek() + s );
 	}
 	
+	// WARNING: A Printable class cannot implement its Printable.print( out ) method using
+	// out.println( this ) since this results in a recursive loop. What is probably intended
+	// is something like out.println( this.toString() )
+	public void println( Printable p ) {
+		p.print( this );
+	}
+	
 	public void println( Object obj ) {
 		this.println( Strings.toString( obj ) );
 	}
@@ -81,6 +89,22 @@ public class IndentWriter {
 	
 	public void println() {
 		this.out.println();
+	}
+	
+	public void printErr( Throwable error ) {
+		this.println( "Error: " + error );
+		this.increaseIndent();
+		App.get().getLocation( error ).forEach( this::println );
+		this.decreaseIndent();
+		
+		Throwable cause = error.getCause();
+		while ( cause != null ) {
+			this.println( "Caused By: " + cause );
+			this.increaseIndent();
+			App.get().getLocation( cause ).forEach( this::println );
+			this.decreaseIndent();
+			cause = cause.getCause();
+		}		
 	}
 
 	public void close() {

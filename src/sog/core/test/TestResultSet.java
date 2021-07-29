@@ -13,7 +13,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import sog.core.App;
 import sog.core.Assert;
@@ -32,13 +35,15 @@ import sog.util.IndentWriter;
  */
 public class TestResultSet extends Result {
 	
+	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
+	
 	private long elapsedTime = 0L;
 	
 	private int passCount = 0;
 	
 	private int failCount = 0;
 
-	private final List<Result> results = new ArrayList<Result>();
+	private final Set<Result> results = new TreeSet<Result>( COMP );
 	
 	public TestResultSet( String label ) {
 		super( Assert.nonEmpty( label ) );
@@ -63,10 +68,11 @@ public class TestResultSet extends Result {
 
 	@Override
 	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println( this );
+		Assert.nonNull( out ).println( this.toString() );
 		
 		out.increaseIndent();
-		this.results.forEach( out::println );
+		this.results.stream().map( Object::toString ).forEach( out::println );
+		//this.results.forEach( out::println );  // VERBOSE
 		out.decreaseIndent();
 	}
 	

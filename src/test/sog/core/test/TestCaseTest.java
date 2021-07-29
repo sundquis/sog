@@ -172,11 +172,17 @@ public class TestCaseTest extends Test.Container {
 		private Procedure currentBeforeEach = Procedure.NOOP;
 		private Procedure currentAfterEach = Procedure.NOOP;
 		
+		private Error unexpectedError = null;
+		
 		public MyContainer() { super( TestCase.class ); }
 		
 		public void setBeforeEach( Procedure beforeEach ) { this.currentBeforeEach = beforeEach; }
 		
 		public void setAfterEach( Procedure afterEach ) { this.currentAfterEach = afterEach; }
+		
+		public void setUnexpectedError( Error error ) {
+			this.unexpectedError = error;
+		}
 		
 		@Override public Procedure beforeEach() { return this.currentBeforeEach; }
 		
@@ -253,6 +259,13 @@ public class TestCaseTest extends Test.Container {
 			tc.expectError( AssertionError.class );
 			tc.assertTrue( true );
 			this.sleep();
+		}
+
+		@Test.Impl( member = "member", description = "description" )
+		public void throwUnexpectedError( Test.Case tc ) {
+			tc.assertTrue( true );
+			this.sleep();
+			throw this.unexpectedError;
 		}
 
 						
@@ -1159,6 +1172,37 @@ public class TestCaseTest extends Test.Container {
     	tc.expectError( AssertionError.class );
     	this.noop.print( null );
     }
+
+	@Test.Impl( 
+		member = "method: void TestCase.print(IndentWriter)", 
+		description = "Prints causes when excpetion is thrown" 
+	)
+	public void tm_0641DAB89( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		String msg = "Some unique error message";
+		this.container.setUnexpectedError( new Error( msg ) );
+		TestCase error = this.getTimed( "throwUnexpectedError", 0L );
+		error.run();
+		error.print( new IndentWriter( sos ) );
+		tc.assertTrue( sos.toString().contains( msg ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: void TestCase.print(IndentWriter)", 
+		description = "Prints stack trace when excpetion is thrown" 
+	)
+	public void tm_05AA9AAF8( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		List<String> messages = List.of( "Root cause", "Nested exception", "Outer exception message" );
+		Error err = new Error( messages.get( 0 ) );
+		err = new Error( messages.get( 1 ), err );
+		err = new Error( messages.get( 2 ), err );
+		this.container.setUnexpectedError( err );
+		TestCase error = this.getTimed( "throwUnexpectedError", 0L );
+		error.run();
+		error.print( new IndentWriter( sos ) );
+		messages.forEach( s -> tc.assertTrue( sos.toString().contains( s ) ) );
+	}
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
