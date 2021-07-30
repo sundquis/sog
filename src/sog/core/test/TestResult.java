@@ -262,7 +262,8 @@ public class TestResult extends Result {
 			if ( isSubject ) {
 				this.addError( null, "Subject is also marked to be skipped", this.subjectClass );
 			} else {
-				this.addSkip( this.subjectClass, skip.value() );
+				// The recursive method scanClass() adds the skip message
+				// this.addSkip( this.subjectClass, skip.value() );
 			}
 		} else {
 			if ( isSubject ) {
