@@ -231,12 +231,14 @@ import sog.core.test.TestResultSet;
  * 				Implements Printable.print( ... ) to include details on errors, skips, stubs, and failed cases.
  * 
  * 		sog.core.test.TestResultSet
- * 			Responsibilities: FIXME
- * 			Structure: FIXME
- * 			Services: FIXME
- * 
- * 
- * 		
+ * 			Responsibilities:
+ * 				Aggregate results for multiple classes into a single Result.
+ * 			Structure:
+ * 				Extends Result to represent the results after running the test case.
+ * 				Holds a Set of TestResult instance sorted by classname.
+ * 			Services:
+ *  			Mutator to set the verbosity level.
+ *  			Static helper methods for assembling sets of results by package or directory tree.
  */
 @Test.Subject( "test." )
 public class Test {
@@ -663,7 +665,15 @@ public class Test {
 	/** Convenience method to evaluate and print results for the package containing the given subject */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void evalPackage( Class<?> subjectClass ) {
-		TestResultSet.testPackage( Assert.nonNull( subjectClass ) );
+		TestResultSet.forPackage( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.err, "\t" ) );
+	}
+	
+	/** Convenience method to evaluate and print results for the package containing the given subject */
+	@Test.Decl( "Throws AssertionError for null subject" )
+	@Test.Decl( "When verbose is true details for each class TestResult are given" )
+	public static void evalPackage( Class<?> subjectClass, boolean verbose ) {
+		TestResultSet.forPackage( Assert.nonNull( subjectClass ) )
+			.setVerbose( verbose ).print( new IndentWriter( System.err, "\t" ) );
 	}
 	
 	

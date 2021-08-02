@@ -744,7 +744,25 @@ public class TestTest extends Test.Container {
     	Test.evalPackage( null );
     }
 
-	
+	@Test.Impl( 
+		member = "method: void Test.evalPackage(Class, boolean)", 
+		description = "Throws AssertionError for null subject" 
+	)
+	public void tm_0CCC0451D( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Test.evalPackage( null );
+	}
+		
+	@Test.Impl( 
+		member = "method: void Test.evalPackage(Class, boolean)", 
+		description = "When verbose is true details for each class TestResult are given" 
+	)
+	public void tm_06BBE429E( Test.Case tc ) {
+		tc.addMessage( "Manually verified." );
+		tc.assertTrue( true );
+	}
+
+		
 
 	public static void main( String[] args ) {
 		Test.eval( Test.class );

@@ -8,10 +8,10 @@
 package sog.core;
 
 
+import java.io.IOException;
 import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -53,11 +53,11 @@ public class App implements Runnable {
 		
 	private App() {
 		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Property.STRING ) );
-		this.root = Assert.rwDirectory( Paths.get( rootDirName ) );
+		this.root = Assert.rwDirectory( Path.of( rootDirName ) );
 		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Property.STRING ) );
 		this.sourceDirs = Property.get( "source.dirs", Collections.<String>emptyList(), Property.LIST )
 			.stream()
-			.map( Paths::get )
+			.map( Path::of )
 			.collect( Collectors.toList() );
 		Assert.isTrue( ! this.sourceDirs.isEmpty() );
 
@@ -107,7 +107,7 @@ public class App implements Runnable {
 
 		String[] components = encl.getName().split( "\\." );
 		components[components.length-1] += ".java";
-		Path relName = Paths.get( "",  components );
+		Path relName = Path.of( "",  components );
 
 		return this.sourceDirs().stream()
 			.filter( p -> Files.exists( p.resolve( relName ) ) )
@@ -135,7 +135,7 @@ public class App implements Runnable {
 
 		String[] components = encl.getName().split( "\\." );
 		components[components.length-1] += ".java";
-		Path relName = Paths.get( "",  components );
+		Path relName = Path.of( "",  components );
 
 		return this.sourceDirs().stream()
 			.map( p -> p.resolve( relName ) )
@@ -143,6 +143,35 @@ public class App implements Runnable {
 			.findAny()
 			.orElseGet( () -> { Fatal.error( "No source file for " + clazz ); return null; } );
 	}
+	
+	
+	public Stream<String> classesInPackage( Class<?> clazz ) {
+		final Path sourceDir = this.sourceDir( clazz );
+		final Path packageDir = this.sourceFile( clazz ).getParent();
+		
+		try {
+			return Files.list( packageDir )
+				.filter( Files::isRegularFile )
+				.map( sourceDir::relativize )
+				.map( Strings::relativePathToClassname );
+		} catch ( IOException e ) {
+			throw new AppException( e );
+		}
+	}
+	
+	
+	public Stream<String> classesUnderDir( Path sourceDir ) {
+		try {
+			return Files.walk( sourceDir )
+				.filter( Files::isRegularFile )
+				.map( sourceDir::relativize )
+				.map( Strings::relativePathToClassname );
+		} catch ( IOException e ) {
+			throw new AppException( e );
+		}
+	}
+	
+	
 	
 	/** For objects that require clean-up before shutdown. */
 	public static interface OnShutdown {
@@ -270,7 +299,10 @@ public class App implements Runnable {
 	}
 	
 	public static void main( String[] args ) {
-		Other.a();
+		//Other.a();
+		
+		App.get().classesUnderDir( Path.of( "/", "home", "sundquis", "book", "sog", "src" ) ).forEach( System.out::println );
+		//App.get().classesInPackage( test.sog.core.test.TestResultTest.class ).forEach( System.out::println );
 	}
 
 	

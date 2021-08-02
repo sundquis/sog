@@ -439,14 +439,13 @@ public class TestResult extends Result {
 
 		out.increaseIndent();
 		
+		out.println();
 		if ( this.errors.size() > 0 ) {
-			out.println();
 			out.println( "ERRORS:" );
 			out.increaseIndent();
 			this.errors.forEach( out::println );
 			out.decreaseIndent();
 		} else {
-			out.println();
 			out.println( "RESULTS:" );
 			out.increaseIndent();
 			this.testCases.forEach( out::println );
@@ -468,6 +467,7 @@ public class TestResult extends Result {
 			this.unimplemented.forEach( out::println );
 			out.decreaseIndent();
 		}
+		out.println();
 
 		out.decreaseIndent();
 	}

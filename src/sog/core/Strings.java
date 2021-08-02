@@ -230,9 +230,9 @@ public final class Strings {
 	@Test.Decl( "Class to relative path to classname correct" )
 	public static String relativePathToClassname( Path relativePath ) {
 		String result = StreamSupport.stream( relativePath.spliterator(), false )
-			.map( p -> p.toString() )
+			.map( Object::toString )
 			.collect( Collectors.joining( "." ) );
-		Assert.isTrue( result.endsWith( ".java" ) );
+		//Assert.isTrue( result.endsWith( ".java" ) );
 		return result.replace( ".java",  "" );
 	}
 	
