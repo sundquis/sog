@@ -1,10 +1,21 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.core.test;
 
 import java.io.IOException;
@@ -33,6 +44,7 @@ import sog.util.IndentWriter;
  * Refactor adding streams of classes to a TestResultSet
  * Find bug in source dir method
  */
+@Test.Subject( "test." )
 public class TestResultSet extends Result {
 	
 	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
@@ -199,12 +211,6 @@ public class TestResultSet extends Result {
 		System.out.println();
 		
 		// TESTS
-
-		//testPackage( "sog", "core", "test" );
-		//testPackages( "sog", "core", "test" );
-		//testSourceDir( "home", "sundquis", "book", "sog", "src", "sog", "core", "test" );
-		testPackage( Test.class );
-
 
 		System.out.println("\nDone!");
 

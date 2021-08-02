@@ -215,7 +215,7 @@ public class TestResult extends Result {
 			out.increaseIndent();
 			Arrays.stream( this.details ).forEach( out::println );
 			if ( this.error != null ) {
-				out.println( this.error );
+				out.printErr( this.error );
 			}
 			out.decreaseIndent();
 		}
@@ -229,7 +229,6 @@ public class TestResult extends Result {
 	 * @param description - Brief String description of the error
 	 * @param details - Any number of additional Objects providing details
 	 */
-	@Test.Decl( "If error is null no location information is printed" )
 	@Test.Decl( "If error is not null location information is printed" )
 	@Test.Decl( "If error is not null includes information on cause(s)" )
 	@Test.Decl( "Error messages include description" )
@@ -436,7 +435,7 @@ public class TestResult extends Result {
 	@Test.Decl( "Includes details on members that have been skipped" )
 	@Test.Decl( "Includes stubs for unimplemented methods" )
 	public void print( IndentWriter out ) {
-		out.println( this.toString() );
+		Assert.nonNull( out ).println( this.toString() );
 
 		out.increaseIndent();
 		

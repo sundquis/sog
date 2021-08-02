@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import sog.core.App;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.test.Policy;
@@ -347,197 +348,244 @@ public class TestResultTest extends Test.Container {
 		tc.assertTrue( this.messages( tr ).contains( "constructor: TestObligations()" ) );
 	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Subject fields are scanned for test obligations" 
-		)
-		public void tm_0282D26C0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Subject fields are scanned for test obligations" 
+	)
+	public void tm_0282D26C0( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TestObligations.class );
+		// FRAGILE. Could try to retrieve and access individual Err instances.
+		tc.assertTrue( this.messages( tr ).contains( "field: int TestObligations.testableField" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Subject member classes are recursively scanned" 
-		)
-		public void tm_07D880F1A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Subject member classes are recursively scanned" 
+	)
+	public void tm_07D880F1A( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TestObligations.class );
+		// FRAGILE. Could try to retrieve and access individual Err instances.
+		tc.assertTrue( this.messages( tr ).contains( "field: int TestObligations.Inner.testableInnerField" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Subject methods are scanned for test obligations" 
-		)
-		public void tm_05FC179DF( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Subject methods are scanned for test obligations" 
+	)
+	public void tm_05FC179DF( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TestObligations.class );
+		// FRAGILE. Could try to retrieve and access individual Err instances.
+		tc.assertTrue( this.messages( tr ).contains( "method: void TestObligations.testableMethod" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Test container class is scanned for test method implementations" 
-		)
-		public void tm_04818361B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Test container class is scanned for test method implementations" 
+	)
+	public void tm_04818361B( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertEqual( "9", this.getContainer( tr ).toString() );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Test container methods without Test.Impl annotations are ignored" 
-		)
-		public void tm_03E79E116( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Test container methods without Test.Impl annotations are ignored" 
+	)
+	public void tm_03E79E116( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertEqual( "9", this.getContainer( tr ).toString() );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Throws AssertionError for null subject" 
-		)
-		public void tm_05A0636B4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Throws AssertionError for null subject" 
+	)
+	public void tm_05A0636B4( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		TestResult.forSubject( null );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "Unimplemented test declarations count as test failures" 
-		)
-		public void tm_05E38A64D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "Unimplemented test declarations count as test failures" 
+	)
+	public void tm_05E38A64D( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( UnimplementedDeclarations.class );
+		tc.assertEqual( 3, tr.getFailCount() );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestResult TestResult.forSubject(Class)", 
-			description = "if the container location ends with a dot a test container class in a parallel package is used" 
-		)
-		public void tm_090A089C9( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestResult TestResult.forSubject(Class)", 
+		description = "if the container location ends with a dot a test container class in a parallel package is used" 
+	)
+	public void tm_090A089C9( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( TestResult.class );
+		String containerLocation = this.containerLocation( tr );
+		tc.assertTrue( containerLocation.endsWith( "." ) );
+		String containerClassname = this.getContainer( tr ).getClass().getName();
+		tc.assertTrue( containerClassname.startsWith( containerLocation ) );
+		tc.assertTrue( containerClassname.endsWith( TestResult.class.getName() + "Test" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: int TestResult.getFailCount()", 
-			description = "Return is the sum of the weights of all failing cases" 
-		)
-		public void tm_0F73C8FE7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int TestResult.getFailCount()", 
+		description = "Return is the sum of the weights of all failing cases" 
+	)
+	public void tm_0F73C8FE7( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( FailCount.class );
+		tc.assertEqual( 6, tr.getFailCount() );
+	}
 		
-		@Test.Impl( 
-			member = "method: int TestResult.getPassCount()", 
-			description = "Return is the sum of the weights of all passing cases" 
-		)
-		public void tm_0EAD3A681( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int TestResult.getPassCount()", 
+		description = "Return is the sum of the weights of all passing cases" 
+	)
+	public void tm_0EAD3A681( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( PassCount.class );
+		tc.assertEqual( 6, tr.getPassCount() );
+	}
 		
-		@Test.Impl( 
-			member = "method: long TestResult.getElapsedTime()", 
-			description = "Reported time is the sum of the times of all test cases" 
-		)
-		public void tm_03A708E7D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: long TestResult.getElapsedTime()", 
+		description = "Reported time is the sum of the times of all test cases" 
+	)
+	public void tm_03A708E7D( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ElapsdedTime.class );
+		tc.assertTrue( tr.getElapsedTime() >= 60L );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addError(Throwable, String, Object[])", 
-			description = "Detail objects are included in message" 
-		)
-		public void tm_0CFB722F7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		description = "Detail objects are included in message" 
+	)
+	public void tm_0CFB722F7( Test.Case tc ) {
+		Object detail = new Object() {};
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		this.evalSubjectMethod( tr, "addError", null, new Exception(), "Message", new Object[] { detail } );
+		tc.assertTrue( this.messages( tr ).contains( detail.toString() ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addError(Throwable, String, Object[])", 
-			description = "Error messages include description" 
-		)
-		public void tm_0E40BFC36( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		description = "Error messages include description" 
+	)
+	public void tm_0E40BFC36( Test.Case tc ) {
+		Object detail = new Object() {};
+		String message = "A really strange message";
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		this.evalSubjectMethod( tr, "addError", null, new Exception(), message, new Object[] { detail } );
+		tc.assertTrue( this.messages( tr ).contains( message ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addError(Throwable, String, Object[])", 
-			description = "If error is not null includes information on cause(s)" 
-		)
-		public void tm_00804D5A6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		description = "If error is not null includes information on cause(s)" 
+	)
+	public void tm_00804D5A6( Test.Case tc ) {
+		Object detail = new Object() {};
+		String message = "A really strange message";
+		String err1 = "First error message";
+		String err2 = "Second error message";
+		Exception e1 = new Exception( err1 );
+		Exception e2 = new Exception( err2, e1 );
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		this.evalSubjectMethod( tr, "addError", null, e2, message, new Object[] { detail } );
+		tc.assertTrue( this.messages( tr ).contains( err1 ) );
+		tc.assertTrue( this.messages( tr ).contains( err2 ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addError(Throwable, String, Object[])", 
-			description = "If error is not null location information is printed" 
-		)
-		public void tm_0B12B5572( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		description = "If error is not null location information is printed" 
+	)
+	public void tm_0B12B5572( Test.Case tc ) {
+		Object detail = new Object() {};
+		String message = "A really strange message";
+		String err = "First error message in exception";
+		Exception e = new Exception( err );
+		String location = App.get().getLocation( e ).findFirst().get();
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		this.evalSubjectMethod( tr, "addError", null, e, message, new Object[] { detail } );
+		tc.assertTrue( this.messages( tr ).contains( location ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addError(Throwable, String, Object[])", 
-			description = "If error is null no location information is printed" 
-		)
-		public void tm_0630247DC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addSkip(Object, String)", 
+		description = "Skip message includes the reason" 
+	)
+	public void tm_0A8E65AEF( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		String message = "Reason to skip somoe memeber";
+		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { null, message} );
+		tc.assertTrue( this.skipMessages( tr ).contains( message ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addSkip(Object, String)", 
-			description = "Skip message includes the reason" 
-		)
-		public void tm_0A8E65AEF( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.addSkip(Object, String)", 
+		description = "Skip message includes the source member" 
+	)
+	public void tm_0F7103BCA( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		Object source = new Object() {};
+		String message = "Reason to skip somoe memeber";
+		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { source, message} );
+		tc.assertTrue( this.skipMessages( tr ).contains( source.toString() ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.addSkip(Object, String)", 
-			description = "Skip message includes the source member" 
-		)
-		public void tm_0F7103BCA( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "If no errors then result details are included" 
+	)
+	public void tm_01937DAA6( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertTrue( this.messages( tr ).contains( "RESULTS" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "If no errors then result details are included" 
-		)
-		public void tm_01937DAA6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "If there are errors then details are included" 
+	)
+	public void tm_074B4DD86( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( AllFailWithErrors.class );
+		tc.assertTrue( this.messages( tr ).contains( "ERRORS" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "If there are errors then details are included" 
-		)
-		public void tm_074B4DD86( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "Includes details on members that have been skipped" 
+	)
+	public void tm_023D7CCFF( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( SkippedMemberClassesIgnored.class );
+		tc.assertTrue( this.messages( tr ).contains( "SKIPS" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "Includes details on members that have been skipped" 
-		)
-		public void tm_023D7CCFF( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "Includes global summary statistics" 
+	)
+	public void tm_0C9B26B94( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tc.assertTrue( this.messages( tr ).contains( tr.toString() ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "Includes global summary statistics" 
-		)
-		public void tm_0C9B26B94( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "Includes stubs for unimplemented methods" 
+	)
+	public void tm_0F59F5383( Test.Case tc ) {
+		TestResult tr = TestResult.forSubject( UnimplementedDeclarations.class );
+		tc.assertTrue( this.messages( tr ).contains( "STUBS" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "Includes stubs for unimplemented methods" 
-		)
-		public void tm_0F59F5383( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: void TestResult.print(IndentWriter)", 
-			description = "Throws AssertionError for null writer" 
-		)
-		public void tm_0A4F4F335( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void TestResult.print(IndentWriter)", 
+		description = "Throws AssertionError for null writer" 
+	)
+	public void tm_0A4F4F335( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		tr.print( null );
+	}
 
 		
 		
@@ -574,6 +622,9 @@ class ValidSubject {
 		TEST() { super( ValidSubject.class ); }
 		
 		@Override public String toString() { return "" + this.testCaseCount; }
+		
+		// This is ignored
+		public void tm_0( TestCase tc ) { this.testCaseCount++; tc.addMessage( "GENERATED STUB" ); }
 
 		@Test.Impl( member = "constructor: ValidSubject(int)", description = "Test description" )
 		public void tm_1( Test.Case tc ) { this.testCaseCount++; tc.addMessage( "GENERATED STUB" ); }
@@ -749,4 +800,93 @@ class TestObligations {
 
 	public TestObligations() {}
 	
+	public int testableField = 0;
+	
+	public void testableMethod() {}
+	
+	public static class Inner {
+		public int testableInnerField = 0;
+	}
+	
+}
+
+class UnimplementedDeclarations {
+	@Test.Decl( "test" ) UnimplementedDeclarations() {}
+	@Test.Decl( "test" ) public int i = 0;
+	@Test.Decl( "test" ) public void m() {}
+}
+
+@Test.Subject( ".TEST" )
+class FailCount {
+
+	@Test.Decl( "test" ) public FailCount() {}
+	@Test.Decl( "test" ) public void m1() {}
+	@Test.Decl( "test" ) public void m2() {}
+	
+	@Test.Skip( "container" )
+	public static class TEST extends Test.Container {
+		TEST() { super( FailCount.class ); }
+
+		@Test.Impl( member = "constructor: FailCount()", description = "test" )
+		public void tm_0A72809EE( Test.Case tc ) { tc.assertTrue( false ); }
+		
+		@Test.Impl( member = "method: void FailCount.m1()", description = "test", weight = 2 )
+		public void tm_029F3244F( Test.Case tc ) { tc.assertTrue( false ); }
+			
+		@Test.Impl( member = "method: void FailCount.m2()", description = "test", weight = 3 )
+		public void tm_031A4C9AE( Test.Case tc ) { tc.assertTrue( false ); }
+	}
+}
+
+@Test.Subject( ".TEST" )
+class PassCount {
+
+	@Test.Decl( "test" ) public PassCount() {}
+	@Test.Decl( "test" ) public void m1() {}
+	@Test.Decl( "test" ) public void m2() {}
+	
+	@Test.Skip( "container" )
+	public static class TEST extends Test.Container {
+		TEST() { super( PassCount.class ); }
+
+		@Test.Impl( member = "constructor: PassCount()", description = "test" )
+		public void tm_0A72809EE( Test.Case tc ) { tc.assertTrue( true ); }
+		
+		@Test.Impl( member = "method: void PassCount.m1()", description = "test", weight = 2 )
+		public void tm_029F3244F( Test.Case tc ) { tc.assertTrue( true ); }
+			
+		@Test.Impl( member = "method: void PassCount.m2()", description = "test", weight = 3 )
+		public void tm_031A4C9AE( Test.Case tc ) { tc.assertTrue( true ); }
+	}
+}
+
+@Test.Subject( ".TEST" )
+class ElapsdedTime {
+
+	@Test.Decl( "test" ) public ElapsdedTime() {}
+	@Test.Decl( "test" ) public void m1() {}
+	@Test.Decl( "test" ) public void m2() {}
+	
+	@Test.Skip( "container" )
+	public static class TEST extends Test.Container {
+		TEST() { super( ElapsdedTime.class ); }
+
+		@Test.Impl( member = "constructor: ElapsdedTime()", description = "test" )
+		public void tm_03F5EA4E2( Test.Case tc ) { 
+			try { Thread.sleep( 10L ); } catch ( InterruptedException e ) {}
+			tc.addMessage( "GENERATED STUB" ); 
+		}
+			
+		@Test.Impl( member = "method: void ElapsdedTime.m1()", description = "test" )
+		public void tm_0D96C1045( Test.Case tc ) {
+			try { Thread.sleep( 20L ); } catch ( InterruptedException e ) {}
+			tc.addMessage( "GENERATED STUB" );
+		}
+			
+		@Test.Impl( member = "method: void ElapsdedTime.m2()", description = "test" )
+		public void tm_0E11DB5A4( Test.Case tc ) {
+			try { Thread.sleep( 30L ); } catch ( InterruptedException e ) {}
+			tc.addMessage( "GENERATED STUB" );
+		}
+	}
 }

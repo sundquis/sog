@@ -82,15 +82,6 @@ public class IndentWriter {
 		p.print( this );
 	}
 	
-	public void println( Object obj ) {
-		this.println( Strings.toString( obj ) );
-	}
-	
-	
-	public void println() {
-		this.out.println();
-	}
-	
 	public void printErr( Throwable error ) {
 		this.println( "Error: " + error );
 		this.increaseIndent();
@@ -107,6 +98,15 @@ public class IndentWriter {
 		}		
 	}
 
+	public void println( Object obj ) {
+		this.println( Strings.toString( obj ) );
+	}
+	
+	
+	public void println() {
+		this.out.println();
+	}
+	
 	public void close() {
 		if ( this.out != null ) {
 			this.out.close();
