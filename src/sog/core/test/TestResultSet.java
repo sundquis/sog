@@ -177,14 +177,14 @@ public class TestResultSet extends Result {
 	@Test.Decl( "Adds one TestResult for each valid class name" )
 	@Test.Decl( "Return is this TestResultSet instance" )
 	public TestResultSet addClasses( Stream<String> classnames ) {
-		classnames.forEach( this::addClass );
+		Assert.nonNull( classnames ).forEach( this::addClass );
 		
 		return this;
 	}
 	
 	
 	@Test.Decl( "Aggregates TestResult instances for every class under every source directory" )
-	@Test.Decl( "Return is this TestResultSet instance" )
+	@Test.Decl( "Return is not null" )
 	public static TestResultSet forAllSourceDirs() {
 		final TestResultSet trs = new TestResultSet( "ALL:\t" 
 			+ new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
@@ -198,9 +198,9 @@ public class TestResultSet extends Result {
 
 	@Test.Decl( "Throws AssertionError for null source path" )
 	@Test.Decl( "Aggregates TestResult instances for every class under the given source directory" )
-	@Test.Decl( "Return is this TestResultSet instance" )
+	@Test.Decl( "Return is not null" )
 	public static TestResultSet forSourceDir( Path sourceDir ) {
-		TestResultSet trs = new TestResultSet( "DIR:\t" + sourceDir );
+		TestResultSet trs = new TestResultSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
 		
 		trs.addClasses( App.get().classesUnderDir( sourceDir ) );
 		
@@ -210,9 +210,9 @@ public class TestResultSet extends Result {
 	
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Aggregates TestResult instances for every class in the same package as the given class" )
-	@Test.Decl( "Return is this TestResultSet instance" )
+	@Test.Decl( "Return is not null" )
 	public static TestResultSet forPackage( Class<?> clazz ) {
-		TestResultSet trs = new TestResultSet( "PKG:\t" + clazz.getPackageName() );
+		TestResultSet trs = new TestResultSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
 		
 		trs.addClasses( App.get().classesInPackage( clazz ) );
 		
