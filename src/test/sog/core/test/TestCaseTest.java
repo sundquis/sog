@@ -39,6 +39,7 @@ import sog.util.StringOutputStream;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestCaseTest extends Test.Container {
 
 	

@@ -127,7 +127,7 @@ public class Property {
 	@Test.Decl( "White space after comman ignored" )
 	public static final Function<String, String[]> CSV = (s) -> s.split( ",\\s*" );
 	
-	public static final Function<String, List<String>> LIST = (s) -> Arrays.asList( CSV.apply(s));
+	public static final Function<String, List<String>> LIST = (s) -> Arrays.asList( CSV.apply(s) );
 	
 
 	

@@ -31,6 +31,7 @@ import sog.core.test.Policy;
 /**
  * Test implementations.
  */
+@Test.Skip( "Container" )
 public class PolicyTest extends Test.Container {
 
 

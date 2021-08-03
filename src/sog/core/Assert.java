@@ -133,6 +133,13 @@ public class Assert {
 		return n;		
 	}
 	
+	public static Integer greaterThan( Integer n, Integer min ) {
+		if ( n <= min ) {
+			Assert.fail();
+		}
+		return n;
+	}
+	
 	public static Integer lessThan( Integer n, Integer max ) {
 		if ( n >= max ) {
 			Assert.fail();

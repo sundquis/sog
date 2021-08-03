@@ -29,6 +29,7 @@ import sog.core.Test;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestTest extends Test.Container {
 
 	

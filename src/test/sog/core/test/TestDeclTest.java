@@ -29,6 +29,7 @@ import sog.util.StringOutputStream;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestDeclTest extends Test.Container {
 
 	public TestDeclTest() {

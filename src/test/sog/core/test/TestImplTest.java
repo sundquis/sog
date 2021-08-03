@@ -31,6 +31,7 @@ import sog.core.test.TestImpl;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestImplTest extends Test.Container {
 	
 	private final Map<String, Method> methods;

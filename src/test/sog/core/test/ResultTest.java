@@ -26,6 +26,7 @@ import sog.util.IndentWriter;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class ResultTest extends Test.Container {
 
 	public ResultTest() {

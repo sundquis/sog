@@ -1,10 +1,21 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.core;
 
 
@@ -13,7 +24,6 @@ import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,17 +31,16 @@ import java.util.stream.Stream;
 
 
 /**
- * @author sundquis
- * 
  * Singleton used to expose access to application level resources:
- *
  */
+@Test.Subject( "test." )
 public class App implements Runnable {
 	
 	private static App instance = null;
 	
 	/** Retrieve the singleton instance */
 	@Test.Decl( "Is not null" )
+	@Test.Decl( "Value is unique" )
 	public static App get() {
 		if ( App.instance == null ) {
 			synchronized ( App.class ) {
@@ -43,6 +52,7 @@ public class App implements Runnable {
 		return Assert.nonNull( App.instance );
 	}
 
+	
 	private final Path root;
 	
 	private final String description;
@@ -55,7 +65,7 @@ public class App implements Runnable {
 		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Property.STRING ) );
 		this.root = Assert.rwDirectory( Path.of( rootDirName ) );
 		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Property.STRING ) );
-		this.sourceDirs = Property.get( "source.dirs", Collections.<String>emptyList(), Property.LIST )
+		this.sourceDirs = Property.get( "source.dirs", List.of(), Property.LIST )
 			.stream()
 			.map( Path::of )
 			.collect( Collectors.toList() );
@@ -86,7 +96,8 @@ public class App implements Runnable {
 	}
 	
 	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws App Excetion for missing source dir" )
+	@Test.Decl( "Throws AppException for missing source dir" )
+	@Test.Decl( "Throws AppException for secondary class" )
 	@Test.Decl( "Returns non null" )
 	@Test.Decl( "Returns readable" )
 	@Test.Decl( "Returns writeable" )
@@ -107,7 +118,7 @@ public class App implements Runnable {
 
 		String[] components = encl.getName().split( "\\." );
 		components[components.length-1] += ".java";
-		Path relName = Path.of( "",  components );
+		Path relName = Path.of( "", components );
 
 		return this.sourceDirs().stream()
 			.filter( p -> Files.exists( p.resolve( relName ) ) )
@@ -116,7 +127,8 @@ public class App implements Runnable {
 	}
 		
 	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws App Excetion for missing source file" )
+	@Test.Decl( "Throws AppException for missing source file" )
+	@Test.Decl( "Throws AppException for secondary class" )
 	@Test.Decl( "Returns non null" )
 	@Test.Decl( "Returns readable" )
 	@Test.Decl( "Returns container for nested class" )
@@ -144,7 +156,14 @@ public class App implements Runnable {
 			.orElseGet( () -> { Fatal.error( "No source file for " + clazz ); return null; } );
 	}
 	
-	
+
+	@Test.Decl( "Throws AssertionError for null class" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are non-empty" )
+	@Test.Decl( "Elements are files in the package directory of the given class" )
+	@Test.Decl( "Java source files correspond to class names" )
+	@Test.Decl( "Non-source files are included" )
 	public Stream<String> classesInPackage( Class<?> clazz ) {
 		final Path sourceDir = this.sourceDir( clazz );
 		final Path packageDir = this.sourceFile( clazz ).getParent();
@@ -160,6 +179,13 @@ public class App implements Runnable {
 	}
 	
 	
+	@Test.Decl( "Throws AssertionError for null class source directory" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are non-empty" )
+	@Test.Decl( "Elements are files in the package directory of the given class or one of its sub-directories" )
+	@Test.Decl( "Java source files correspond to class names" )
+	@Test.Decl( "Non-source files are included" )
 	public Stream<String> classesUnderDir( Path sourceDir ) {
 		try {
 			return Files.walk( sourceDir )
@@ -174,6 +200,7 @@ public class App implements Runnable {
 	
 	
 	/** For objects that require clean-up before shutdown. */
+	@FunctionalInterface
 	public static interface OnShutdown {
 		public void terminate();
 	}
@@ -185,7 +212,6 @@ public class App implements Runnable {
 		this.objectsForShutdown.add( Assert.nonNull( os ) );
 	}
 
-	/** @see java.lang.Runnable#run() */
 	@Override
 	@Test.Decl( "Calls terminate on shutdown" )
 	public void run() {
@@ -199,14 +225,14 @@ public class App implements Runnable {
 		}
 	}
 	
-	// FIXME: Test
 	public static class Location {
 		
 		private final String className;
 		private final String methodName;
 		private final String fileName;
 		private final int lineNo;
-		
+
+		@Test.Decl( "Throws AssertionError for null frame" )
 		public Location( StackWalker.StackFrame sf ) {
 			Assert.nonNull( sf );
 			
@@ -216,6 +242,7 @@ public class App implements Runnable {
 			this.lineNo = sf.getLineNumber();
 		}
 		
+		@Test.Decl( "Throws AssertionError for null element" )
 		public Location( StackTraceElement ste ) {
 			Assert.nonNull( ste );
 			
@@ -226,6 +253,8 @@ public class App implements Runnable {
 		}
 		
 		@Override
+		@Test.Decl( "Return is non-empty" )
+		@Test.Decl( "Return includes a file link" )
 		public String toString() {
 			String[] comps = this.className.split("\\.");
 			//comps[comps.length-1] = ".";  // This stopped working 7/25/21
@@ -235,11 +264,15 @@ public class App implements Runnable {
 		}
 	}
 
-	// FIXME: Document
+	
 	/**
-	 * Return a file name and line number pointer to the calling location of an executing program.
-	 * If the calling stack does not have the requested depth, an AppException is thrown.
+	 * Return a stream of file locations corresponding to the stack of an executing program.
 	 */
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Elements correspond to the calling stack" )
 	public Stream<String> getLocation() {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
 			.map( Location::new )
@@ -250,6 +283,18 @@ public class App implements Runnable {
 	
 	
 	
+	/**
+	 * Return a stream of file locations corresponding to the portion of the stack of an executing 
+	 * program that corresponds to classes with the given prefix.
+	 */
+	@Test.Decl( "Throws AssertionError for null prefix" )
+	@Test.Decl( "Throws AssertionError for empty prefix" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Elements correspond to the calling stack" )
+	@Test.Decl( "Elements have classes matching the given class name prefix" )
 	public Stream<String> getLocation( String prefix ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
 			.filter( sf -> sf.getClassName().startsWith( prefix ) )
@@ -261,6 +306,16 @@ public class App implements Runnable {
 	
 	
 
+	/**
+	 * Return a stream of file locations corresponding to the stack trace elements of the
+	 * given Throwable object.
+	 */
+	@Test.Decl( "Throws AssertionError for null Throwable" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Elements correspond to the stack trace" )
 	public Stream<String> getLocation( Throwable th ) {
 		return Arrays.stream( th.getStackTrace() )
 			.map( Location::new )
@@ -268,42 +323,50 @@ public class App implements Runnable {
 	}
 	
 
+	@Test.Decl( "Throws AssertionError for negative offset" )
+	@Test.Decl( "Throws AppExcpetion for offset larger than stack depth" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is correct for offset = 0" )
+	@Test.Decl( "Return is correct for offset = 1" )
+	@Test.Decl( "Return is correct for offset = 2" )
+	@Test.Decl( "Returns class for nested class" )
+	@Test.Decl( "Returns class for nested nested class" )
+	@Test.Decl( "Returns class for local class" )
+	@Test.Decl( "Returns class for anonymous class" )
+	@Test.Decl( "Returns class for secondary class" )
 	public Class<?> getCallingClass( int offset ) {
-		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
-			s -> s.skip(offset).findFirst().get()
-		).getDeclaringClass();
-	}
-	
-	
-	public String getCallingMethod( int offset ) {
-		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk(
-			s -> s.skip( offset ).findFirst().get()
-		).getMethodName();
-	}
-	
-	
-	
-	
-	// FIXME: Convert to proper testing
-	public static class Inner {
-		public static void a() {
-			System.out.println( App.get().getCallingClass(0));
-			System.out.println( App.get().getCallingClass(1));
-			System.out.println( App.get().getCallingClass(2));
-			System.out.println( App.get().getCallingClass(3));
-		}
-	}
-	
-	public static class Other {
-		public static void a() { Inner.a(); }
-	}
-	
-	public static void main( String[] args ) {
-		//Other.a();
+		Assert.nonNeg( offset );
 		
-		App.get().classesUnderDir( Path.of( "/", "home", "sundquis", "book", "sog", "src" ) ).forEach( System.out::println );
-		//App.get().classesInPackage( test.sog.core.test.TestResultTest.class ).forEach( System.out::println );
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
+			.map( StackWalker.StackFrame::getDeclaringClass )
+			.skip( offset )
+			.findFirst()
+			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
+		);
 	}
-
+	
+	
+	@Test.Decl( "Throws AssertionError for negative offset" )
+	@Test.Decl( "Throws AppExcpetion for offset larger than stack depth" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is correct for offset = 0" )
+	@Test.Decl( "Return is correct for offset = 1" )
+	@Test.Decl( "Return is correct for offset = 2" )
+	@Test.Decl( "Returns method for nested class" )
+	@Test.Decl( "Returns method for nested nested class" )
+	@Test.Decl( "Returns method for local class" )
+	@Test.Decl( "Returns method for anonymous class" )
+	@Test.Decl( "Returns method for secondary class" )
+	public String getCallingMethod( int offset ) {
+		Assert.nonNeg( offset );
+		
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
+			.map(  StackWalker.StackFrame::getMethodName )
+			.skip( offset )
+			.findFirst()
+			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
+		);
+	}
+	
 	
 }

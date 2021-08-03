@@ -41,6 +41,7 @@ import sog.util.Printable;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestMemberTest extends Test.Container {
 
 	private final Map<Integer, Constructor<?>> CONSTRUCTORS;

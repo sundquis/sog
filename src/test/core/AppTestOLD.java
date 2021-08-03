@@ -25,17 +25,17 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class AppTest extends Test.Container {
+public class AppTestOLD extends Test.Container {
 
 
 	public Path mySource; 
 	
 	public Path myDir;
 	
-	public AppTest() {
+	public AppTestOLD() {
 		super( App.class );
-		this.mySource = App.get().sourceFile( AppTest.class );
-		this.myDir = App.get().sourceDir( AppTest.class );
+		this.mySource = App.get().sourceFile( AppTestOLD.class );
+		this.myDir = App.get().sourceDir( AppTestOLD.class );
 	}
 
 

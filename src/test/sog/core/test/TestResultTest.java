@@ -36,6 +36,7 @@ import sog.util.StringOutputStream;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestResultTest extends Test.Container {
 	
 	private final Policy originalPolicy;

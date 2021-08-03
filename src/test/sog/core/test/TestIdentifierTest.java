@@ -25,6 +25,7 @@ import sog.core.test.TestIdentifier;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestIdentifierTest extends Test.Container {
 
 	public TestIdentifierTest() {

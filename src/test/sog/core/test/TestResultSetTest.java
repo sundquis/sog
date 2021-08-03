@@ -33,6 +33,7 @@ import sog.util.StringOutputStream;
 /**
  * 
  */
+@Test.Skip( "Container" )
 public class TestResultSetTest extends Test.Container {
 
 	public TestResultSetTest() {
