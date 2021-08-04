@@ -77,6 +77,7 @@ public class TestCaseTest extends Test.Container {
 	public Procedure beforeEach() {
 		return () -> {
 			this.noop = this.getCase( "noopMethod" );
+			this.current = this.noop;
 			this.impl = this.getSubjectField( this.noop, "impl", impl );
 		};
 	}
@@ -200,6 +201,12 @@ public class TestCaseTest extends Test.Container {
 		
 		@Test.Impl( member = "member", description = "description" )
 		public void failMethod( Test.Case tc ) { tc.assertTrue( false  ); }
+
+		@Test.Impl( member = "member", description = "description" )
+		public void assertPass( Test.Case tc ) { tc.assertPass(); }
+		
+		@Test.Impl( member = "member", description = "description" )
+		public void assertFail( Test.Case tc ) { tc.assertFail( "Fail message" ); }
 
 		@Test.Impl( member = "A", description = "D", priority = 0 ) public void ordered0() {}
 		@Test.Impl( member = "A", description = "D", priority = 1 ) public void ordered1() {}
@@ -1725,11 +1732,76 @@ public class TestCaseTest extends Test.Container {
     	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
 
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertFail(String)", 
+		description = "Case fails" 
+	)
+	public void tm_03E469684( Test.Case tc ) {
+		TestCase test = this.getTimed( "assertFail", 0L );
+		test.run();
+		tc.assertEqual( TestCase.State.FAIL, this.getState() );
+	}
+		
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertFail(String)", 
+		description = "File location is set" 
+	)
+	public void tm_01784AA72( Test.Case tc ) {
+		TestCase test = this.getTimed( "assertFail", 0L );
+		test.run();
+		tc.assertNotEmpty( this.getFileLocation() );
+	}
+		
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertFail(String)", 
+		description = "Return is this" 
+	)
+	public void tm_0B1FB3D83( Test.Case tc ) {
+		tc.assertEqual( this.noop, this.noop.assertFail( "msg" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertFail(String)", 
+		description = "Failure message is included" 
+	)
+	public void tm_06A65EDDA( Test.Case tc ) {
+		String msg = "Some error message";
+		this.noop.assertFail( msg );
+		tc.assertEqual( List.of( msg ), this.getMessages() );
+	}
+
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertPass()", 
+		description = "Case passes" 
+	)
+	public void tm_03AC7014A( Test.Case tc ) {
+		TestCase test = this.getTimed( "assertPass", 0L );
+		test.run();
+		tc.assertEqual( TestCase.State.PASS, this.getState() );
+	}
+		
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertPass()", 
+		description = "File location is set" 
+	)
+	public void tm_0E591072E( Test.Case tc ) {
+		TestCase test = this.getTimed( "assertPass", 0L );
+		test.run();
+		tc.assertNotEmpty( this.getFileLocation() );
+	}
+		
+	@Test.Impl( 
+		member = "method: Test.Case TestCase.assertPass()", 
+		description = "Return is this" 
+	)
+	public void tm_0A4CAD73F( Test.Case tc ) {
+		tc.assertEqual( this.noop, this.noop.assertPass() );
+	}
 
     
         
     public static void main( String[] args ) {
-		//Test.eval( TestCase.class );
-		Test.evalPackage( TestCase.class );
+		Test.eval( TestCase.class );
+		//Test.evalPackage( TestCase.class );
 	}
 }

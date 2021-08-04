@@ -299,7 +299,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "If old state is FAIL, new state is FAIL" )
 	private void fail( String message ) {
 		this.state = this.state.fail();
-		this.addMessage( Assert.nonEmpty( message ) + ": " + this.getFileLocation() );
+		this.addMessage( Assert.nonEmpty( message ) );
 	}
 	
 
@@ -407,6 +407,41 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 
 	
 
+	/**
+	 * Unconditionally mark the case as failed.
+	 *  
+	 * @param message
+	 * 		Description of the failure
+	 * @return
+	 * 		this Test.Case
+	 */
+	@Test.Decl( "Case fails" )
+	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
+	@Test.Decl( "Failure message is included" )
+	public Test.Case assertFail( String message ) {
+		this.setFileLocation();
+		this.fail( message );
+		return this;
+	}
+	
+	
+	/**
+	 * Unconditionally mark the case as passed.
+	 *  
+	 * @return
+	 * 		this Test.Case
+	 */
+	@Test.Decl( "Case passes" )
+	@Test.Decl( "Return is this" )
+	@Test.Decl( "File location is set" )
+	public Test.Case assertPass() {
+		this.setFileLocation();
+		this.pass();
+		return this;
+	}
+		
+	
 	/**
 	 * Assert that the given object is not null.
 	 * 

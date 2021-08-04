@@ -552,12 +552,13 @@ public class Test {
 		// Can be used with the following "toggle block" pattern to manually check cases via visual inspection
 		// 
 		//		// TOGGLE:
-		//		//* */ tc.assertTrue( false ); /*
-		//		tc.assertTrue( true );
+		//		//* */ tc.assertPass(); /*
+		//		tc.assertFail( "Explanation" );
+		//		...
 		//		/* */
 		// 
-		// When the first line starts "/* */" the first assertion is live, causing the case to fail.
-		// When the first line starts "//* */" the second assertion is live, causing the case to pass.
+		// When the first line starts "/* */" the first assertion is live, causing the case to pass.
+		// When the first line starts "//* */" the second assertion is live, causing the case to fail.
 		// 
 		// Before the toggle block, messages explain how to visually check the test case.
 		public Test.Case addMessage( String message );
@@ -602,6 +603,26 @@ public class Test {
 		 * 		this Test.Case
 		 */
 		public Test.Case assertNotEmpty( String s );
+		
+		
+		/**
+		 * Unconditionally mark the case as passed.
+		 *  
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case assertPass();
+		
+		
+		/**
+		 * Unconditionally mark the case as failed.
+		 *  
+		 * @param message
+		 * 		Description of the failure
+		 * @return
+		 * 		this Test.Case
+		 */
+		public Test.Case assertFail( String message );
 		
 		
 		/**

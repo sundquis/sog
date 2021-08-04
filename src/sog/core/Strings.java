@@ -9,11 +9,8 @@ package sog.core;
 
 
 import java.lang.reflect.Array;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 
 public final class Strings {
@@ -226,21 +223,6 @@ public final class Strings {
 		
 		return buf.toString();
 	}
-	
-	@Test.Decl( "Class to relative path to classname correct" )
-	public static String relativePathToClassname( Path relativePath ) {
-		String result = StreamSupport.stream( relativePath.spliterator(), false )
-			.map( Object::toString )
-			.collect( Collectors.joining( "." ) );
-		//Assert.isTrue( result.endsWith( ".java" ) );
-		return result.replace( ".java",  "" );
-	}
-	
-	public static String relativePathToPackage( Path relativePath ) {
-		return StreamSupport.stream( Assert.nonNull( relativePath ).spliterator(), false )
-			.map( Path::toString ).collect( Collectors.joining( "." ) );
-	}
-	
 	
 	public static String toHex( int n ) {
 		return "0x" + Strings.rightJustify( Integer.toHexString(n).toUpperCase(),  4,  '0' );

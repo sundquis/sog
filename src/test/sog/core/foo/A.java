@@ -19,15 +19,61 @@
 
 package test.sog.core.foo;
 
+import java.util.stream.Stream;
+
+import sog.core.App;
 import sog.core.Test;
 
 /**
  * 
  */
-@Test.Skip( "Container" )
+@Test.Skip( "For testing" )
 public class A {
 	
-	public A() {
+	public static Stream<String> classesInPackage() {
+		return App.get().classesInPackage( Secondary.class );
+	}
+	
+	public static String classname() {
+		return "test.sog.core.foo.Secondary";
+	}
+	
+	public static Stream<String> getLocation() {
+		return Secondary.getLocationSecondary();
+	}
+	
+	public static Stream<String> getLocation( String prefix ) {
+		return Secondary.getLocationSecondary( prefix );
+	}
+	
+	public static Stream<String> getLocationException() {
+		return Secondary.getLocationExceptionSecondary();
+	}
+	
+	public A() {}
+	
+	static public Object getSecondary() {
+		return new Secondary();
 	}
 
+}
+
+@Test.Skip( "For testing" )
+class Secondary {
+	
+	static Stream<String> getLocationSecondary() {
+		return App.get().getLocation();
+	}
+
+	static Stream<String> getLocationSecondary( String prefix ) {
+		return App.get().getLocation( prefix );
+	}
+
+	static Stream<String> getLocationExceptionSecondary() {
+		return App.get().getLocation( new Exception() );
+	}
+	
+	@Override public String toString() {
+		return App.get().getCallingMethod( 1 );
+	}
 }

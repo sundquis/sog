@@ -16,37 +16,31 @@
  * *** *** * 
  * Sundquist
  */
-package sog.core;
+package test.sog.core;
+
+import sog.core.AppException;
+import sog.core.Test;
 
 /**
- * The base application exception type
- *
- * Depends on:
- * 		NONE
+ * 
  */
-@Test.Subject( "test." )
-public class AppException extends RuntimeException {
-
-	private static final long serialVersionUID = -2314875945481995828L;
-
-	/** Constructs an exception with empty detail message. */
-	public AppException() {
-		super();
-	}
-
-	/** Constructs an exception with specified detail message. */
-	public AppException( String msg ) {
-		super( msg );
-	}
-
-	/** Constructs an exception with specified cause. */
-	public AppException( Throwable cause ) {
-		super( cause );
-	}
-
-	/** Constructs an exception with specified detail message and cause. */
-	public AppException( String msg, Throwable cause ) {
-		super( msg, cause );
+@Test.Skip( "Container" )
+public class AppExceptionTest extends Test.Container {
+	
+	public AppExceptionTest() {
+		super( AppException.class );
 	}
 	
+	
+	
+	// TEST CASES
+	
+	
+	
+	
+
+	public static void main( String[] args ) {
+		Test.eval( AppException.class );
+		//Test.evalPackage( AppException.class );
+	}
 }

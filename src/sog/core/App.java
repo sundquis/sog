@@ -26,8 +26,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -156,23 +158,42 @@ public class App implements Runnable {
 			.orElseGet( () -> { Fatal.error( "No source file for " + clazz ); return null; } );
 	}
 	
+	
+	@Test.Decl( "True for every java source file" )
+	@Test.Decl( "False for null paths" )
+	@Test.Decl( "False for empty paths" )
+	@Test.Decl( "False for directories" )
+	@Test.Decl( "False for non-java files" )
+	public static final Predicate<Path> SOURCE_FILE = p -> 
+		p != null && Files.isRegularFile( p ) && p.getFileName().toString().endsWith( ".java" );
 
+	
+	private String relativePathToClassname( Path relativePath ) {
+		String result = StreamSupport.stream( relativePath.spliterator(), false )
+			.map( Object::toString )
+			.collect( Collectors.joining( "." ) );
+		Assert.isTrue( result.endsWith( ".java" ) );
+		return result.replace( ".java",  "" );
+	}
+		
+		
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are non-empty" )
-	@Test.Decl( "Elements are files in the package directory of the given class" )
-	@Test.Decl( "Java source files correspond to class names" )
-	@Test.Decl( "Non-source files are included" )
+	@Test.Decl( "Elements are classnames for classes in the package of the given class" )
+	@Test.Decl( "One element for each class in the package" )
+	@Test.Decl( "Secondary classes are not included" )
+	@Test.Decl( "Non-source files are excluded" )
 	public Stream<String> classesInPackage( Class<?> clazz ) {
-		final Path sourceDir = this.sourceDir( clazz );
+		final Path sourceDir = this.sourceDir( Assert.nonNull( clazz ) );
 		final Path packageDir = this.sourceFile( clazz ).getParent();
 		
 		try {
 			return Files.list( packageDir )
-				.filter( Files::isRegularFile )
+				.filter( App.SOURCE_FILE )
 				.map( sourceDir::relativize )
-				.map( Strings::relativePathToClassname );
+				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
 			throw new AppException( e );
 		}
@@ -183,15 +204,16 @@ public class App implements Runnable {
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are non-empty" )
-	@Test.Decl( "Elements are files in the package directory of the given class or one of its sub-directories" )
-	@Test.Decl( "Java source files correspond to class names" )
-	@Test.Decl( "Non-source files are included" )
-	public Stream<String> classesUnderDir( Path sourceDir ) {
+	@Test.Decl( "Elements are classnames for classes in the directory or sub-directories of the given directory" )
+	@Test.Decl( "One element for each class under the given directory" )
+	@Test.Decl( "Non-source files are excluded" )
+	@Test.Decl( "Secondary classes are not included" )
+	public Stream<String> classesUnderDir( Path dir ) {
 		try {
-			return Files.walk( sourceDir )
-				.filter( Files::isRegularFile )
-				.map( sourceDir::relativize )
-				.map( Strings::relativePathToClassname );
+			return Files.walk( Assert.nonNull( dir ) )
+				.filter( App.SOURCE_FILE )
+				.map( dir::relativize )
+				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
 			throw new AppException( e );
 		}
@@ -207,7 +229,6 @@ public class App implements Runnable {
 
 	/** Register for shutdown termination */
 	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Registers hook" )
 	public void terminateOnShutdown( OnShutdown os ) {
 		this.objectsForShutdown.add( Assert.nonNull( os ) );
 	}
@@ -254,7 +275,6 @@ public class App implements Runnable {
 		
 		@Override
 		@Test.Decl( "Return is non-empty" )
-		@Test.Decl( "Return includes a file link" )
 		public String toString() {
 			String[] comps = this.className.split("\\.");
 			//comps[comps.length-1] = ".";  // This stopped working 7/25/21
@@ -271,7 +291,7 @@ public class App implements Runnable {
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are file links" )
-	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the calling stack" )
 	public Stream<String> getLocation() {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
@@ -292,12 +312,12 @@ public class App implements Runnable {
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are file links" )
-	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the calling stack" )
 	@Test.Decl( "Elements have classes matching the given class name prefix" )
 	public Stream<String> getLocation( String prefix ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
-			.filter( sf -> sf.getClassName().startsWith( prefix ) )
+			.filter( sf -> sf.getClassName().startsWith( Assert.nonEmpty( prefix ) ) )
 			.map( Location::new )
 			.map( Location::toString )
 			.collect( Collectors.toList() )
@@ -314,10 +334,10 @@ public class App implements Runnable {
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are file links" )
-	@Test.Decl( "Links fail for secondary classes" )
+	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the stack trace" )
 	public Stream<String> getLocation( Throwable th ) {
-		return Arrays.stream( th.getStackTrace() )
+		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
 			.map( Location::new )
 			.map( Location::toString );
 	}
@@ -366,6 +386,21 @@ public class App implements Runnable {
 			.findFirst()
 			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
 		);
+	}
+	
+	
+	
+	public static void main( String[] args ) {
+		Path dir = App.get().sourceFile( App.class ).getParent();
+		System.out.println( ">>> DIR: " + dir );
+		
+		try {
+			Files.list( dir ).filter( App.SOURCE_FILE ).forEach( System.out::println );
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}
+		
+		System.out.println( "Done!" );
 	}
 	
 	

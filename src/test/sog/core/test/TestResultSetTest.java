@@ -413,7 +413,7 @@ public class TestResultSetTest extends Test.Container {
 	)
 	public void tm_067F458BE( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		TestResultSet.forPackage( test.sog.core.test.foo.C1.class ).print( new IndentWriter( sos, " " ) );
+		TestResultSet.forPackage( test.sog.core.test.foo.C1.class ).addClass( "foo.bar" ).print( new IndentWriter( sos, " " ) );
 		tc.assertTrue( sos.toString().contains( "Bad Classes" ) );
 	}
 		

@@ -227,9 +227,13 @@ public class TestResultSet extends Result {
 		System.out.println();
 		
 		// TESTS
-		TestResultSet.forPackage( Test.class ).setVerbose( true ).print( new IndentWriter( System.err, "\t" ) );
+		//TestResultSet.forPackage( Test.class ).setVerbose( true ).print( new IndentWriter( System.err, "\t" ) );
 		//TestResultSet.forSourceDir( Path.of( "/", "home", "sundquis", "book", "sog", "src" ) ).print( new IndentWriter( System.err ) );
-		//TestResultSet.forAllSourceDirs().print( new IndentWriter( System.err ) );
+		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.err, "\t" ) );
+		//Test.evalPackage( TestResultSet.class );
+		//Test.eval();
+		
+		//App.get().classesInPackage( TestResultSet.class ).forEach( System.out::println );
 		
 		System.out.println("\nDone!");
 

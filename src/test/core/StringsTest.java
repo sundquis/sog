@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import sog.core.App;
-import sog.core.Procedure;
+//import sog.core.Procedure;
 import sog.core.Strings;
 import sog.core.Test;
 
@@ -727,7 +727,8 @@ public class StringsTest extends Test.Container {
 	public void toString_StringRepresentationOfNullIsNull( Test.Case tc ) {
 		tc.assertEqual( "null",  Strings.toString( null ) );
 	}
-				
+
+	/*
 	@Test.Impl( member = "public String Strings.relativePathToClassname(Path)", description = "Class to relative path to classname correct" )
 	public void relativePathToClassname_ClassToRelativePathToClassnameCorrect( Test.Case tc ) {
 		Class<?>[] classes = new Class<?>[] { 
@@ -748,6 +749,7 @@ public class StringsTest extends Test.Container {
 			tc.assertEqual( clazz.getName(), className );
 		}
 	}
+	*/
 	
 	
 	

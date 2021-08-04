@@ -18,14 +18,19 @@
  */
 package test.sog.core;
 
+import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.AppException;
 import sog.core.Test;
 import sog.core.test.TestCase;
+import sog.util.StringOutputStream;
+import test.sog.core.foo.A;
 
 /**
  * 
@@ -135,8 +140,12 @@ public class AppTest extends Test.Container{
 		
 		@Override public String toString() { return App.get().getCallingClass( 1 ).getName(); }
 		
+		public String nestedCallingMethod() { return App.get().getCallingMethod( 1 ); }
+		
 		static class Inner {
 			@Override public String toString() { return App.get().getCallingClass( 1 ).getName(); }
+			
+			public String innerCallingMethod() { return App.get().getCallingMethod( 1 ); }
 		}
 	}
 	
@@ -432,420 +441,607 @@ public class AppTest extends Test.Container{
 		
 	@Test.Impl( 
 		member = "method: Stream App.classesInPackage(Class)", 
-		description = "Elements are files in the package directory of the given class" 
+		description = "Elements are classnames for classes in the package of the given class" 
 	)
 	public void tm_0A7F8D3CC( Test.Case tc ) {
-		final String prefix = "test.sog.core.foo.";
-		final Consumer<String> check = s -> tc.assertTrue( s.startsWith( prefix ) );
-		App.get().classesInPackage( test.sog.core.foo.A.class ).forEach( check );
+		final Class<A> c = test.sog.core.foo.A.class;
+		final Package p = c.getPackage();
+		final Consumer<String> check = s -> {
+			try { 
+				Class<?> clazz = Class.forName( s );
+				tc.assertEqual( p, clazz.getPackage() );
+			} catch ( ClassNotFoundException e ) {
+				tc.assertFail( "Class not found: " + s );
+			}
+		};
+		App.get().classesInPackage( c ).forEach( check );
 	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Elements are non-empty" 
-		)
-		public void tm_07FBD890E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Elements are non-empty" 
+	)
+	public void tm_07FBD890E( Test.Case tc ) {
+		App.get().classesInPackage( A.class ).forEach( tc::assertNotEmpty );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Java source files correspond to class names" 
-		)
-		public void tm_023EF2D9C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "One element for each class in the package" 
+	)
+	public void tm_023EF2D9C( Test.Case tc ) {
+		// Three class: A, B, C
+		tc.assertEqual( 3L, App.get().classesInPackage( A.class ).count() );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Non-source files are included" 
-		)
-		public void tm_00B4E5956( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Return is non-null" 
-		)
-		public void tm_0EC260903( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Return is not terminated" 
-		)
-		public void tm_0C9AAAB0C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesInPackage(Class)", 
-			description = "Throws AssertionError for null class" 
-		)
-		public void tm_01D3F1A53( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Elements are files in the package directory of the given class or one of its sub-directories" 
-		)
-		public void tm_0901BD867( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Elements are non-empty" 
-		)
-		public void tm_07EE2BBF5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Java source files correspond to class names" 
-		)
-		public void tm_0FF08A115( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Non-source files are included" 
-		)
-		public void tm_05F7C648F( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Return is non-null" 
-		)
-		public void tm_0B42EC76A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Return is not terminated" 
-		)
-		public void tm_0944EC033( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.classesUnderDir(Path)", 
-			description = "Throws AssertionError for null class source directory" 
-		)
-		public void tm_0C71BBCA4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation()", 
-			description = "Elements are file links" 
-		)
-		public void tm_0E6EE3978( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation()", 
-			description = "Elements correspond to the calling stack" 
-		)
-		public void tm_0D91F7968( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation()", 
-			description = "Links fail for secondary classes" 
-		)
-		public void tm_021F60730( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Secondary classes are not included" 
+	)
+	public void tm_085492351( Test.Case tc ) {
+		tc.expectError( AppException.class );
+		A.classesInPackage().forEach( System.out::println );
+	}
 
-		@Test.Impl( 
-			member = "method: Stream App.getLocation()", 
-			description = "Return is non-null" 
-		)
-		public void tm_000E15555( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Non-source files are excluded" 
+	)
+	public void tm_00B4E5956( Test.Case tc ) {
+		String filename = "README.txt";
+		Path dir = App.get().sourceFile( A.class ).getParent();
+		Path readme = dir.resolve( Path.of( filename ) );
+		tc.assertTrue( Files.exists( readme ) );
+		tc.assertEqual( 0L, App.get().classesInPackage( A.class ).filter( s -> s.contains( filename ) ).count() );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation()", 
-			description = "Return is not terminated" 
-		)
-		public void tm_0717BF1DE( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0EC260903( Test.Case tc ) {
+		tc.assertNonNull( App.get().classesInPackage( A.class ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Elements are file links" 
-		)
-		public void tm_01CB2DCE7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0C9AAAB0C( Test.Case tc ) {
+		App.get().classesInPackage( A.class ).map( Function.identity() );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Elements correspond to the calling stack" 
-		)
-		public void tm_0821641D9( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesInPackage(Class)", 
+		description = "Throws AssertionError for null class" 
+	)
+	public void tm_01D3F1A53( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().classesInPackage( null );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Elements have classes matching the given class name prefix" 
-		)
-		public void tm_0F8318AAC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Elements are classnames for classes in the directory or sub-directories of the given directory" 
+	)
+	public void tm_0901BD867( Test.Case tc ) {
+		final Path dir = App.get().sourceDir( App.class );
+		final Consumer<String> check = s -> {
+			try { 
+				Class<?> clazz = Class.forName( s );
+				tc.assertEqual( dir, App.get().sourceDir( clazz ) );
+			} catch ( ClassNotFoundException e ) {
+				tc.assertFail( "Class not found: " + s );
+			}
+		};
+		App.get().classesUnderDir( dir ).forEach( check );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Links fail for secondary classes" 
-		)
-		public void tm_0D790D0A1( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Elements are non-empty" 
+	)
+	public void tm_07EE2BBF5( Test.Case tc ) {
+		App.get().classesUnderDir( App.get().sourceDir( App.class ) ).forEach( tc::assertNotEmpty );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "One element for each class under the given directory" 
+	)
+	public void tm_0FF08A115( Test.Case tc ) {
+		tc.assertTrue( App.get().classesUnderDir( App.get().sourceDir( App.class ) ).count() > 50L );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Non-source files are excluded" 
+	)
+	public void tm_05F7C648F( Test.Case tc ) {
+		String filename = "README.txt";
+		Path dir = App.get().sourceFile( A.class ).getParent();
+		Path sourceDir = App.get().sourceDir( A.class );
+		Path readme = dir.resolve( Path.of( filename ) );
+		tc.assertTrue( Files.exists( readme) );
+		tc.assertEqual( 0L, App.get().classesUnderDir( sourceDir ).filter( s -> s.contains( filename ) ).count() );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Secondary classes are not included" 
+	)
+	public void tm_0C46E33B8( Test.Case tc ) {
+		String classname = "test.sog.core.foo.Secondary";
+		try {
+			Class<?> c = Class.forName( classname );
+			tc.assertEqual( classname, c.getName() );
+		} catch ( ClassNotFoundException e ) {}
+		Path sourceDir = App.get().sourceDir( A.class );
+		tc.assertEqual( 0L, App.get().classesUnderDir( sourceDir ).filter( s -> s.contains( classname ) ).count() );
+	}
 
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Return is non-null" 
-		)
-		public void tm_024320886( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0B42EC76A( Test.Case tc ) {
+		Path dir = App.get().sourceDir( A.class );
+		tc.assertNonNull( App.get().classesUnderDir( dir ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Return is not terminated" 
-		)
-		public void tm_0F44BBC4F( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0944EC033( Test.Case tc ) {
+		Path dir = App.get().sourceDir( A.class );
+		App.get().classesUnderDir( dir ).map( Function.identity() );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Throws AssertionError for empty prefix" 
-		)
-		public void tm_0E83961BC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path)", 
+		description = "Throws AssertionError for null class source directory" 
+	)
+	public void tm_0C71BBCA4( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().classesUnderDir( null );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(String)", 
-			description = "Throws AssertionError for null prefix" 
-		)
-		public void tm_0CF000FCA( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation()", 
+		description = "Elements are file links" 
+	)
+	public void tm_0E6EE3978( Test.Case tc ) {
+		App.get().getLocation().forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Elements are file links" 
-		)
-		public void tm_0901581E8( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation()", 
+		description = "Elements correspond to the calling stack" 
+	)
+	public void tm_0D91F7968( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		new Exception().printStackTrace( new PrintStream( sos, true ) );
+		tc.addMessage( "STACK TRACE:" );
+		tc.addMessage( sos.toString() );
+		tc.addMessage( " " );
+		tc.addMessage( "LOCATION" );
+		App.get().getLocation().forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Elements correspond to the stack trace" 
-		)
-		public void tm_0DF0FD879( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Links fail for secondary classes" 
-		)
-		public void tm_05CA13CC0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation()", 
+		description = "Links work for secondary classes" 
+	)
+	public void tm_021F60730( Test.Case tc ) {
+		A.getLocation().forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
+		tc.assertPass();
+		/* */
+	}
 
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Return is non-null" 
-		)
-		public void tm_0CC8A86E5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation()", 
+		description = "Return is non-null" 
+	)
+	public void tm_000E15555( Test.Case tc ) {
+		tc.assertNonNull( App.get().getLocation() );
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Return is not terminated" 
-		)
-		public void tm_0ED3DB76E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation()", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0717BF1DE( Test.Case tc ) {
+		App.get().getLocation().map( Function.identity() );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: Stream App.getLocation(Throwable)", 
-			description = "Throws AssertionError for null Throwable" 
-		)
-		public void tm_03BC3785D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Elements are file links" 
+	)
+	public void tm_01CB2DCE7( Test.Case tc ) {
+		App.get().getLocation( "sog.core" ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Inspect and test previous links that all start with 'sog.core'" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.Location.toString()", 
-			description = "Return includes a file link" 
-		)
-		public void tm_0D2E6BB13( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Elements correspond to the calling stack" 
+	)
+	public void tm_0821641D9( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		new Exception().printStackTrace( new PrintStream( sos, true ) );
+		tc.addMessage( "STACK TRACE:" );
+		tc.addMessage( sos.toString() );
+		tc.addMessage( " " );
+		tc.addMessage( "LOCATIONS starting with sog.core:" );
+		App.get().getLocation( "sog.core" ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.Location.toString()", 
-			description = "Return is non-empty" 
-		)
-		public void tm_00F7C8960( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Elements have classes matching the given class name prefix" 
+	)
+	public void tm_0F8318AAC( Test.Case tc ) {
+		final String prefix = "sog";
+		Consumer<String> process = s -> tc.assertTrue( s.startsWith( prefix ) );
+		App.get().getLocation( prefix ).forEach( process );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.description()", 
-			description = "Is not empty" 
-		)
-		public void tm_06C24E9B0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Links work for secondary classes" 
+	)
+	public void tm_0D790D0A1( Test.Case tc ) {
+		String prefix = "test";
+		A.getLocation( prefix ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
+		tc.assertPass();
+		/* */
+	}
+
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Return is non-null" 
+	)
+	public void tm_024320886( Test.Case tc ) {
+		tc.assertNonNull( App.get().getLocation( "sog" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.description()", 
-			description = "Is not null" 
-		)
-		public void tm_01B89801A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0F44BBC4F( Test.Case tc ) {
+		App.get().getLocation( "sog" ).map( Function.identity() );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Return is correct for offset = 0" 
-		)
-		public void tm_04A7A3DC3( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Throws AssertionError for empty prefix" 
+	)
+	public void tm_0E83961BC( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().getLocation( "" );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Return is correct for offset = 1" 
-		)
-		public void tm_04A7A4184( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(String)", 
+		description = "Throws AssertionError for null prefix" 
+	)
+	public void tm_0CF000FCA( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		String prefix = null;
+		App.get().getLocation( prefix );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Return is correct for offset = 2" 
-		)
-		public void tm_04A7A4545( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Elements are file links" 
+	)
+	public void tm_0901581E8( Test.Case tc ) {
+		Exception e = new Exception();
+		App.get().getLocation( e ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Return is non-null" 
-		)
-		public void tm_0EB4D74DD( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Elements correspond to the stack trace" 
+	)
+	public void tm_0DF0FD879( Test.Case tc ) {
+		Exception e = new Exception();
+		StringOutputStream sos = new StringOutputStream();
+		e.printStackTrace( new PrintStream( sos, true ) );
+		tc.addMessage( "STACK TRACE:" );
+		tc.addMessage( sos.toString() );
+		tc.addMessage( " " );
+		tc.addMessage( "LOCATION:" );
+		App.get().getLocation( e ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
+		tc.assertPass();
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Returns method for anonymous class" 
-		)
-		public void tm_05EFFE93C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Links work for secondary classes" 
+	)
+	public void tm_05CA13CC0( Test.Case tc ) {
+		A.getLocationException().forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationExceptionSecondary" ); /*
+		tc.assertPass();
+		/* */
+	}
+
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0CC8A86E5( Test.Case tc ) {
+		tc.assertNonNull( App.get().getLocation( new Throwable() ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Returns method for local class" 
-		)
-		public void tm_018A7D43A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0ED3DB76E( Test.Case tc ) {
+		App.get().getLocation( new Throwable() ).map( Function.identity() );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Returns method for nested class" 
-		)
-		public void tm_0B0F1014E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable)", 
+		description = "Throws AssertionError for null Throwable" 
+	)
+	public void tm_03BC3785D( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Throwable t = null;
+		App.get().getLocation( t );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Returns method for nested nested class" 
-		)
-		public void tm_0B3E6480F( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.Location.toString()", 
+		description = "Return is non-empty" 
+	)
+	public void tm_00F7C8960( Test.Case tc ) {
+		Exception e = new Exception();
+		tc.assertNotEmpty( new App.Location( e.getStackTrace()[0] ).toString() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Returns method for secondary class" 
-		)
-		public void tm_0BBC1EF43( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.description()", 
+		description = "Is not empty" 
+	)
+	public void tm_06C24E9B0( Test.Case tc ) {
+		tc.assertNotEmpty( App.get().description() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Throws AppExcpetion for offset larger than stack depth" 
-		)
-		public void tm_0F4DB4BC4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.description()", 
+		description = "Is not null" 
+	)
+	public void tm_01B89801A( Test.Case tc ) {
+		tc.assertNonNull( App.get().description() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String App.getCallingMethod(int)", 
-			description = "Throws AssertionError for negative offset" 
-		)
-		public void tm_058684266( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Return is correct for offset = 0" 
+	)
+	public void tm_04A7A3DC3( Test.Case tc ) {
+		tc.assertEqual( "getCallingMethod", App.get().getCallingMethod( 0 ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void App.run()", 
-			description = "Calls terminate on shutdown" 
-		)
-		public void tm_0C4CE178F( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Return is correct for offset = 1" 
+	)
+	public void tm_04A7A4184( Test.Case tc ) {
+		tc.assertEqual( "tm_04A7A4184", App.get().getCallingMethod( 1 ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void App.terminateOnShutdown(App.OnShutdown)", 
-			description = "Registers hook" 
-		)
-		public void tm_08E7828DE( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Return is correct for offset = 2" 
+	)
+	public void tm_04A7A4545( Test.Case tc ) {
+		tc.assertEqual( "run", App.get().getCallingMethod( 2 ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void App.terminateOnShutdown(App.OnShutdown)", 
-			description = "Throws assertion error for null" 
-		)
-		public void tm_03710D592( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0EB4D74DD( Test.Case tc ) {
+		tc.assertNonNull( App.get().getCallingMethod( 3 ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Returns method for anonymous class" 
+	)
+	public void tm_05EFFE93C( Test.Case tc ) {
+		Object obj = new Object() { @Override public String toString() { return App.get().getCallingMethod( 1 ); } };
+		tc.assertEqual( "toString", obj.toString() );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Returns method for local class" 
+	)
+	public void tm_018A7D43A( Test.Case tc ) {
+		class Local {
+			@Override public String toString() { return App.get().getCallingMethod( 1 ); }
 		}
-	
+		Local local = new Local();
+		tc.assertEqual( "toString", local.toString() );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Returns method for nested class" 
+	)
+	public void tm_0B0F1014E( Test.Case tc ) {
+		Nested nested = new Nested();
+		tc.assertEqual( "nestedCallingMethod", nested.nestedCallingMethod() );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Returns method for nested nested class" 
+	)
+	public void tm_0B3E6480F( Test.Case tc ) {
+		Nested.Inner inner = new Nested.Inner();
+		tc.assertEqual( "innerCallingMethod", inner.innerCallingMethod() );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Returns method for secondary class" 
+	)
+	public void tm_0BBC1EF43( Test.Case tc ) {
+		tc.assertEqual( "toString", A.getSecondary().toString() );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Throws AppExcpetion for offset larger than stack depth" 
+	)
+	public void tm_0F4DB4BC4( Test.Case tc ) {
+		tc.expectError( AppException.class );
+		App.get().getCallingMethod( 42 );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.getCallingMethod(int)", 
+		description = "Throws AssertionError for negative offset" 
+	)
+	public void tm_058684266( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().getCallingMethod( -1 );
+	}
+		
+	@Test.Impl( 
+		member = "method: void App.run()", 
+		description = "Calls terminate on shutdown" 
+	)
+	public void tm_0C4CE178F( Test.Case tc ) {
+		// TOGGLE:
+		/* */ tc.assertPass(); /*
+		tc.assertFail( "SHOULD SEE" );
+		tc.addMessage( "Terminating [1]" );
+		tc.addMessage( "Terminating [2]" );
+		tc.addMessage( "Terminating [3]" );
+		class MyOnShutdown implements App.OnShutdown {
+			private final int ID;
+			public MyOnShutdown( int ID ) { this.ID = ID; }
+			@Override public void terminate() { System.out.println( "Terminating " + this ); }
+			@Override public String toString() { return "[" + this.ID + "]"; }
+		}
+		Stream.of( 1, 2, 3 ).map( MyOnShutdown::new ).forEach( App.get()::terminateOnShutdown );
+		/* */
+	}
+		
+	@Test.Impl( 
+		member = "method: void App.terminateOnShutdown(App.OnShutdown)", 
+		description = "Throws assertion error for null" 
+	)
+	public void tm_03710D592( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().terminateOnShutdown( null );
+	}
+
+	@Test.Impl( 
+		member = "field: Predicate App.SOURCE_FILE", 
+		description = "False for directories" 
+	)
+	public void tm_028A41449( Test.Case tc ) {
+		tc.assertFalse( App.SOURCE_FILE.test( App.get().sourceDir( AppTest.class ) ) );
+	}
+		
+	@Test.Impl( 
+		member = "field: Predicate App.SOURCE_FILE", 
+		description = "False for empty paths" 
+	)
+	public void tm_01CF0F4D9( Test.Case tc ) {
+		Path dir = App.get().sourceDir( AppTest.class );
+		tc.assertFalse( App.SOURCE_FILE.test( dir.relativize( dir ) ) );
+	}
+		
+	@Test.Impl( 
+		member = "field: Predicate App.SOURCE_FILE", 
+		description = "False for non-java files" 
+	)
+	public void tm_02BDC4691( Test.Case tc ) {
+		Path p = App.get().sourceFile( test.sog.core.foo.A.class ).getParent();
+		p = p.resolve( Path.of( "README.txt" ) );
+		tc.assertFalse( App.SOURCE_FILE.test( p ) );
+	}
+		
+	@Test.Impl( 
+		member = "field: Predicate App.SOURCE_FILE", 
+		description = "False for null paths" 
+	)
+	public void tm_09253592D( Test.Case tc ) {
+		tc.assertFalse( App.SOURCE_FILE.test( null ) );
+	}
+		
+	@Test.Impl( 
+		member = "field: Predicate App.SOURCE_FILE", 
+		description = "True for every java source file" 
+	)
+	public void tm_0C7545DE3( Test.Case tc ) {
+		tc.assertEqual( 3L, Stream.of( AppTest.class, App.class, test.sog.core.foo.A.class )
+			.map( App.get()::sourceFile )
+			.filter( App.SOURCE_FILE )
+			.count()
+		);
+	}
+
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( App.class );
-		//Test.evalPackage( App.class );
+		//Test.eval( App.class );
+		Test.evalPackage( App.class );
 	}
 }
 
