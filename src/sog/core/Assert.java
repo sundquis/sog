@@ -142,7 +142,7 @@ public class Assert {
 		if ( s == null || s.length() < minLength || s.length() > maxLength ) {
 			String errMsg = s == null ? "null" :
 				s.length() < minLength ? "too short" : "too long";
-			Assert.fail( "String '" + s + "'is " + errMsg );
+			Assert.fail( "String '" + s + "' is " + errMsg );
 		}
 		return s;
 	}

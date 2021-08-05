@@ -1767,7 +1767,7 @@ public class TestCaseTest extends Test.Container {
 	public void tm_06A65EDDA( Test.Case tc ) {
 		String msg = "Some error message";
 		this.noop.assertFail( msg );
-		tc.assertEqual( List.of( msg ), this.getMessages() );
+		tc.assertTrue( this.getMessages().get( 0 ).contains( msg ) );
 	}
 
 	@Test.Impl( 

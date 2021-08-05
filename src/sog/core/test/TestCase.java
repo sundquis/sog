@@ -360,7 +360,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "File location is set" )
 	public Case addMessage( String message ) {
 		this.setFileLocation();
-		this.messages.add( Assert.nonEmpty( message ) );
+		this.messages.add( "[" + this.getFileLocation() + "] " + Assert.nonEmpty( message ) );
 		return this;
 	}
 
@@ -706,6 +706,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 		return this.impl.toString().hashCode();
 	}
 	
-	
+
 
 }
