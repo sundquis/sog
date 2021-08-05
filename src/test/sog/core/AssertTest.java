@@ -30,7 +30,19 @@ import sog.core.Test;
 @Test.Skip( "Container" )
 public class AssertTest extends Test.Container {
 	
-	private static final String ERR_MSG = "Custom diagnostic error message.";
+	private final String ERR_MSG = "Custom diagnostic error message.";
+	
+	private final Path READABLE_FILE = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+	private final Path UNREADABLE_FILE = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
+	private final Path WRITEABLE_FILE = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+	private final Path UNWRITEABLE_FILE = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
+
+	private final Path READABLE_DIR = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+	private final Path UNREADABLE_DIR = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
+	private final Path WRITEABLE_DIR = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+	private final Path UNWRITEABLE_DIR = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
+	
+	private final Path DOES_NOT_EXIST = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
 	
 	public AssertTest() {
 		super( Assert.class );
@@ -582,20 +594,17 @@ public class AssertTest extends Test.Container {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
-			Assert.readableDirectory( readableFile );
+			Assert.readableDirectory( this.DOES_NOT_EXIST );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-			Assert.readableDirectory( readableFile );
+			Assert.readableDirectory( this.READABLE_FILE );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unreadableDir= App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-			Assert.readableDirectory( unreadableDir );
+			Assert.readableDirectory( this.UNREADABLE_DIR );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
@@ -606,8 +615,7 @@ public class AssertTest extends Test.Container {
 		description = "Returns path if it represents a readable directory" 
 	)
 	public void tm_0950CF440( Test.Case tc ) {
-		Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
-		tc.assertEqual( readableDir, Assert.readableDirectory( readableDir ) );
+		tc.assertEqual( this.READABLE_DIR, Assert.readableDirectory( this.READABLE_DIR ) );
 	}
 		
 	@Test.Impl( 
@@ -775,7 +783,7 @@ public class AssertTest extends Test.Container {
 		description = "Includes diagnostic message" 
 	)
 	public void tm_00F6FDD45( Test.Case tc ) {
-		boolean verbose = true;
+		boolean verbose = false;
 		try {
 			Assert.rwDirectory( null );
 		} catch ( AssertionError ae ) {
@@ -807,141 +815,292 @@ public class AssertTest extends Test.Container {
 		}
 	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwDirectory(Path)", 
-			description = "Returns path if it represents a readable and writeable directory" 
-		)
-		public void tm_01C116DE5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwDirectory(Path)", 
+		description = "Returns path if it represents a readable and writeable directory" 
+	)
+	public void tm_01C116DE5( Test.Case tc ) {
+		Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+		tc.assertEqual( readableDir, Assert.rwDirectory( readableDir ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwDirectory(Path)", 
-			description = "Throws AssertionError if path does not represent a readable and writeable directory" 
-		)
-		public void tm_01AA45C1B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwDirectory(Path)", 
+		description = "Throws AssertionError if path does not represent a readable and writeable directory" 
+	)
+	public void tm_01AA45C1B( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
+		Assert.rwDirectory( unreadableDir );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwDirectory(Path, String)", 
-			description = "Includes diagnostic message" 
-		)
-		public void tm_08FB26F40( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Path Assert.rwDirectory(Path, String)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_08FB26F40( Test.Case tc ) {
+		boolean verbose = false;
+		try {
+			Assert.rwDirectory( null, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+			Assert.rwDirectory( readableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+			Assert.rwDirectory( readableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
+			Assert.rwDirectory( unreadableDir, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+			Assert.rwDirectory( unwriteableDir, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwDirectory(Path, String)", 
-			description = "Returns path if it represents a readable and writeable directory" 
-		)
-		public void tm_033C50CCA( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwDirectory(Path, String)", 
+		description = "Returns path if it represents a readable and writeable directory" 
+	)
+	public void tm_033C50CCA( Test.Case tc ) {
+		Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+		tc.assertEqual( readableDir, Assert.rwDirectory( readableDir, ERR_MSG ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwDirectory(Path, String)", 
-			description = "Throws AssertionError if path does not represent a readable and writeable directory" 
-		)
-		public void tm_09E24C116( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwDirectory(Path, String)", 
+		description = "Throws AssertionError if path does not represent a readable and writeable directory" 
+	)
+	public void tm_09E24C116( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
+		Assert.rwDirectory( unreadableDir, ERR_MSG );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path)", 
-			description = "Includes diagnostic message" 
-		)
-		public void tm_052A5217C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_052A5217C( Test.Case tc ) {
+		boolean verbose = false;
+		try {
+			Assert.rwFile( null );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+			Assert.rwFile( readableFile );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+			Assert.rwFile( readableDir );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
+			Assert.rwFile( unreadableFile );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unwriteableFile = App.get().root().resolve( Path.of( "example", "unwriteable_file" ) );
+			Assert.rwFile( unwriteableFile );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path)", 
-			description = "Returns path if it represents a readable and writeable file" 
-		)
-		public void tm_08836CED1( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path)", 
+		description = "Returns path if it represents a readable and writeable file" 
+	)
+	public void tm_08836CED1( Test.Case tc ) {
+		Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+		tc.assertEqual( readableFile, Assert.rwFile( readableFile ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path)", 
-			description = "Throws AssertionError if path does not represent a readable and writeable file" 
-		)
-		public void tm_00FC0150D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path)", 
+		description = "Throws AssertionError if path does not represent a readable and writeable file" 
+	)
+	public void tm_00FC0150D( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unwriteableFile = App.get().root().resolve( Path.of( "example", "unwriteable_file" ) );
+		Assert.rwFile( unwriteableFile );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path, String)", 
-			description = "Includes diagnostic message" 
-		)
-		public void tm_0D6178C77( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path, String)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_0D6178C77( Test.Case tc ) {
+		boolean verbose = false;
+		try {
+			Assert.rwFile( null, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+			Assert.rwFile( readableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+			Assert.rwFile( readableDir, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
+			Assert.rwFile( unreadableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unwriteableFile = App.get().root().resolve( Path.of( "example", "unwriteable_file" ) );
+			Assert.rwFile( unwriteableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path, String)", 
-			description = "Returns path if it represents a readable and writeable file" 
-		)
-		public void tm_07A068DCC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path, String)", 
+		description = "Returns path if it represents a readable and writeable file" 
+	)
+	public void tm_07A068DCC( Test.Case tc ) {
+		Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+		tc.assertEqual( readableFile, Assert.rwFile( readableFile, ERR_MSG ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.rwFile(Path, String)", 
-			description = "Throws AssertionError if path does not represent a readable and writeable file" 
-		)
-		public void tm_00E58C632( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.rwFile(Path, String)", 
+		description = "Throws AssertionError if path does not represent a readable and writeable file" 
+	)
+	public void tm_00E58C632( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unwriteableFile = App.get().root().resolve( Path.of( "example", "unwriteable_file" ) );
+		Assert.rwFile( unwriteableFile, ERR_MSG );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path)", 
-			description = "Includes diagnostic message" 
-		)
-		public void tm_00F8CF80F( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_00F8CF80F( Test.Case tc ) {
+		boolean verbose = false;
+		try {
+			Assert.writeableDirectory( null );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+			Assert.writeableDirectory( readableFile );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path writeableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+			Assert.writeableDirectory( writeableFile );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+			Assert.writeableDirectory( unwriteableDir );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path)", 
-			description = "Returns path if it represents a writeable directory" 
-		)
-		public void tm_07D47398E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path)", 
+		description = "Returns path if it represents a writeable directory" 
+	)
+	public void tm_07D47398E( Test.Case tc ) {
+		Path writeableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+		tc.assertEqual( writeableDir, Assert.writeableDirectory( writeableDir ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path)", 
-			description = "Throws AssertionError if path does not represent a writeable directory" 
-		)
-		public void tm_0F7B559C4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path)", 
+		description = "Throws AssertionError if path does not represent a writeable directory" 
+	)
+	public void tm_0F7B559C4( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+		Assert.writeableDirectory( unwriteableDir );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path, String)", 
-			description = "Includes diagnostic message" 
-		)
-		public void tm_01415200A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path, String)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_01415200A( Test.Case tc ) {
+		boolean verbose = true;
+		try {
+			Assert.writeableDirectory( null, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
+		try {
+			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+			Assert.writeableDirectory( readableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path writeableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
+			Assert.writeableDirectory( writeableFile, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+		try {
+			Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+			Assert.writeableDirectory( unwriteableDir, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), verbose );
+		}
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path, String)", 
-			description = "Returns path if it represents a writeable directory" 
-		)
-		public void tm_060E5E089( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path, String)", 
+		description = "Returns path if it represents a writeable directory" 
+	)
+	public void tm_060E5E089( Test.Case tc ) {
+		Path writeableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
+		tc.assertEqual( writeableDir, Assert.writeableDirectory( writeableDir, ERR_MSG ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Path Assert.writeableDirectory(Path, String)", 
-			description = "Throws AssertionError if path does not represent a writeable directory" 
-		)
-		public void tm_0900622E9( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Path Assert.writeableDirectory(Path, String)", 
+		description = "Throws AssertionError if path does not represent a writeable directory" 
+	)
+	public void tm_0900622E9( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+		Assert.writeableDirectory( unwriteableDir, ERR_MSG );
+	}
 		
 		@Test.Impl( 
 			member = "method: Path Assert.writeableFile(Path)", 
