@@ -624,8 +624,7 @@ public class AssertTest extends Test.Container {
 	)
 	public void tm_0A6EA86C0( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-		Assert.readableDirectory( unreadableDir );
+		Assert.readableDirectory( this.UNREADABLE_DIR );
 	}
 		
 	@Test.Impl( 
@@ -640,20 +639,17 @@ public class AssertTest extends Test.Container {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
-			Assert.readableDirectory( readableFile, ERR_MSG );
+			Assert.readableDirectory( this.DOES_NOT_EXIST, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-			Assert.readableDirectory( readableFile, ERR_MSG );
+			Assert.readableDirectory( this.READABLE_FILE, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unreadableDir= App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-			Assert.readableDirectory( unreadableDir, ERR_MSG );
+			Assert.readableDirectory( this.UNREADABLE_DIR, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
@@ -664,8 +660,7 @@ public class AssertTest extends Test.Container {
 		description = "Returns path if it represents a readable directory" 
 	)
 	public void tm_08312FCE5( Test.Case tc ) {
-		Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
-		tc.assertEqual( readableDir, Assert.readableDirectory( readableDir, ERR_MSG ) );
+		tc.assertEqual( this.READABLE_DIR, Assert.readableDirectory( this.READABLE_DIR, ERR_MSG ) );
 	}
 		
 	@Test.Impl( 
@@ -674,8 +669,7 @@ public class AssertTest extends Test.Container {
 	)
 	public void tm_05926A9FB( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-		Assert.readableDirectory( unreadableDir, ERR_MSG );
+		Assert.readableDirectory( this.UNREADABLE_DIR, ERR_MSG );
 	}
 		
 	@Test.Impl( 
@@ -690,20 +684,17 @@ public class AssertTest extends Test.Container {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableDir = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
-			Assert.readableFile( readableDir );
+			Assert.readableFile( this.DOES_NOT_EXIST );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
-			Assert.readableFile( readableDir );
+			Assert.readableFile( this.READABLE_DIR );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
-			Assert.readableFile( unreadableFile );
+			Assert.readableFile( this.UNREADABLE_FILE );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
@@ -714,8 +705,7 @@ public class AssertTest extends Test.Container {
 		description = "Returns path if it represents a readable file" 
 	)
 	public void tm_0A1FC44CC( Test.Case tc ) {
-		Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-		tc.assertEqual( readableFile, Assert.readableFile( readableFile ) );
+		tc.assertEqual( this.READABLE_FILE, Assert.readableFile( this.READABLE_FILE ) );
 	}
 		
 	@Test.Impl( 
@@ -724,8 +714,7 @@ public class AssertTest extends Test.Container {
 	)
 	public void tm_0DDE2E652( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
-		Assert.readableFile( unreadableFile );
+		Assert.readableFile( this.UNREADABLE_FILE );
 	}
 		
 	@Test.Impl( 
@@ -740,20 +729,17 @@ public class AssertTest extends Test.Container {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableDir = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
-			Assert.readableFile( readableDir, ERR_MSG );
+			Assert.readableFile( this.DOES_NOT_EXIST, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableDir = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
-			Assert.readableFile( readableDir, ERR_MSG );
+			Assert.readableFile( this.READABLE_DIR, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
-			Assert.readableFile( unreadableFile, ERR_MSG );
+			Assert.readableFile( this.UNREADABLE_FILE, ERR_MSG );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
@@ -764,8 +750,7 @@ public class AssertTest extends Test.Container {
 		description = "Returns path if it represents a readable file" 
 	)
 	public void tm_02E24EC07( Test.Case tc ) {
-		Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-		tc.assertEqual( readableFile, Assert.readableFile( readableFile ,ERR_MSG ) );
+		tc.assertEqual( this.READABLE_FILE, Assert.readableFile( this.READABLE_FILE, ERR_MSG ) );
 	}
 		
 	@Test.Impl( 
@@ -774,8 +759,7 @@ public class AssertTest extends Test.Container {
 	)
 	public void tm_045DF4737( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Path unreadableFile = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
-		Assert.readableFile( unreadableFile, ERR_MSG );
+		Assert.readableFile( this.UNREADABLE_FILE, ERR_MSG );
 	}
 		
 	@Test.Impl( 
@@ -783,33 +767,29 @@ public class AssertTest extends Test.Container {
 		description = "Includes diagnostic message" 
 	)
 	public void tm_00F6FDD45( Test.Case tc ) {
-		boolean verbose = false;
+		boolean verbose = true;
 		try {
 			Assert.rwDirectory( null );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
-			Assert.rwDirectory( readableFile );
+			Assert.rwDirectory( this.DOES_NOT_EXIST );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path readableFile = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-			Assert.rwDirectory( readableFile );
+			Assert.rwDirectory( this.READABLE_FILE );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unreadableDir = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-			Assert.rwDirectory( unreadableDir );
+			Assert.rwDirectory( this.UNREADABLE_DIR );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
 		try {
-			Path unwriteableDir = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
-			Assert.rwDirectory( unwriteableDir );
+			Assert.rwDirectory( this.UNWRITEABLE_DIR );
 		} catch ( AssertionError ae ) {
 			this.assertNotEmpty( tc, ae.getMessage(), verbose );
 		}
