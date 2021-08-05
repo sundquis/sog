@@ -1429,6 +1429,65 @@ public class AssertTest extends Test.Container {
 		Assert.isTrue( false, ERR_MSG );
 	}
 	
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_06687C858( Test.Case tc ) {
+		try {
+			Assert.lessThanOrEqual( 42, 41 );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), false );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer)", 
+		description = "Returns integer if it is less than or equal to the minimum" 
+	)
+	public void tm_03CD62D07( Test.Case tc ) {
+		tc.assertEqual( 42, Assert.lessThanOrEqual( 42, 42 ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer)", 
+		description = "Throws AssertionError if integer is greater than the minimum" 
+	)
+	public void tm_0EAEE84BF( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Assert.lessThanOrEqual( 42, 1 );
+	}
+		
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer, String)", 
+		description = "Includes diagnostic message" 
+	)
+	public void tm_0B2C39753( Test.Case tc ) {
+		try {
+			Assert.lessThanOrEqual( 42, 41, ERR_MSG );
+		} catch ( AssertionError ae ) {
+			this.assertNotEmpty( tc, ae.getMessage(), false );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer, String)", 
+		description = "Returns integer if it is less than or equal to the minimum" 
+	)
+	public void tm_083EF3EAC( Test.Case tc ) {
+		tc.assertEqual( 42, Assert.lessThanOrEqual( 42, 42, ERR_MSG ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Integer Assert.lessThanOrEqual(Integer, Integer, String)", 
+		description = "Throws AssertionError if integer is greater than the minimum" 
+	)
+	public void tm_0D009C124( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Assert.lessThanOrEqual( 42, 1, ERR_MSG );
+	}
+
+	
 	
 	
 

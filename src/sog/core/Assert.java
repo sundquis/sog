@@ -398,6 +398,27 @@ public class Assert {
 	}
 	
 
+	@Test.Decl( "Throws AssertionError if integer is greater than the minimum" )
+	@Test.Decl( "Returns integer if it is less than or equal to the minimum" )
+	@Test.Decl( "Includes diagnostic message" )
+	public static Integer lessThanOrEqual( Integer n, Integer max, String errMsg ) {
+		if ( n > max ) {
+			Assert.fail( errMsg );
+		}
+		return n;
+	}
+
+	@Test.Decl( "Throws AssertionError if integer is greater than the minimum" )
+	@Test.Decl( "Returns integer if it is less than or equal to the minimum" )
+	@Test.Decl( "Includes diagnostic message" )
+	public static Integer lessThanOrEqual( Integer n, Integer max ) {
+		if ( n > max ) {
+			Assert.fail( "Should be less or equal to " + max + ": " + n );
+		}
+		return n;
+	}
+
+	
 	@Test.Decl( "Throws AssertionError if predicate is false" )
 	@Test.Decl( "Returns predicate if it is true" )
 	@Test.Decl( "Includes diagnostic message" )

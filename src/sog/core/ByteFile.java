@@ -31,23 +31,36 @@ import java.io.RandomAccessFile;
  * Not thread-safe
  */
 @Test.Subject( "test." )
-public class ByteFile  {
+public class ByteFile implements AutoCloseable {
 	
-	private static long GB = 1000L * 1000L * 1000L;
+	/* For defining lengths in terms of 1 gig */
+	private static long GB = 1_000_000_000L;
 
-	// Configurable max data file length in bytes (1 GB default)
-	private static long MAX_LENGTH = Property.get( "maxLength", 1 * GB, Property.LONG );
+	/* Configurable max data file length in bytes (1 GB default) */
+	private static long MAX_LENGTH = Property.get( "maxLength", 1L * GB, Property.LONG );
 
-	// Configurable data usage limit to issue warning (2 GB default)
-	private static long WARN_LIMIT = Property.get( "warnLimit", 2 * GB, Property.LONG );
+	/*
+	 * Configurable data usage limit.
+	 * When the total (across all ByteFlie instances) data usage reaches this limit, calls to
+	 * add additional bytes trigger warning messages.
+	 */
+	private static long WARN_LIMIT = Property.get( "warnLimit", 2L * GB, Property.LONG );
 	
-	// Configurable data usage limit to shut down ByteFile (5 GB default)
-	private static long FAIL_LIMIT = Property.get( "failLimit", 5 * GB, Property.LONG );
+	/*
+	 * Configurable data usage limit.
+	 * When the total (across all ByteFlie instances) data usage reaches this limit, the nex
+	 * call to add additional bytes triggers an Error.
+	 */
+	private static long FAIL_LIMIT = Property.get( "failLimit", 5L * GB, Property.LONG );
 	
 
-	// Used to monitor total disk usage and signal warning or failure
+	/*
+	 * The total (across all ByteFil instances) number of bytes being stored.
+	 * Used to trigger warnings and an Error
+	 */
 	private static volatile long TOTAL_BYTES = 0L;
 
+	/* Adjust the total number of bytes used and trigger warnings or an error if needed. */
 	private static void newBytes( int count ) {
 		TOTAL_BYTES += (long) count;
 		if ( TOTAL_BYTES > WARN_LIMIT ) {
@@ -61,10 +74,10 @@ public class ByteFile  {
 	
 	
 	
-	// Temporary file holding data
+	/* Temporary file holding the data as raw bytes. */
 	private File file;
 	
-	// Current length in bytes
+	/* Current length of the file in bytes. */
 	private int length;
 	
 	/** 
@@ -85,7 +98,9 @@ public class ByteFile  {
 	 * The current length in bytes
 	 * @return
 	 */
-	@Test.Decl( "Length increases" )
+	@Test.Decl( "Length increases with write" )
+	@Test.Decl( "Length is non-negative" )
+	@Test.Decl( "Length is at most MAX_LENGTH" )
 	public int length() {
 		return this.length;
 	}
@@ -119,27 +134,34 @@ public class ByteFile  {
 	 * @throws IOException
 	 * 		If {@code RandomAccessFile} operations fail or if the maximum length is exceeded.
 	 */
-	@Test.Decl( "Increases length" )
-	@Test.Decl( "Same length for small write" )
-	@Test.Decl( "Beyond max length throws AssertionError" )
-	@Test.Decl( "At warn limit issues warning" )
-	@Test.Decl( "At fail limit throws AppException" )
 	@Test.Decl( "Throws AssertionError for disposed" )
+	@Test.Decl( "Throws AssertionError for negative position" )
 	@Test.Decl( "Throws AssertionError for null source" )
 	@Test.Decl( "Throws AssertionError for negative offset" )
-	@Test.Decl( "Throws AssertionError for offset too big" )
-	@Test.Decl( "Throws AssertionError for illegal count" )
-	@Test.Decl( "Increases total bytes" )
+	@Test.Decl( "Throws AssertionError for offset greater or equal to length of source" )
+	@Test.Decl( "Throws AssertionError for negative count" )
+	@Test.Decl( "Throws AssertionError for offset + count > source.length" )
+	@Test.Decl( "Throws AssertionError for position + count > MAX_LENGTH" )
+	@Test.Decl( "At warn limit issues warning" )
+	@Test.Decl( "At fail limit throws AppException" )
+	@Test.Decl( "Increases length if position + count > length" )
+	@Test.Decl( "Does not increase length if position + count <= length" )
+	@Test.Decl( "Increases total bytes if position + count > length" )
+	@Test.Decl( "Does not increase total bytes if position + count <= length" )
+	@Test.Decl( "Can recover bytes written at position zero" )
+	@Test.Decl( "Can recover bytes written at positive position" )
+	@Test.Decl( "Can recover bytes written with positive offset" )
 	public void write( int position, byte[] src, int offset, int count ) {
 		Assert.isTrue( this.isOpen() );
+		Assert.nonNeg( position );
 		Assert.nonNull( src );
-		Assert.isTrue( offset >= 0 );
-		Assert.isTrue( offset < src.length );
-		Assert.isTrue( offset + count <= src.length );
+		Assert.nonNeg( offset );
+		Assert.lessThan( offset, src.length );
+		Assert.lessThanOrEqual( offset + count, src.length );
 		
 		int oldLength = this.length;
 		int newLength = Math.max( this.length, position + count );
-		Assert.isTrue( (long) newLength <= MAX_LENGTH );
+		Assert.isTrue( (long) newLength <= ByteFile.MAX_LENGTH );
 		
 		try ( RandomAccessFile raf = new RandomAccessFile( this.file, "rw" ) ) {
 			Assert.isTrue( (long) oldLength == raf.length() );
@@ -165,6 +187,18 @@ public class ByteFile  {
 	 * @throws IOException
 	 * 		If {@code RandomAccessFile} operations fail or if the maximum length is exceeded.
 	 */
+	@Test.Decl( "Throws AssertionError for disposed" )
+	@Test.Decl( "Throws AssertionError for negative position" )
+	@Test.Decl( "Throws AssertionError for null source" )
+	@Test.Decl( "Throws AssertionError for position + source.length > MAX_LENGTH" )
+	@Test.Decl( "At warn limit issues warning" )
+	@Test.Decl( "At fail limit throws AppException" )
+	@Test.Decl( "Increases length if position + source.length > length" )
+	@Test.Decl( "Does not increase length if position + source.length <= length" )
+	@Test.Decl( "Increases total bytes if position + source.length > length" )
+	@Test.Decl( "Does not increase total bytes if position + source.length <= length" )
+	@Test.Decl( "Can recover bytes written at position zero" )
+	@Test.Decl( "Can recover bytes written at positive position" )
 	public void write( int position, byte[] src ) {
 		this.write( position, src, 0, src.length );
 	}
@@ -175,10 +209,12 @@ public class ByteFile  {
 	 * @param count
 	 * @return
 	 */
+	@Test.Decl( "Throws AssertionError for negative count" )
 	@Test.Decl( "True for small count" )
 	@Test.Decl( "False for large count" )
 	@Test.Decl( "False for disposed" )
 	public boolean canAppend( int count ) {
+		Assert.nonNeg( count );
 		return this.isOpen() && (long) this.length + count <= MAX_LENGTH;
 	}
 
@@ -191,8 +227,19 @@ public class ByteFile  {
 	 * @return
 	 * 		The position in this {@code ByteFile} where the write starts
 	 */
+	@Test.Decl( "Throws AssertionError for disposed" )
+	@Test.Decl( "Throws AssertionError for null source" )
+	@Test.Decl( "Throws AssertionError for negative offset" )
+	@Test.Decl( "Throws AssertionError for offset greater or equal to length of source" )
+	@Test.Decl( "Throws AssertionError for negative count" )
+	@Test.Decl( "Throws AssertionError for offset + count > source.length" )
+	@Test.Decl( "Throws AssertionError for length + count > MAX_LENGTH" )
+	@Test.Decl( "At warn limit issues warning" )
+	@Test.Decl( "At fail limit throws AppException" )
 	@Test.Decl( "Increases length by count" )
 	@Test.Decl( "Increases total bytes by count" )
+	@Test.Decl( "Can recover bytes written with zero offset" )
+	@Test.Decl( "Can recover bytes written with positive offset" )
 	public int append( byte[] src, int offset, int count ) {
 		int position = this.length;
 		this.write( position, src, offset, count );
@@ -206,14 +253,20 @@ public class ByteFile  {
 	 * @return
 	 * 		The position in this {@code ByteFile} where the write starts
 	 */
-	@Test.Decl( "Increases length by src length" )
-	@Test.Decl( "Increases total bytes by count" )
+	@Test.Decl( "Throws AssertionError for disposed" )
+	@Test.Decl( "Throws AssertionError for null source" )
+	@Test.Decl( "Throws AssertionError for length + source.length > MAX_LENGTH" )
+	@Test.Decl( "At warn limit issues warning" )
+	@Test.Decl( "At fail limit throws AppException" )
+	@Test.Decl( "Increases length by source.length" )
+	@Test.Decl( "Increases total bytes by source.length" )
+	@Test.Decl( "Can recover bytes" )
 	public int append( byte[] src ) {
 		return this.append( src, 0, src.length );
 	}
 	
 	/**
-	 * Determine if this {@code ByteFile} can erad {@code count} bytes at {@code position}.
+	 * Determine if this {@code ByteFile} can read {@code count} bytes at {@code position}.
 	 * 
 	 * @param position
 	 * @param count
@@ -242,22 +295,22 @@ public class ByteFile  {
 	 * 		If {@code RandomAccessFile} operations fail or if the maximum length is exceeded.
 	 */
 	@Test.Decl( "Throws AssertionError for disposed" )
-	@Test.Decl( "Throws AssertionError for null destination" )
 	@Test.Decl( "Throws AssertionError for negative position" )
-	@Test.Decl( "Throws AssertionError on read past EOF" )
+	@Test.Decl( "Throws AssertionError for null destination" )
 	@Test.Decl( "Throws AssertionError for negative offset" )
-	@Test.Decl( "Throws AssertionError for offset too big" )
-	@Test.Decl( "Throws AssertionError for count too big" )
+	@Test.Decl( "Throws AssertionError for offset greater or equal to length of destination" )
+	@Test.Decl( "Throws AssertionError for offset + count > destination.length" )
 	@Test.Decl( "Throws AssertionError for negative count" )
-	@Test.Decl( "Is consistent with write" )
+	@Test.Decl( "Throws AssertionError for position + count > length" )
+	@Test.Decl( "Read is idempotent" )
 	public void read( int position, byte[] dest, int offset, int count ) {
 		Assert.isTrue( this.isOpen() );
 		Assert.nonNull( dest );
-		Assert.isTrue( position >= 0 );
-		Assert.isTrue( position + count <= this.length );  // Read beyond end of file
-		Assert.isTrue( offset >= 0 );
-		Assert.isTrue( offset + count <= dest.length );
-		Assert.isTrue( count >= 0 );
+		Assert.nonNeg( position );
+		Assert.lessThanOrEqual( position + count, this.length );  // Read beyond end of file
+		Assert.nonNeg( offset );
+		Assert.lessThanOrEqual( offset + count, dest.length );
+		Assert.nonNeg( count );
 		
 		try ( RandomAccessFile raf = new RandomAccessFile( this.file, "r" ) ) {
 			raf.seek( position );
@@ -279,11 +332,23 @@ public class ByteFile  {
 	 * @return
 	 * 		The newly constructed byte array
 	 */
-	@Test.Decl( "Is consistent with write" )
+	@Test.Decl( "Throws AssertionError for disposed" )
+	@Test.Decl( "Throws AssertionError for negative position" )
+	@Test.Decl( "Throws AssertionError for negative count" )
+	@Test.Decl( "Throws AssertionError for position + count > length" )
+	@Test.Decl( "Read is idempotent" )
 	public byte[] read( int position, int count ) {
-		byte[] result = new byte[ count ];
+		byte[] result = new byte[ Assert.nonNeg( count ) ];
 		this.read( position, result, 0, count );
 		return result;
+	}
+	/**
+	 * @return
+	 * 		The current length of the file in bytes
+	 */
+	@Test.Decl( "Agrees with length of underlying physical file" )
+	public int getLength() {
+		return this.length;
 	}
 	
 	/** Determine if this {@code ByteFile} can accept read/write requests */
@@ -295,6 +360,7 @@ public class ByteFile  {
 	
 	/** Close this {@code ByteFile} and release resources. */
 	@Test.Decl( "Releases resources" )
+	@Test.Decl( "Idempotent" )
 	public void dispose() {
 		if ( this.file != null && this.file.delete() ) {
 			ByteFile.newBytes( -1 * this.length );
@@ -306,6 +372,12 @@ public class ByteFile  {
 	@Test.Decl( "Indicates length" )
 	public String toString() {
 		return this.file.getAbsolutePath() + "(Length = " + this.length + ")";
+	}
+
+	@Override
+	@Test.Decl( "Idempotent" )
+	public void close() {
+		this.dispose();
 	}
 	
 

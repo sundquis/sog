@@ -16,7 +16,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class ByteFileTest extends Test.Container {
+public class ByteFileTestOLD extends Test.Container {
 
 
 	private byte[] BYTES = "A fairly long string that we use for testing".getBytes();
@@ -27,7 +27,7 @@ public class ByteFileTest extends Test.Container {
 	private long warnLimit;
 	private long failLimit;
 	
-	public ByteFileTest() {
+	public ByteFileTestOLD() {
 		super( ByteFile.class );
 		
 		this.maxLength = this.getSubjectField( null,  "MAX_LENGTH", 0L );
