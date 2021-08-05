@@ -30,23 +30,30 @@ public class AppException extends RuntimeException {
 	private static final long serialVersionUID = -2314875945481995828L;
 
 	/** Constructs an exception with empty detail message. */
+	@Test.Skip( "No testing required" )
 	public AppException() {
 		super();
 	}
 
 	/** Constructs an exception with specified detail message. */
+	@Test.Decl( "Throws AsserionError for null message" )
+	@Test.Decl( "Throws AsserionError for empty message" )
 	public AppException( String msg ) {
-		super( msg );
+		super( Assert.nonEmpty( msg ) );
 	}
 
 	/** Constructs an exception with specified cause. */
+	@Test.Decl( "Throws AsserionError for null cause" )
 	public AppException( Throwable cause ) {
-		super( cause );
+		super( Assert.nonNull( cause ) );
 	}
 
 	/** Constructs an exception with specified detail message and cause. */
+	@Test.Decl( "Throws AsserionError for null message" )
+	@Test.Decl( "Throws AsserionError for empty message" )
+	@Test.Decl( "Throws AsserionError for null cause" )
 	public AppException( String msg, Throwable cause ) {
-		super( msg, cause );
+		super( Assert.nonEmpty( msg ), Assert.nonNull( cause ) );
 	}
 	
 }

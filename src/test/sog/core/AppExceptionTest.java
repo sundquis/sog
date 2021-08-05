@@ -35,6 +35,67 @@ public class AppExceptionTest extends Test.Container {
 	
 	// TEST CASES
 	
+	@Test.Impl( 
+		member = "constructor: AppException(String)", 
+		description = "Throws AsserionError for empty message" 
+	)
+	public void tm_0CE4F475E( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		new AppException( "" );
+	}
+	
+	@Test.Impl( 
+		member = "constructor: AppException(String)", 
+		description = "Throws AsserionError for null message" 
+	)
+	public void tm_0C3B35DDA( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		String msg = null;
+		new AppException( msg );
+	}
+	
+	@Test.Impl( 
+		member = "constructor: AppException(String, Throwable)", 
+		description = "Throws AsserionError for empty message" 
+	)
+	public void tm_0D1CD07BE( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		String msg = "";
+		Throwable th = new Throwable();
+		new AppException( msg, th );
+	}
+	
+	@Test.Impl( 
+		member = "constructor: AppException(String, Throwable)", 
+		description = "Throws AsserionError for null cause" 
+	)
+	public void tm_05CE3C35C( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		String msg = "hi";
+		Throwable th = null;
+		new AppException( msg, th );
+	}
+	
+	@Test.Impl( 
+		member = "constructor: AppException(String, Throwable)", 
+		description = "Throws AsserionError for null message" 
+	)
+	public void tm_0B34C117A( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		String msg = null;
+		Throwable th = new Throwable();
+		new AppException( msg, th );
+	}
+	
+	@Test.Impl( 
+		member = "constructor: AppException(Throwable)", 
+		description = "Throws AsserionError for null cause" 
+	)
+	public void tm_066DF6237( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Throwable th = null;
+		new AppException( th );
+	}
 	
 	
 	
