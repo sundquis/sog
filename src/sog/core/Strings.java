@@ -174,7 +174,7 @@ public final class Strings {
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append( "{" );
-		if ( length <= 5 ) {
+		if ( length <= 6 ) {
 			boolean notFirst  = false;
 			for ( Object obj : objects ) {
 				if ( notFirst ) buf.append( ", " );
@@ -184,9 +184,10 @@ public final class Strings {
 		} else {
 			Iterator<Object> iter = objects.iterator();
 			buf.append( Strings.toString( iter.next() ) ).append( ", " );
+			buf.append( Strings.toString( iter.next() ) ).append( ", " );
 			buf.append( Strings.toString( iter.next() ) );
-			buf.append( ", ...<" ).append( length - 3 ).append( " more>... " );
-			for ( int i = 3; i < length; i++ ) iter.next();
+			buf.append( ", ...<" ).append( length - 4 ).append( " more>... " );
+			for ( int i = 4; i < length; i++ ) iter.next();
 			buf.append( Strings.toString( iter.next() ) );
 		}
 		buf.append( "}" );
@@ -215,8 +216,9 @@ public final class Strings {
 			}
 		} else {
 			buf.append( Strings.toString( Array.get( obj,  0 ) ) ).append( ", " );
-			buf.append( Strings.toString( Array.get( obj,  1 ) ) );
-			buf.append( ", ...<" ).append( length - 3 ).append( " more>... " );
+			buf.append( Strings.toString( Array.get( obj,  1 ) ) ).append( ", " );
+			buf.append( Strings.toString( Array.get( obj,  2 ) ) );
+			buf.append( ", ...<" ).append( length - 4 ).append( " more>... " );
 			buf.append( Strings.toString( Array.get( obj,  length -1 ) ) );
 		}
 		buf.append( "]" );

@@ -25,7 +25,7 @@ import sog.core.Cache.Builder;
  * @author sundquis
  *
  */
-public class CacheTest extends Test.Container {
+public class CacheTestOLD extends Test.Container {
 
 	// Test implementations
 	
@@ -97,7 +97,7 @@ public class CacheTest extends Test.Container {
 	private Cache<Integer, Value> cache;
 	private Builder<Integer, Value> builder = new MyBuilder();
 	
-	public CacheTest() {
+	public CacheTestOLD() {
 		super( Cache.class );
 	}
 	

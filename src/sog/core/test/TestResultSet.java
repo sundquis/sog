@@ -121,7 +121,7 @@ public class TestResultSet extends Result {
 		}
 		if ( this.skippedClasses.size() > 0 ) {
 			out.println();
-			out.println( "Bad Classes:" );
+			out.println( "Skipped Classes:" );
 			out.increaseIndent();
 			this.skippedClasses.forEach( out::println );
 			out.decreaseIndent();
@@ -131,7 +131,7 @@ public class TestResultSet extends Result {
 	
 	
 	private void addSkippedClass( String className, Throwable error ) {
-		this.skippedClasses.add( className + ": " + error );
+		this.skippedClasses.add( className + ": " + ( error == null ? "Skipped" : error.toString() ) );
 	}
 	
 
@@ -152,7 +152,12 @@ public class TestResultSet extends Result {
 	@Test.Decl( "Adds one TestResult" )
 	@Test.Decl( "Return is this TestResultSet instance" )
 	public TestResultSet addClass( Class<?> clazz ) {
-		return this.addResult( TestResult.forSubject( Assert.nonNull( clazz ) ) );
+		if ( clazz.getDeclaredAnnotation( Test.Skip.class ) == null ) {
+			return this.addResult( TestResult.forSubject( Assert.nonNull( clazz ) ) );
+		} else {
+			this.addSkippedClass( clazz.getName(), null );
+			return this;
+		}
 	}
 	
 

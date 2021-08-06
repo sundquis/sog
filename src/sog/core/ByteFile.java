@@ -158,6 +158,11 @@ public class ByteFile implements AutoCloseable {
 		Assert.nonNeg( offset );
 		Assert.lessThan( offset, src.length );
 		Assert.lessThanOrEqual( offset + count, src.length );
+		Assert.nonNeg( count );
+		
+		if ( count == 0 ) {
+			return;
+		}
 		
 		int oldLength = this.length;
 		int newLength = Math.max( this.length, position + count );
@@ -200,7 +205,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Can recover bytes written at position zero" )
 	@Test.Decl( "Can recover bytes written at positive position" )
 	public void write( int position, byte[] src ) {
-		this.write( position, src, 0, src.length );
+		this.write( position, Assert.nonNull( src ), 0, src.length );
 	}
 	
 	/**
@@ -298,7 +303,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Throws AssertionError for negative position" )
 	@Test.Decl( "Throws AssertionError for null destination" )
 	@Test.Decl( "Throws AssertionError for negative offset" )
-	@Test.Decl( "Throws AssertionError for offset greater or equal to length of destination" )
+	@Test.Decl( "Throws AssertionError for offset greater than length of destination" )
 	@Test.Decl( "Throws AssertionError for offset + count > destination.length" )
 	@Test.Decl( "Throws AssertionError for negative count" )
 	@Test.Decl( "Throws AssertionError for position + count > length" )
@@ -312,6 +317,10 @@ public class ByteFile implements AutoCloseable {
 		Assert.nonNeg( offset );
 		Assert.lessThanOrEqual( offset + count, dest.length );
 		Assert.nonNeg( count );
+		
+		if ( count == 0 ) {
+			return;
+		}
 		
 		try ( RandomAccessFile raf = new RandomAccessFile( this.file, "r" ) ) {
 			raf.seek( position );
@@ -373,7 +382,7 @@ public class ByteFile implements AutoCloseable {
 	@Override
 	@Test.Decl( "Indicates length" )
 	public String toString() {
-		return this.file.getAbsolutePath() + "(Length = " + this.length + ")";
+		return ( this.isOpen() ? this.file.getAbsolutePath() : "CLOSED" ) + "(Length = " + this.length  + ")";
 	}
 
 	@Override

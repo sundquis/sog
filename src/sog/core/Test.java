@@ -696,6 +696,10 @@ public class Test {
 		TestResultSet.forPackage( Assert.nonNull( subjectClass ) )
 			.setVerbose( verbose ).print( new IndentWriter( System.err, "\t" ) );
 	}
-	
+
+	@Test.Skip( "FIXME/Manually verified" )
+	public static void evalAll() {
+		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.err, "\t" ) );
+	}
 	
 }
