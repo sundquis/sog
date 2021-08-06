@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
@@ -27,7 +26,7 @@ import sog.core.Test;
  */
 public class Fault implements Printable {
 	
-	
+		
 	private static final Set<Consumer<Fault>> listeners = new HashSet<>();
 
 	/**
@@ -60,7 +59,7 @@ public class Fault implements Printable {
 	private final List<String> sources;
 	
 	// File and line number where fault was generated
-	private final Stream<String> faultLocation;
+	private final List<String> faultLocation;
 	
 	/**
 	 * Construct a {@code Fault} representing a application defect. The required
@@ -76,7 +75,7 @@ public class Fault implements Printable {
 		this.description = Assert.nonEmpty( description );
 		this.sources = Arrays.stream( sources ).map( Strings::toString ).collect( Collectors.toList() );
 		// FIXME: adjust using skip(..) and limit(..)
-		this.faultLocation = App.get().getLocation();
+		this.faultLocation = App.get().getLocation().collect( Collectors.toList() );
 	}
 
 	
@@ -128,10 +127,10 @@ public class Fault implements Printable {
 	@Test.Decl( "Model location printed when possible" )
 	@Test.Decl( "All provided sources printed" )
 	public void print( IndentWriter out ) {
-		out.println( "FAULT: " + this.description );
+		out.println( this.toString() );
 		out.increaseIndent();
 
-		out.println( "FAULT LOCATION:" );
+		out.println( "LOCATION:" );
 		out.increaseIndent();
 		this.faultLocation.forEach( out::println );
 		out.decreaseIndent();

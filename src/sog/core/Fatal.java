@@ -7,6 +7,7 @@
 
 package sog.core;
 
+import sog.util.Fault;
 
 /**
  * A class used to signal fatal runtime conditions.
@@ -58,13 +59,17 @@ public final class Fatal {
 	}
 	
 	/**
-	 * Print a warning message about a serious and potentially fatal condition.
+	 * //Print a warning message about a serious and potentially fatal condition.
+	 * Toss a fault indicating a serious condition.
+	 * To receive notifications register a listener:
+	 * 		Fault.addListener( Consumer<Fault> listener )
 	 * 
 	 * @param detail
 	 *      A string detail message to include in the exception message.
 	 */
 	public static void warning( String detail ) {
-		new AppException( "WARNING: " + detail ).printStackTrace();
+		new Fault( "WARNING: " + detail ).toss();
+		//new AppException( "WARNING: " + detail ).printStackTrace();
 	}
 
 	/**

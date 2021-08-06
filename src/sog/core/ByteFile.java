@@ -242,7 +242,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Can recover bytes written with positive offset" )
 	public int append( byte[] src, int offset, int count ) {
 		int position = this.length;
-		this.write( position, src, offset, count );
+		this.write( position, Assert.nonNull( src ), Assert.nonNeg( offset ), Assert.nonNeg( count ) );
 		return position;
 	}
 	
@@ -262,7 +262,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Increases total bytes by source.length" )
 	@Test.Decl( "Can recover bytes" )
 	public int append( byte[] src ) {
-		return this.append( src, 0, src.length );
+		return this.append( Assert.nonNull( src ), 0, src.length );
 	}
 	
 	/**
@@ -303,6 +303,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Throws AssertionError for negative count" )
 	@Test.Decl( "Throws AssertionError for position + count > length" )
 	@Test.Decl( "Read is idempotent" )
+	@Test.Decl( "Read is consistent with write" )
 	public void read( int position, byte[] dest, int offset, int count ) {
 		Assert.isTrue( this.isOpen() );
 		Assert.nonNull( dest );
@@ -337,6 +338,7 @@ public class ByteFile implements AutoCloseable {
 	@Test.Decl( "Throws AssertionError for negative count" )
 	@Test.Decl( "Throws AssertionError for position + count > length" )
 	@Test.Decl( "Read is idempotent" )
+	@Test.Decl( "Read is consistent with write" )
 	public byte[] read( int position, int count ) {
 		byte[] result = new byte[ Assert.nonNeg( count ) ];
 		this.read( position, result, 0, count );

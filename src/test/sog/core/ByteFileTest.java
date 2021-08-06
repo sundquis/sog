@@ -18,9 +18,23 @@
  */
 package test.sog.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import sog.core.AppException;
 import sog.core.ByteFile;
 import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.Fault;
+import sog.util.IndentWriter;
+import sog.util.StringOutputStream;
 
 /**
  * 
@@ -34,6 +48,10 @@ public class ByteFileTest extends Test.Container {
 	private final long ORIG_WARN_LIMIT;
 	private final long ORIG_FAIL_LIMIT;
 	
+	private final long MAX_LENGTH = LIMIT;
+	private final long WARN_LIMIT = LIMIT * 2;
+	private final long FAIL_LIMIT = LIMIT * 5;
+	
 	public ByteFileTest() {
 		super( ByteFile.class );
 		
@@ -42,9 +60,9 @@ public class ByteFileTest extends Test.Container {
 		this.ORIG_FAIL_LIMIT = this.getSubjectField( null, "FAIL_LIMIT", null );
 
 		// Reduce limits to make it easier to trigger exceptional cases
-		this.setSubjectField( null, "MAX_LENGTH", LIMIT );
-		this.setSubjectField( null, "WARN_LIMIT", LIMIT * 2 );
-		this.setSubjectField( null, "FAIL_LIMIT", LIMIT * 5 );
+		this.setSubjectField( null, "MAX_LENGTH", this.MAX_LENGTH );
+		this.setSubjectField( null, "WARN_LIMIT", this.WARN_LIMIT );
+		this.setSubjectField( null, "FAIL_LIMIT", this.FAIL_LIMIT );
 	}
 	
 	
@@ -56,6 +74,24 @@ public class ByteFileTest extends Test.Container {
 			this.setSubjectField( null, "FAIL_LIMIT", this.ORIG_FAIL_LIMIT );
 		};
 	}
+	
+	public File getFile( ByteFile bf ) {
+		return this.getSubjectField( bf, "file", null );
+	}
+	
+	/* Test cases can assume all strings (and their corresponding byte arrays) have length at least 10. */
+	public final String[] ARGS = new String[] { 
+		"Hello world!",
+		"The second string.",
+		"Four score and seven years ago..",
+		"A long time ago, in a alaxy far, far away...",
+		"In a hole in, in the ground, there lived a Hobbit.",
+		"The answer to the ultimate question of life, the universe, and everything."
+	};
+	
+	/* Reusable byte array to read and append. */
+	public final byte[] DATA = ARGS[ARGS.length - 1].getBytes();
+
 	
 	
 	
@@ -109,7 +145,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0F7F0AA8B( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canAppend( (int) LIMIT + 1 ) );
+			tc.assertFalse( bf.canAppend( (int) this.MAX_LENGTH + 1 ) );
 		}
 	}
 		
@@ -132,7 +168,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0B52185CE( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertTrue( bf.canAppend( (int) LIMIT ) );
+			tc.assertTrue( bf.canAppend( (int) this.MAX_LENGTH ) );
 		}
 	}
 		
@@ -199,7 +235,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0451D0457( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canWrite( 1, (int) LIMIT ) );
+			tc.assertFalse( bf.canWrite( 1, (int) this.MAX_LENGTH ) );
 		}
 	}
 		
@@ -209,7 +245,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_05F2799B7( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canWrite( (int) LIMIT, 1 ) );
+			tc.assertFalse( bf.canWrite( (int) this.MAX_LENGTH, 1 ) );
 		}
 	}
 		
@@ -259,6 +295,20 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: byte[] ByteFile.read(int, int)", 
+		description = "Read is consistent with write" 
+	)
+	public void tm_09853AA15( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			List<Integer> positions = Stream.of( this.ARGS )
+				.map( String::getBytes ).map( bf::append ).collect( Collectors.toList() );
+			for ( int i = 0; i < this.ARGS.length; i++ ) {
+				tc.assertEqual( this.ARGS[i].substring( 0, 10 ), new String( bf.read( positions.get( i ), 10 ) ) );
+			}
+		}
+	}
+	
+	@Test.Impl( 
+		member = "method: byte[] ByteFile.read(int, int)", 
 		description = "Throws AssertionError for disposed" 
 	)
 	public void tm_0C0731D4B( Test.Case tc ) {
@@ -305,181 +355,312 @@ public class ByteFileTest extends Test.Container {
 		}
 	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "At fail limit throws AppException" 
-		)
-		public void tm_06694C1DC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "At fail limit throws AppException" 
+	)
+	public void tm_06694C1DC( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.append( "random data".getBytes() );
+			tc.expectError( AssertionError.class );
+			bf.read( 10, 10 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "At warn limit issues warning" 
-		)
-		public void tm_084F9DB69( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "At warn limit issues warning" 
+	)
+	public void tm_084F9DB69( Test.Case tc ) {
+		// Warn limit is 2 * max length
+		try ( 
+			ByteFile bf1 = new ByteFile(); 
+			ByteFile bf2 = new ByteFile(); 
+			ByteFile bf3 = new ByteFile() 
+		) {
+			StringOutputStream sos = new StringOutputStream();
+			IndentWriter out = new IndentWriter( sos );
+			Fault.addListener( out::println );
+			byte[] data = "FULL".getBytes();
+			int position = (int) this.MAX_LENGTH - data.length;
+			bf1.write( position, data );
+			bf2.write( position, data );
+			bf3.write( 0, data );
+			tc.assertNotEmpty( sos.toString() );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Can recover bytes" 
-		)
-		public void tm_0BC7914D4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Can recover bytes" 
+	)
+	public void tm_0BC7914D4( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			String message = "String to append";
+			bf.write( 100, "some data".getBytes() );
+			int position = bf.append( message.getBytes() );
+			tc.assertEqual( message, new String( bf.read( position, message.length() ) ) );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Increases length by source.length" 
-		)
-		public void tm_0392704D0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Increases length by source.length" 
+	)
+	public void tm_0392704D0( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( 100, "some random data".getBytes() );
+			int length = bf.getLength();
+			byte[] data = "message to append".getBytes();
+			bf.append( data );
+			tc.assertEqual( length + data.length, bf.getLength() );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Increases total bytes by source.length" 
-		)
-		public void tm_0A0B685D1( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Increases total bytes by source.length" 
+	)
+	public void tm_0A0B685D1( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			long TOTAL_BYTES = this.getSubjectField( null, "TOTAL_BYTES", null );
+			byte[] data = "message to append".getBytes();
+			bf.append( data );
+			tc.assertEqual( TOTAL_BYTES + data.length, this.getSubjectField( null, "TOTAL_BYTES", null ) );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Throws AssertionError for disposed" 
-		)
-		public void tm_07F406F24( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Throws AssertionError for disposed" 
+	)
+	public void tm_07F406F24( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.append( this.DATA );
+			tc.expectError( AssertionError.class );
+			bf.dispose();
+			bf.append( this.DATA );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Throws AssertionError for length + source.length > MAX_LENGTH" 
-		)
-		public void tm_09BF6C210( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Throws AssertionError for length + source.length > MAX_LENGTH" 
+	)
+	public void tm_09BF6C210( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( (int) this.MAX_LENGTH - this.DATA.length, this.DATA );
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[])", 
-			description = "Throws AssertionError for null source" 
-		)
-		public void tm_0A69EEC0B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[])", 
+		description = "Throws AssertionError for null source" 
+	)
+	public void tm_0A69EEC0B( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			tc.expectError( AssertionError.class );
+			bf.append( null );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "At fail limit throws AppException" 
-		)
-		public void tm_0C770D63C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "At fail limit throws AppException" 
+	)
+	public void tm_0C770D63C( Test.Case tc ) {
+		// Fail limit is 5 * max length
+		try ( 
+				ByteFile bf1 = new ByteFile(); 
+				ByteFile bf2 = new ByteFile(); 
+				ByteFile bf3 = new ByteFile(); 
+				ByteFile bf4 = new ByteFile(); 
+				ByteFile bf5 = new ByteFile(); 
+				ByteFile bf6 = new ByteFile(); 
+			) {
+				int position = (int) this.MAX_LENGTH - this.DATA.length;
+				bf1.write( position, this.DATA );
+				bf2.write( position, this.DATA );
+				bf3.write( position, this.DATA );
+				bf4.write( position, this.DATA );
+				bf5.write( position, this.DATA );
+				tc.expectError( AppException.class );
+				bf6.append( this.DATA, 0, 1 );
+			}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "At warn limit issues warning" 
-		)
-		public void tm_0FD3A8B09( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "At warn limit issues warning" 
+	)
+	public void tm_0FD3A8B09( Test.Case tc ) {
+		// Warn limit is 2 * max length
+		try ( 
+			ByteFile bf1 = new ByteFile(); 
+			ByteFile bf2 = new ByteFile(); 
+			ByteFile bf3 = new ByteFile()
+		) {
+			int position = (int) this.MAX_LENGTH - this.DATA.length;
+			bf1.write( position, this.DATA );
+			bf2.write( position, this.DATA );
+			StringOutputStream sos = new StringOutputStream();
+			IndentWriter out = new IndentWriter( sos );
+			Fault.addListener( out::println );
+			bf3.append( this.DATA, 0, 1 );
+			tc.assertNotEmpty( sos.toString() );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Can recover bytes written with positive offset" 
-		)
-		public void tm_0ED2DF4EB( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Can recover bytes written with positive offset" 
+	)
+	public void tm_0ED2DF4EB( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( 100, this.DATA );
+			int position = bf.append( this.DATA, 5, 7 );
+			tc.assertEqual( new String( this.DATA, 5, 7 ), new String( bf.read( position, 7 ) ) );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Can recover bytes written with zero offset" 
-		)
-		public void tm_03021001C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Can recover bytes written with zero offset" 
+	)
+	public void tm_03021001C( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( 123, this.DATA );
+			int position = bf.append( this.DATA, 0, 7 );
+			tc.assertEqual( new String( this.DATA, 0, 7 ), new String( bf.read( position, 7 ) ) );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Increases length by count" 
-		)
-		public void tm_0E16E6CA6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Increases length by count" 
+	)
+	public void tm_0E16E6CA6( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( 37, this.DATA );
+			int length = bf.getLength();
+			bf.append( this.DATA, 3, 11 );
+			tc.assertEqual( length + 11, bf.getLength() );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Increases total bytes by count" 
-		)
-		public void tm_011D851E7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Increases total bytes by count" 
+	)
+	public void tm_011D851E7( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.write( 43, this.DATA );
+			int count = 9;
+			long TOTAL_BYTES = this.getSubjectField( null, "TOTAL_BYTES", null );
+			bf.append( this.DATA, 2, count );
+			tc.assertEqual( TOTAL_BYTES + count, this.getSubjectField( null, "TOTAL_BYTES", null ) );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for disposed" 
-		)
-		public void tm_039E6E6C4( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for disposed" 
+	)
+	public void tm_039E6E6C4( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			bf.append( this.DATA, 5, 9 );
+			bf.dispose();
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, 5, 9 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for length + count > MAX_LENGTH" 
-		)
-		public void tm_05A8EB9BA( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for length + count > MAX_LENGTH" 
+	)
+	public void tm_05A8EB9BA( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			int count = 8;
+			bf.write( (int) this.MAX_LENGTH - count, this.DATA, 0, 1 );
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, 1, count );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for negative count" 
-		)
-		public void tm_03B798F43( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for negative count" 
+	)
+	public void tm_03B798F43( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, 1, -1 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for negative offset" 
-		)
-		public void tm_01CD67DF5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for negative offset" 
+	)
+	public void tm_01CD67DF5( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, -1, 1 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for null source" 
-		)
-		public void tm_05899D06B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for null source" 
+	)
+	public void tm_05899D06B( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			tc.expectError( AssertionError.class );
+			bf.append( null, 0, 1 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for offset + count > source.length" 
-		)
-		public void tm_022A4ADC3( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for offset + count > source.length" 
+	)
+	public void tm_022A4ADC3( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, 10, 100 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.append(byte[], int, int)", 
-			description = "Throws AssertionError for offset greater or equal to length of source" 
-		)
-		public void tm_084B33E10( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int ByteFile.append(byte[], int, int)", 
+		description = "Throws AssertionError for offset greater or equal to length of source" 
+	)
+	public void tm_084B33E10( Test.Case tc ) {
+		try ( ByteFile bf = new ByteFile() ) {
+			int length = this.DATA.length;
+			tc.expectError( AssertionError.class );
+			bf.append( this.DATA, length, 1 );
 		}
+	}
 		
-		@Test.Impl( 
-			member = "method: int ByteFile.getLength()", 
-			description = "Agrees with length of underlying physical file" 
-		)
-		public void tm_0C681DE75( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int ByteFile.getLength()", 
+		description = "Agrees with length of underlying physical file" 
+	)
+	public void tm_0C681DE75( Test.Case tc ) {
+		try ( 
+			ByteFile bf = new ByteFile();
+			RandomAccessFile raf = new RandomAccessFile( this.getFile( bf ), "r" )
+		) {
+			Stream.of( 27, 11, 92, 78, 76, 100 ).forEach( n -> bf.write( n, this.DATA ) );
+			tc.assertEqual( bf.getLength(), (int) raf.length() );
+		} catch ( Exception e ) {
+			throw new AppException(e);
+		} 
+	}
 		
 		@Test.Impl( 
 			member = "method: int ByteFile.length()", 
@@ -537,6 +718,14 @@ public class ByteFileTest extends Test.Container {
 			tc.addMessage( "GENERATED STUB" );
 		}
 		
+		@Test.Impl( 
+				member = "method: void ByteFile.read(int, byte[], int, int)", 
+				description = "Read is consistent with write" 
+			)
+			public void tm_04254FE82( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+
 		@Test.Impl( 
 			member = "method: void ByteFile.read(int, byte[], int, int)", 
 			description = "Throws AssertionError for disposed" 
