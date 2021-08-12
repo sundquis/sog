@@ -25,6 +25,14 @@ import java.lang.ref.SoftReference;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+/**
+ * A Cache implementation built on java SoftReferences.
+ * 
+ * Elements are stored as (key, value) pairs. The keys (type parameter K) are Comparable
+ * and values (type parameter V) retrieved from a map using soft references. When a softly
+ * held value is garbage-collected the missing value is reconstructed on demand by the
+ * associated Builder.
+ */
 @Test.Subject( "test." )
 public final class Cache<K extends Comparable<K>, V> {
 	
@@ -45,7 +53,7 @@ public final class Cache<K extends Comparable<K>, V> {
 
 		private final K key;
 
-		SoftRef( K key, V value, ReferenceQueue<V> rq ) {
+		private SoftRef( K key, V value, ReferenceQueue<V> rq ) {
 			super( value, rq );
 			this.key = Assert.nonNull( key );
 		}
@@ -65,7 +73,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	private boolean collected;
 	
 	/** Construct */
-	@Test.Decl( "Null Builder throws Assertion Error" )
+	@Test.Decl( "Throws AssertionError for null builder" )
 	public Cache( Builder<K, V> builder ) {
 		this.builder = Assert.nonNull( builder );
 		this.rq = new ReferenceQueue<V>();
@@ -86,16 +94,17 @@ public final class Cache<K extends Comparable<K>, V> {
 	
 	/**
 	 * Return the value corresponding to the given key. If the value is not currently
-	 * held the associated builder is used to construct an instance.
+	 * held, the associated builder is used to construct an instance.
 	 * 
 	 * @param key
 	 * @return
 	 * @throws AppException		If the builder is unable to construct the value.
 	 */
-	@Test.Decl( "Null key throws Assertion Error" )
-	@Test.Decl( "Values are not null" )
+	@Test.Decl( "Throws AssertionError for null key" )
+	@Test.Decl( "Throws AssertionError if Builder produces null" )
 	@Test.Decl( "From empty cache returns valid object" )
 	@Test.Decl( "Stored uncolllectable object returns same object" )
+	@Test.Decl( "After garbage collection produces valid object" )
 	@Test.Decl( "Get stress test" )
 	@Test.Decl( "Multi thread stress test" )
 	public V get( K key ) throws AppException {
@@ -109,12 +118,12 @@ public final class Cache<K extends Comparable<K>, V> {
 			this.flushQueue();
 
 			if ( value == null ) {
-				value = this.builder.make( key );
+				value = Assert.nonNull( this.builder.make( key ) );
 				this.map.put( key, new SoftRef<K, V>( key, value, this.rq ) );
 			}
 		}
 
-		return Assert.nonNull( value );
+		return value;
 	}
 
 	/**
