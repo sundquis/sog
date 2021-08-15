@@ -29,9 +29,9 @@ import java.util.TreeMap;
  * A Cache implementation built on java SoftReferences.
  * 
  * Elements are stored as (key, value) pairs. The keys (type parameter K) are Comparable
- * and values (type parameter V) retrieved from a map using soft references. When a softly
- * held value is garbage-collected the missing value is reconstructed on demand by the
- * associated Builder.
+ * and values (type parameter V) rae retrieved from a map using soft references. When a softly
+ * held value is garbage-collected the association is removed from the map and if subsequently
+ * needed, the missing value is reconstructed on demand by the associated Builder.
  */
 @Test.Subject( "test." )
 public final class Cache<K extends Comparable<K>, V> {
@@ -69,8 +69,8 @@ public final class Cache<K extends Comparable<K>, V> {
 	/** The contents of the cache are stored here. **/
 	private final SortedMap<K, SoftRef<K, V>> map;
 
-	/** Useful for diagnostics. */
-	private boolean collected;
+	/** The number of Values that have been garbage collected. */
+	private int collected;
 	
 	/** Construct */
 	@Test.Decl( "Throws AssertionError for null builder" )
@@ -78,20 +78,9 @@ public final class Cache<K extends Comparable<K>, V> {
 		this.builder = Assert.nonNull( builder );
 		this.rq = new ReferenceQueue<V>();
 		this.map = new TreeMap<K, SoftRef<K, V>>();
-		this.collected = false;
+		this.collected = 0;
 	}
 
-	/**
-	 * True if the reference queue has provided a soft reference.
-	 * This can only happen if get() is called after a garbage collection.
-	 * 
-	 * @return
-	 */
-	@Test.Decl( "False at creation" )
-	public boolean collected() {
-		return collected;
-	}
-	
 	/**
 	 * Return the value corresponding to the given key. If the value is not currently
 	 * held, the associated builder is used to construct an instance.
@@ -100,58 +89,73 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * @return
 	 * @throws AppException		If the builder is unable to construct the value.
 	 */
+	@SuppressWarnings( "unchecked" )
 	@Test.Decl( "Throws AssertionError for null key" )
 	@Test.Decl( "Throws AssertionError if Builder produces null" )
+	@Test.Decl( "Throws AppException if Builder throws exception" )
 	@Test.Decl( "From empty cache returns valid object" )
-	@Test.Decl( "Stored uncolllectable object returns same object" )
+	@Test.Decl( "After clear() produces equivalent object" )
+	@Test.Decl( "After clear() produces non-identical object" )
+	@Test.Decl( "Stored uncolllectable object returns identical object" )
 	@Test.Decl( "After garbage collection produces valid object" )
-	@Test.Decl( "Get stress test" )
-	@Test.Decl( "Multi thread stress test" )
+	@Test.Decl( "Produces identical values for identical keys before collection" )
+	@Test.Decl( "Produces identical values for identical keys after collection" )
+	@Test.Decl( "Values before and after collection are equivalent" )
+	@Test.Decl( "Values before and after collection are not identical" )
 	public V get( K key ) throws AppException {
 		Assert.nonNull( key );
 		V value = null;
 
 		synchronized ( this.map ) {
+			// Attempt to find a SoftRef for the given key and its associated Value
 			SoftRef<K, V> sr = this.map.get( key );
 			value = (sr == null) ? null : sr.get();
+
+			// If value == null there are a number of possible cases:
+			//		This is the first request for the desired SofRef and it has never been added to the map.
+			// 		The map does not contain a SoftRef for the key because it was removed.
+			//		The SoftRef is in the map but its value was collected before sr.get() completed.
+
+			// If value != null we now hold a strong reference to it, it cannot be collected,
+			// and the map holds the association
 			
-			this.flushQueue();
+			// Before continuing we poll the reference queue to see if collection has occurred.
+			// If it has we can remove the associations from the map.
+			while ( (sr = (SoftRef<K, V>) this.rq.poll()) != null ) {
+				this.map.remove( sr.key );
+				this.collected++;
+			}
 
 			if ( value == null ) {
-				value = Assert.nonNull( this.builder.make( key ) );
-				this.map.put( key, new SoftRef<K, V>( key, value, this.rq ) );
+				try {
+					value = this.builder.make( key );
+				} catch ( Throwable t ) {
+					throw new AppException( t );
+				}
+				this.map.put( key, new SoftRef<K, V>( key, Assert.nonNull( value ), this.rq ) );
 			}
 		}
 
 		return value;
 	}
+	
 
-	/**
-	 * Remove all associations.
-	 */
-	@Test.Decl( "Then get() retrieves distinct instance" )
-	@Test.Decl( "Then get() retrieves equivalent value" )
-	@Test.Decl( "Cache empty after" )
-	public void flush() {
-		synchronized ( this.map ) {
-			this.map.clear();
-		}
-		
+	@Test.Decl( "Idempotent" )
+	public void clear() {
+		this.map.clear();
 	}
-
+	
 	/**
-	 * Queue contains references whose referents have been collected.
-	 * Remove these keys from the map.
+	 * The number of Value instances that have been collected.
 	 * 
-	 * Only called when lock on map is held.
+	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private void flushQueue() {
-		SoftRef<K, V> sr = null;
-		while ( (sr = (SoftRef<K, V>) this.rq.poll()) != null ) {
-			this.map.remove( sr.key );
-			this.collected = true;
-		}
+	@Test.Decl( "Zero at creation" )
+	@Test.Decl( "Unchanged after clear()" )
+	@Test.Decl( "Greater than zero when the size of the map decreases" )
+	@Test.Decl( "collected() + size() is invariant across collections" )
+	public int collected() {
+		return collected;
 	}
 	
 	/**
@@ -160,7 +164,9 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * @return
 	 */
 	@Test.Decl( "Created empty" )
+	@Test.Decl( "Zero after clear()" )
 	@Test.Decl( "Not empty after get" )
+	@Test.Decl( "Decreases after collection" )
 	public int size() {
 		return this.map.size();
 	}
@@ -169,8 +175,8 @@ public final class Cache<K extends Comparable<K>, V> {
 	@Test.Decl( "Result is not null" )
 	@Test.Decl( "Result is not empty" )
 	public String toString() {
-		return "Cache(" + this.size() + " keys)";
+		return "Cache(" + this.size() + " key" + (this.size() == 1 ? "" : "s") + ")";
 	}
-	
+
 	
 }
