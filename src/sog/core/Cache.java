@@ -166,13 +166,11 @@ public final class Cache<K extends Comparable<K>, V> {
 	@Test.Decl( "Created empty" )
 	@Test.Decl( "Zero after clear()" )
 	@Test.Decl( "Not empty after get" )
-	@Test.Decl( "Decreases after collection" )
 	public int size() {
 		return this.map.size();
 	}
 
 	@Override
-	@Test.Decl( "Result is not null" )
 	@Test.Decl( "Result is not empty" )
 	public String toString() {
 		return "Cache(" + this.size() + " key" + (this.size() == 1 ? "" : "s") + ")";

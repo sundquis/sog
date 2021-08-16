@@ -152,7 +152,7 @@ public class TestResultSet extends Result {
 	@Test.Decl( "Adds one TestResult" )
 	@Test.Decl( "Return is this TestResultSet instance" )
 	public TestResultSet addClass( Class<?> clazz ) {
-		if ( clazz.getDeclaredAnnotation( Test.Skip.class ) == null ) {
+		if ( Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class ) == null ) {
 			return this.addResult( TestResult.forSubject( Assert.nonNull( clazz ) ) );
 		} else {
 			this.addSkippedClass( clazz.getName(), null );

@@ -19,6 +19,7 @@
 package test.sog.core;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import sog.core.AppException;
 import sog.core.Cache;
@@ -27,7 +28,7 @@ import sog.core.Strings;
 import sog.core.Test;
 
 /**
- * 
+ * A number of test cases for Cache provoke garbage collection which contributes to execution time.
  */
 @Test.Skip( "Container" )
 public class CacheTest extends Test.Container {
@@ -39,9 +40,9 @@ public class CacheTest extends Test.Container {
 	
 	
 	public static class Value {
-		private final static int SIZE = 100000;
+		// Chosen to minimize the total execution time.
+		private final static int SIZE = 1_000_000;
 		private static int NEXT_ID = 0;
-	
 		
 		private final int ID;
 		private final String label;
@@ -238,101 +239,128 @@ public class CacheTest extends Test.Container {
 		tc.assertFalse( label.equals( this.cache.get( 0 ).toString() ) );
 	}
 		
-		@Test.Impl( 
-			member = "method: String Cache.toString()", 
-			description = "Result is not empty" 
-		)
-		public void tm_0D1FB8F40( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Cache.toString()", 
+		description = "Result is not empty" 
+	)
+	public void tm_0D1FB8F40( Test.Case tc ) {
+		tc.assertNotEmpty( this.cache.toString() );
+		this.cache.get( 0 );
+		tc.assertNotEmpty( this.cache.toString() );
+		this.cache.clear();
+		tc.assertNotEmpty( this.cache.toString() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Cache.toString()", 
-			description = "Result is not null" 
-		)
-		public void tm_0D47FE88A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int Cache.collected()", 
+		description = "Greater than zero when the size of the map decreases" 
+	)
+	public void tm_0BAF8A0A0( Test.Case tc ) {
+		int n = 0;
+		int previous = this.cache.size();
+		while ( this.cache.size() >= previous ) {
+			previous = this.cache.size();
+			this.cache.get( n++ );
 		}
+		tc.assertTrue( this.cache.collected() > 0 );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.collected()", 
-			description = "Greater than zero when the size of the map decreases" 
-		)
-		public void tm_0BAF8A0A0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int Cache.collected()", 
+		description = "Unchanged after clear()" 
+	)
+	public void tm_02FCB933D( Test.Case tc ) {
+		int n = 0;
+		while ( this.cache.collected() == 0 ) {
+			this.cache.get( n++ );
 		}
+		int collected = this.cache.collected();
+		this.cache.clear();
+		tc.assertEqual( collected, this.cache.collected() );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.collected()", 
-			description = "Unchanged after clear()" 
-		)
-		public void tm_02FCB933D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int Cache.collected()", 
+		description = "Zero at creation" 
+	)
+	public void tm_0B3F7DD32( Test.Case tc ) {
+		tc.assertEqual( 0, this.cache.collected() );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.collected()", 
-			description = "Zero at creation" 
-		)
-		public void tm_0B3F7DD32( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: int Cache.collected()", 
+		description = "collected() + size() is invariant across collections" 
+	)
+	public void tm_0B29392B5( Test.Case tc ) {
+		int n = 0;
+		while ( this.cache.collected() == 0 ) {
+			this.cache.get( n++ );
 		}
+		int collected = this.cache.collected();
+		int previousSize = 0;
+		while ( this.cache.collected() == collected ) {
+			previousSize = this.cache.size();
+			this.cache.get( n++ );
+		}
+		// GC occurs before new item is inserted in map so:
+		int newTotal = this.cache.collected() + this.cache.size() - 1;
+		tc.assertEqual( collected + previousSize, newTotal );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.collected()", 
-			description = "collected() + size() is invariant across collections" 
-		)
-		public void tm_0B29392B5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int Cache.size()", 
+		description = "Created empty" 
+	)
+	public void tm_0ACE6B283( Test.Case tc ) {
+		tc.assertTrue( this.cache.size() == 0 );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.size()", 
-			description = "Created empty" 
-		)
-		public void tm_0ACE6B283( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int Cache.size()", 
+		description = "Not empty after get" 
+	)
+	public void tm_0C706A3A0( Test.Case tc ) {
+		this.cache.get( 0 );
+		tc.assertTrue( this.cache.size() > 0 );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.size()", 
-			description = "Decreases after collection" 
-		)
-		public void tm_09F5EFB75( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: int Cache.size()", 
+		description = "Zero after clear()" 
+	)
+	public void tm_0C70038FA( Test.Case tc ) {
+		Stream.of( 0, 1, 2, 3 ).forEach( this.cache::get );
+		tc.assertTrue( this.cache.size() > 0 );
+		this.cache.clear();
+		tc.assertTrue( this.cache.size() == 0 );
+	}
 		
-		@Test.Impl( 
-			member = "method: int Cache.size()", 
-			description = "Not empty after get" 
-		)
-		public void tm_0C706A3A0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: void Cache.clear()", 
+		description = "Idempotent" 
+	)
+	public void tm_0A7ED3A2A( Test.Case tc ) {
+		int n = 0;
+		while ( this.cache.collected() == 0 ) {
+			this.cache.get( n++ );
 		}
-		
-		@Test.Impl( 
-			member = "method: int Cache.size()", 
-			description = "Zero after clear()" 
-		)
-		public void tm_0C70038FA( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: void Cache.clear()", 
-			description = "Idempotent" 
-		)
-		public void tm_0A7ED3A2A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+		this.cache.clear();
+		int oldSize = this.cache.size();
+		int oldCollected = this.cache.collected();
+		String oldString = this.cache.toString();
+		this.cache.clear();
+		tc.assertEqual( oldSize, this.cache.size() );
+		tc.assertEqual( oldCollected, this.cache.collected() );
+		tc.assertEqual( oldString, this.cache.toString() );
+	}
 
 	
 	
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( Cache.class );
+		Test.eval( Cache.class );
 		//Test.evalPackage( Cache.class );
-		Test.evalAll();
+		//Test.evalAll();
 	}
 }

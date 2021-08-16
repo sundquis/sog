@@ -17,9 +17,9 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class LocalDirTest extends Test.Container {
+public class LocalDirTestOLD extends Test.Container {
 	
-	public LocalDirTest() {
+	public LocalDirTestOLD() {
 		super( LocalDir.class );
 	}
 
