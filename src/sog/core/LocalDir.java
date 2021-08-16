@@ -26,7 +26,13 @@ import java.nio.file.Path;
 
 
 /**
+ * Represents a directory under the root of the application.
  * 
+ * Services:
+ * 		Append a new subdirectory.
+ * 		Retrieve a Path representing the current directory.
+ * 		Retrieve a file in the current directory with the specified extension.
+ * 		Retrieve a temporary file.
  */
 @Test.Subject( "test." )
 public class LocalDir {
@@ -37,41 +43,52 @@ public class LocalDir {
 	public static enum Type {
 
 		/** No system type defined. */
+		@Test.Skip( "Enumerated constant" )
 		PLAIN( "plain" ),
 
 		/** File used to store configuration information */
+		@Test.Skip( "Enumerated constant" )
 		PROPERTY( "xml" ),
 
 		/** Temporary file*/
+		@Test.Skip( "Enumerated constant" )
 		TEMPORARY( "tmp" ),
 
 		/** File contains comma separated values */
+		@Test.Skip( "Enumerated constant" )
 		CSV( "csv" ),
 
 		/** File contains generic binary data */
+		@Test.Skip( "Enumerated constant" )
 		DATA( "dat" ),
 
 		/** File contains serialized objects */
+		@Test.Skip( "Enumerated constant" )
 		SERIAL( "ser" ),
 
 		/** Text file */
+		@Test.Skip( "Enumerated constant" )
 		TEXT( "txt" ),
 
 		/** Java source file */
+		@Test.Skip( "Enumerated constant" ) 		
 		SRC( "java" ),
 
 		/** HTML file */
+		@Test.Skip( "Enumerated constant" ) 		
 		HTML( "html" ),
 		
 		/** An xml file */
+		@Test.Skip( "Enumerated constant" ) 		
 		XML( "xml" );
 		
 		private String extension;
 		
-		Type( String ext ) {
+		private Type( String ext ) {
 			this.extension = "." + ext;
 		}
-		
+
+		@Test.Decl( "Starts with dot" )
 		public String getExtension() {
 			return this.extension;
 		}
@@ -82,11 +99,18 @@ public class LocalDir {
 	
 	private boolean createMissingDirs;
 
+	@Test.Decl( "Directory exists" )
+	@Test.Decl( "Directory is readable" )
+	@Test.Decl( "Directory is writeable" )
 	public LocalDir( boolean createMissingDirs ) {
 		this.createMissingDirs = createMissingDirs;
 		this.path = Assert.rwDirectory( App.get().root() );
 	}
-	
+
+	@Test.Decl( "Directory exists" )
+	@Test.Decl( "Directory is readable" )
+	@Test.Decl( "Directory is writeable" )
+	@Test.Decl( "Default creates missing directories" )
 	public LocalDir() {
 		this( true );
 	}
@@ -100,11 +124,14 @@ public class LocalDir {
 	 * @return
 	 *      This LocalDir instance.
 	 */
-	@Test.Decl( "Appending null subdir throws assertion error")
-	@Test.Decl( "Appending empty subdir throws assertion error")
+	@Test.Decl( "Throws AssertionError for null subdir name" )
+	@Test.Decl( "Throws AssertionError for empty subdir name" )
+	@Test.Decl( "Throws AppException if missing directory cannot be created" )
+	@Test.Decl( "Throws AssertionError if resulting directory does not exist" )
+	@Test.Decl( "Throws AssertionError if resulting directory is not readable" )
+	@Test.Decl( "Return is this LocalDir instance" )
 	public LocalDir sub( String subDir ) {
-		Assert.nonEmpty( subDir );
-		this.path = this.path.resolve( subDir );
+		this.path = this.path.resolve( Assert.nonEmpty( subDir ) );
 		if ( !Files.exists( this.path ) && this.createMissingDirs ) {
 			try {
 				Files.createDirectory( this.path );
@@ -133,25 +160,24 @@ public class LocalDir {
 	/**
 	 * Retrieve the named file of the given type in the current directory.
 	 */
-	@Test.Decl( "throws Assertion Error if name is null" )
-	@Test.Decl( "throws Assertion Error if name is empty" )
-	@Test.Decl( "throws Assertion Error if type is null" )
+	@Test.Decl( "Throws AssertionError if name is null" )
+	@Test.Decl( "Throws AssertionError if name is empty" )
+	@Test.Decl( "Throws AssertionError if type is null" )
 	public Path getFile( String name, Type type ) {
-		Assert.nonEmpty( name );
-		Assert.nonNull( type );
-		return this.path.resolve( name + type.getExtension() );
+		return this.path.resolve( Assert.nonEmpty( name ) + Assert.nonNull( type ).getExtension() );
 	}
 	
 	/** Retrieve a temporary file that will be deleted when the JVM exits */
 	@Test.Decl( "Temporary file exists" )
 	@Test.Decl( "Temporary file is readable" )
 	@Test.Decl( "Temporary file is writeable" )
-	@Test.Decl( "Throws arretion error if prefix is null" )
-	@Test.Decl( "Throws arretion error if prefix is empty" )
-	@Test.Decl( "Throws arretion error if prefix is short" )
+	@Test.Decl( "Throws AssertionError if prefix is null" )
+	@Test.Decl( "Throws AssertionError if prefix is empty" )
+	@Test.Decl( "Throws AssertionError if prefix is shorter than 3 characters" )
+	@Test.Decl( "Throws AssertionError if prefix is longer than 10 characters" )
 	public File getTmpFile( String prefix ) {
 		Assert.nonEmpty( prefix );
-		Assert.isTrue( prefix.length() >= 3 );
+		Assert.boundedString( prefix, 3, 10 );
 		
 		File f = null;
 		try {

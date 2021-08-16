@@ -20,9 +20,9 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class ObjectsTest extends Test.Container {
+public class ObjectsTestOLD extends Test.Container {
 	
-	public ObjectsTest() {
+	public ObjectsTestOLD() {
 		super( Objects.class );
 	}
 

@@ -89,11 +89,11 @@ public class SoftStringTest extends Test.Container {
 		// find . -type f -printf '%s %p\n' | sort -nr | less
 		// Here I use the source for ObjectsTest
 		
-		Object[] lines1 = Files.lines( App.get().sourceFile( ObjectsTest.class ) )
+		Object[] lines1 = Files.lines( App.get().sourceFile( ObjectsTestOLD.class ) )
 			.map( SoftString::new )
 			.toArray();
 		
-		Object[] lines2 = Files.lines( App.get().sourceFile( ObjectsTest.class ) )
+		Object[] lines2 = Files.lines( App.get().sourceFile( ObjectsTestOLD.class ) )
 			.map( SoftString::new )
 			.toArray();
 		
@@ -112,7 +112,7 @@ public class SoftStringTest extends Test.Container {
 		
 		int stressMultiplicty = 100;
 		for ( int i = 0; i < stressMultiplicty; i++ ) {
-			Files.lines( App.get().sourceFile( ObjectsTest.class ) )
+			Files.lines( App.get().sourceFile( ObjectsTestOLD.class ) )
 				.map( SoftString::new )
 				.forEach( lines::add );			
 		}
@@ -134,11 +134,11 @@ public class SoftStringTest extends Test.Container {
 		// find . -type f -printf '%s %p\n' | sort -nr | less
 		// Here I use the source for ObjectsTest
 		
-		Object[] lines1 = Files.lines( App.get().sourceFile( ObjectsTest.class ) )
+		Object[] lines1 = Files.lines( App.get().sourceFile( ObjectsTestOLD.class ) )
 			.map( SoftString::new )
 			.toArray();
 		
-		Object[] lines2 = Files.lines( App.get().sourceFile( ObjectsTest.class ) )
+		Object[] lines2 = Files.lines( App.get().sourceFile( ObjectsTestOLD.class ) )
 			.map( SoftString::new )
 			.toArray();
 		
