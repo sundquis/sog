@@ -33,21 +33,37 @@ public class AssertTest extends Test.Container {
 	
 	private final String ERR_MSG = "Custom diagnostic error message.";
 	
-	private final Path READABLE_FILE = App.get().root().resolve( Path.of( "example", "readable_file" ) );
-	private final Path UNREADABLE_FILE = App.get().root().resolve( Path.of( "example", "unreadable_file" ) );
-	private final Path WRITEABLE_FILE = App.get().root().resolve( Path.of( "example", "writeable_file" ) );
-	private final Path UNWRITEABLE_FILE = App.get().root().resolve( Path.of( "example", "unwriteable_file" ) );
+	private final Path READABLE_FILE;
+	private final Path UNREADABLE_FILE;
+	private final Path WRITEABLE_FILE;
+	private final Path UNWRITEABLE_FILE;
 
-	private final Path READABLE_DIR = App.get().root().resolve( Path.of( "example", "readable_dir" ) );
-	private final Path UNREADABLE_DIR = App.get().root().resolve( Path.of( "example", "unreadable_dir" ) );
-	private final Path WRITEABLE_DIR = App.get().root().resolve( Path.of( "example", "writeable_dir" ) );
-	private final Path UNWRITEABLE_DIR = App.get().root().resolve( Path.of( "example", "unwriteable_dir" ) );
+	private final Path READABLE_DIR;
+	private final Path UNREADABLE_DIR;
+	private final Path WRITEABLE_DIR;
+	private final Path UNWRITEABLE_DIR;
 	
-	private final Path DOES_NOT_EXIST = App.get().root().resolve( Path.of( "example", "DOES_NOT_EXIST" ) );
+	private final Path DOES_NOT_EXIST;
 	
 	public AssertTest() {
 		super( Assert.class );
 		
+		Path root = App.get().root().resolve( Path.of( "tmp", "assert" ) );
+		
+		this.READABLE_FILE = root.resolve( Path.of( "readable_file" ) );
+		this.UNREADABLE_FILE = root.resolve( Path.of( "unreadable_file" ) );
+		this.WRITEABLE_FILE = root.resolve( Path.of( "writeable_file" ) );
+		this.UNWRITEABLE_FILE = root.resolve( Path.of( "unwriteable_file" ) );
+
+		this.READABLE_DIR = root.resolve( Path.of( "readable_dir" ) );
+		this.UNREADABLE_DIR = root.resolve( Path.of( "unreadable_dir" ) );
+		this.WRITEABLE_DIR = root.resolve( Path.of( "writeable_dir" ) );
+		this.UNWRITEABLE_DIR = root.resolve( Path.of( "unwriteable_dir" ) );
+		
+		this.DOES_NOT_EXIST = root.resolve( Path.of( "DOES_NOT_EXIST" ) );
+
+		// If these assertions fail use the script tool/bin/ASSERT_FILES.sh to
+		// set up files and directories with permissions
 		assert Files.exists( this.READABLE_FILE );
 		assert Files.exists( this.UNREADABLE_FILE );
 		assert Files.exists( this.WRITEABLE_FILE );

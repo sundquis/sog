@@ -1,6 +1,0 @@
-#!/bin/bash
-
-chmod -r unreadable_dir
-chmod -r unreadable_file
-chmod -w unwriteable_dir
-chmod -w unwriteable_file
