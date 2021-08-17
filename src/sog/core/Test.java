@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
@@ -695,6 +696,22 @@ public class Test {
 	public static void evalPackage( Class<?> subjectClass, boolean verbose ) {
 		TestResultSet.forPackage( Assert.nonNull( subjectClass ) )
 			.setVerbose( verbose ).print( new IndentWriter( System.err, "\t" ) );
+	}
+	
+	/** 
+	 * Relative to the source directory of the given subject class, print results for classes under
+	 * the sub-directory (sub-package) determined by the components.
+	 */
+	@Test.Decl( "Throws AssertionError for null subject class" )
+	@Test.Decl( "Throws AppException for components not on source path" )
+	public static void evalDir( Class<?> subjectClass, String... components  ) {
+		Path sourceDir = App.get().sourceDir( Assert.nonNull( subjectClass ) );
+		Path subDir = Path.of( "" );
+		for ( int i = 0; i < components.length; i++ ) {
+			subDir = subDir.resolve( Path.of( components[i] ) );
+		}
+		TestResultSet.forPackages( sourceDir, sourceDir.resolve( subDir ) )
+			.print( new IndentWriter( System.err, "\t" ) );
 	}
 
 	@Test.Skip( "FIXME/Manually verified" )

@@ -1036,12 +1036,103 @@ public class AppTest extends Test.Container{
 		);
 	}
 
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Elements are classnames for classes in the directory or sub-directories of the given directory" 
+	)
+	public void tm_09A597DD6( Test.Case tc ) {
+		final Path dir = App.get().sourceDir( App.class );
+		final Consumer<String> check = s -> {
+			try { 
+				Class<?> clazz = Class.forName( s );
+				tc.assertEqual( dir, App.get().sourceDir( clazz ) );
+			} catch ( ClassNotFoundException e ) {
+				tc.assertFail( "Class not found: " + s );
+			}
+		};
+		App.get().classesUnderDir( dir, Path.of( "sog", "core" ) ).forEach( check );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Elements are non-empty" 
+	)
+	public void tm_0655E466E( Test.Case tc ) {
+		App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "sog" ) ).forEach( tc::assertNotEmpty );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Non-source files are excluded" 
+	)
+	public void tm_0BDC66184( Test.Case tc ) {
+		String filename = "README.txt";
+		Path readme = App.get().sourceFile( test.sog.core.foo.A.class ).getParent().resolve( Path.of( filename ) );
+		tc.assertTrue( Files.exists( readme) );
+
+		App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "test", "sog" ) )
+			.forEach( s -> tc.assertFalse( s.contains( filename ) ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0677C7663( Test.Case tc ) {
+		Path dir = App.get().sourceDir( App.class );
+		tc.assertNonNull( App.get().classesUnderDir( dir, Path.of( "sog" ) ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0CA11906C( Test.Case tc ) {
+		Path dir = App.get().sourceDir( App.class );
+		App.get().classesUnderDir( dir, Path.of( "sog" ) ).map( Function.identity() );
+		tc.assertPass();
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Secondary classes are not included" 
+	)
+	public void tm_027D8D0B1( Test.Case tc ) {
+		String classname = "test.sog.core.foo.Secondary";
+		try {
+			Class<?> c = Class.forName( classname );
+			tc.assertEqual( classname, c.getName() );
+		} catch ( ClassNotFoundException e ) {}
+		Path sourceDir = App.get().sourceDir( test.sog.core.foo.A.class );
+		App.get().classesUnderDir( sourceDir, Path.of( "test", "sog", "core" ) )
+			.forEach( s -> tc.assertFalse( s.contains( "Secondary" ) ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Throws AssertionError for null class source directory" 
+	)
+	public void tm_0327D230B( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().classesUnderDir( null, Path.of( "sog" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.classesUnderDir(Path, Path)", 
+		description = "Throws AssertionError for null sub-directory" 
+	)
+	public void tm_0A23EAB5B( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().classesUnderDir( App.get().sourceDir( App.class ), null );
+	}
+
 	
 	
 
 	public static void main( String[] args ) {
 		//Test.eval( App.class );
-		Test.evalPackage( App.class );
+		//Test.evalPackage( App.class );
+		Test.evalDir( App.class, "sog", "core" );
 	}
 }
 

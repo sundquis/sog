@@ -18,6 +18,7 @@
  */
 package test.sog.core.test;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -456,12 +457,50 @@ public class TestResultSetTest extends Test.Container {
 		new TestResultSet( "Testing" ).print( null );
 	}
 
+	@Test.Impl( 
+		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		description = "Aggregates TestResult instances for every class under the given directory" 
+	)
+	public void tm_0FBB7A244( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
+		tc.assertPass();
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		description = "Return is not null" 
+	)
+	public void tm_0984A45D4( Test.Case tc ) {
+		Path sourceDir = App.get().sourceDir( App.class );
+		Path sub = Path.of( "sog", "core", "xml" );
+		tc.assertNonNull( TestResultSet.forPackages( sourceDir, sub ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		description = "Throws AssertionError for null source directory" 
+	)
+	public void tm_0046B215F( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		TestResultSet.forPackages( null, Path.of( "sog" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		description = "Throws AssertionError for null sub-directory" 
+	)
+	public void tm_00B5612DF( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		TestResultSet.forPackages( App.get().sourceDir( App.class ), null );
+	}
+
 	
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( TestResultSet.class );
+		//Test.eval( TestResultSet.class );
 		//Test.evalPackage( TestResultSet.class );
+		Test.evalDir( Test.class, "sog", "core", "test" );
 	}
 }

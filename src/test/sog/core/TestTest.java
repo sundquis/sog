@@ -762,11 +762,31 @@ public class TestTest extends Test.Container {
 		tc.addMessage( "Manually verified." );
 		tc.assertTrue( true );
 	}
+	
+	@Test.Impl( 
+		member = "method: void Test.evalDir(Class, String[])", 
+		description = "Throws AppException for components not on source path" 
+	)
+	public void tm_04AA69422( Test.Case tc ) {
+		tc.expectError( AppException.class );
+		Test.evalDir( sog.core.Test.class, "sog", "foo" );
+	}
+		
+	@Test.Impl( 
+		member = "method: void Test.evalDir(Class, String[])", 
+		description = "Throws AssertionError for null subject class" 
+	)
+	public void tm_0B372F19F( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Test.evalDir( null, "sog" );
+	}
+
 
 		
 
 	public static void main( String[] args ) {
-		Test.eval( Test.class );
+		//Test.eval( Test.class );
 		//Test.evalPackage( Test.class );
+		Test.evalDir( Test.class, "sog" );
 	}
 }

@@ -1,8 +1,20 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 
 package sog.core;
@@ -14,13 +26,16 @@ import java.util.List;
  *
  */
 @FunctionalInterface
+@Test.Subject("test." )
 public interface Procedure {
 
 	/**
 	 * No arguments, no return, no Exception.
 	 */
 	public void exec();
+
 	
+	@Test.Decl( "A non-null Procedure that does nothing" )
 	public static final Procedure NOOP = new Procedure() { public void exec() {} };
 
 	/**
@@ -30,6 +45,8 @@ public interface Procedure {
 	 * @param after
 	 * @return
 	 */
+	@Test.Decl( "Throws AssertionError for null Procedure after" )
+	@Test.Decl( "Result executes given after Procedure following execution of this" )
 	default public Procedure andThen( Procedure after ) {
 		return () -> { this.exec(); after.exec(); };
 	}
@@ -41,6 +58,8 @@ public interface Procedure {
 	 * @param after
 	 * @return
 	 */
+	@Test.Decl( "Throws AssertionError for null list of Procedure more" )
+	@Test.Decl( "Result executes given list in order following execution of this" )
 	default public Procedure andThen( List<Procedure> more ) {
 		return () -> { this.exec(); more.forEach( Procedure::exec ); };
 	}

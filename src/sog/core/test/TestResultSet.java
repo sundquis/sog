@@ -212,6 +212,20 @@ public class TestResultSet extends Result {
 		return trs;
 	}
 	
+
+	@Test.Decl( "Throws AssertionError for null source directory" )
+	@Test.Decl( "Throws AssertionError for null sub-directory" )
+	@Test.Decl( "Aggregates TestResult instances for every class under the given directory" )
+	@Test.Decl( "Return is not null" )
+	public static TestResultSet forPackages( Path sourceDir, Path sub ) {
+		TestResultSet trs = new TestResultSet( "PKGS:\t" + Assert.nonNull( sub ) );
+		
+		trs.addClasses( App.get().classesUnderDir( Assert.nonNull( sourceDir ), sub ) );
+		
+		return trs;
+	}
+	
+	
 	
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Aggregates TestResult instances for every class in the same package as the given class" )

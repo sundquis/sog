@@ -208,18 +208,37 @@ public class App implements Runnable {
 	@Test.Decl( "One element for each class under the given directory" )
 	@Test.Decl( "Non-source files are excluded" )
 	@Test.Decl( "Secondary classes are not included" )
-	public Stream<String> classesUnderDir( Path dir ) {
+	public Stream<String> classesUnderDir( Path sourceDir ) {
 		try {
-			return Files.walk( Assert.nonNull( dir ) )
+			return Files.walk( Assert.nonNull( sourceDir ) )
 				.filter( App.SOURCE_FILE )
-				.map( dir::relativize )
+				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
 			throw new AppException( e );
 		}
 	}
 	
-	
+
+	@Test.Decl( "Throws AssertionError for null class source directory" )
+	@Test.Decl( "Throws AssertionError for null sub-directory" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are non-empty" )
+	@Test.Decl( "Elements are classnames for classes in the directory or sub-directories of the given directory" )
+	@Test.Decl( "Non-source files are excluded" )
+	@Test.Decl( "Secondary classes are not included" )
+	public Stream<String> classesUnderDir( Path sourceDir, Path sub ) {
+		try {
+			return Files.walk( Assert.nonNull( sourceDir ).resolve( Assert.nonNull( sub ) ) )
+				.filter( App.SOURCE_FILE )
+				.map( sourceDir::relativize )
+				.map( this::relativePathToClassname );
+		} catch ( IOException e ) {
+			throw new AppException( e );
+		}
+	}
+
 	
 	/** For objects that require clean-up before shutdown. */
 	@FunctionalInterface
@@ -391,15 +410,9 @@ public class App implements Runnable {
 	
 	
 	public static void main( String[] args ) {
-		Path dir = App.get().sourceFile( App.class ).getParent();
-		System.out.println( ">>> DIR: " + dir );
-		
-		try {
-			Files.list( dir ).filter( App.SOURCE_FILE ).forEach( System.out::println );
-		} catch ( IOException e ) {
-			e.printStackTrace();
-		}
-		
+		//App.get().classesUnderPackage( App.class ).forEach( System.out::println );
+		//Arrays.stream( Package.getPackages() ).forEach( System.out::println );
+		App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "" ) ).forEach( System.out::println );
 		System.out.println( "Done!" );
 	}
 	
