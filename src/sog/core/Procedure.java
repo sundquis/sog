@@ -48,7 +48,7 @@ public interface Procedure {
 	@Test.Decl( "Throws AssertionError for null Procedure after" )
 	@Test.Decl( "Result executes given after Procedure following execution of this" )
 	default public Procedure andThen( Procedure after ) {
-		return () -> { this.exec(); after.exec(); };
+		return () -> { this.exec(); Assert.nonNull( after ).exec(); };
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public interface Procedure {
 	@Test.Decl( "Throws AssertionError for null list of Procedure more" )
 	@Test.Decl( "Result executes given list in order following execution of this" )
 	default public Procedure andThen( List<Procedure> more ) {
-		return () -> { this.exec(); more.forEach( Procedure::exec ); };
+		return () -> { this.exec(); Assert.nonNull( more ).forEach( Procedure::exec ); };
 	}
 	
 }

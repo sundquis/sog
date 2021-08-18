@@ -17,9 +17,9 @@ import sog.core.xml.XML;
  * @author sundquis
  *
  */
-public class PropertyTest extends Test.Container {
+public class PropertyTestOLD extends Test.Container {
 	
-	public PropertyTest() {
+	public PropertyTestOLD() {
 		super( Property.class );
 	}
 

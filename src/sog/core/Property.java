@@ -1,8 +1,20 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 
 package sog.core;
@@ -27,6 +39,7 @@ import sog.core.xml.XMLHandler;
  * This must be a path to a directory containing the xml property file "system.xml"
  * 
  */
+@Test.Subject( "test." )
 public class Property {
 
 	// The system.dir property must be defined, for example as a JVM arg:
@@ -39,19 +52,17 @@ public class Property {
 	
 	
 	/** Retrieve a configurable property from the system property file */
-	@Test.Decl( "Throws assertion error for null name" )
-	@Test.Decl( "Throws assertion error for empty name" )
-	@Test.Decl( "throws assertion error for null parser" )
+	@Test.Decl( "Throws AssertionError for null name" )
+	@Test.Decl( "Throws AssertionError for empty name" )
+	@Test.Decl( "Throws AssertionError for null parser" )
 	@Test.Decl( "Retrieves properties for top level classes" )
 	@Test.Decl( "Retrieves properties for nested classes" )
 	@Test.Decl( "Retrieves properties for double nested classes" )
-	@Test.Decl( "Throws assertion error for anonymous classes" )
-	@Test.Decl( "Throws assertion error for local classs" )
+	@Test.Decl( "Throws AssertionError for anonymous classes" )
+	@Test.Decl( "Throws AssertionError for local classs" )
 	@Test.Decl( "Prints declaration for missing property" )
 	@Test.Decl( "Last value for multiple elements" )
 	@Test.Decl( "Uses default for missing" )
-	@Test.Decl( "Throws exception for malformed integer" )
-	@Test.Decl( "Throws exception for malformed long" )
 	public static <T> T get( String name, T defaultValue, Function<String, T> parser ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( parser );
@@ -71,13 +82,13 @@ public class Property {
 	}
 	
 	/** Retrieve a configurable block of text from the system property file */
-	@Test.Decl( "Throws assertion error for null name" )
-	@Test.Decl( "Throws assertion error for empty name" )
+	@Test.Decl( "Throws AssertionError for null name" )
+	@Test.Decl( "Throws AssertionError for empty name" )
 	@Test.Decl( "Retrieves text for top level classes" )
 	@Test.Decl( "Retrieves text for nested classes" )
 	@Test.Decl( "Retrieves text for double nested classes" )
-	@Test.Decl( "Throws assertion error for anonymous classes" )
-	@Test.Decl( "Throws assertion error for local classs" )
+	@Test.Decl( "Throws AssertionError for anonymous classes" )
+	@Test.Decl( "Throws AssertionError for local classs" )
 	@Test.Decl( "Prints declaration for missing property" )
 	@Test.Decl( "Can retrieve empty" )
 	@Test.Decl( "Can use property name" )
@@ -100,6 +111,7 @@ public class Property {
 		return value;
 	}
 	
+	// To avoid issues with initialization we cannot use the service provided by App.get().getCallingClass( offset )
 	private static String getClassName() {
 		// FRAGILE:
 		StackTraceElement[] stackTrace = (new Exception()).getStackTrace();
@@ -108,25 +120,42 @@ public class Property {
 		//		Property.get/getText
 		//		<class declaring a property>
 		Assert.isTrue( stackTrace.length > 2 );
-		String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
+		
+		// This original regular expression was not documented and seems wrong
+		//String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
+
+		// Replaced with expression that matches inner class names that contain "$n"
+		String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
 		return Assert.nonEmpty( className );
 	}
 	
 	// Convenience parsers. Add as needed.
+	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Correct for sample cases" )
 	public static final Function<String, Integer> INTEGER = (s) -> Integer.parseInt(s);
 
+	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Correct for sample cases" )
 	public static final Function<String, Long> LONG = (s) -> Long.parseLong(s);
 	
+	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Correct for sample cases" )
 	public static final Function<String, Boolean> BOOLEAN = (s) -> Boolean.parseBoolean(s);
 	
+	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Correct for sample cases" )
 	public static final Function<String, String> STRING = (s) -> s;
 
 	@Test.Decl( "Collection of common cases" )
 	@Test.Decl( "Array of length one allowed" )
 	@Test.Decl( "Empty array allowed" )
-	@Test.Decl( "White space after comman ignored" )
+	@Test.Decl( "White space after comma ignored" )
 	public static final Function<String, String[]> CSV = (s) -> s.split( ",\\s*" );
 	
+	@Test.Decl( "Collection of common cases" )
+	@Test.Decl( "Array of length one allowed" )
+	@Test.Decl( "Empty array allowed" )
+	@Test.Decl( "White space after comma ignored" )
 	public static final Function<String, List<String>> LIST = (s) -> Arrays.asList( CSV.apply(s) );
 	
 
@@ -179,6 +208,7 @@ public class Property {
 	}
 	
 	// Tied to the structure defined in system.dtd
+	@Test.Skip( "FIXME" )
 	private class SystemHandler extends XMLHandler {
 		
 		private String currentClassName = null;
@@ -233,6 +263,5 @@ public class Property {
 	}
 	
 
-		
 
 }

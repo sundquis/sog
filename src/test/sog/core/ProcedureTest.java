@@ -19,6 +19,11 @@
 
 package test.sog.core;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import sog.core.Procedure;
 import sog.core.Test;
 
@@ -34,44 +39,67 @@ public class ProcedureTest extends Test.Container {
 	// TEST CASES
 	
 	@Test.Impl( 
-			member = "field: Procedure Procedure.NOOP", 
-			description = "A non-null Procedure that does nothing" 
-		)
-		public void tm_08D8EF8D2( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+		member = "field: Procedure Procedure.NOOP", 
+		description = "A non-null Procedure that does nothing" 
+	)
+	public void tm_08D8EF8D2( Test.Case tc ) {
+		tc.assertNonNull( Procedure.NOOP );
+		Procedure.NOOP.exec();
+	}
 		
-		@Test.Impl( 
-			member = "method: Procedure Procedure.andThen(List)", 
-			description = "Result executes given list in order following execution of this" 
-		)
-		public void tm_035B7CFDD( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Procedure Procedure.andThen(List)", 
+		description = "Result executes given list in order following execution of this" 
+	)
+	public void tm_035B7CFDD( Test.Case tc ) {
+		final List<Integer> results = new ArrayList<Integer>();
+		class Proc implements Procedure {
+			int n;
+			Proc( int n ) { this.n = n; }
+			@Override public void exec() { results.add( n ); }
 		}
+		List<Procedure> more = Stream.of( 1, 2, 3 ).map( Proc::new ).collect( Collectors.toList() );
+		Procedure proc = new Proc( 0 );
+		proc.andThen( more ).exec();
+		tc.assertEqual( List.of( 0, 1, 2, 3 ), results );
+	}
 		
-		@Test.Impl( 
-			member = "method: Procedure Procedure.andThen(List)", 
-			description = "Throws AssertionError for null list of Procedure more" 
-		)
-		public void tm_0716FE7BE( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Procedure Procedure.andThen(List)", 
+		description = "Throws AssertionError for null list of Procedure more" 
+	)
+	public void tm_0716FE7BE( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		List<Procedure> more = null;
+		Procedure.NOOP.andThen( more ).exec();
+	}
 		
-		@Test.Impl( 
-			member = "method: Procedure Procedure.andThen(Procedure)", 
-			description = "Result executes given after Procedure following execution of this" 
-		)
-		public void tm_0C594791E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Procedure Procedure.andThen(Procedure)", 
+		description = "Result executes given after Procedure following execution of this" 
+	)
+	public void tm_0C594791E( Test.Case tc ) {
+		final List<Integer> results = new ArrayList<Integer>();
+		class Proc implements Procedure {
+			int n;
+			Proc( int n ) { this.n = n; }
+			@Override public void exec() { results.add( n ); }
 		}
+		Procedure proc = new Proc( 0 );
+		Procedure after = new Proc( 1 );
+		proc.andThen( after ).exec();
+		tc.assertEqual( List.of( 0, 1 ), results );
+	}
 		
-		@Test.Impl( 
-			member = "method: Procedure Procedure.andThen(Procedure)", 
-			description = "Throws AssertionError for null Procedure after" 
-		)
-		public void tm_08B1082A9( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Procedure Procedure.andThen(Procedure)", 
+		description = "Throws AssertionError for null Procedure after" 
+	)
+	public void tm_08B1082A9( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Procedure after = null;
+		Procedure.NOOP.andThen( after ).exec();
+	}
 
 	
 	
@@ -79,5 +107,6 @@ public class ProcedureTest extends Test.Container {
 	public static void main( String[] args ) {
 		Test.eval( Procedure.class );
 		//Test.evalPackage( Procedure.class );
+		//Test.evalDir( Procedure.class, "sog" );
 	}
 }

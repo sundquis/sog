@@ -72,7 +72,6 @@ public class App implements Runnable {
 			.map( Path::of )
 			.collect( Collectors.toList() );
 		Assert.isTrue( ! this.sourceDirs.isEmpty() );
-
 		this.objectsForShutdown = new LinkedList<OnShutdown>();
 		Runtime.getRuntime().addShutdownHook( new Thread( this ) );
 	}
@@ -111,9 +110,7 @@ public class App implements Runnable {
 	@Test.Decl( "Returns container for nested local class" )
 	@Test.Decl( "Returns container for nested anonymous class" )
 	public Path sourceDir( Class<?> clazz ) {
-		Assert.nonNull( clazz );
-
-		Class<?> encl = clazz;
+		Class<?> encl = Assert.nonNull( clazz );
 		while ( encl.getEnclosingClass() != null ) {
 			encl = encl.getEnclosingClass();
 		}
@@ -140,9 +137,7 @@ public class App implements Runnable {
 	@Test.Decl( "Returns container for nested local class" )
 	@Test.Decl( "Returns container for nested anonymous class" )
 	public Path sourceFile( Class<?> clazz ) {
-		Assert.nonNull( clazz );
-
-		Class<?> encl = clazz;
+		Class<?> encl = Assert.nonNull( clazz );
 		while ( encl.getEnclosingClass() != null ) {
 			encl = encl.getEnclosingClass();
 		}
@@ -410,9 +405,10 @@ public class App implements Runnable {
 	
 	
 	public static void main( String[] args ) {
+		Test.eval();
 		//App.get().classesUnderPackage( App.class ).forEach( System.out::println );
 		//Arrays.stream( Package.getPackages() ).forEach( System.out::println );
-		App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "" ) ).forEach( System.out::println );
+		//App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "" ) ).forEach( System.out::println );
 		System.out.println( "Done!" );
 	}
 	
