@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Function;
 
 import sog.core.xml.XMLHandler;
 
@@ -38,12 +37,22 @@ import sog.core.xml.XMLHandler;
  * An application must define the single System property: "system.dir"
  * This must be a path to a directory containing the xml property file "system.xml"
  * 
+ * App depends on this class, so it should not have any dependencies on other core classes.
+ * It does depend on the XMLHandler class.
  */
 @Test.Subject( "test." )
 public class Property {
+	
+	
+	@FunctionalInterface
+	public static interface Parser<T> {
+		public T value( String s );
+	}
+	
 
 	// The system.dir property must be defined, for example as a JVM arg:
 	//     -Dsystem.dir=...
+	// The property must be an absolute path to the directory serving as the root for the application
 	private static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
 
 	private static final String SYSTEM_NAME = "system.xml";
@@ -61,9 +70,9 @@ public class Property {
 	@Test.Decl( "Throws AssertionError for anonymous classes" )
 	@Test.Decl( "Throws AssertionError for local classs" )
 	@Test.Decl( "Prints declaration for missing property" )
-	@Test.Decl( "Last value for multiple elements" )
+	@Test.Decl( "Last value for repeated elements" )
 	@Test.Decl( "Uses default for missing" )
-	public static <T> T get( String name, T defaultValue, Function<String, T> parser ) {
+	public static <T> T get( String name, T defaultValue, Parser<T> parser ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( parser );
 
@@ -78,7 +87,7 @@ public class Property {
 			System.err.println( "</class>" );
 		}
 		
-		return stringValue == null ? defaultValue : parser.apply( stringValue );
+		return stringValue == null ? defaultValue : parser.value( stringValue );
 	}
 	
 	/** Retrieve a configurable block of text from the system property file */
@@ -129,34 +138,35 @@ public class Property {
 		return Assert.nonEmpty( className );
 	}
 	
+	
 	// Convenience parsers. Add as needed.
-	@Test.Decl( "Throws ??? for mal-formed string" )
+	
+	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Function<String, Integer> INTEGER = (s) -> Integer.parseInt(s);
+	public static final Parser<Integer> INTEGER = (s) -> Integer.parseInt(s);
 
-	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Function<String, Long> LONG = (s) -> Long.parseLong(s);
+	public static final Parser<Long> LONG = (s) -> Long.parseLong(s);
 	
-	@Test.Decl( "Throws ??? for mal-formed string" )
+	@Test.Decl( "Returns false for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Function<String, Boolean> BOOLEAN = (s) -> Boolean.parseBoolean(s);
+	public static final Parser<Boolean> BOOLEAN = (s) -> Boolean.parseBoolean(s);
 	
-	@Test.Decl( "Throws ??? for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Function<String, String> STRING = (s) -> s;
+	public static final Parser<String> STRING = (s) -> s;
 
 	@Test.Decl( "Collection of common cases" )
 	@Test.Decl( "Array of length one allowed" )
-	@Test.Decl( "Empty array allowed" )
+	@Test.Decl( "Empty array not allowed" )
 	@Test.Decl( "White space after comma ignored" )
-	public static final Function<String, String[]> CSV = (s) -> s.split( ",\\s*" );
+	public static final Parser<String[]> CSV = (s) -> s.split( ",\\s*" );
 	
 	@Test.Decl( "Collection of common cases" )
-	@Test.Decl( "Array of length one allowed" )
-	@Test.Decl( "Empty array allowed" )
+	@Test.Decl( "List of length one allowed" )
+	@Test.Decl( "Empty list not allowed" )
 	@Test.Decl( "White space after comma ignored" )
-	public static final Function<String, List<String>> LIST = (s) -> Arrays.asList( CSV.apply(s) );
+	public static final Parser<List<String>> LIST = (s) -> Arrays.asList( CSV.value(s) );
 	
 
 	

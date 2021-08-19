@@ -170,7 +170,7 @@ public class Objects {
 		if ( a1 == null || a2 == null ) {
 			return a1 == a2;
 		}
-		
+
 		Assert.isTrue( a1.getClass().isArray() );
 		Assert.isTrue( a2.getClass().isArray() );
 		
@@ -249,6 +249,7 @@ public class Objects {
 		
 		return areEqual;
 	}
+
 	
 		
 }

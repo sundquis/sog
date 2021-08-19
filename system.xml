@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Either need to hard-code location of DTD or use internal. -->
+<!-- FIXME: Verify this and/or fix. -->
 <!-- <!DOCTYPE system SYSTEM "/home/sundquis/book/sog/system.dtd">  -->
 
 <!DOCTYPE system [
@@ -55,27 +56,12 @@
 		<property name="threshold" value="50" />
 	</class>
 
-    <class fullname="sog.core.test.Result">
-        <property name="show.global.results" value="true" />
-        <property name="show.class.results" value="true" />
-        <property name="show.member.results" value="true" />
-        <property name="show.case.results" value="true" />
-        <property name="show.fail.cases" value="true" />
-        <property name="show.pass.cases" value="true" />
-        <property name="show.unexecuted.cases" value="true" />
-        <property name="warn.untested.class" value="false" />
-        <property name="warn.untested.constructor" value="false" />
-        <property name="warn.untested.method" value="true" />
-        <property name="warn.untested.field" value="true" />
-        <property name="warn.untested.nonpublic.members" value="false" />
-        <property name="warn.untested.public.members" value="true" />
-    </class>
-
     <!-- For testing -->
-	<class fullname="test.core.PropertyTest">
+	<class fullname="test.sog.core.PropertyTest">
+		<property name="repeated" value="foo" />
+		<property name="repeated" value="bar" />
+
 		<property name="nested.test" value="true" />
-		<property name="duplicate" value="false" />
-		<property name="duplicate" value="true" />
 		<property name="malformed" value="XXXX" />
 		<text name="empty"></text>
 		<text name="nested">Nested</text>
@@ -85,7 +71,7 @@
 	</class>
 
     <!-- For testing -->
-	<class fullname="test.core.PropertyTest$Inner">
+	<class fullname="test.sog.core.PropertyTest$Inner">
 		<property name="double.nested.test" value="true" />
 		<text name="innertest">Text value</text>
 	</class>
@@ -94,11 +80,6 @@
 		<text name="declaration"><![CDATA[<?xml version="1.0" encoding="utf-8"?>]]></text>
 	</class>
 		
-	<class fullname="sog.persist.model.sql.Names">
-		<property name="max.tablename.length" value="100" />
-		<property name="max.columnname.length" value="50" />
-	</class>
-	
 	<class fullname="sog.util.Macro">
 		<property name="maxIterations" value="100" />
 	</class>

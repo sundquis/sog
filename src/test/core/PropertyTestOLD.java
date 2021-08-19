@@ -109,7 +109,7 @@ public class PropertyTestOLD extends Test.Container {
 	public void CSV_ArrayOfLengthOneAllowed( Test.Case tc ) {
 		String arg = "A single string.";
 		String[] array = { "A single string." };
-		tc.assertEqual( array, Property.CSV.apply( arg ) );
+		//tc.assertEqual( array, Property.CSV.apply( arg ) );
 	}
 
 	private static String[][] ARRAYS = {
@@ -129,7 +129,7 @@ public class PropertyTestOLD extends Test.Container {
 	@Test.Impl( member = "public Function Property.CSV", description = "Collection of common cases", weight = 5 )
 	public void CSV_CollectionOfCommonCases( Test.Case tc ) {
 		for ( int i = 0; i < ARRAYS.length; i++ ) {
-			tc.assertEqual( ARRAYS[i],  Property.CSV.apply( ARGS[i] ) );
+			//tc.assertEqual( ARRAYS[i],  Property.CSV.apply( ARGS[i] ) );
 		}
 	}
 
@@ -137,14 +137,14 @@ public class PropertyTestOLD extends Test.Container {
 	public void CSV_EmptyArrayAllowed( Test.Case tc ) {
 		String arg = "";
 		String[] array = { "" };
-		tc.assertEqual( array, Property.CSV.apply( arg ) );
+		//tc.assertEqual( array, Property.CSV.apply( arg ) );
 	}
 	
 	@Test.Impl( member = "public Function Property.CSV", description = "White space after comman ignored" )
 	public void CSV_WhiteSpaceAfterCommanIgnored( Test.Case tc ) {
 		String arg = "Spaces ignored,        Tabs ignored,\t\tNewlines ignored,\n\n Done";
 		String[] array = { "Spaces ignored", "Tabs ignored", "Newlines ignored", "Done" };
-		tc.assertEqual( array, Property.CSV.apply( arg ) );
+		//tc.assertEqual( array, Property.CSV.apply( arg ) );
 	}
 
 	@Test.Impl( member = "public String Property.getText(String)", description = "Prints declaration for missing property" )
