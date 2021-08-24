@@ -31,14 +31,14 @@ import test.sog.core.ObjectsTest;
  * @author sundquis
  *
  */
-public class SoftStringTest extends Test.Container {
+public class SoftStringTestOLD extends Test.Container {
 
 	private SoftString soft;
 	
 	private int ORIG_THRESHOLD;
 	private int threshold = 5;
 	
-	public SoftStringTest() {
+	public SoftStringTestOLD() {
 		super( SoftString.class );
 		
 		this.ORIG_THRESHOLD = this.getSubjectField( null,  "THRESHOLD",  0 );

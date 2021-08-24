@@ -226,165 +226,206 @@ public class PropertyTest extends Test.Container {
 		/* */
 	}
 		
+	public static class Inner {
+		
+		public static final String MSG = Property.get( "message", "foo", Property.STRING );
+		
+		public static final String TEXT = Property.getText( "message" );
+		
+		public static class Nested {
+			public static final String MSG = Property.get( "message", "foo", Property.STRING );
+			public static final String TEXT = Property.getText( "message" );
+		}
+	
+	}
+	
 	@Test.Impl( 
 		member = "method: Object Property.get(String, Object, Property.Parser)", 
 		description = "Retrieves properties for double nested classes" 
 	)
 	public void tm_082AA0C45( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+		tc.assertEqual( "bar", Inner.Nested.MSG );
 	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Retrieves properties for nested classes" 
-		)
-		public void tm_09B5D985A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Retrieves properties for nested classes" 
+	)
+	public void tm_09B5D985A( Test.Case tc ) {
+		tc.assertEqual( "bar", Inner.MSG );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Retrieves properties for top level classes" 
-		)
-		public void tm_02FAD2C58( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Retrieves properties for top level classes" 
+	)
+	public void tm_02FAD2C58( Test.Case tc ) {
+		tc.assertEqual( "bar", Property.get( "message", "foo", Property.STRING ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Throws AssertionError for anonymous classes" 
-		)
-		public void tm_0E5D30F77( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Retrieves properties for anonymous classes" 
+	)
+	public void tm_0E5D30F77( Test.Case tc ) {
+		String s = new Object() { 
+			@Override public String toString() { return Property.get( "message", "foo", Property.STRING ); }
+		}.toString();
+		tc.assertEqual( "bar", s );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Throws AssertionError for empty name" 
-		)
-		public void tm_05D390A50( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Throws AssertionError for empty name" 
+	)
+	public void tm_05D390A50( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Property.get( "", "foo", Property.STRING );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Throws AssertionError for local classs" 
-		)
-		public void tm_0E024C6E2( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Retrieves properties for local classes" 
+	)
+	public void tm_0E024C6E2( Test.Case tc ) {
+		class Local {
+			@Override public String toString() { return Property.get( "message", "foo", Property.STRING ); }
 		}
+		String s = new Local().toString();
+		tc.assertEqual( "bar", s );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Throws AssertionError for null name" 
-		)
-		public void tm_0BBEC9E48( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Throws AssertionError for null name" 
+	)
+	public void tm_0BBEC9E48( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Property.get( null, "foo", Property.STRING );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Throws AssertionError for null parser" 
-		)
-		public void tm_04C6CD25C( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Throws AssertionError for null parser" 
+	)
+	public void tm_04C6CD25C( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Property.Parser<String> p = null;
+		Property.get( "message", "foo", p );
+	}
 		
-		@Test.Impl( 
-			member = "method: Object Property.get(String, Object, Property.Parser)", 
-			description = "Uses default for missing" 
-		)
-		public void tm_096581170( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Object Property.get(String, Object, Property.Parser)", 
+		description = "Uses default for missing" 
+	)
+	public void tm_096581170( Test.Case tc ) {
+		tc.assertEqual( "default", Property.get( "bogus", "default", Property.STRING ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Can retrieve empty" 
-		)
-		public void tm_0ADC0F21B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Can retrieve empty" 
+	)
+	public void tm_0ADC0F21B( Test.Case tc ) {
+		tc.assertEqual( "", Property.getText( "empty message" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Can use property name" 
-		)
-		public void tm_0A642ED81( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Can use property name" 
+	)
+	public void tm_0A642ED81( Test.Case tc ) {
+		tc.assertEqual( "Bar", Property.getText( "message" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Last value for multiple elements" 
-		)
-		public void tm_0A2D74919( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Last value for multiple elements" 
+	)
+	public void tm_0A2D74919( Test.Case tc ) {
+		tc.assertEqual( "Bar", Property.getText( "repeated" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Prints declaration for missing property" 
-		)
-		public void tm_060042E5A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Prints declaration for missing property" 
+	)
+	public void tm_060042E5A( Test.Case tc ) {
+		// TOGGLE:
+		/* */ tc.assertPass(); /*
+		tc.assertFail( "SHOULD SEE:" );
+		tc.addMessage( "WARNING: Text not found:" );
+		tc.addMessage( "<class fullname=\"test.sog.core.PropertyTest\">" );
+		tc.addMessage( "<text name=\"bogus\">Text value</text>" );
+		tc.addMessage( "</class>" );
+		Property.getText( "bogus" );
+		/* */
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Retrieves text for double nested classes" 
-		)
-		public void tm_07F2FF20D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Retrieves text for double nested classes" 
+	)
+	public void tm_07F2FF20D( Test.Case tc ) {
+		tc.assertEqual( "Message.", Inner.Nested.TEXT );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Retrieves text for nested classes" 
-		)
-		public void tm_0A1572392( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Retrieves text for nested classes" 
+	)
+	public void tm_0A1572392( Test.Case tc ) {
+		tc.assertEqual( "Message.", Inner.TEXT );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Retrieves text for top level classes" 
-		)
-		public void tm_07A5D3620( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Retrieves text for top level classes" 
+	)
+	public void tm_07A5D3620( Test.Case tc ) {
+		tc.assertEqual( "Bar", Property.getText( "message" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Throws AssertionError for anonymous classes" 
-		)
-		public void tm_045210D69( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Retrieves text for anonymous classes" 
+	)
+	public void tm_045210D69( Test.Case tc ) {
+		String s = new Object() {
+			@Override public String toString() { return Property.getText( "message" ); }
+		}.toString();
+		tc.assertEqual( "Bar", s );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Throws AssertionError for empty name" 
-		)
-		public void tm_0509EF89E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Throws AssertionError for empty name" 
+	)
+	public void tm_0509EF89E( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Property.getText( "" );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Throws AssertionError for local classs" 
-		)
-		public void tm_091C859B0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Retrieves text for local classes" 
+	)
+	public void tm_091C859B0( Test.Case tc ) {
+		class Local {
+			@Override public String toString() { return Property.getText( "message" ); }
 		}
+		String s = new Local().toString();
+		tc.assertEqual( "Bar", s );
+	}
 		
-		@Test.Impl( 
-			member = "method: String Property.getText(String)", 
-			description = "Throws AssertionError for null name" 
-		)
-		public void tm_0CC08AE3A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Property.getText(String)", 
+		description = "Throws AssertionError for null name" 
+	)
+	public void tm_0CC08AE3A( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Property.getText( null );
+	}
 
 	
 	

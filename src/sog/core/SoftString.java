@@ -1,8 +1,20 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 
 package sog.core;
@@ -14,10 +26,15 @@ import java.util.List;
 
 
 /**
- * Strings represented by soft references to byte arrays.
+ * Strings represented by soft references backed by byte arrays.
+ * 
+ * For applications that need a large number of long Strings. A SoftString uses a collectible
+ * soft reference to the String (the payload) and a reference to ByteFile location that
+ * maintains the String across collections.
  * 
  * NOT thread safe
  */
+@Test.Subject( "test." )
 public class SoftString implements Comparable<SoftString> {
 
 	// Where the persistent data resides
@@ -99,8 +116,9 @@ public class SoftString implements Comparable<SoftString> {
 	
 	@Override
 	@Test.Decl( "Stress test correct value" )
+	@Test.Decl( "Result is not null" )
 	public String toString() {
-		String result;
+		String result = null;
 		
 		if ( this.location == null ) {
 			result = this.hard;
@@ -112,7 +130,7 @@ public class SoftString implements Comparable<SoftString> {
 			}
 		}
 		
-		return result;
+		return Assert.nonNull( result );
 	}
 	
 	@Override

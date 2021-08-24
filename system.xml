@@ -60,21 +60,26 @@
 	<class fullname="test.sog.core.PropertyTest">
 		<property name="repeated" value="foo" />
 		<property name="repeated" value="bar" />
+		<property name="message" value="bar" />
+		<text name="empty message"></text>
+		<text name="message">Bar</text>
+		<text name="repeated">One</text>
+		<text name="repeated">Two</text>
+		<text name="repeated">Bar</text>
+	</class>
 
-		<property name="nested.test" value="true" />
-		<property name="malformed" value="XXXX" />
-		<text name="empty"></text>
-		<text name="nested">Nested</text>
-		<text name="duplicate">Duplicate</text>
-		<text name="repeated">Bogus</text>
-		<text name="repeated">Repeated</text>
+    <!-- For testing -->
+	<class fullname="test.sog.core.PropertyTest$Inner$Nested">
+		<property name="message" value="bar" />
+		<text name="message">Message.</text>
 	</class>
 
     <!-- For testing -->
 	<class fullname="test.sog.core.PropertyTest$Inner">
-		<property name="double.nested.test" value="true" />
-		<text name="innertest">Text value</text>
+		<property name="message" value="bar" />
+		<text name="message">Message.</text>
 	</class>
+	
 
 	<class fullname="sog.core.xml.XML">
 		<text name="declaration"><![CDATA[<?xml version="1.0" encoding="utf-8"?>]]></text>
