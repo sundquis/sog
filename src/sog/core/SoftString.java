@@ -37,7 +37,7 @@ import java.util.List;
 @Test.Subject( "test." )
 public class SoftString implements Comparable<SoftString> {
 
-	// Where the persistent data resides
+	/* Where the persistent data resides */
 	private static class Location {
 
 		private static final List<ByteFile> BYTE_FILES = new ArrayList<ByteFile>();
@@ -58,6 +58,7 @@ public class SoftString implements Comparable<SoftString> {
 					i++;
 				}
 			}
+			
 			if ( file == null ) {
 				file = new ByteFile();
 				BYTE_FILES.add( file );
@@ -68,13 +69,15 @@ public class SoftString implements Comparable<SoftString> {
 			this.length = data.length;
 		}
 		
-		private String get() {
+		@Override
+		@Test.Decl( "Consistent with constructed value" )
+		public String toString() {
 			return new String( BYTE_FILES.get( this.fileIndex ).read( this.offset, this.length ) );
 		}
 	}
 
 	
-	// Configurable minimum string length for soft references
+	/* Configurable minimum string length for soft references */
 	private static Integer THRESHOLD = Property.get( "threshold", 50, Property.INTEGER );
 
 	
@@ -83,7 +86,7 @@ public class SoftString implements Comparable<SoftString> {
 	
 	private final Location location;
 	
-	private SoftReference<String> ref;
+	private SoftReference<String> soft;
 
 	/**
 	 * Create string reference; if the length is less than {@code THRESHOLD} use a
@@ -98,7 +101,6 @@ public class SoftString implements Comparable<SoftString> {
 	@Test.Decl( "Can construct empty" )
 	@Test.Decl( "Can construct short strings" )
 	@Test.Decl( "Can construct long strings" )
-	@Test.Decl( "Correct value after collection" )
 	@Test.Decl( "Strings longer than threshold are soft" )
 	public SoftString( String s ) {
 		Assert.nonNull( s );
@@ -106,27 +108,29 @@ public class SoftString implements Comparable<SoftString> {
 		if ( s.length() < SoftString.THRESHOLD ) {
 			this.hard = s;
 			this.location = null;
-			this.ref = null;
+			this.soft = null;
 		} else {
 			this.hard = null;
 			this.location = new Location( s );
-			this.ref = new SoftReference<String>( s );
+			this.soft = new SoftReference<String>( s );
 		}
 	}
 	
 	@Override
 	@Test.Decl( "Stress test correct value" )
 	@Test.Decl( "Result is not null" )
+	@Test.Decl( "Consistent with constructed value" )
+	@Test.Decl( "Correct value after collection" )
 	public String toString() {
 		String result = null;
 		
 		if ( this.location == null ) {
 			result = this.hard;
 		} else {
-			result = this.ref.get();
+			result = this.soft.get();
 			if ( result == null ) {  // value has been collected
-				result = this.location.get();
-				this.ref = new SoftReference<>( result );
+				result = this.location.toString();
+				this.soft = new SoftReference<>( result );
 			}
 		}
 		
@@ -135,6 +139,7 @@ public class SoftString implements Comparable<SoftString> {
 	
 	@Override
 	@Test.Decl( "Can sort large collections" )
+	@Test.Decl( "Consistent with String.compareTo()" )
 	public int compareTo( SoftString other ) {
 		return this.toString().compareTo( other.toString() );
 	}
@@ -142,24 +147,23 @@ public class SoftString implements Comparable<SoftString> {
 	@Override
 	@Test.Decl( "Sample cases equal" )
 	@Test.Decl( "Sample cases not equal" )
-	@Test.Decl( "Consistent with compare" )
+	@Test.Decl( "If equals then compareTo is zero" )
+	@Test.Decl( "If compareTo is zero then equals" )
 	public boolean equals( Object other ) {
-		boolean result;
-		if ( other == null || !SoftString.class.equals( other.getClass() ) ) {
-			result = false;
-		} else {
-			result = this.compareTo( (SoftString)other ) == 0;
+		boolean result = false;
+		
+		if ( other != null && this.getClass().equals( other.getClass() ) ) {
+			result = this.toString().equals( other.toString() );
 		}
+
 		return result;
 	}
 	
 	@Override
-	@Test.Decl( "Sample cases equal" )
+	@Test.Decl( "If equlas then hashCodes are the same" )
 	public int hashCode() {
 		return this.toString().hashCode();
 	}
-
-	
 	
 	
 }

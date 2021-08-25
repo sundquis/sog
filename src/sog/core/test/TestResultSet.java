@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
+import sog.core.Strings;
 import sog.core.Test;
 import sog.util.IndentWriter;
 
@@ -144,6 +145,13 @@ public class TestResultSet extends Result {
 		this.elapsedTime += result.getElapsedTime();
 		this.passCount += result.getPassCount();
 		this.failCount += result.getFailCount();
+		
+		if ( this.verbose ) {
+			System.err.println( Strings.rightJustify( "" + result.getPassCount(), 5, ' ' ) 
+				+ ", " + Strings.rightJustify( "" + result.getFailCount(), 5, ' '  )
+			);
+		}
+		
 		return this;
 	}
 	
