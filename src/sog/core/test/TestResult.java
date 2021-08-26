@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
+import sog.core.Property;
 import sog.core.Strings;
 import sog.core.Test;
 import sog.util.IndentWriter;
@@ -54,6 +54,14 @@ import sog.util.Printable;
  */
 @Test.Subject( "test." )
 public class TestResult extends Result {
+	
+	
+	private static boolean PROGRESS = Property.get( "progress", false, Property.BOOLEAN );
+	
+	private static int WRAP = Property.get( "wrap", 20, Property.INTEGER );
+	
+	private static int numTestCase = 0;
+	
 	
 
 	/**
@@ -409,24 +417,32 @@ public class TestResult extends Result {
 			.collect( Collectors.toList() );
 		this.failCount += this.unimplemented.size();
 
-		final boolean noErrors = this.errors.size() == 0;
-		Consumer<TestCase> process = tc -> {
-			if ( noErrors ) {
-				tc.run();
-			}
-			this.elapsedTime += tc.getElapsedTime();
-			this.passCount += tc.getPassCount();
-			this.failCount += tc.getFailCount();
-		};
+		this.testCases.forEach( this::addTestCase );
 		
-		this.testCases.forEach( process );
-
 		if ( this.container != null ) {
 			this.container.afterAll().exec();
 		}
 	}
 	
 
+	private void addTestCase( TestCase tc ) {
+		if ( this.errors.size() == 0 ) {
+			tc.run();
+		}
+		this.elapsedTime += tc.getElapsedTime();
+		this.passCount += tc.getPassCount();
+		this.failCount += tc.getFailCount();
+		
+		if ( TestResult.PROGRESS ) {
+			TestResult.numTestCase++;
+			System.err.print( "." );
+			if ( TestResult.numTestCase % TestResult.WRAP == 0 ) {
+				System.err.println();
+			}
+		}
+	}
+	
+	
 	@Override
 	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Includes global summary statistics" )
@@ -436,7 +452,7 @@ public class TestResult extends Result {
 	@Test.Decl( "Includes stubs for unimplemented methods" )
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out ).println( this.toString() );
-
+		
 		out.increaseIndent();
 		
 		out.println();

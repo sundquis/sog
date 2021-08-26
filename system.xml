@@ -29,6 +29,18 @@
 
 <system description="Developmental demonstration version.">
 
+	<!-- Properties for TestResultSet -->
+	<class fullname="sog.core.test.TestResultSet">
+		<property name="verbose" value="false" />
+	</class>
+
+	
+	<!-- Properties for TestResult -->
+	<class fullname="sog.core.test.TestResult">
+		<property name="progress" value="true" />
+		<property name="wrap" value="80" />
+	</class>
+
 
     <!-- Properties for App -->
     <class fullname="sog.core.App">

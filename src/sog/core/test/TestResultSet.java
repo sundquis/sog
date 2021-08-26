@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
-import sog.core.Strings;
+import sog.core.Property;
 import sog.core.Test;
 import sog.util.IndentWriter;
 
@@ -52,6 +52,8 @@ public class TestResultSet extends Result {
 	
 	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
 	
+	private static boolean VERBOSE = Property.get( "verbose", false, Property.BOOLEAN );
+	
 
 	
 	private long elapsedTime = 0L;
@@ -64,28 +66,14 @@ public class TestResultSet extends Result {
 
 	private final Set<Result> results;
 	
-	private boolean verbose;
-
 	@Test.Decl( "Throws AssertionError for empty label" )
 	@Test.Decl( "Throws AssertionError for null label" )
-	public TestResultSet( String label, boolean verbose ) {
+	public TestResultSet( String label ) {
 		super( Assert.nonEmpty( label ) );
 		
 		this.results = new TreeSet<Result>( TestResultSet.COMP );
-		this.verbose = verbose;
 	}
 
-	@Test.Decl( "Default has verbose = false" )
-	public TestResultSet( String label ) {
-		this( label, false );
-	}
-	
-
-	@Test.Decl( "Return is this TestResultSet instance" )
-	public TestResultSet setVerbose( boolean verbose ) {
-		this.verbose = verbose;
-		return this;
-	}
 	
 	@Override
 	@Test.Decl( "Value is the total elapsed time for all tests" )
@@ -107,7 +95,6 @@ public class TestResultSet extends Result {
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "If verbose is true includes details from each TestResult" )
 	@Test.Decl( "Includes summary for each TestResult" )
 	@Test.Decl( "Includes messages for each bad classname" )
 	@Test.Decl( "Results are printed in alphabetaical order" )
@@ -115,7 +102,7 @@ public class TestResultSet extends Result {
 		Assert.nonNull( out ).println( this.toString() );
 		
 		out.increaseIndent();
-		if ( this.verbose ) {
+		if ( VERBOSE ) {
 			this.results.stream().forEach( out::println );
 		} else {
 			this.results.stream().map( Object::toString ).forEach( out::println );
@@ -145,13 +132,6 @@ public class TestResultSet extends Result {
 		this.elapsedTime += result.getElapsedTime();
 		this.passCount += result.getPassCount();
 		this.failCount += result.getFailCount();
-		
-		if ( this.verbose ) {
-			System.err.println( Strings.rightJustify( "" + result.getPassCount(), 5, ' ' ) 
-				+ ", " + Strings.rightJustify( "" + result.getFailCount(), 5, ' '  )
-			);
-		}
-		
 		return this;
 	}
 	

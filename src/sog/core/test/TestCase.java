@@ -45,6 +45,7 @@ import sog.util.IndentWriter;
 public class TestCase extends Result implements Test.Case, Comparable<TestCase>, Runnable {
 	
 	
+	
 	/**
 	 * A TestCase is created in the OPEN state and remains OPEN until the PASS/FAIL status
 	 * can be determined. This happens in Container code when one of the Test.Case.assertXXXX() methods is

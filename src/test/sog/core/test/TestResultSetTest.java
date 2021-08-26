@@ -36,16 +36,12 @@ import sog.util.StringOutputStream;
  */
 @Test.Skip( "Container" )
 public class TestResultSetTest extends Test.Container {
-
+	
 	public TestResultSetTest() {
 		super( TestResultSet.class );
 	}
 	
 	
-	public boolean getVerbose( TestResultSet trs ) {
-		return this.getSubjectField( trs, "verbose", null );
-	}
-
 	
 	public Set<Result> getResults( TestResultSet trs ) {
 		return this.getSubjectField( trs, "results", null );
@@ -84,15 +80,6 @@ public class TestResultSetTest extends Test.Container {
 	
 	@Test.Impl( 
 		member = "constructor: TestResultSet(String)", 
-		description = "Default has verbose = false" 
-	)
-	public void tm_017656908( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
-		tc.assertFalse( this.getVerbose( trs ) );
-	}
-		
-	@Test.Impl( 
-		member = "constructor: TestResultSet(String, boolean)", 
 		description = "Throws AssertionError for empty label" 
 	)
 	public void tm_0E5BF9170( Test.Case tc ) {
@@ -101,7 +88,7 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "constructor: TestResultSet(String, boolean)", 
+		member = "constructor: TestResultSet(String)", 
 		description = "Throws AssertionError for null label" 
 	)
 	public void tm_0A1C6DF82( Test.Case tc ) {
@@ -356,16 +343,7 @@ public class TestResultSetTest extends Test.Container {
 		tc.expectError( AssertionError.class );
 		TestResultSet.forSourceDir( null );
 	}
-		
-	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.setVerbose(boolean)", 
-		description = "Return is this TestResultSet instance" 
-	)
-	public void tm_07A9EAA2A( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
-		tc.assertEqual( trs, trs.setVerbose( true ) );
-	}
-		
+			
 	@Test.Impl( 
 		member = "method: int TestResultSet.getFailCount()", 
 		description = "Value is the sum of all failing weights for all tests" 
@@ -391,21 +369,6 @@ public class TestResultSetTest extends Test.Container {
 	public void tm_0ED41C40C( Test.Case tc ) {
 		TestResultSet trs = TestResultSet.forPackage( test.sog.core.test.foo.C1.class );
 		tc.assertTrue( trs.getElapsedTime() >= 21L );
-	}
-		
-	@Test.Impl( 
-		member = "method: void TestResultSet.print(IndentWriter)", 
-		description = "If verbose is true includes details from each TestResult" 
-	)
-	public void tm_04519880D( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
-		TestResultSet.forPackage( test.sog.core.test.foo.C1.class )
-			.setVerbose( true ).print( new IndentWriter( sos, " " ) );
-		String msg = sos.toString();
-		int pos = msg.indexOf( "RESULTS" );
-		pos = msg.indexOf( "RESULTS", pos +1 );
-		pos = msg.indexOf( "RESULTS", pos +1 );
-		tc.assertTrue( pos > 0 );
 	}
 		
 	@Test.Impl( 
@@ -501,6 +464,7 @@ public class TestResultSetTest extends Test.Container {
 	public static void main( String[] args ) {
 		//Test.eval( TestResultSet.class );
 		//Test.evalPackage( TestResultSet.class );
-		Test.evalDir( Test.class, "sog", "core", "test" );
+		//Test.evalDir( Test.class, "sog", "core" );
+		Test.evalAll();
 	}
 }

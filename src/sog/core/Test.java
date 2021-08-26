@@ -675,7 +675,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for one subject class */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
-		TestResult.forSubject( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.err, "\t" ) );
+		TestResult.forSubject( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */
@@ -687,15 +687,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for the package containing the given subject */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void evalPackage( Class<?> subjectClass ) {
-		TestResultSet.forPackage( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.err, "\t" ) );
-	}
-	
-	/** Convenience method to evaluate and print results for the package containing the given subject */
-	@Test.Decl( "Throws AssertionError for null subject" )
-	@Test.Decl( "When verbose is true details for each class TestResult are given" )
-	public static void evalPackage( Class<?> subjectClass, boolean verbose ) {
-		TestResultSet.forPackage( Assert.nonNull( subjectClass ) )
-			.setVerbose( verbose ).print( new IndentWriter( System.err, "\t" ) );
+		TestResultSet.forPackage( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 	/** 
@@ -711,12 +703,12 @@ public class Test {
 			subDir = subDir.resolve( Path.of( components[i] ) );
 		}
 		TestResultSet.forPackages( sourceDir, sourceDir.resolve( subDir ) )
-			.print( new IndentWriter( System.err, "\t" ) );
+			.print( new IndentWriter( System.out, "\t" ) );
 	}
 
 	@Test.Skip( "FIXME/Manually verified" )
 	public static void evalAll() {
-		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.err, "\t" ) );
+		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 }
