@@ -346,8 +346,8 @@ public class SoftStringTest extends Test.Container {
 
 
 	public static void main( String[] args ) {
-		//Test.eval( SoftString.class );
+		Test.eval( SoftString.class );
 		//Test.evalPackage( SoftString.class );
-		Test.evalDir( SoftString.class, "sog" );
+		//Test.evalDir( SoftString.class, "sog" );
 	}
 }

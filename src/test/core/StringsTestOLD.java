@@ -30,7 +30,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class StringsTest extends Test.Container {
+public class StringsTestOLD extends Test.Container {
 
 	
 	// These objects are various arrays
@@ -43,7 +43,7 @@ public class StringsTest extends Test.Container {
 	
 	private List<String> testListStrings;
 	
-	public StringsTest() {
+	public StringsTestOLD() {
 		super( Strings.class );
 		
 		init();

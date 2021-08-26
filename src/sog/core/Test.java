@@ -675,7 +675,9 @@ public class Test {
 	/** Convenience method to evaluate and print results for one subject class */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
-		TestResult.forSubject( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.out, "\t" ) );
+		TestResult tr = TestResult.forSubject( Assert.nonNull( subjectClass ) );
+		System.err.println();
+		tr.print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */
@@ -687,7 +689,9 @@ public class Test {
 	/** Convenience method to evaluate and print results for the package containing the given subject */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void evalPackage( Class<?> subjectClass ) {
-		TestResultSet.forPackage( Assert.nonNull( subjectClass ) ).print( new IndentWriter( System.out, "\t" ) );
+		TestResultSet trs = TestResultSet.forPackage( Assert.nonNull( subjectClass ) );
+		System.err.println();
+		trs.print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 	/** 
@@ -702,13 +706,16 @@ public class Test {
 		for ( int i = 0; i < components.length; i++ ) {
 			subDir = subDir.resolve( Path.of( components[i] ) );
 		}
-		TestResultSet.forPackages( sourceDir, sourceDir.resolve( subDir ) )
-			.print( new IndentWriter( System.out, "\t" ) );
+		TestResultSet trs = TestResultSet.forPackages( sourceDir, sourceDir.resolve( subDir ) );
+		System.err.println();
+		trs.print( new IndentWriter( System.out, "\t" ) );
 	}
 
 	@Test.Skip( "FIXME/Manually verified" )
 	public static void evalAll() {
-		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.out, "\t" ) );
+		TestResultSet trs = TestResultSet.forAllSourceDirs();
+		System.err.println();
+		trs.print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 }
