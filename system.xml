@@ -68,6 +68,12 @@
 		<property name="threshold" value="50" />
 	</class>
 
+	<!--  ByteFile properties on sizes -->
+	<class fullname="sog.core.Strings">
+		<property name="collection.max.length" value="7" />
+		<property name="array.max.length" value="7" />
+	</class>
+
     <!-- For testing -->
 	<class fullname="test.sog.core.PropertyTest">
 		<property name="repeated" value="foo" />

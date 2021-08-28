@@ -21,12 +21,19 @@ package sog.core;
 
 
 
-import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.stream.Collectors;
 
 @Test.Subject(  "test." )
 public final class Strings {
+	
+
+	/* If a collection has more than this many elements then toString() omits some elements. */
+	private static final int COLLECTION_MAX_LENGTH = Property.get( "collection.max.length", 7, Property.INTEGER );
+	
+	/* If an array has more than this many elements then toString() omits some elements. */
+	private static final int ARRAY_MAX_LEBGTH = Property.get( "array.max.length", 7, Property.INTEGER );
 
 
 	/** Not intended to be instantiated. */
@@ -38,27 +45,34 @@ public final class Strings {
 	 * If the width is negative, the string is left-justified.
 	 * If the width is positive, the string is right-justified.
 	 */
-	@Test.Decl( "Throws assertion error for zero width" )
 	@Test.Decl( "Throws assertion error for null string" )
-	@Test.Decl( "Justify empty with neg width is not empty" )
-	@Test.Decl( "Justify empty with pos width is not empty" )
+	@Test.Decl( "Return is empty for zero width" )
+	@Test.Decl( "Length of return is specified width" )
+	@Test.Decl( "For negative width equal to opposite of length return is the given string" )
+	@Test.Decl( "For large negative width return value starts with given string" )
+	@Test.Decl( "For large negative width return value ends with the pad character" )
+	@Test.Decl( "For small negative width given string starts with return value" )
+	@Test.Decl( "For positive width equal to length return is the given string" )
+	@Test.Decl( "For large positive width return value ends with given string" )
+	@Test.Decl( "For large positive width return value starts with the pad character" )
+	@Test.Decl( "For small positive width given string ends with return value" )
 	public static String justify( String s, int w, char pad ) {
 		Assert.nonNull( s );
-		Assert.nonZero( w );
 		
 		return Assert.nonEmpty( (w < 0) ? leftJustify( s, -1*w, pad ) : rightJustify( s, w, pad ) );
 	}
 
 	/** Truncate to given width. If shorter left justify by padding on the right. */
-	@Test.Decl( "Throws assertion error for non positive width" )
 	@Test.Decl( "Throws assertion error for null string" )
-	@Test.Decl( "Result has specified length" )
-	@Test.Decl( "Long string truncated" )
-	@Test.Decl( "Short string padded with given character" )
-	@Test.Decl( "Sample cases" )
+	@Test.Decl( "Return is empty for zero width" )
+	@Test.Decl( "Length of return is specified width" )
+	@Test.Decl( "For width equal to length return is the given string" )
+	@Test.Decl( "For large width return value starts with given string" )
+	@Test.Decl( "For large width return value ends with the pad character" )
+	@Test.Decl( "For small width given string starts with return value" )
 	public static String leftJustify( String s, int w, char pad ) {
 		Assert.nonNull( s );
-		Assert.positive( w );
+		Assert.nonNeg( w );
 		
 		StringBuffer padded = new StringBuffer( s );
 		while ( padded.length() < w ) {
@@ -69,15 +83,16 @@ public final class Strings {
 	}
 
 	/** Truncate to given width. If shorter right justify by padding on the left. */
-	@Test.Decl( "Throws assertion error for non positive width" )
 	@Test.Decl( "Throws assertion error for null string" )
-	@Test.Decl( "Result has specified length" )
-	@Test.Decl( "Long string truncated" )
-	@Test.Decl( "Short string padded with given character" )
-	@Test.Decl( "Sample cases" )
+	@Test.Decl( "Return is empty for zero width" )
+	@Test.Decl( "Length of return is specified width" )
+	@Test.Decl( "For width equal to length return is the given string" )
+	@Test.Decl( "For large width return value ends with given string" )
+	@Test.Decl( "For large width return value starts with the pad character" )
+	@Test.Decl( "For small width given string ends with return value" )
 	public static String rightJustify( String s, int w, char pad ) {
 		Assert.nonNull( s );
-		Assert.positive( w );
+		Assert.nonNeg( w );
 		
 		StringBuffer padded = new StringBuffer();
 		while ( padded.length() < w - s.length() ) {
@@ -124,6 +139,8 @@ public final class Strings {
 	@Test.Decl( "Result contains only letters" )
 	@Test.Decl( "Sample cases" )
 	@Test.Decl( "Underscore removed" )
+	@Test.Decl( "If no alphabetic characters in input then return is empty" )
+	@Test.Decl( "Result is trimmed" )
 	public static String toCamelCase( String s ) {
 		Assert.nonNull( s );
 		
@@ -133,6 +150,7 @@ public final class Strings {
 		// White space sequences to single space
 		result = result.replaceAll( "\\s+", " " );
 		
+		/*
 		String[] words = result.split( " " );
 		result = "";
 		for ( String word : words ) {
@@ -140,11 +158,18 @@ public final class Strings {
 				result += word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
 			}
 		}
+		*/
+		
+		result = Arrays.stream( result.split( " " ) ).map( Strings::initCap ).collect( Collectors.joining( "" ) );
 
 		// Remove leading digits
 		result = result.replaceAll( "^\\d*",  "" );
 		
 		return result;
+	}
+	
+	private static String initCap( String s ) {
+		return s.length() == 0 ? "" : s.substring( 0, 1 ).toUpperCase() + s.substring( 1 ).toLowerCase();
 	}
 	
 	/**
@@ -154,7 +179,7 @@ public final class Strings {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test.Decl( "String representation of null is null" )
-	@Test.Decl( "Identity on empty" )
+	@Test.Decl( "Identity on strings" )
 	@Test.Decl( "Agrees with object to string for non array non collection" )
 	@Test.Decl( "Provides alternate string representation for arrays" )
 	@Test.Decl( "Provides alternate string representation for collections" )
@@ -164,7 +189,7 @@ public final class Strings {
 		}
 		
 		if ( obj.getClass().isArray() ) {
-			return Strings.arrayToString( obj );
+			return Strings.arrayToString( (Object[])obj );
 		}
 		
 		if ( Collection.class.isAssignableFrom( obj.getClass() ) ) {
@@ -184,28 +209,19 @@ public final class Strings {
 	public static String collectionToString( Collection<Object> objects ) {
 		Assert.nonNull( objects );
 		int length = objects.size();
-		
-		StringBuffer buf = new StringBuffer();
-		buf.append( "{" );
-		if ( length <= 6 ) {
-			boolean notFirst  = false;
-			for ( Object obj : objects ) {
-				if ( notFirst ) buf.append( ", " );
-				notFirst = true;
-				buf.append( Strings.toString( obj ) );
-			}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append( "{" );
+		if ( length <= Strings.COLLECTION_MAX_LENGTH ) {
+			sb.append( objects.stream().map( Strings::toString ).collect( Collectors.joining( ", " ) ) );
 		} else {
-			Iterator<Object> iter = objects.iterator();
-			buf.append( Strings.toString( iter.next() ) ).append( ", " );
-			buf.append( Strings.toString( iter.next() ) ).append( ", " );
-			buf.append( Strings.toString( iter.next() ) );
-			buf.append( ", ...<" ).append( length - 4 ).append( " more>... " );
-			for ( int i = 4; i < length; i++ ) iter.next();
-			buf.append( Strings.toString( iter.next() ) );
+			sb.append( objects.stream().limit( 4L ).map( Strings::toString ).collect( Collectors.joining( ", " ) ) );
+			sb.append( ", ...<" ).append( length - 5 ).append( " more>... " );
+			sb.append( objects.stream().skip( length - 1 ).findFirst().get() );
 		}
-		buf.append( "}" );
+		sb.append( "}" );
 		
-		return buf.toString();
+		return sb.toString();
 	}
 	
 	@Test.Decl( "Throws assertion error on null arrays" )
@@ -215,32 +231,31 @@ public final class Strings {
 	@Test.Decl( "Sample cases for arrays of collections" )
 	@Test.Decl( "Sample cases for arrays of arrays" )
 	@Test.Decl( "Omitted elements are indicated" )
-	public static String arrayToString( Object obj ) {
-		Assert.nonNull( obj );
-		Assert.isTrue( obj.getClass().isArray() );
-		int length = Array.getLength( obj );
+	public static String arrayToString( Object[] objects ) {
+		Assert.nonNull( objects );
+		int length = objects.length;
 		
-		StringBuffer buf = new StringBuffer();
-		buf.append( "[" );
-		if ( length <= 6 ) {
-			for ( int i = 0; i < length; i++ ) {
-				if ( i > 0 ) buf.append( ", " );
-				buf.append( Strings.toString( Array.get( obj,  i ) ) );
-			}
+		StringBuilder sb = new StringBuilder();
+		sb.append( "[" );
+		if ( length <= Strings.ARRAY_MAX_LEBGTH ) {
+			sb.append( Arrays.stream( objects ).map( Strings::toString ).collect( Collectors.joining( ", ") ) );
 		} else {
-			buf.append( Strings.toString( Array.get( obj,  0 ) ) ).append( ", " );
-			buf.append( Strings.toString( Array.get( obj,  1 ) ) ).append( ", " );
-			buf.append( Strings.toString( Array.get( obj,  2 ) ) );
-			buf.append( ", ...<" ).append( length - 4 ).append( " more>... " );
-			buf.append( Strings.toString( Array.get( obj,  length -1 ) ) );
+			sb.append( Arrays.stream( objects ).limit( 4L ).map( Strings::toString ).collect( Collectors.joining( ", " ) ) );
+			sb.append( ", ...<" ).append( length - 5 ).append( " more>... " );
+			sb.append( Arrays.stream( objects ).skip( length - 1 ).findFirst().get() );
 		}
-		buf.append( "]" );
+		sb.append( "]" );
 		
-		return buf.toString();
+		return sb.toString();
 	}
 	
+	
+	@Test.Decl( "Throws Assertionrror for negative" )
+	@Test.Decl( "Result is non-empty" )
+	@Test.Decl( "Hex digits have natural representation" )
+	@Test.Decl( "Integer.MAX_VALUE is represented" )
 	public static String toHex( int n ) {
-		return "0x" + Strings.rightJustify( Integer.toHexString(n).toUpperCase(),  4,  '0' );
+		return "0x" + Strings.rightJustify( Integer.toHexString(n).toUpperCase(), 4, '0' );
 	}
 	
 		
