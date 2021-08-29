@@ -33,7 +33,7 @@ public final class Strings {
 	private static final int COLLECTION_MAX_LENGTH = Property.get( "collection.max.length", 7, Property.INTEGER );
 	
 	/* If an array has more than this many elements then toString() omits some elements. */
-	private static final int ARRAY_MAX_LEBGTH = Property.get( "array.max.length", 7, Property.INTEGER );
+	private static final int ARRAY_MAX_LENGTH = Property.get( "array.max.length", 7, Property.INTEGER );
 
 
 	/** Not intended to be instantiated. */
@@ -45,7 +45,7 @@ public final class Strings {
 	 * If the width is negative, the string is left-justified.
 	 * If the width is positive, the string is right-justified.
 	 */
-	@Test.Decl( "Throws assertion error for null string" )
+	@Test.Decl( "Throws AssertionError for null string" )
 	@Test.Decl( "Return is empty for zero width" )
 	@Test.Decl( "Length of return is specified width" )
 	@Test.Decl( "For negative width equal to opposite of length return is the given string" )
@@ -59,11 +59,12 @@ public final class Strings {
 	public static String justify( String s, int w, char pad ) {
 		Assert.nonNull( s );
 		
-		return Assert.nonEmpty( (w < 0) ? leftJustify( s, -1*w, pad ) : rightJustify( s, w, pad ) );
+		return w == 0 ? "" :
+			w > 0 ? Strings.rightJustify( s, w, pad ) : Strings.leftJustify( s, -1 * w, pad );
 	}
 
-	/** Truncate to given width. If shorter left justify by padding on the right. */
-	@Test.Decl( "Throws assertion error for null string" )
+	/** Right-truncate to given width. If shorter left justify by padding on the right. */
+	@Test.Decl( "Throws AssertionError for null string" )
 	@Test.Decl( "Return is empty for zero width" )
 	@Test.Decl( "Length of return is specified width" )
 	@Test.Decl( "For width equal to length return is the given string" )
@@ -73,17 +74,18 @@ public final class Strings {
 	public static String leftJustify( String s, int w, char pad ) {
 		Assert.nonNull( s );
 		Assert.nonNeg( w );
-		
-		StringBuffer padded = new StringBuffer( s );
-		while ( padded.length() < w ) {
-			padded.append( pad );
+
+		StringBuilder sb = new StringBuilder( s );
+		while ( sb.length() < w ) {
+			sb.append( pad );
 		}
-		padded.setLength( w );
-		return Assert.nonEmpty( padded.toString() );
+		sb.setLength( w );
+		
+		return sb.toString();
 	}
 
 	/** Truncate to given width. If shorter right justify by padding on the left. */
-	@Test.Decl( "Throws assertion error for null string" )
+	@Test.Decl( "Throws AssertionError for null string" )
 	@Test.Decl( "Return is empty for zero width" )
 	@Test.Decl( "Length of return is specified width" )
 	@Test.Decl( "For width equal to length return is the given string" )
@@ -93,20 +95,22 @@ public final class Strings {
 	public static String rightJustify( String s, int w, char pad ) {
 		Assert.nonNull( s );
 		Assert.nonNeg( w );
-		
-		StringBuffer padded = new StringBuffer();
-		while ( padded.length() < w - s.length() ) {
-			padded.append( pad );
+
+		StringBuilder sb = new StringBuilder( s );
+		sb.reverse();
+		while ( sb.length() < w ) {
+			sb.append( pad );
 		}
-		padded.append( s );
-		padded.setLength( w );
-		return Assert.nonEmpty( padded.toString() );
+		sb.setLength( w );
+		sb.reverse();
+
+		return sb.toString();
 	}
 
 	/**
 	 * Remove any enclosing quotes and/or whitespace.
 	 */
-	@Test.Decl( "Throws assertion error for null string" )
+	@Test.Decl( "Throws AssertionError for null string" )
 	@Test.Decl( "Identity on empty" )
 	@Test.Decl( "Identity for non quoted trimmed strings" )
 	@Test.Decl( "Ignores unmatched quotes" )
@@ -131,7 +135,7 @@ public final class Strings {
 		return (s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("\'") && s.endsWith("\'"));
 	}
 	
-	@Test.Decl( "Throws assertion error for null string" )
+	@Test.Decl( "Throws AssertionError for null string" )
 	@Test.Decl( "Identity on empty" )
 	@Test.Decl( "Result contains no white space" )
 	@Test.Decl( "Does not start with a digit" )
@@ -149,17 +153,8 @@ public final class Strings {
 		
 		// White space sequences to single space
 		result = result.replaceAll( "\\s+", " " );
-		
-		/*
-		String[] words = result.split( " " );
-		result = "";
-		for ( String word : words ) {
-			if ( word.length() > 0 ) {
-				result += word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
-			}
-		}
-		*/
-		
+
+		// Initial capitalization and concatenation
 		result = Arrays.stream( result.split( " " ) ).map( Strings::initCap ).collect( Collectors.joining( "" ) );
 
 		// Remove leading digits
@@ -199,14 +194,16 @@ public final class Strings {
 		return obj.toString();
 	}
 	
-	@Test.Decl( "Throws assertion error on null collections" )
+	@Test.Decl( "Throws AssertionError on null collections" )
 	@Test.Decl( "Enclosed in set braces" )
 	@Test.Decl( "Empty collection allowed" )
 	@Test.Decl( "Sample cases for collections of primitive" )
 	@Test.Decl( "Sample cases for collections of collections" )
 	@Test.Decl( "Sample cases for collections of arrays" )
-	@Test.Decl( "Omitted elements are indicated" )
-	public static String collectionToString( Collection<Object> objects ) {
+	@Test.Decl( "Omitted elements are indicated with 'more'" )
+	@Test.Decl( "For long collections first element is shown" )
+	@Test.Decl( "For long collections last element is shown" )
+	public static String collectionToString( Collection<?> objects ) {
 		Assert.nonNull( objects );
 		int length = objects.size();
 
@@ -224,20 +221,22 @@ public final class Strings {
 		return sb.toString();
 	}
 	
-	@Test.Decl( "Throws assertion error on null arrays" )
-	@Test.Decl( "Enclosed in set brackets" )
+	@Test.Decl( "Throws AssertionError on null arrays" )
+	@Test.Decl( "Enclosed in square brackets" )
 	@Test.Decl( "Empty array allowed" )
 	@Test.Decl( "Sample cases for arrays of primitive" )
 	@Test.Decl( "Sample cases for arrays of collections" )
 	@Test.Decl( "Sample cases for arrays of arrays" )
-	@Test.Decl( "Omitted elements are indicated" )
+	@Test.Decl( "Omitted elements are indicated with 'more'" )
+	@Test.Decl( "For long arrays first element is shown" )
+	@Test.Decl( "For long arrays last element is shown" )
 	public static String arrayToString( Object[] objects ) {
 		Assert.nonNull( objects );
 		int length = objects.length;
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append( "[" );
-		if ( length <= Strings.ARRAY_MAX_LEBGTH ) {
+		if ( length <= Strings.ARRAY_MAX_LENGTH ) {
 			sb.append( Arrays.stream( objects ).map( Strings::toString ).collect( Collectors.joining( ", ") ) );
 		} else {
 			sb.append( Arrays.stream( objects ).limit( 4L ).map( Strings::toString ).collect( Collectors.joining( ", " ) ) );
@@ -250,10 +249,10 @@ public final class Strings {
 	}
 	
 	
-	@Test.Decl( "Throws Assertionrror for negative" )
 	@Test.Decl( "Result is non-empty" )
 	@Test.Decl( "Hex digits have natural representation" )
-	@Test.Decl( "Integer.MAX_VALUE is represented" )
+	@Test.Decl( "Positive integers up to 2^16 - 1 have representation" )
+	@Test.Decl( "Integers greater than 2^16 - 1 wrap around" )
 	public static String toHex( int n ) {
 		return "0x" + Strings.rightJustify( Integer.toHexString(n).toUpperCase(), 4, '0' );
 	}
