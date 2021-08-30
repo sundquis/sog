@@ -746,24 +746,6 @@ public class TestTest extends Test.Container {
     }
 
 	@Test.Impl( 
-		member = "method: void Test.evalPackage(Class, boolean)", 
-		description = "Throws AssertionError for null subject" 
-	)
-	public void tm_0CCC0451D( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		Test.evalPackage( null );
-	}
-		
-	@Test.Impl( 
-		member = "method: void Test.evalPackage(Class, boolean)", 
-		description = "When verbose is true details for each class TestResult are given" 
-	)
-	public void tm_06BBE429E( Test.Case tc ) {
-		tc.addMessage( "Manually verified." );
-		tc.assertTrue( true );
-	}
-	
-	@Test.Impl( 
 		member = "method: void Test.evalDir(Class, String[])", 
 		description = "Throws AppException for components not on source path" 
 	)
@@ -785,8 +767,8 @@ public class TestTest extends Test.Container {
 		
 
 	public static void main( String[] args ) {
-		//Test.eval( Test.class );
+		Test.eval( Test.class );
 		//Test.evalPackage( Test.class );
-		Test.evalDir( Test.class, "sog" );
+		//Test.evalDir( Test.class, "sog" );
 	}
 }

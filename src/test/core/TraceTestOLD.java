@@ -23,9 +23,9 @@ import sog.core.Test;
  * @author sundquis
  *
  */
-public class TraceTest extends Test.Container {
+public class TraceTestOLD extends Test.Container {
 	
-	public TraceTest() {
+	public TraceTestOLD() {
 		super( Trace.class );
 	}
 

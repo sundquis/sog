@@ -21,6 +21,7 @@ package sog.core;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -59,18 +60,19 @@ import java.util.function.Function;
  * Uses equals for comparisons
  */
 @Test.Subject( "test." )
-public class Switch<T, A, R> {
-
+public class Switch<T, A, R> implements BiFunction<T, A, R> {
+	
 	/** Holds the registered handlers */
-	private Map<T, Function<? super A, ? extends R>> handlers;
+	private final Map<T, Function<? super A, ? extends R>> handlers;
 	
 	/** The default case */
 	private Function<? super A, ? extends R> defaultHandler;
 	
 	/** Builds a switch object associated with the given type T. */
+	@Test.Decl( "Default handler returns null" )
 	public Switch() {
 		this.handlers = new HashMap<T, Function<? super A, ? extends R>>();
-		this.defaultHandler = null;
+		this.defaultHandler = a -> { return null; };
 	}
 
 	/**
@@ -84,10 +86,10 @@ public class Switch<T, A, R> {
 	 * @param handler
 	 *        A non-null implementation of the apply method
 	 */
-	@Test.Decl( "Throws assertion error for null key" )
-	@Test.Decl( "Throws assertion error for null handler" )
-	@Test.Decl( "Returns non null" )
+	@Test.Decl( "Throws AssertionError for null key" )
+	@Test.Decl( "Throws AssertionError for null handler" )
 	@Test.Decl( "Returns this Switch instance" )
+	@Test.Decl( "Replaces previously added case" )
 	public Switch<T, A, R> addCase( T key, Function<? super A, ? extends R> handler ) {
 		Assert.nonNull( key );
 		Assert.nonNull( handler );
@@ -106,9 +108,9 @@ public class Switch<T, A, R> {
 	 * @param handler
 	 *        The non-null handler for the default case.
 	 */
-	@Test.Decl( "Throws assertion error for null handler" )
-	@Test.Decl( "Returns non null" )
+	@Test.Decl( "Throws AssertionError for null handler" )
 	@Test.Decl( "Returns this Switch instance" )
+	@Test.Decl( "Replaces previously set default" )
 	public Switch<T, A, R> addDefault( Function<? super A, ? extends R> handler ) {
 		this.defaultHandler = Assert.nonNull( handler );
 
@@ -127,19 +129,15 @@ public class Switch<T, A, R> {
 	 * @return
 	 * 		The result of the corresponding apply method
 	 */
-	@Test.Decl( "Throws assertion error for null key" )
-	@Test.Decl( "Throws App exception when no handler found" )
-	@Test.Decl( "Throws App exception when handler raises exception" )
+	@Override
+	@Test.Decl( "Throws AssertionError for null key" )
+	@Test.Decl( "Throws AppException when handler raises exception" )
 	public R apply( T key, A arg ) {
 		Assert.nonNull( key );
 		
 		Function<? super A, ? extends R> handler = this.handlers.get( key );
 		if ( handler == null ) {
 			handler = this.defaultHandler;
-		}
-		
-		if ( handler == null ) {
-			Fatal.error( "No handler found" );
 		}
 		
 		R result = null;
