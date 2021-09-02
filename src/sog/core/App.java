@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -62,6 +65,8 @@ public class App implements Runnable {
 	private final List<Path> sourceDirs;
 	
 	private final List<OnShutdown> objectsForShutdown;
+	
+	private final String startDateTime;
 		
 	private App() {
 		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Property.STRING ) );
@@ -74,6 +79,9 @@ public class App implements Runnable {
 		Assert.isTrue( ! this.sourceDirs.isEmpty() );
 		this.objectsForShutdown = new LinkedList<OnShutdown>();
 		Runtime.getRuntime().addShutdownHook( new Thread( this ) );
+		
+		DateFormat fmt = new SimpleDateFormat( "yyyy.MM.dd#HH.mm.ss" );
+		this.startDateTime = fmt.format( new Date() );
 	}
 
 	/** Root directory for all application resources */
@@ -88,6 +96,13 @@ public class App implements Runnable {
 	@Test.Decl( "Is not null" )
 	public String description() {
 		return this.description;
+	}
+
+	@Test.Decl( "Return is non-empty" )
+	@Test.Decl( "Return indicates the date that the application started" )
+	@Test.Decl( "Return indicates the time that the application started" )
+	public String startDateTime() {
+		return this.startDateTime;
 	}
 	
 	@Test.Decl( "Is not empty" )

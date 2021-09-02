@@ -36,6 +36,253 @@ public class TraceTest extends Test.Container {
 	
 	// TEST CASES
 	
+	@Test.Impl( 
+		member = "constructor: Trace(String)", 
+		description = "Default does not echo messages" 
+	)
+	public void tm_0BE58576B( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" );
+	}
+		
+		@Test.Impl( 
+			member = "constructor: Trace(String, boolean)", 
+			description = "Throws assertion error for empty topic" 
+		)
+		public void tm_052B773D7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.MsgHandler.getPath()", 
+			description = "Return is not null" 
+		)
+		public void tm_00D670DCA( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.MsgHandler.getPath()", 
+			description = "Returns path to file containing messages on this trace instance" 
+		)
+		public void tm_0E35EE116( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Can write after close" 
+		)
+		public void tm_0AA62E0C7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "File does not exist if disabled messages written" 
+		)
+		public void tm_04FF7342F( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "File does not exist if no messages written" 
+		)
+		public void tm_04808168A( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Opens new handler with different file" 
+		)
+		public void tm_0A5866674( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Returned file contains messages if written and enabled" 
+		)
+		public void tm_0849BE184( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Returns non null when disabled" 
+		)
+		public void tm_0AEC4446B( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Returns non null when enabled" 
+		)
+		public void tm_04E74B088( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: Path Trace.close()", 
+			description = "Returns readable file if written and enabled" 
+		)
+		public void tm_0D5BA7A4F( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String Trace.MsgHandler.toString()", 
+			description = "Return is non-empty" 
+		)
+		public void tm_06C5A51F0( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String Trace.toString()", 
+			description = "Identifies state when disabled" 
+		)
+		public void tm_03A39B903( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String Trace.toString()", 
+			description = "Indicates state when enabled" 
+		)
+		public void tm_080A480B6( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String Trace.toString()", 
+			description = "Indicates topic when enabled" 
+		)
+		public void tm_0AE0E6858( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: boolean Trace.isEnabled()", 
+			description = "Enabled when initialized" 
+		)
+		public void tm_0D7CD7141( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.MsgHandler.accept(String)", 
+			description = "Issues global warning when message exceeds line count warn limit" 
+		)
+		public void tm_098DDCE38( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.MsgHandler.accept(String)", 
+			description = "Throws AppException when message exceeds line count fail limit" 
+		)
+		public void tm_0D663A554( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.MsgHandler.accept(String)", 
+			description = "Throws AssertionError for null message" 
+		)
+		public void tm_06A65E5CB( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.MsgHandler.run()", 
+			description = "Throws AppExcpetion when started from a non-worker thread" 
+		)
+		public void tm_03536554E( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.disable()", 
+			description = "Messages ignored" 
+		)
+		public void tm_03AE16491( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.disable()", 
+			description = "Not enabled after" 
+		)
+		public void tm_029C75393( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.enable()", 
+			description = "Is enabled after" 
+		)
+		public void tm_03563EC99( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.enable()", 
+			description = "Same file used when re-enabled without close" 
+		)
+		public void tm_09E398F66( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Message printed if echo enabled" 
+		)
+		public void tm_035D21085( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Multi thread stress test" 
+		)
+		public void tm_0C88F7B5C( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Throws AppException when count exceeds fail limit" 
+		)
+		public void tm_06D8BB53B( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Throws AssertionError for empty message" 
+		)
+		public void tm_0EF81F1FF( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Throws AssertionError for null message" 
+		)
+		public void tm_030205B19( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.write(String)", 
+			description = "Warning issued when count exceeds warn limit" 
+		)
+		public void tm_0968768B5( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
 	
 	
 	

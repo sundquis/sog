@@ -23,9 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,27 +34,45 @@ import sog.util.MultiQueue;
 import sog.util.Queue;
 
 /**
- * @author sundquis
- *
+ * A thread-safe tracing service that writes formatted messages to a file and optionally echoes
+ * to standard output.
+ * 
+ * Trace instances are created with a "topic" and produce messages pertaining to that topic.
+ * The messages also include information about the current thread, calling class and method
+ * (from the stack trace) in addition to the diagnostic message. A Trace instance formats the 
+ * message and then enqueues the message with the current MsgHandler.
+ * 
+ * MsgHandler instances maintain a worker thread that reads the queue for messages, transfers
+ * messages to a buffer, then writes the buffer to a particular file. The size of the buffer
+ * is a configurable property, as are the limits (warn and fail) on the number of messages
+ * that can be written to the given file. When constructed, a MsgHandler registers to be
+ * terminated when the application shuts down, and then the MsgHandler starts the worker thread
+ * that listens for messages.
+ * 
+ * Static methods allow tracing to be disabled and enabled, and allow for the current tracing
+ * file to be closed and replaced with a new file.
  */
 @Test.Subject( "test." )
 public class Trace {
+
+
 	
-	// Subdirectory of <root> holding trace files
+	/* Subdirectory of <root> holding trace files. */
 	private static String TRACE_DIR_NAME = Property.get( "dir.name",  "trace",  Property.STRING );
 	
-	// Issue warning when this many lines written
+	/* Issue warning when this many lines have been written to a single file. */
 	private static Integer WARN_LIMIT = Property.get( "warn.limit",  1000000,  Property.INTEGER );
 
-	// Stop tracing when this many lines written
+	/* Stop tracing when this many lines have been written to a single file. */
 	private static Integer FAIL_LIMIT = Property.get( "fail.limit",  100000000,  Property.INTEGER );
 	
-	// Number of lines to hold in buffer before writing to file
+	/* Number of lines to hold in buffer before writing to file. */
 	private static Integer MAX_BUFFER_SIZE = Property.get( "max.buffer.size",  100,  Property.INTEGER );
 
 	
-	
-
+	/*
+	 * 
+	 */
 	private static class MsgHandler implements Runnable, OnShutdown, Consumer<String> {
 		
 		private static int fileNo = 0;
@@ -79,20 +94,19 @@ public class Trace {
 		// Read the message queue, move to buffer, empty buffer to file
 		private final Thread worker;
 		
-		MsgHandler() {
-			this.entries = new MultiQueue<String>( new FifoQueue<String>() );
-			this.buffer = new LinkedList<String>();
-			
+		private MsgHandler() {
 			// Register for shutdown. Close the queue, process existing messages
 			App.get().terminateOnShutdown( this );
 			
-			this.lineCount = 0;
+			this.entries = new MultiQueue<String>( new FifoQueue<String>() );
+			this.buffer = new LinkedList<String>();
 			
-			DateFormat fmt = new SimpleDateFormat( "yyyy.MM.dd" );
-			String filename = fmt.format( new Date() ) + "." + fileNo++;
+			String seq = Strings.rightJustify( "" + Trace.MsgHandler.fileNo++, 4, '0' );
+			String filename = App.get().startDateTime() + "#" + seq;
 			LocalDir dir = new LocalDir( true );
 			dir.sub( Trace.TRACE_DIR_NAME );
 			this.traceFile = dir.getFile( filename,  LocalDir.Type.TEXT );
+			this.lineCount = 0;
 			
 			this.worker = new Thread( this );
 			this.worker.setDaemon( true );
@@ -103,6 +117,7 @@ public class Trace {
 		 * @see sog.core.App.OnShutdown#terminate()
 		 */
 		@Override
+		@Test.Skip( "Closing the queue interrupts the waiting worker thread" )
 		public void terminate() {
 			this.entries.close();
 			try {
@@ -110,6 +125,8 @@ public class Trace {
 			} catch ( InterruptedException e ) {}
 		}
 		
+		@Test.Decl( "Returns path to file containing messages on this trace instance" )
+		@Test.Decl( "Return is not null" )
 		public Path getPath() {
 			return this.traceFile;
 		}
@@ -118,6 +135,7 @@ public class Trace {
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
+		@Test.Decl( "Throws AppExcpetion when started from a non-worker thread" )
 		public void run() {
 			if ( Thread.currentThread() != this.worker ) {
 				throw new AppException( "Cannot start externally." );
@@ -151,6 +169,9 @@ public class Trace {
 		 * @see java.util.function.Consumer#accept(java.lang.Object)
 		 */
 		@Override
+		@Test.Decl( "Throws AssertionError for null message" )
+		@Test.Decl( "Issues global warning when message exceeds line count warn limit" )
+		@Test.Decl( "Throws AppException when message exceeds line count fail limit" )
 		public synchronized void accept( String msg ) {
 			if ( this.lineCount == 0 ) {
 				this.entries.put( Trace.HEADER );
@@ -169,6 +190,7 @@ public class Trace {
 		}
 		
 		@Override
+		@Test.Decl( "Return is non-empty" )
 		public String toString() {
 			return this.traceFile.toString();
 		}
@@ -183,13 +205,8 @@ public class Trace {
 	private static MsgHandler ENABLED = new MsgHandler();
 	
 	private static Consumer<String> currentHandler = Trace.ENABLED;
-	
-	private static Consumer<String> getHandler() {
-		synchronized ( mutex ) {
-			return Trace.currentHandler;
-		}
-	}
 
+	
 	/**
 	 * Report the current tracing status.
 	 * @return
@@ -288,12 +305,12 @@ public class Trace {
 	private static final String HEADER = Trace.formatter.format(
 		"SEQ NO", "TOPIC", "THREAD", "CLASS NAME", "METHOD", "MESSAGE" );
 
-	@Test.Decl( "Throws assertion exception for null message" )
-	@Test.Decl( "Throws assetrion exception for empty message" )
+	@Test.Decl( "Throws AssertionError for null message" )
+	@Test.Decl( "Throws AssertionError for empty message" )
 	@Test.Decl( "Multi thread stress test" )
 	@Test.Decl( "Message printed if echo enabled" )
 	@Test.Decl( "Warning issued when count exceeds warn limit" )
-	@Test.Decl( "Fatal error issued when count exceeds fail limit")
+	@Test.Decl( "Throws AppException when count exceeds fail limit")
 	public void write( String message ) {
 		Assert.nonEmpty( message );
 		StackTraceElement ste = (new Exception()).getStackTrace()[1];
@@ -308,7 +325,7 @@ public class Trace {
 			System.out.println( msg );
 		}
 		
-		Trace.getHandler().accept( msg );
+		Trace.currentHandler.accept( msg );
 	}
 	
 	@Override
