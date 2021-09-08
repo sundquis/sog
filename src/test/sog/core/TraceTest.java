@@ -19,6 +19,11 @@
 
 package test.sog.core;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
+import sog.core.AppException;
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Trace;
 
@@ -33,24 +38,72 @@ public class TraceTest extends Test.Container {
 	}
 	
 	
+	private Trace trace;
+	
+	@Override
+	public Procedure beforeEach() {
+		return () -> {
+			this.trace = new Trace( "Testing" );
+		};
+	}
+	
+	@Override
+	public Procedure afterEach() {
+		return () -> {
+			try {
+				Files.deleteIfExists( Trace.close() );
+			} catch ( IOException e ) {
+				throw new AppException( e );
+			}
+			this.trace = null;
+		};
+	}
+	
+	
 	
 	// TEST CASES
 	
 	@Test.Impl( 
 		member = "constructor: Trace(String)", 
-		description = "Default does not echo messages" 
+		description = "Not echoEnabled" 
 	)
-	public void tm_0BE58576B( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+	public void tm_09A8AADCC( Test.Case tc ) {
+		tc.assertFalse( this.trace.echoEnabled() );
 	}
 		
-		@Test.Impl( 
-			member = "constructor: Trace(String, boolean)", 
-			description = "Throws assertion error for empty topic" 
-		)
-		public void tm_052B773D7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "constructor: Trace(String)", 
+		description = "Throws AssertionError for empty topic" 
+	)
+	public void tm_071DC5D1B( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		new Trace( "" );
+	}
+		
+	@Test.Impl( 
+		member = "constructor: Trace(String, boolean)", 
+		description = "If echoMessages then echoEnabled" 
+	)
+	public void tm_0C9DBBE20( Test.Case tc ) {
+		tc.assertTrue( new Trace( "x", true ).echoEnabled() );
+	}
+		
+	@Test.Impl( 
+		member = "constructor: Trace(String, boolean)", 
+		description = "If not echoMessages then not echoEnabled" 
+	)
+	public void tm_04150D5C6( Test.Case tc ) {
+		tc.assertFalse( new Trace( "x", false ).echoEnabled() );
+	}
+		
+	@Test.Impl( 
+		member = "constructor: Trace(String, boolean)", 
+		description = "Throws AssertionError for empty topic" 
+	)
+	public void tm_0396493F9( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		new Trace( "", true );
+	}
 		
 		@Test.Impl( 
 			member = "method: Path Trace.MsgHandler.getPath()", 
@@ -165,6 +218,14 @@ public class TraceTest extends Test.Container {
 		}
 		
 		@Test.Impl( 
+			member = "method: boolean Trace.echoEnabled()", 
+			description = "If echoEnabled then write(message) copies to standard out" 
+		)
+		public void tm_0E91ADF03( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
 			member = "method: boolean Trace.isEnabled()", 
 			description = "Enabled when initialized" 
 		)
@@ -233,6 +294,22 @@ public class TraceTest extends Test.Container {
 			description = "Same file used when re-enabled without close" 
 		)
 		public void tm_09E398F66( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.enableEcho(boolean)", 
+			description = "If enableEcho(false) then not echoEnabled" 
+		)
+		public void tm_0D5BC94E4( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: void Trace.enableEcho(boolean)", 
+			description = "If enableEcho(true) then echoEnabled" 
+		)
+		public void tm_049222A36( Test.Case tc ) {
 			tc.addMessage( "GENERATED STUB" );
 		}
 		

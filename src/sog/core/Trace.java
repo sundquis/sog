@@ -20,6 +20,7 @@
 package sog.core;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -35,43 +36,89 @@ import sog.util.Queue;
 
 /**
  * A thread-safe tracing service that writes formatted messages to a file and optionally echoes
- * to standard output.
+ * to a PrintWriter.
  * 
- * Trace instances are created with a "topic" and produce messages pertaining to that topic.
- * The messages also include information about the current thread, calling class and method
- * (from the stack trace) in addition to the diagnostic message. A Trace instance formats the 
- * message and then enqueues the message with the current MsgHandler.
+ * The singleton Trace instance holds a queue of pending messages. Trace is Runnable, and backs
+ * an instance worker thread that polls the queue for new messages and transfers them to a buffer.
+ * When the buffer is full it writes messages to a file. When the file is full it opens a new
+ * file for subsequent messages.
  * 
- * MsgHandler instances maintain a worker thread that reads the queue for messages, transfers
- * messages to a buffer, then writes the buffer to a particular file. The size of the buffer
- * is a configurable property, as are the limits (warn and fail) on the number of messages
- * that can be written to the given file. When constructed, a MsgHandler registers to be
- * terminated when the application shuts down, and then the MsgHandler starts the worker thread
- * that listens for messages.
+ * Messages are formatted and contain a "source" as well as information about the current thread, 
+ * calling class and method (from the stack trace) in addition to the diagnostic message. 
  * 
- * Static methods allow tracing to be disabled and enabled, and allow for the current tracing
- * file to be closed and replaced with a new file.
+ * Static methods allow tracing to be disabled and enabled, and allow for the Trace facility to be
+ * completely terminated.
  */
 @Test.Subject( "test." )
-public class Trace {
+public class Trace implements Runnable, OnShutdown {
 
-
+	
 	
 	/* Subdirectory of <root> holding trace files. */
-	private static String TRACE_DIR_NAME = Property.get( "dir.name",  "trace",  Property.STRING );
-	
-	/* Issue warning when this many lines have been written to a single file. */
-	private static Integer WARN_LIMIT = Property.get( "warn.limit",  1000000,  Property.INTEGER );
+	private static final String TRACE_DIR_NAME = Property.get( "dir.name",  "trace",  Property.STRING );
 
-	/* Stop tracing when this many lines have been written to a single file. */
-	private static Integer FAIL_LIMIT = Property.get( "fail.limit",  100000000,  Property.INTEGER );
+	/* After this many messages have been added the buffer is written to the current trace file. */
+	private static final Integer BUFFER_LIMIT = Property.get( "buffer.limit", 100, Property.INTEGER );
 	
-	/* Number of lines to hold in buffer before writing to file. */
-	private static Integer MAX_BUFFER_SIZE = Property.get( "max.buffer.size",  100,  Property.INTEGER );
+	/* After this many lines have been written to a trace file a new file is opened. */
+	private static final Integer LINE_LIMIT = Property.get( "line.limit", 10_000, Property.INTEGER );
+	
+	/* After this many files have been written a Fatal.error is triggered. */
+	private static final Integer FILE_LIMIT = Property.get( "file.limit", 100, Property.INTEGER );
+	
+
+	/* The singleton instance. */
+	private static final Trace INSTANCE = new Trace();
+
+	
+	@Test.Decl( "Throws AssertionError for null source" )
+	@Test.Decl( "Throws AssertionError for empty message" )
+	@Test.Decl( "Message is written to file before application exits" )
+	@Test.Decl( "Trace message includes details on the source object" )
+	@Test.Decl( "Trace message includes the given message" )
+	@Test.Decl( "Trace message includes details on the calling thread" )
+	@Test.Decl( "Trace message includes details on the calling class" )
+	@Test.Decl( "Trace message includes details on the calling method" )
+	public static void write( Object source, String message ) {
+		Fatal.unimplemented( "" );
+	}
+
+	
+	@Test.Decl( "Throws AssertionError for null source" )
+	@Test.Decl( "Throws AssertionError for empty message" )
+	@Test.Decl( "Throws AssertionError for null PrintWriter" )
+	@Test.Decl( "Message is written to file before application exits" )
+	@Test.Decl( "Message is echoed to the given PrintWriter immediately" )
+	@Test.Decl( "Trace message includes details on the source object" )
+	@Test.Decl( "Trace message includes the given message" )
+	@Test.Decl( "Trace message includes details on the calling thread" )
+	@Test.Decl( "Trace message includes details on the calling class" )
+	@Test.Decl( "Trace message includes details on the calling method" )
+	public static void write( Object source, String message, PrintWriter out ) {
+		Fatal.unimplemented( "" );
+	}
+	
+	
+	@Test.Decl( "After enable(true) message are logged in the trace file" )
+	@Test.Decl( "After enable(false) messages are ignored" )
+	@Test.Decl( "Is idempotent" )
+	@Test.Decl( "Does not affect pending messages" )
+	public static void enable( boolean enable ) {
+		Fatal.unimplemented( "" );
+	}
+	
+	
+	@Test.Decl( "After enable(true) returns true" )
+	@Test.Decl( "After enable(false) returns false" )
+	public static boolean isEnabled() {
+		Fatal.unimplemented( "" );
+		return false;
+	}
 
 	
 	/*
-	 * 
+	 * The thread that processes enqueued messages. The MsgHandler moves messages to a buffer
+	 * and then, when the buffer is full, writes the messages to a trace file.
 	 */
 	private static class MsgHandler implements Runnable, OnShutdown, Consumer<String> {
 		
@@ -79,19 +126,19 @@ public class Trace {
 		
 		
 
-		// Client write calls add messages to the queue. MsgHandler thread processes
+		/* Client write( message ) calls add messages to the queue. MsgHandler thread processes them. */
 		private final Queue<String> entries;
 		
-		// Only accessed by handler; a buffer between queued messages and file write
+		/* Only accessed by handler; a buffer between queued messages and file write. */
 		private final List<String> buffer;
 		
-		// Current number of messages
+		/* Current number of messages written to the trace file. */
 		private volatile int lineCount;
 		
-		// Messages are written here
+		/* Messages are written here. */
 		private final Path traceFile;
 		
-		// Read the message queue, move to buffer, empty buffer to file
+		/* Read the message queue, move to buffer, empty buffer to file. */
 		private final Thread worker;
 		
 		private MsgHandler() {
@@ -121,7 +168,7 @@ public class Trace {
 		public void terminate() {
 			this.entries.close();
 			try {
-				this.worker.join();
+				this.worker.join( 2000L );
 			} catch ( InterruptedException e ) {}
 		}
 		
@@ -197,113 +244,70 @@ public class Trace {
 		
 	}
 
-	private final static Object mutex = new Object() {};
-	
-	// The no-op consumer when messages are disabled
-	private static final Consumer<String> DISABLED = (s) -> {};
-
-	private static MsgHandler ENABLED = new MsgHandler();
-	
-	private static Consumer<String> currentHandler = Trace.ENABLED;
-
-	
-	/**
-	 * Report the current tracing status.
-	 * @return
-	 */
-	@Test.Decl( "Enabled when initialized" )
-	public static boolean isEnabled() {
-		return Trace.currentHandler != Trace.DISABLED;
-	}
-
-	/**
-	 * When enabled, trace messages are written to a trace file.
-	 */
-	@Test.Decl( "Is enabled after" )
-	@Test.Decl( "Same file used when re-enabled without close" )
-	public static void enable() {
-		synchronized ( mutex ) {
-			Trace.currentHandler = Trace.ENABLED;
-		}
-	}
-	
-	/**
-	 * When disabled, messages are not written to file. Messages may still be echoed to
-	 * standard out.
-	 */
-	@Test.Decl( "Not enabled after" )
-	@Test.Decl( "Messages ignored" )
-	public static void disable() {
-		synchronized ( mutex ) {
-			Trace.currentHandler = Trace.DISABLED;
-		}
-	}
-	
-	/**
-	 * Close the current Trace file and return the path to the file.
-	 * Independent of the enabled status. When disabled, closes the handler that would be used if re-enabled.
-	 * A new handler is constructed to handle subsequent writes.
-	 * If no messages were written while enabled then this file does not exist.
-	 * 
-	 * @return
-	 */
-	@Test.Decl( "Returns non null when disabled" )
-	@Test.Decl( "Returns non null when enabled" )
-	@Test.Decl( "File does not exist if no messages written" )
-	@Test.Decl( "File does not exist if disabled messages written" )
-	@Test.Decl( "Returns readable file if written and enabled" )
-	@Test.Decl( "Returned file contains messages if written and enabled" )
-	@Test.Decl( "Opens new handler with different file" )
-	@Test.Decl( "Can write after close" )
-	public static Path close() {
-		synchronized ( mutex ) {
-			MsgHandler current = Trace.ENABLED;
-			Trace.ENABLED = new MsgHandler();
-			if ( Trace.isEnabled() ) {
-				Trace.currentHandler = Trace.ENABLED;
-			}
-	
-			current.terminate();
-			return current.getPath();
-		}
-	}
 	
 
-	
-	
-	
-	private String topic;
-	private int seqNo;
-	private boolean echoMessages;
-	
-	@Test.Decl( "Throws assertion error for empty topic" )
-	public Trace( String topic, boolean echoMessages ) {
-		this.topic = Assert.nonEmpty( topic );
-		this.seqNo = 1;
-		this.echoMessages = echoMessages;
-		
-		if ( echoMessages ) {
-			System.out.println( Trace.HEADER );
-		}
-	}
 
-	@Test.Decl( "Default does not echo messages" )
-	public Trace( String topic ) {
-		this( topic, false );
+	/* When a message is added */
+	private final FixedWidth formatter;
+	
+	private final String header;
+	
+	/* Client write( message ) calls add messages to the queue. Trace worker thread processes them. */
+	private final Queue<String> entries;
+	
+	/* Only accessed by the Trace worker; a buffer between queued messages and file write. */
+	private final List<String> buffer;
+	
+	/* Number of messages written to the current trace file. */
+	private volatile int lineNumber;
+	
+	/* Trace files are  */
+	private int fileNumber;
+	
+	/* Messages are written here. */
+	private final Path traceFile;
+	
+	/* Read the message queue, move to buffer, empty buffer to file. */
+	private final Thread worker;
+	
+	
+	private Trace() {
+		this.formatter = new FixedWidth()
+			.defaultFieldSeparator( " " )
+			.right( 7,  ' ' )
+			.left( 10,  ' ' )
+			.left( 10,  ' ' )
+			.left( 25,  ' ' )
+			.left( 25,  ' ' )
+			.left( 50,  ' ' );
+			
+		this.header = this.formatter.format( "LINE NO", "SOURCE", "THREAD", "CLASS NAME", "METHOD", "MESSAGE" );
 	}
+	
+	
+	// FIXME: Remove
+	public Trace( String s ) { this(); }
+	
+	// FIXME: Remove
+	public static Path close() { return null; }
+	
+	// FIXME: Remove
+	public Trace( String s, boolean b ) { this(); }
+	
+	// FIXME: Remove
+	public static void enable() {}
 
-	
-	private static final FixedWidth formatter = new FixedWidth()
-		.defaultFieldSeparator( " " )
-		.right( 5,  ' ' )
-		.left( 10,  ' ' )
-		.left( 10,  ' ' )
-		.left( 25,  ' ' )
-		.left( 25,  ' ' )
-		.left( 50,  ' ' );
-	
-	private static final String HEADER = Trace.formatter.format(
-		"SEQ NO", "TOPIC", "THREAD", "CLASS NAME", "METHOD", "MESSAGE" );
+	// FIXME: Remove
+	public static void disable() {}
+
+	// FIXME: Remove
+	public boolean echoEnabled() { return false; }
+
+
+
+
+
+	 
 
 	@Test.Decl( "Throws AssertionError for null message" )
 	@Test.Decl( "Throws AssertionError for empty message" )

@@ -8,9 +8,10 @@
 package sog.util;
 
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import sog.core.Assert;
 import sog.core.Strings;
@@ -22,72 +23,90 @@ import sog.core.Test;
  */
 public class FixedWidth {
 	
-	// Field functions pull args out of array, separator functions return string
-	private List<Function<Object[], String>> functions;
 	
-	// Left/Right justified fields, not separators
+	@FunctionalInterface
+	public interface Field {
+		
+		/** Return a string of the given width (length), based on a given string and padding character. */
+		public String format( String s, int width, char pad );
+		
+		public static Field LEFT = Strings::leftJustify;
+		
+		public static Field RIGHT = Strings::rightJustify;
+	}
+	
+
+	
+	/* Field functions act on arguments from the array, separator functions return a separator. */
+	private final List<Function<Object[], String>> formatters;
+	
+	/* The list of field names, used to build the header. */
+	private final List<String> fieldNames;
+	
+	/* The list of underlines, used to build header2. */
+	private final List<String> underlines;
+	
+	/* Formatted fields that depend on an array of objects, not separators. */
 	private int fieldCount;
 	
-	// Current total length
-	private int length;
+	/* Total width, in characters, of a formatted string. */
+	private int width;
 	
-	// Default separator currently in effect
-	private String defaultSeparator;
+	/* The field names as a formatted string. */
+	private String header;
 	
-	// Null representation currently in effect
-	private String nullRepresentation;
-	
-	private boolean previousIsField;
+	/* An optional second row, underlining the field names. */
+	private String header2;
 
+	
 	/**
 	 * Construct an empty {@code FixedWidth} formatter.
 	 */
 	@Test.Decl( "Empty formatter produces empty formatted string" )
 	public FixedWidth() {
-		super();
-		
-		this.functions = new LinkedList<>();
+		this.formatters = new ArrayList<>();
+		this.fieldNames = new ArrayList<>();
+		this.underlines = new ArrayList<>();
 		this.fieldCount = 0;
-		this.length = 0;
-		this.defaultSeparator = "";
-		this.nullRepresentation = "";
-		this.previousIsField = false;
+		this.width = 0;
+		this.header = null;
+		this.header2 = null;
 	}
 	
-	/**
-	 * Set the default field separator. This string is inserted between consecutive fields.
-	 * 
-	 * @param defaultFieldSeparator
-	 * @return
-	 */
-	@Test.Decl( "Can be emtpty" )
-	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Applied to remaining fields" )
-	@Test.Decl( "Previous fields unaffected" )
-	@Test.Decl( "If not specified, default is empty string" )
-	@Test.Decl( "Overrides default empty" )
-	public FixedWidth defaultFieldSeparator( String defaultFieldSeparator ) {
-		this.defaultSeparator = Assert.nonNull( defaultFieldSeparator );
-		return this;
-	}
 	
-	/**
-	 * Use the given string to represent {@code null} fields.
-	 * 
-	 * @param nullRepresentation
-	 * @return
-	 */
-	@Test.Decl( "Can be empty" )
-	@Test.Decl( "Throws assertion error for null" )
-	@Test.Decl( "Applied to remaining fields" )
-	@Test.Decl( "Previous fields unaffected" )
-	@Test.Decl( "If not specified, default is empty string" )
-	@Test.Decl( "Overrides default empty" )
-	public FixedWidth nullFields( String nullRepresentation ) {
-		this.nullRepresentation = Assert.nonNull( nullRepresentation );
+	public FixedWidth field( String name, int width, char pad, Field formatter ) {
+		final int index = this.fieldCount++;
+		this.formatters.add( args -> {
+			return formatter.format( Strings.toString( args[index] ), width, pad );
+		});
+		
+		this.fieldNames.add( formatter.format( name, width, ' ' ) );
+		this.underlines.add( formatter.format( "", width, '=' ) );
+		this.width += width;
+		this.header = null;
+		this.header2 = null;
+		
 		return this;
 	}
 
+	
+	@Test.Decl( "Can not be empty" )
+	@Test.Decl( "Throws assertion error for null separator" )
+	@Test.Decl( "Overrides default" )
+	@Test.Decl( "Does not affect subsequent separators" )
+	@Test.Decl( "Multiple separators allowed" )
+	@Test.Decl( "Appends if last" )
+	public FixedWidth sep( String separator ) {
+		this.formatters.add( args -> separator );
+
+		this.width += separator.length();
+		this.header = null;
+		this.header2 = null;
+		
+		return this;
+	}
+
+	
 	/**
 	 * Append a left-justified field with given positive width and padding character.
 	 * 
@@ -99,25 +118,8 @@ public class FixedWidth {
 	@Test.Decl( "Padding character is used" )
 	@Test.Decl( "Width is correct for short" )
 	@Test.Decl( "Truncated for long" )
-	public FixedWidth left( int width, char pad ) {
-		Assert.positive( width );
-		this.addField( width,  pad,  Strings::leftJustify );
-		return this;
-	}
-	
-	/**
-	 * Append a left-justified field with given positive width, padding character, and representation.
-	 * 
-	 * @param width
-	 * @return
-	 */
-	@Test.Decl( "Throws assertion error for null representation" )
-	@Test.Decl( "Representation overrides toString() for this field" )
-	@Test.Decl( "Other fields unaffected" )
-	public <T> FixedWidth left( int width, char pad, Function<T, String> representation ) {
-		Assert.positive( width );
-		this.addField( width,  pad,  Strings::leftJustify, Assert.nonNull( representation ) );
-		return this;
+	public FixedWidth left( String name, int width, char pad ) {
+		return this.field( name, width, pad, Field.LEFT );
 	}
 	
 	/**
@@ -131,57 +133,16 @@ public class FixedWidth {
 	@Test.Decl( "Padding character is used" )
 	@Test.Decl( "Width is correct for short" )
 	@Test.Decl( "Truncated for long" )
-	public FixedWidth right( int width, char pad ) {
-		Assert.positive( width );
-		this.addField( width,  pad,  Strings::rightJustify );
-		return this;
+	public FixedWidth right( String name, int width, char pad ) {
+		return this.field( name, width, pad, Field.RIGHT );
 	}
 
-	/**
-	 * Append a right-justified field with given positive width, padding character, and representation.
-	 * 
-	 * @param width
-	 * @return
-	 */
-	@Test.Decl( "Throws assertion error for null representation" )
-	@Test.Decl( "Representation overrides toString() for this field" )
-	@Test.Decl( "Other fields unaffected" )
-	public <T> FixedWidth right( int width, char pad, Function<T, String> representation ) {
-		Assert.positive( width );
-		this.addField( width,  pad,  Strings::rightJustify, Assert.nonNull( representation ) );
-		return this;
-	}
-	
-	/**
-	 * Append a field separator string. This overrides the default separator between this
-	 * field and the next. If there is no subsequent field the separator is appended to the
-	 * end of the formatted string.
-	 * 
-	 * @param separator
-	 * @return
-	 */
-	@Test.Decl( "Can be empty" )
-	@Test.Decl( "Throws assertion error for null separator" )
-	@Test.Decl( "Overrides default" )
-	@Test.Decl( "Does not affect subsequent separators" )
-	@Test.Decl( "Multiple separators allowed" )
-	@Test.Decl( "Appends if last" )
-	public FixedWidth sep( String separator ) {
-		this.addSep( Assert.nonNull( separator ) );
-		return this;
-	}
-	
-	/**
-	 * Returns the current length of a formatted string
-	 * 
-	 * @return
-	 */
 	@Test.Decl( "Includes fields" )
 	@Test.Decl( "Includes separators" )
 	@Test.Decl( "Increases when field appended" )
 	@Test.Decl( "Increses when separator appended" )
-	public int length() {
-		return this.length;
+	public int width() {
+		return this.width;
 	}
 	
 	/**
@@ -197,19 +158,25 @@ public class FixedWidth {
 	@Test.Decl( "Fields formatted in the order specified" )
 	@Test.Decl( "Fields are separated as specified" )
 	@Test.Decl( "Fields can be added after formatting" )
-	@Test.Decl( "Throws class cast exception for wron argument type" )
+	@Test.Decl( "Throws class cast exception for wrong argument type" )
 	public String format( Object ... fields ) {
 		if ( this.fieldCount != fields.length ) {
 			throw new IllegalArgumentException( "Wrong number of fields. Expected " + this.fieldCount + ", got " + fields.length );
 		}
 		
-		StringBuilder buf = new StringBuilder();
-		for ( Function<Object[], String> f : this.functions ) {
-			buf.append( f.apply( fields ) );
-		}
-		
-		return buf.toString();
+		return this.formatters.stream().map( f -> f.apply( fields ) ).collect( Collectors.joining() );
 	}
+	
+	
+	public String header() {
+		return null;
+	}
+	
+	
+	public String header2() {
+		return null;
+	}
+	
 	
 	/**
 	 * Return basic info about this formatter
@@ -218,42 +185,8 @@ public class FixedWidth {
 	@Test.Decl( "Includes length" )
 	@Override
 	public String toString() {
-		return "FixedWidth(" + this.fieldCount + " fields, length = " + this.length + ")";
+		return "FixedWidth(" + this.fieldCount + " fields, width = " + this.width + ")";
 	}
 
-	@FunctionalInterface
-	private static interface Justifier {
-		public String fmt( String s, int width, char pad );
-	}
-	
-	private void addSep( String sep ) {
-		this.functions.add( args -> sep );
-		this.length += sep.length();
-		this.previousIsField = false;
-	}
-	
-	private void addField( int width, char pad, Justifier justifier ) {
-		this.addField( width,  pad,  justifier, (x) -> x.toString() );
-	}
-	
-	private <T> void addField( int width, char pad, Justifier justifier, Function<T, String> rep ) {
-		if ( this.previousIsField ) {
-			String sep = this.defaultSeparator;
-			this.functions.add( (args) -> sep );
-			this.length += sep.length();
-		}
-		
-		int index = this.fieldCount++;
-		String nrep = this.nullRepresentation;
-		this.functions.add( args -> {
-			@SuppressWarnings("unchecked")
-			T val = (T) args[index];
-			String s = val == null ? nrep : rep.apply( val );
-			return justifier.fmt( s,  width,  pad );
-		});
-
-		this.length += width;
-		this.previousIsField = true;
-	}
 
 }
