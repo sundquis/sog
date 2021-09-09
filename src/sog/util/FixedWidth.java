@@ -43,9 +43,6 @@ public class FixedWidth {
 	/* The list of field names, used to build the header. */
 	private final List<String> fieldNames;
 	
-	/* The list of underlines, used to build header2. */
-	private final List<String> underlines;
-	
 	/* Formatted fields that depend on an array of objects, not separators. */
 	private int fieldCount;
 	
@@ -55,9 +52,6 @@ public class FixedWidth {
 	/* The field names as a formatted string. */
 	private String header;
 	
-	/* An optional second row, underlining the field names. */
-	private String header2;
-
 	
 	/**
 	 * Construct an empty {@code FixedWidth} formatter.
@@ -66,25 +60,19 @@ public class FixedWidth {
 	public FixedWidth() {
 		this.formatters = new ArrayList<>();
 		this.fieldNames = new ArrayList<>();
-		this.underlines = new ArrayList<>();
 		this.fieldCount = 0;
 		this.width = 0;
 		this.header = null;
-		this.header2 = null;
 	}
 	
 	
 	public FixedWidth field( String name, int width, char pad, Field formatter ) {
+		final int w = width > 0 ? width : name.length();
 		final int index = this.fieldCount++;
-		this.formatters.add( args -> {
-			return formatter.format( Strings.toString( args[index] ), width, pad );
-		});
-		
-		this.fieldNames.add( formatter.format( name, width, ' ' ) );
-		this.underlines.add( formatter.format( "", width, '=' ) );
-		this.width += width;
+		this.formatters.add( args -> formatter.format( Strings.toString( args[index] ), w, pad ) );
+		this.fieldNames.add( name );
+		this.width += w;
 		this.header = null;
-		this.header2 = null;
 		
 		return this;
 	}
@@ -97,11 +85,11 @@ public class FixedWidth {
 	@Test.Decl( "Multiple separators allowed" )
 	@Test.Decl( "Appends if last" )
 	public FixedWidth sep( String separator ) {
+		Assert.nonNull( separator );
+		
 		this.formatters.add( args -> separator );
-
 		this.width += separator.length();
 		this.header = null;
-		this.header2 = null;
 		
 		return this;
 	}
@@ -169,12 +157,11 @@ public class FixedWidth {
 	
 	
 	public String header() {
-		return null;
-	}
-	
-	
-	public String header2() {
-		return null;
+		if ( this.header == null ) {
+			this.header = this.format( this.fieldNames.toArray() );
+		}
+		
+		return this.header;
 	}
 	
 	
