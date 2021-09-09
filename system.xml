@@ -49,13 +49,13 @@
         <property name="source.dirs" value="/home/sundquis/book/sog/src" />
     </class>
 
-    <!-- Tracing properties -->
-    <class fullname="sog.core.Trace">
-        <property name="dir.name" value="trace" />
-        <property name="warn.limit" value="1000000" />
-        <property name="fail.limit" value="100000000" />
-        <property name="max.buffer.size" value="100" />
-    </class>
+    <!-- Properties for Trace -->
+	<class fullname="sog.core.Trace">
+		<property name="buffer.limit" value="100" />
+		<property name="line.limit" value="50000" />
+		<property name="file.limit" value="200" />
+		<property name="dir.name" value="trace" />
+	</class>
 
 	<!--  ByteFile properties on sizes -->
 	<class fullname="sog.core.ByteFile">

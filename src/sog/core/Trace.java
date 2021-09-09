@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import sog.core.App.OnShutdown;
@@ -47,6 +48,9 @@ import sog.util.Queue;
  * 
  * Static methods allow tracing to be disabled and enabled, and allow for the Trace facility to be
  * completely terminated.
+ * 
+ * FIXME: FixedWidth results is so much truncation and onformation loss; this should be replaced
+ * with a new CSV formatter.
  */
 @Test.Subject( "test." )
 public class Trace implements Runnable, OnShutdown {
@@ -69,11 +73,11 @@ public class Trace implements Runnable, OnShutdown {
 
 	/* Produces the fixed width formatted message. */
 	private static final FixedWidth FORMATTER = new FixedWidth()
-		.right( "SEQ NO", 6, '0' )
-		.left( "SOURCE", 10, ' ' )
-		.left( "THREAD", 10,  ' ' )
-		.left( "CLASS NAME", 25,  ' ' )
-		.left( "METHOD", 25,  ' ' )
+		.right( "SEQ NO", 6, '0' ).sep( " " )
+		.left( "SOURCE", 10, ' ' ).sep( " " )
+		.left( "THREAD", 20,  ' ' ).sep( " " )
+		.left( "CLASS NAME", 25,  ' ' ).sep( " " )
+		.left( "METHOD", 20,  ' ' ).sep( " " )
 		.left( "MESSAGE", 50,  ' ' );
 	
 	/* Global counter for all messages. */
@@ -89,6 +93,7 @@ public class Trace implements Runnable, OnShutdown {
 	@Test.Decl( "Trace message includes details on the calling thread" )
 	@Test.Decl( "Trace message includes details on the calling class" )
 	@Test.Decl( "Trace message includes details on the calling method" )
+	@Test.Decl( "Multi-thread stress test" )
 	public static void write( Object source, String message, PrintWriter out ) {
 		if ( !Trace.enabled ) {
 			return;
@@ -149,7 +154,10 @@ public class Trace implements Runnable, OnShutdown {
 	/* Client write( message ) calls add messages to the queue. Trace worker thread processes them. */
 	private final Queue<String> entries;
 	
-	/* Only accessed by the Trace worker; a buffer between queued messages and file write. */
+	
+	// All remaining state is only accessed by the Trace worker thread.
+	
+	/* A buffer between queued messages and file write. */
 	private final List<String> buffer;
 	
 	/* Number of messages written to the current trace file. */
@@ -177,7 +185,10 @@ public class Trace implements Runnable, OnShutdown {
 	
 	
 	@Override
+	@Test.Decl( "Pending messages are written to the trace file" )
+	@Test.Decl( "After termination, messages are ignored" )
 	public void terminate() {
+		Trace.write( "Trace", "Terminating: " + new Date() );
 		this.entries.close();
 		try {
 			this.worker.join( 2000L );
@@ -186,6 +197,8 @@ public class Trace implements Runnable, OnShutdown {
 	
 	
 	@Override
+	@Test.Decl( "Throws AppException when called from an external thread" )
+	@Test.Decl( "Inserts header for new files" )
 	public void run() {
 		if ( Thread.currentThread() != this.worker ) {
 			throw new AppException( "Cannot start externally." );
@@ -207,10 +220,8 @@ public class Trace implements Runnable, OnShutdown {
 	
 	
 	private void emptyBuffer() {
-		String filename = new FixedWidth()
-			.left( App.get().startDateTime(), 0, ' ' )
-			.right( "" + this.fileCount, 4, '0' )
-			.header();
+		String filename = 
+			App.get().startDateTime() + "#" + Strings.rightJustify( "" + this.fileCount, 4, '0' );
 		
 		Path traceFile = new LocalDir( true )
 			.sub( Trace.TRACE_DIR_NAME )
@@ -236,14 +247,6 @@ public class Trace implements Runnable, OnShutdown {
 		
 	}
 	
-
-	@Override
-	@Test.Decl( "Indicates topic when enabled" )
-	@Test.Decl( "Indicates state when enabled" )
-	@Test.Decl( "Identifies state when disabled" )
-	public String toString() {
-		return "Trace(" + Trace.seqNo + " messages, " + (Trace.isEnabled() ? "ENABLED" : "DISABLED") + ")";
-	}
 	
 	
 }
