@@ -19,8 +19,13 @@
 
 package test.sog.core;
 
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Trace;
+import sog.util.StringOutputStream;
 
 /**
  * 
@@ -31,6 +36,27 @@ public class TraceTest extends Test.Container {
 	public TraceTest() {
 		super( Trace.class );
 	}
+
+	
+	private StringOutputStream sos;
+	private PrintWriter out;
+	
+	@Override
+	public Procedure beforeEach() {
+		return () -> {
+			this.sos = new StringOutputStream();
+			this.out = new PrintWriter( this.sos, true );
+		};
+	}
+	
+	@Override
+	public Procedure afterEach() {
+		return () -> {
+			this.sos = null;
+			this.out = null;
+		};
+	}
+
 	
 	
 	
@@ -60,24 +86,32 @@ public class TraceTest extends Test.Container {
 		description = "After enable(false) messages are ignored" 
 	)
 	public void tm_0E392F861( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+		Trace.enable( true );
+		Trace.write( "Test", "BEFORE", this.out );
+		Trace.enable( false );
+		Trace.write( "Test", "AFTER", this.out );
+		tc.assertFalse( this.sos.toString().contains( "AFTER" ) );
 	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.enable(boolean)", 
-			description = "After enable(true) message are logged in the trace file" 
-		)
-		public void tm_0EF1563EE( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void Trace.enable(boolean)", 
+		description = "After enable(true) message are logged in the trace file" 
+	)
+	public void tm_0EF1563EE( Test.Case tc ) {
+		Trace.enable( true );
+		Trace.write( "Test", "BEFORE", this.out );
+		Trace.enable( false );
+		Trace.write( "Test", "AFTER", this.out );
+		tc.assertTrue( this.sos.toString().contains( "BEFORE" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.enable(boolean)", 
-			description = "Does not affect pending messages" 
-		)
-		public void tm_0E6B239C2( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: void Trace.enable(boolean)", 
+		description = "Does not affect pending messages" 
+	)
+	public void tm_0E6B239C2( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" );
+	}
 		
 		@Test.Impl( 
 			member = "method: void Trace.enable(boolean)", 

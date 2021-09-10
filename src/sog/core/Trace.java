@@ -175,6 +175,7 @@ public class Trace implements Runnable, OnShutdown {
 		
 		this.entries = new MultiQueue<String>( new FifoQueue<String>() );
 		this.buffer = new ArrayList<String>();
+		this.buffer.add(  Trace.FORMATTER.header() );
 		this.lineCount = 0;
 		this.fileCount = 0;
 		
@@ -206,9 +207,6 @@ public class Trace implements Runnable, OnShutdown {
 
 		String msg = null;
 		while ( (msg = this.entries.get()) != null ) {
-			if ( this.lineCount == 0 ) {
-				this.buffer.add( Trace.FORMATTER.header() );
-			}
 			this.buffer.add( msg );
 			if ( this.buffer.size() > Trace.BUFFER_LIMIT ) {
 				this.emptyBuffer();
@@ -239,6 +237,7 @@ public class Trace implements Runnable, OnShutdown {
 		if ( this.lineCount > Trace.LINE_LIMIT ) {
 			this.lineCount = 0;
 			this.fileCount++;
+			this.buffer.add( Trace.FORMATTER.header() );
 		}
 		
 		if ( this.fileCount > Trace.FILE_LIMIT ) {

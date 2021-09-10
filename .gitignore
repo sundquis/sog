@@ -4,6 +4,7 @@
 /tmp
 /test
 /html
+/trace
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
