@@ -74,8 +74,8 @@ public class Trace implements Runnable, OnShutdown {
 	/* Produces the fixed width formatted message. */
 	private static final FixedWidth FORMATTER = new FixedWidth()
 		.right( "SEQ NO", 6, '0' ).sep( " " )
-		.left( "SOURCE", 10, ' ' ).sep( " " )
-		.left( "THREAD", 20,  ' ' ).sep( " " )
+		.left( "SOURCE", 30, ' ' ).sep( " " )
+		.left( "THREAD", 30,  ' ' ).sep( " " )
 		.left( "CLASS NAME", 25,  ' ' ).sep( " " )
 		.left( "METHOD", 20,  ' ' ).sep( " " )
 		.left( "MESSAGE", 50,  ' ' );
@@ -95,6 +95,9 @@ public class Trace implements Runnable, OnShutdown {
 	@Test.Decl( "Trace message includes details on the calling method" )
 	@Test.Decl( "Multi-thread stress test" )
 	public static void write( Object source, String message, PrintWriter out ) {
+		Assert.nonEmpty( message );
+		Assert.nonNull( source );
+		
 		if ( !Trace.enabled ) {
 			return;
 		}
@@ -108,6 +111,7 @@ public class Trace implements Runnable, OnShutdown {
 			ste.getMethodName(),
 			message
 		);
+		
 		Trace.INSTANCE.entries.put( entry );
 		if ( out != null ) {
 			out.println( entry );
@@ -130,10 +134,8 @@ public class Trace implements Runnable, OnShutdown {
 	
 	private static volatile boolean enabled = true;
 	
-	@Test.Decl( "After enable(true) message are logged in the trace file" )
+	@Test.Decl( "After enable(true) message are enqueued for logging" )
 	@Test.Decl( "After enable(false) messages are ignored" )
-	@Test.Decl( "Is idempotent" )
-	@Test.Decl( "Does not affect pending messages" )
 	public static void enable( boolean enable ) {
 		Trace.enabled = enable;
 	}
@@ -199,7 +201,6 @@ public class Trace implements Runnable, OnShutdown {
 	
 	@Override
 	@Test.Decl( "Throws AppException when called from an external thread" )
-	@Test.Decl( "Inserts header for new files" )
 	public void run() {
 		if ( Thread.currentThread() != this.worker ) {
 			throw new AppException( "Cannot start externally." );
