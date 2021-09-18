@@ -94,28 +94,17 @@ public class Trace implements Runnable, OnShutdown {
 	@Test.Decl( "Trace message includes details on the calling class" )
 	@Test.Decl( "Trace message includes details on the calling method" )
 	@Test.Decl( "Multi-thread stress test" )
-	public static void write( Object source, String message, PrintWriter out ) {
-		Assert.nonEmpty( message );
-		Assert.nonNull( source );
+	@Test.Decl( "Return is non-empty when enabled" )
+	@Test.Decl( "Return is non-empty when disabled" )
+	public static String write( Object source, String message, PrintWriter out ) {
+		String entry = Trace.getEntry( source, message ); 
 		
-		if ( !Trace.enabled ) {
-			return;
+		if ( Trace.enabled ) {
+			Trace.INSTANCE.entries.put( entry );
+			Assert.nonNull( out ).println( entry );
 		}
 		
-		StackTraceElement ste = (new Exception()).getStackTrace()[1];
-		String entry = Trace.FORMATTER.format( 
-			Trace.seqNo++,
-			source,
-			Thread.currentThread(),
-			ste.getClassName(),
-			ste.getMethodName(),
-			message
-		);
-		
-		Trace.INSTANCE.entries.put( entry );
-		if ( out != null ) {
-			out.println( entry );
-		}
+		return entry;
 	}
 	
 	@Test.Decl( "Throws AssertionError for null source" )
@@ -126,8 +115,28 @@ public class Trace implements Runnable, OnShutdown {
 	@Test.Decl( "Trace message includes details on the calling thread" )
 	@Test.Decl( "Trace message includes details on the calling class" )
 	@Test.Decl( "Trace message includes details on the calling method" )
-	public static void write( Object source, String message ) {
-		Trace.write( source, message, null );
+	@Test.Decl( "Return is non-empty when enabled" )
+	@Test.Decl( "Return is non-empty when disabled" )
+	public static String write( Object source, String message ) {
+		String entry = Trace.getEntry( source, message ); 
+		
+		if ( Trace.enabled ) {
+			Trace.INSTANCE.entries.put( entry );
+		}
+		
+		return entry;
+	}
+	
+	private static String getEntry( Object source, String message ) {
+		StackTraceElement ste = (new Exception()).getStackTrace()[2];
+		return Trace.FORMATTER.format( 
+			Trace.seqNo++,
+			Assert.nonNull( source ),
+			Thread.currentThread(),
+			ste.getClassName(),
+			ste.getMethodName(),
+			Assert.nonEmpty( message )
+		);
 	}
 
 	

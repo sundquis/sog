@@ -1126,13 +1126,37 @@ public class AppTest extends Test.Container{
 		App.get().classesUnderDir( App.get().sourceDir( App.class ), null );
 	}
 
+	@Test.Impl( 
+		member = "method: String App.startDateTime()", 
+		description = "Return indicates the date that the application started" 
+	)
+	public void tm_02602333B( Test.Case tc ) {
+		tc.addMessage( "Manually verified" ).assertPass();
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.startDateTime()", 
+		description = "Return indicates the time that the application started" 
+	)
+	public void tm_00BA62C3C( Test.Case tc ) {
+		tc.addMessage( "Manually verified" ).assertPass();
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.startDateTime()", 
+		description = "Return is non-empty" 
+	)
+	public void tm_076A7FC18( Test.Case tc ) {
+		tc.assertNotEmpty( App.get().startDateTime() );
+	}
+
 	
 	
 
 	public static void main( String[] args ) {
 		//Test.eval( App.class );
-		//Test.evalPackage( App.class );
-		Test.evalDir( App.class, "sog", "core" );
+		Test.evalPackage( App.class );
+		//Test.evalDir( App.class, "sog", "core" );
 	}
 }
 

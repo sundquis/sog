@@ -171,7 +171,7 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Message is written to file before application exits" 
 	)
 	public void tm_033B9403F( Test.Case tc ) {
@@ -179,7 +179,7 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Throws AssertionError for empty message" 
 	)
 	public void tm_0EFE80A0C( Test.Case tc ) {
@@ -188,7 +188,7 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Throws AssertionError for null source" 
 	)
 	public void tm_07023E5EC( Test.Case tc ) {
@@ -197,47 +197,70 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Trace message includes details on the calling class" 
 	)
 	public void tm_01D86EC21( Test.Case tc ) {
-		tc.addMessage( "Manually verified." ).assertPass();
+		String s = this.getClass().getName();
+		tc.assertTrue( Trace.write( this, "hi" ).contains( s ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Trace message includes details on the calling method" 
 	)
 	public void tm_04FA6EAAE( Test.Case tc ) {
-		tc.addMessage( "Manually verified." ).assertPass();
+		String s = "tm_04FA6EAAE";
+		tc.assertTrue( Trace.write( this, "hi" ).contains( s ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Trace message includes details on the calling thread" 
 	)
 	public void tm_0C1E78197( Test.Case tc ) {
-		tc.addMessage( "Manually verified." ).assertPass();
+		String s = Thread.currentThread().toString();
+		tc.assertTrue( Trace.write( this, "hi" ).contains( s ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Trace message includes details on the source object" 
 	)
 	public void tm_04995C5E9( Test.Case tc ) {
-		tc.addMessage( "Manually verified." ).assertPass();
+		String s = this.toString();
+		tc.assertTrue( Trace.write( this, "hi" ).contains( s ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String)", 
+		member = "method: String Trace.write(Object, String)", 
 		description = "Trace message includes the given message" 
 	)
 	public void tm_014A86C54( Test.Case tc ) {
-		tc.addMessage( "Manually verified." ).assertPass();
+		String s = "Some random message... 42";
+		tc.assertTrue( Trace.write( this, s ).contains( s ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String, PrintWriter)", 
+		member = "method: String Trace.write(Object, String)", 
+		description = "Return is non-empty when disabled" 
+	)
+	public void tm_01374793C( Test.Case tc ) {
+		Trace.enable( false );
+		tc.assertNotEmpty( Trace.write( this, "hi" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String)", 
+		description = "Return is non-empty when enabled" 
+	)
+	public void tm_049721D97( Test.Case tc ) {
+		Trace.enable( true );
+		tc.assertNotEmpty( Trace.write( this, "hi" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
 		description = "Message is echoed to the given PrintWriter immediately" 
 	)
 	public void tm_066FF07D2( Test.Case tc ) {
@@ -246,7 +269,7 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String, PrintWriter)", 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
 		description = "Message is written to file before application exits" 
 	)
 	public void tm_0A3B3B4D3( Test.Case tc ) {
@@ -254,7 +277,7 @@ public class TraceTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void Trace.write(Object, String, PrintWriter)", 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
 		description = "Multi-thread stress test" 
 	)
 	public void tm_0F59A5A68( Test.Case tc ) throws InterruptedException {
@@ -265,75 +288,100 @@ public class TraceTest extends Test.Container {
 		tc.assertPass();
 	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Throws AssertionError for empty message" 
-		)
-		public void tm_0891DBCA0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Throws AssertionError for empty message" 
+	)
+	public void tm_0891DBCA0( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Trace.write( this, "", this.out );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Throws AssertionError for null PrintWriter" 
-		)
-		public void tm_0329A0071( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Throws AssertionError for null PrintWriter" 
+	)
+	public void tm_0329A0071( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Trace.write( this, "hi", null );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Throws AssertionError for null source" 
-		)
-		public void tm_0FE8D2D80( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Throws AssertionError for null source" 
+	)
+	public void tm_0FE8D2D80( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Trace.write( null, "hi", this.out );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Trace message includes details on the calling class" 
-		)
-		public void tm_08D8160B5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Trace message includes details on the calling class" 
+	)
+	public void tm_08D8160B5( Test.Case tc ) {
+		String s = this.getSubjectClass().getName();
+		tc.assertTrue( Trace.write( this, "hi", this.out ).contains( s ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Trace message includes details on the calling method" 
-		)
-		public void tm_0DEFB089A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Trace message includes details on the calling method" 
+	)
+	public void tm_0DEFB089A( Test.Case tc ) {
+		String s = "tm_0DEFB089A";
+		tc.assertTrue( Trace.write( this, "hi", this.out ).contains( s ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Trace message includes details on the calling thread" 
-		)
-		public void tm_0513B9F83( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Trace message includes details on the calling thread" 
+	)
+	public void tm_0513B9F83( Test.Case tc ) {
+		String s = Thread.currentThread().toString();
+		tc.assertTrue( Trace.write( this, "hi", this.out ).contains( s ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Trace message includes details on the source object" 
-		)
-		public void tm_0B9903A7D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Trace message includes details on the source object" 
+	)
+	public void tm_0B9903A7D( Test.Case tc ) {
+		String s = this.toString();
+		tc.assertTrue( Trace.write( this, "hi", this.out ).contains( s ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: void Trace.write(Object, String, PrintWriter)", 
-			description = "Trace message includes the given message" 
-		)
-		public void tm_0A2290C40( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Trace message includes the given message" 
+	)
+	public void tm_0A2290C40( Test.Case tc ) {
+		String s = "Some bogus and random message";
+		tc.assertTrue( Trace.write( this, s, this.out ).contains( s ) );
+	}
 	
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Return is non-empty when disabled" 
+	)
+	public void tm_04EE87C36( Test.Case tc ) {
+		Trace.enable( false );
+		tc.assertNonNull( Trace.write( this, "hi", this.out ) );
+	}
+			
+	@Test.Impl( 
+		member = "method: String Trace.write(Object, String, PrintWriter)", 
+		description = "Return is non-empty when enabled" 
+	)
+	public void tm_02A54D35D( Test.Case tc ) {
+		Trace.enable( true );
+		tc.assertNonNull( Trace.write( this, "hi", this.out ) );
+	}
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Trace.class );
-		//Test.evalPackage( Trace.class );
+		//Test.eval( Trace.class );
+		Test.evalPackage( Trace.class );
 	}
 }

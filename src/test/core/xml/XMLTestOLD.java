@@ -15,9 +15,9 @@ import sog.core.xml.XML;
  * @author sundquis
  *
  */
-public class XMLTest extends Test.Container {
+public class XMLTestOLD extends Test.Container {
 	
-	public XMLTest() {
+	public XMLTestOLD() {
 		super( XML.class );
 	}
 	
