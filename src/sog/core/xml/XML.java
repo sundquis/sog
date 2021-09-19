@@ -53,7 +53,9 @@ public class XML {
 	}
 	
 	@Test.Decl( "Not empty" )
-	@Test.Decl( "starts correct" )
+	@Test.Decl( "Starts correct" )
+	@Test.Decl( "Specifies version" )
+	@Test.Decl( "Specifies encoding" )
 	public String getDeclaration() {
 		return this.declaration;
 	}

@@ -37,29 +37,44 @@ public class XMLTest extends Test.Container {
 	// TEST CASES
 	
 	@Test.Impl( 
-			member = "method: String XML.getDeclaration()", 
-			description = "Not empty" 
-		)
-		public void tm_033B21BF6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+		member = "method: String XML.getDeclaration()", 
+		description = "Not empty" 
+	)
+	public void tm_033B21BF6( Test.Case tc ) {
+		tc.assertNotEmpty( XML.get().getDeclaration() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String XML.getDeclaration()", 
-			description = "starts correct" 
-		)
-		public void tm_0640FE05B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String XML.getDeclaration()", 
+		description = "Starts correct" 
+	)
+	public void tm_0640FE05B( Test.Case tc ) {
+		tc.assertTrue( XML.get().getDeclaration().toLowerCase().startsWith( "<?xml" ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: XML XML.get()", 
-			description = "Is not null" 
-		)
-		public void tm_038ADA1AC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: XML XML.get()", 
+		description = "Is not null" 
+	)
+	public void tm_038ADA1AC( Test.Case tc ) {
+		tc.assertNonNull( XML.get() );
+	}
 	
+	@Test.Impl( 
+		member = "method: String XML.getDeclaration()", 
+		description = "Specifies encoding" 
+	)
+	public void tm_0F49CDAB4( Test.Case tc ) {
+		tc.assertTrue( XML.get().getDeclaration().toLowerCase().contains( "encoding" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: String XML.getDeclaration()", 
+		description = "Specifies version" 
+	)
+	public void tm_0D5FDCCED( Test.Case tc ) {
+		tc.assertTrue( XML.get().getDeclaration().toLowerCase().contains( "version" ) );
+	}
 	
 	
 

@@ -35,7 +35,7 @@ import sog.util.StreamReader;
  * @author sundquis
  *
  */
-public class XMLHandlerTest extends Test.Container {
+public class XMLHandlerTestOLD extends Test.Container {
 
 	// Override event handler of interest, using accept() to assign the result
 	private static abstract class Adapter<T> extends XMLHandler implements Supplier<T>, Consumer<T> {
@@ -97,7 +97,7 @@ public class XMLHandlerTest extends Test.Container {
 		
 	}
 	
-	public XMLHandlerTest() {
+	public XMLHandlerTestOLD() {
 		super( XMLHandler.class );
 	}
 
