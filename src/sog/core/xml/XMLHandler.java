@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,8 +48,13 @@ import sog.core.Fatal;
 import sog.core.Test;
 
 /**
- * @author sundquis
- *
+ * Provides default no-op implementations of the SAX xml parsing call-backs, and minimizes
+ * application contact with the SAX api.
+ * 
+ * Applications define a handler by extending XMLHandler and overriding the call-backs of interest.
+ * Overloaded constructors allow specification of the xml source. The parse() method configures
+ * a SAX xml reader and calls it's parse method on the xml source, which in turn fire call-backs
+ * as parsing events occur. 
  */
 @Test.Subject( "test." )
 public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, LexicalHandler {
@@ -61,7 +67,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param source
 	 */
-	@Test.Decl( "Throws assertion error for null source" )
+	@Test.Decl( "Throws AssertionError for null source" )
 	public XMLHandler( InputSource source ) {
 		this.source = Assert.nonNull( source );
 	}
@@ -71,7 +77,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@Test.Decl( "Throws assertion error for null reader" )
+	@Test.Decl( "Throws AssertionError for null reader" )
 	public XMLHandler( Reader reader ) {
 		this( new InputSource( Assert.nonNull( reader ) ) );
 	}
@@ -81,7 +87,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@Test.Decl( "Throws assertion error for null stream" )
+	@Test.Decl( "Throws AssertionError for null stream" )
 	public XMLHandler( InputStream stream ) {
 		this( new InputSource( Assert.nonNull( stream ) ) );
 	}
@@ -91,7 +97,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * 
 	 * @param reader
 	 */
-	@Test.Decl( "Throws assertion error for null path" )
+	@Test.Decl( "Throws AssertionError for null path" )
 	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
@@ -103,6 +109,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * Parse the document provided by the ({@code InputSource}
 	 * This {@code XMLHandler} will receive parsing events
 	 */
+	@Test.Decl( "Throws AppException when IOException encountered reading xml" )
 	public void parse() {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -123,7 +130,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 			Fatal.error( "Failed to configure parser", e );
 		} catch ( IOException e ) { // parse
 			Fatal.error( "Error while parsing source", e );
-			e.printStackTrace();
 		}
 	}
 
@@ -141,18 +147,53 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		return new Location();
 	}
 
+	/**
+	 * SAX sets the Locator while parsing. This class creates a snapshot of the current 
+	 * location information, if known.
+	 */
 	public class Location {
 		
 		private final int line;
 		private final int col;
+		private final String puplicId;
+		private final String systemId;
 		
 		private Location() {
-			this.line = XMLHandler.this.locator == null ? -1 : XMLHandler.this.locator.getLineNumber();
-			this.col = XMLHandler.this.locator == null ? -1 : XMLHandler.this.locator.getColumnNumber();
+			if ( XMLHandler.this.locator == null ) {
+				this.line = -1;
+				this.col = -1;
+				this.puplicId = "unknown";
+				this.systemId = "unknown";
+			} else {
+				this.line = XMLHandler.this.locator.getLineNumber();
+				this.col = XMLHandler.this.locator.getColumnNumber();
+				this.puplicId = XMLHandler.this.locator.getPublicId();
+				this.systemId = XMLHandler.this.locator.getSystemId();
+			}
 		}
 		
+		@Test.Decl( "Greater or equal to zero while parsing" )
+		@Test.Decl( "Return is -1 when unknown" )
 		public int getLineNumber() { return this.line; }
+		
+		@Test.Decl( "Greater or equal to zero while parsing" )
+		@Test.Decl( "Return is -1 when unknown" )
 		public int getColumnNumber() { return this.col; }
+		
+		@Test.Decl( "Is not empty" )
+		@Test.Decl( "Return is ??? while parsing" )
+		public String getPublicId() {
+			return this.puplicId;
+		}
+		
+		@Test.Decl( "Is not empty" )
+		@Test.Decl( "Return is ??? while parsing" )
+		public String getSystemId() {
+			return this.systemId;
+		}
+
+		@Test.Decl( "Not empty" )
+		@Test.Decl( "Indicates row and column while parsing" )
 		@Override public String toString() { return "(" + this.line + ", " + this.col + ")"; }
 	}
 
@@ -194,6 +235,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Test.Skip( "FIXME: Investigate prefix mapping" )
 	public void startPrefixMapping( String prefix, String uri ) throws SAXException {
 	}
 
@@ -202,6 +244,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
 	 */
 	@Override
+	@Test.Skip( "FIXME: Investigate prefix mapping" )
 	public void endPrefixMapping( String prefix ) throws SAXException {
 	}
 
@@ -215,7 +258,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Result is not null" )
 	@Test.Decl( "Empty map returned when no attributes" )
 	public static Map<String, String> attributesToMap( Attributes atts ) {
-		Map<String, String> result = atts.getLength() > 0 ? new TreeMap<>() : XMLHandler.EMPTY_MAP;
+		Map<String, String> result = atts.getLength() > 0 ? new TreeMap<>() : Collections.emptyMap();
 		
 		for ( int i = 0; i < atts.getLength(); i++ ) {
 			result.put( atts.getQName(i),  atts.getValue(i) );
@@ -224,14 +267,14 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		return result;
 	}
 	
-	private static Map<String, String> EMPTY_MAP = new TreeMap<>();
-
 	/* (non-Javadoc)
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
 	@Override
 	@Test.Decl( "Parser signals start of element processing" )
-	@Test.Decl( "qName is not null" )
+	@Test.Decl( "uri is not empty" )
+	@Test.Decl( "localName is not empty" )
+	@Test.Decl( "qName is not empty" )
 	@Test.Decl( "Attributes is not null" )
 	public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
 		this.startElement( qName,  attributesToMap( atts ) );
@@ -253,7 +296,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Value correct for required attribute" )
 	@Test.Decl( "Value correct for implied attribute" )
 	@Test.Decl( "Value correct for fixed attribute" )
-	@Test.Decl( "Value correct for enumerated" )
+	@Test.Decl( "Value correct for enumerated attribute" )
 	public void startElement( String name, Map<String, String> attributes ) {
 	}
 
@@ -262,6 +305,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Test.Decl( "uri is not empty" )
+	@Test.Decl( "localName is not empty" )
 	@Test.Decl( "qName is not empty" )
 	public void endElement( String uri, String localName, String qName ) throws SAXException {
 		this.endElement( qName );
@@ -291,6 +336,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Override
 	@Test.Decl( "Parser uses to signal content" )
 	@Test.Decl( "Location is identified" )
+	@Test.Decl( "All content registered before endElement" )
 	public void characters( char[] ch, int start, int length ) throws SAXException {
 	}
 
@@ -319,6 +365,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
 	 */
 	@Override
+	@Test.Skip( "FIXME: Investigate" )
 	public void skippedEntity( String name ) throws SAXException {
 	}
 
@@ -327,6 +374,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
 	 */
 	@Override
+	@Test.Skip( "Unable to trigger..." )
 	public void warning( SAXParseException exception ) throws SAXException {
 	}
 
@@ -397,6 +445,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.DeclHandler#externalEntityDecl(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Test.Skip( "FIXME: Investigate" )
 	public void externalEntityDecl( String name, String publicId, String systemId ) throws SAXException {
 	}
 
