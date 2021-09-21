@@ -496,7 +496,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startCDATA()
 	 */
 	@Override
-	@Test.Decl( "Parser signals start of CDATA" )
+	@Test.Decl( "Parser signals start of CDATA before characters" )
 	@Test.Decl( "Location is identified" )
 	public void startCDATA() throws SAXException {
 	}
@@ -507,6 +507,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Override
 	@Test.Decl( "Called after startCDATA()" )
+	@Test.Decl( "Parser signals end of CDATA after characters" )
 	@Test.Decl( "Location is identified" )
 	public void endCDATA() throws SAXException {
 	}
