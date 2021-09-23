@@ -24,12 +24,16 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
 import sog.core.AppException;
+import sog.core.Strings;
 import sog.core.Test;
 import sog.core.xml.XMLHandler;
 import sog.util.Commented;
@@ -69,9 +73,22 @@ public class XMLHandlerTest extends Test.Container {
 			super( Adapter.getReader( label ) );
 		}
 		
-		@Override public void accept( T result ) { this.result = result; }
+		@Override 
+		public void accept( T result ) { this.result = result; }
 		
-		@Override public T get() { return this.result; }
+		@Override 
+		public T get() { this.parse(); return this.result; }
+
+		// details are assumed to be in pairs, (label, value)
+		public void out( boolean show, Object... details ) {
+			if ( !show ) return;
+			
+			System.err.println();
+			System.err.println( ">>> " + this.getLocation() );
+			for ( int i = 0; i < details.length; ) {
+				System.err.println( "\t" + Strings.toString( details[i++] ) + " = " + Strings.toString( details[i++] ) );
+			}
+		}
 		
 	}
 	
@@ -130,103 +147,132 @@ public class XMLHandlerTest extends Test.Container {
 		new XMLHandler( reader );
 	}
 	
+	
 	// ATTRS	<?xml version="1.0" encoding="UTF-8"?>
 	// ATTRS	<!DOCTYPE root [
 	// ATTRS		<!ELEMENT	root	(child*)>
 	// ATTRS		<!ATTLIST	root
 	// ATTRS			name	CDATA	#REQUIRED
+	// ATTRS			age		CDATA	#IMPLIED
+	// ATTRS			id		CDATA	#FIXED		"42"
+	// ATTRS			father	(newton|leibniz)	"leibniz"
 	// ATTRS		>
 	// ATTRS		<!ELEMENT	child	EMPTY>
 	// ATTRS	]>
 	// ATTRS	
+	// ATTRS	<root name="My name" age="59" father="newton">
+	// ATTRS		<child/>
+	// ATTRS	</root>
 		
-		@Test.Impl( 
-			member = "method: Map XMLHandler.attributesToMap(Attributes)", 
-			description = "Empty map returned when no attributes" 
-		)
-		public void tm_01F066856( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Map XMLHandler.attributesToMap(Attributes)", 
+		description = "Empty map returned when no attributes" 
+	)
+	public void tm_01F066856( Test.Case tc ) {
+		tc.assertTrue( 
+			new Adapter<Map<String, String>>( "ATTRS" ) {
+				@Override public void startElement( String uri, String localName, String qName, Attributes atts ) {
+					this.out( false, "uri", uri, "localName", localName, "qName", qName, "atts", atts );
+					if ( qName.equals( "child" ) ) { this.accept( XMLHandler.attributesToMap( atts ) ); }
+				}
+			}.get().isEmpty()
+		);
+	}
 		
-		@Test.Impl( 
-			member = "method: Map XMLHandler.attributesToMap(Attributes)", 
-			description = "Result is not null" 
-		)
-		public void tm_09F68DA71( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Map XMLHandler.attributesToMap(Attributes)", 
+		description = "Result is not null" 
+	)
+	public void tm_09F68DA71( Test.Case tc ) {
+		tc.assertNonNull(
+			new Adapter<Map<String, String>>( "ATTRS" ){
+				@Override public void startElement( String uri, String localName, String qName, Attributes atts ) {
+					if (qName.equals( "root" ) ) { this.accept( XMLHandler.attributesToMap( atts ) ); }
+				}
+			}.get()
+		);
+	}
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.getPublicId()", 
-			description = "Is not empty" 
-		)
-		public void tm_0F3D79C23( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Map XMLHandler.attributesToMap(Attributes)", 
+		description = "All keys are present" 
+	)
+	public void tm_0CEFD09EC( Test.Case tc ) {
+		tc.assertNonNull(
+			new Adapter<Map<String, String>>( "ATTRS" ){
+				@Override public void startElement( String uri, String localName, String qName, Attributes atts ) {
+					if (qName.equals( "root" ) ) { this.accept( XMLHandler.attributesToMap( atts ) ); }
+				}
+			}.get().keySet().containsAll( Set.of( "name", "age", "id", "father" ) )
+		);
+	}
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.getPublicId()", 
-			description = "Return is ??? while parsing" 
-		)
-		public void tm_043558097( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: Map XMLHandler.attributesToMap(Attributes)", 
+		description = "Values are correct" 
+	)
+	public void tm_056FCB76A( Test.Case tc ) {
+		tc.assertEqual( 
+			new Adapter<Map<String, String>>( "ATTRS" ){
+				@Override public void startElement( String uri, String localName, String qName, Attributes atts ) {
+					if (qName.equals( "root" ) ) { this.accept( XMLHandler.attributesToMap( atts ) ); }
+				}
+			}.get(), Map.of( "name", "My name", "age", "59", "id", "42", "father", "newton" )
+		);
+	}
+	
+	
+	// LOCATION	<root>
+	// LOCATION	</root>
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.getSystemId()", 
-			description = "Is not empty" 
-		)
-		public void tm_066E4941D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String XMLHandler.Location.toString()", 
+		description = "Indicates row and column while parsing" 
+	)
+	public void tm_03405A7FD( Test.Case tc ) {
+		tc.assertEqual( "(2, 8)", new Adapter<String>( "LOCATION" ) {
+			@Override public void endElement( String name ) { this.accept( this.getLocation().toString() ); }
+		}.get() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.getSystemId()", 
-			description = "Return is ??? while parsing" 
-		)
-		public void tm_0DC4E555D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String XMLHandler.Location.toString()", 
+		description = "Not empty" 
+	)
+	public void tm_0B48C6125( Test.Case tc ) {
+		tc.assertNotEmpty(  new Adapter<String>( "LOCATION" ) {
+			@Override public void endElement( String name ) { this.accept( this.getLocation().toString() ); }
+		}.get() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.toString()", 
-			description = "Indicates row and column while parsing" 
-		)
-		public void tm_03405A7FD( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: XMLHandler.Location XMLHandler.getLocation()", 
+		description = "Is not null" 
+	)
+	public void tm_0132A429A( Test.Case tc ) {
+		tc.assertNonNull( new Adapter<XMLHandler.Location>( "LOCATION" ) {
+			@Override public void endElement( String name ) { this.accept( this.getLocation() ); }
+		}.get() );
+	}
 		
-		@Test.Impl( 
-			member = "method: String XMLHandler.Location.toString()", 
-			description = "Not empty" 
-		)
-		public void tm_0B48C6125( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: XMLHandler.Location XMLHandler.getLocation()", 
+		description = "Location is unknown after parsing" 
+	)
+	public void tm_0E72E765B( Test.Case tc ) {
+		Adapter<String> a = new Adapter<>( "LOCATION" );
+		a.parse();
+		tc.assertEqual( "(-1, -1)", a.getLocation().toString() );
+	}
 		
-		@Test.Impl( 
-			member = "method: XMLHandler.Location XMLHandler.getLocation()", 
-			description = "Is not null" 
-		)
-		public void tm_0132A429A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: XMLHandler.Location XMLHandler.getLocation()", 
-			description = "Location is unknown after parsing" 
-		)
-		public void tm_0E72E765B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: XMLHandler.Location XMLHandler.getLocation()", 
-			description = "Location is unknown before parsing" 
-		)
-		public void tm_0EDFB4DD6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: XMLHandler.Location XMLHandler.getLocation()", 
+		description = "Location is unknown before parsing" 
+	)
+	public void tm_0EDFB4DD6( Test.Case tc ) {
+		Adapter<String> a = new Adapter<>( "LOCATION" );
+		tc.assertEqual( "(-1, -1)", a.getLocation().toString() );
+	}
 		
 		@Test.Impl( 
 			member = "method: int XMLHandler.Location.getColumnNumber()", 

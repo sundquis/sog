@@ -155,20 +155,14 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		
 		private final int line;
 		private final int col;
-		private final String puplicId;
-		private final String systemId;
 		
 		private Location() {
 			if ( XMLHandler.this.locator == null ) {
 				this.line = -1;
 				this.col = -1;
-				this.puplicId = "unknown";
-				this.systemId = "unknown";
 			} else {
 				this.line = XMLHandler.this.locator.getLineNumber();
 				this.col = XMLHandler.this.locator.getColumnNumber();
-				this.puplicId = XMLHandler.this.locator.getPublicId();
-				this.systemId = XMLHandler.this.locator.getSystemId();
 			}
 		}
 		
@@ -180,18 +174,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		@Test.Decl( "Return is -1 when unknown" )
 		public int getColumnNumber() { return this.col; }
 		
-		@Test.Decl( "Is not empty" )
-		@Test.Decl( "Return is ??? while parsing" )
-		public String getPublicId() {
-			return this.puplicId;
-		}
-		
-		@Test.Decl( "Is not empty" )
-		@Test.Decl( "Return is ??? while parsing" )
-		public String getSystemId() {
-			return this.systemId;
-		}
-
 		@Test.Decl( "Not empty" )
 		@Test.Decl( "Indicates row and column while parsing" )
 		@Override public String toString() { return "(" + this.line + ", " + this.col + ")"; }
@@ -257,6 +239,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Test.Decl( "Result is not null" )
 	@Test.Decl( "Empty map returned when no attributes" )
+	@Test.Decl( "All keys are present" )
+	@Test.Decl( "Values are correct" )
 	public static Map<String, String> attributesToMap( Attributes atts ) {
 		Map<String, String> result = atts.getLength() > 0 ? new TreeMap<>() : Collections.emptyMap();
 		
