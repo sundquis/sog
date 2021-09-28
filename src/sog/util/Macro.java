@@ -85,7 +85,7 @@ public class Macro implements Function<String, Stream<String>> {
 	private final Map<String, List<String>> expansions = new TreeMap<>();
 	
 	/* Reusable matcher */
-	private final Matcher matcher = Macro.PATTERN.matcher(  "" );
+	private final Matcher matcher = Macro.PATTERN.matcher( "" );
 
 	
 	/**

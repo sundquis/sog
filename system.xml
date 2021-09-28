@@ -5,26 +5,26 @@
 <!-- <!DOCTYPE system SYSTEM "/home/sundquis/book/sog/system.dtd">  -->
 
 <!DOCTYPE system [
-	<!ELEMENT system (class)* >
-	<!ATTLIST system
-		description	CDATA	#REQUIRED
-	>
-	
-	<!ELEMENT class (property | text)* >
-	<!ATTLIST class
-		fullname	CDATA	#REQUIRED
-	>
-	
-	<!ELEMENT property EMPTY >
-	<!ATTLIST property
-		name	CDATA	#REQUIRED
-		value	CDATA	#REQUIRED
-	>
-	
-	<!ELEMENT text (#PCDATA) >
-	<!ATTLIST text
-		name	CDATA	#REQUIRED
-	>
+    <!ELEMENT system (class)* >
+    <!ATTLIST system
+        description CDATA   #REQUIRED
+    >
+
+    <!ELEMENT class (property | text)* >
+    <!ATTLIST class
+        fullname    CDATA   #REQUIRED
+    >
+
+    <!ELEMENT property EMPTY >
+    <!ATTLIST property
+        name    CDATA   #REQUIRED
+        value   CDATA   #REQUIRED
+    >
+
+    <!ELEMENT text (#PCDATA) >
+    <!ATTLIST text
+        name    CDATA   #REQUIRED
+    >
 ]>
 
 <system description="Developmental demonstration version.">

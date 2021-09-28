@@ -144,7 +144,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Location is unknown before parsing" )
 	@Test.Decl( "Location is unknown after parsing" )
 	public Location getLocation() {
-		return new Location();
+		return new Location( this.locator );
 	}
 
 	/**
@@ -153,17 +153,30 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	public class Location {
 		
-		private final int line;
-		private final int col;
+		private String publicId = "unknown";
+		private String systemId = "unknown";
+		private int line = -1;
+		private int col = -1;
 		
-		private Location() {
-			if ( XMLHandler.this.locator == null ) {
-				this.line = -1;
-				this.col = -1;
-			} else {
-				this.line = XMLHandler.this.locator.getLineNumber();
-				this.col = XMLHandler.this.locator.getColumnNumber();
+		private Location( Locator locator ) {
+			if ( locator != null ) {
+				this.publicId = locator.getPublicId();
+				this.systemId = locator.getSystemId();
+				this.line = locator.getLineNumber();
+				this.col = locator.getColumnNumber();
 			}
+		}
+		
+		@Test.Decl( "Is not empty" )
+		@Test.Decl( "???" )
+		public String getPublicId() {
+			return this.publicId;
+		}
+		
+		@Test.Decl( "Is not empty" )
+		@Test.Decl( "???" )
+		public String getSystemId() {
+			return this.systemId;
 		}
 		
 		@Test.Decl( "Greater or equal to zero while parsing" )

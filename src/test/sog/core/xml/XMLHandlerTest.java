@@ -19,6 +19,7 @@
 
 package test.sog.core.xml;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -33,6 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
 import sog.core.AppException;
+import sog.core.LocalDir;
 import sog.core.Strings;
 import sog.core.Test;
 import sog.core.xml.XMLHandler;
@@ -858,6 +860,39 @@ public class XMLHandlerTest extends Test.Container {
 			tc.addMessage( "GENERATED STUB" );
 		}
 	
+	@Test.Impl( 
+		member = "method: String XMLHandler.Location.getPublicId()", 
+		description = "???" 
+	)
+	public void tm_0A1F8B79C( Test.Case tc ) {
+		File file = new LocalDir( false ).sub( "tmp" ).getTmpFile( "DTD" );
+		
+		tc.addMessage( file.toString() );
+	}
+			
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getPublicId()", 
+				description = "Is not empty" 
+			)
+			public void tm_0F3D79C23( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getSystemId()", 
+				description = "???" 
+			)
+			public void tm_0C587FE62( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getSystemId()", 
+				description = "Is not empty" 
+			)
+			public void tm_066E4941D( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
 	
 	
 
