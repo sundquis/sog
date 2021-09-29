@@ -80,7 +80,12 @@ public class LocalDir {
 		
 		/** An xml file */
 		@Test.Skip( "Enumerated constant" ) 		
-		XML( "xml" );
+		XML( "xml" ),
+		
+		/** A document type definition file */
+		@Test.Skip( "Enumerated constant" )
+		DTD( "dtd");
+		
 		
 		private String extension;
 		

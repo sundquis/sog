@@ -19,16 +19,19 @@
 
 package test.sog.core.xml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -39,10 +42,14 @@ import sog.core.Strings;
 import sog.core.Test;
 import sog.core.xml.XMLHandler;
 import sog.util.Commented;
+import sog.util.Macro;
 import sog.util.StreamReader;
 
 /**
+ * Test cases reveal the behavior of the SAX parsing framework.
  * 
+ * Cases showing interesting/unexpected/useful behavior are marked with a "LESSON-LEARNED" comment.
+ * Cases illustrating a useful technique are marked with a "PROOF-OF-CONCEPT" comment.
  */
 @Test.Skip( "Container" )
 public class XMLHandlerTest extends Test.Container {
@@ -51,6 +58,12 @@ public class XMLHandlerTest extends Test.Container {
 		super( XMLHandler.class );
 	}
 	
+	
+	/* 
+	 * PROOF-OF-CONCEPT:
+	 * Test case paradigm - Define a Consumer/Producer class to be used by each test case.
+	 * Particularly useful when testing a Handler.
+	 */
 	
 	/*
 	 * Test cases create anonymous subclasses by overriding the call-back of interest, using
@@ -62,8 +75,13 @@ public class XMLHandlerTest extends Test.Container {
 		private static final Commented COMMENT = new Commented() {};
 		
 		private static Reader getReader( String label ) {
+			return Adapter.getReader( label, s -> Stream.of( s ) );
+		}
+
+		/* PROOF-OF-CONCEPT: How to use a Macro to perform substitutions on a Stream of lines. */
+		private static Reader getReader( String label, Function<String, Stream<String>> filter ) {
 			try {
-				return new StreamReader( Adapter.COMMENT.getCommentedLines( label ) );
+				return new StreamReader( Adapter.COMMENT.getCommentedLines( label ).flatMap( filter ) );
 			} catch ( IOException e ) {
 				throw new AppException( e );
 			}
@@ -73,6 +91,10 @@ public class XMLHandlerTest extends Test.Container {
 		
 		private Adapter( String label ) {
 			super( Adapter.getReader( label ) );
+		}
+		
+		private Adapter( String label, Macro filter ) {
+			super( Adapter.getReader( label, filter ) );
 		}
 		
 		@Override 
@@ -275,7 +297,69 @@ public class XMLHandlerTest extends Test.Container {
 		Adapter<String> a = new Adapter<>( "LOCATION" );
 		tc.assertEqual( "(-1, -1)", a.getLocation().toString() );
 	}
+	
+	// EXT-DTD	<?xml version="1.0" encoding="UTF-8"?>
+	// EXT-DTD	<!ELEMENT A (B|C)* >
+	// EXT-DTD	<!ATTLIST A
+	// EXT-DTD		name	CDATA	#REQUIRED
+	// EXT-DTD	>
+	// EXT-DTD	
+	// EXT-DTD	<!ELEMENT B EMPTY>
+	// EXT-DTD	
+	// EXT-DTD	<!ELEMENT C EMPTY>
+	
+	// EXT-XML	<?xml version="1.0" encoding="UTF-8"?>
+	// EXT-XML	<!DOCTYPE A SYSTEM "${ EXT-DTD }">
+	// EXT-XML	<A name="My Name">
+	// EXT-XML		<B/>
+	// EXT-XML		<C/>
+	// EXT-XML	</A>
+	
+	@Test.Impl( 
+		member = "method: String XMLHandler.Location.getPublicId()", 
+		description = "Apparently always unknown for SAX parser?" 
+	)
+	public void tm_0A1F8B79C( Test.Case tc ) throws IOException {
 		
+		Path path = new LocalDir( false ).sub( "tmp" ).getFile( "TEST", LocalDir.Type.DTD );
+		Iterable<String> it = new Commented() {}.getCommentedLines( "EXT-DTD" )::iterator;
+		Files.write( path, it, 
+			StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING );
+		
+		Macro macro = new Macro().expand( "EXT-DTD", path.toString() );
+		tc.assertEqual( "unknown", new Adapter<String>( "EXT-XML", macro ) {
+			@Override public void startElement( String name, Map<String, String> atts ) {
+				this.accept( this.getLocation().getPublicId() );
+			}
+		}.get() );
+	}
+				
+	@Test.Impl( 
+		member = "method: String XMLHandler.Location.getPublicId()", 
+		description = "Is not empty" 
+	)
+	public void tm_0F3D79C23( Test.Case tc ) {
+		tc.addMessage( "GENERATED STUB" );
+	}
+				
+				@Test.Impl( 
+					member = "method: String XMLHandler.Location.getSystemId()", 
+					description = "Apparently always unknown for SAX parser?" 
+				)
+				public void tm_0C587FE62( Test.Case tc ) {
+					tc.addMessage( "GENERATED STUB" );
+				}
+				
+				@Test.Impl( 
+					member = "method: String XMLHandler.Location.getSystemId()", 
+					description = "Is not empty" 
+				)
+				public void tm_066E4941D( Test.Case tc ) {
+					tc.addMessage( "GENERATED STUB" );
+				}
+				
+				
+				
 		@Test.Impl( 
 			member = "method: int XMLHandler.Location.getColumnNumber()", 
 			description = "Greater or equal to zero while parsing" 
@@ -860,39 +944,6 @@ public class XMLHandlerTest extends Test.Container {
 			tc.addMessage( "GENERATED STUB" );
 		}
 	
-	@Test.Impl( 
-		member = "method: String XMLHandler.Location.getPublicId()", 
-		description = "???" 
-	)
-	public void tm_0A1F8B79C( Test.Case tc ) {
-		File file = new LocalDir( false ).sub( "tmp" ).getTmpFile( "DTD" );
-		
-		tc.addMessage( file.toString() );
-	}
-			
-			@Test.Impl( 
-				member = "method: String XMLHandler.Location.getPublicId()", 
-				description = "Is not empty" 
-			)
-			public void tm_0F3D79C23( Test.Case tc ) {
-				tc.addMessage( "GENERATED STUB" );
-			}
-			
-			@Test.Impl( 
-				member = "method: String XMLHandler.Location.getSystemId()", 
-				description = "???" 
-			)
-			public void tm_0C587FE62( Test.Case tc ) {
-				tc.addMessage( "GENERATED STUB" );
-			}
-			
-			@Test.Impl( 
-				member = "method: String XMLHandler.Location.getSystemId()", 
-				description = "Is not empty" 
-			)
-			public void tm_066E4941D( Test.Case tc ) {
-				tc.addMessage( "GENERATED STUB" );
-			}
 	
 	
 

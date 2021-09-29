@@ -160,21 +160,25 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		
 		private Location( Locator locator ) {
 			if ( locator != null ) {
-				this.publicId = locator.getPublicId();
-				this.systemId = locator.getSystemId();
+				if ( locator.getPublicId() != null ) {
+					this.publicId = locator.getPublicId();
+				}
+				if ( locator.getSystemId() != null ) {
+					this.systemId = locator.getSystemId();
+				}
 				this.line = locator.getLineNumber();
 				this.col = locator.getColumnNumber();
 			}
 		}
 		
 		@Test.Decl( "Is not empty" )
-		@Test.Decl( "???" )
+		@Test.Decl( "Apparently always unknown for SAX parser?" )
 		public String getPublicId() {
 			return this.publicId;
 		}
 		
 		@Test.Decl( "Is not empty" )
-		@Test.Decl( "???" )
+		@Test.Decl( "Apparently always unknown for SAX parser?" )
 		public String getSystemId() {
 			return this.systemId;
 		}
