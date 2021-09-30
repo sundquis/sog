@@ -199,23 +199,23 @@ public class Macro implements Function<String, Stream<String>> {
 		Assert.nonNull( line );
 		List<String> results = new LinkedList<>();
 		
-		@SuppressWarnings("resource") 
-		Queue<String> pending = new FifoQueue<>();
-		pending.put( line );
-		int iterations = 0;  // Guard against infinite self-reference
-		String current;
-		while ( (current = pending.get()) != null ) {
-			if ( iterations++ > Macro.MAX_ITERATIONS ) {
-				throw new AppException( "Infinite recurrsion detected: " + line );
-			}
-			if ( this.matcher.reset( current ).find() ) {
-				String head = current.substring( 0,  this.matcher.start() );
-				String key = this.matcher.group( 1 );
-				String tail = current.substring( this.matcher.end() );
-				this.getExpansions( key ).forEach( s -> pending.put( head + s + tail ) );
-			} else {
-				results.add( current );
-			}
+		try ( Queue<String> pending = new FifoQueue<>() ) {
+			pending.put( line );
+			int iterations = 0;  // Guard against infinite self-reference
+			String current;
+			while ( (current = pending.get()) != null ) {
+				if ( iterations++ > Macro.MAX_ITERATIONS ) {
+					throw new AppException( "Infinite recurrsion detected: " + line );
+				}
+				if ( this.matcher.reset( current ).find() ) {
+					String head = current.substring( 0,  this.matcher.start() );
+					String key = this.matcher.group( 1 );
+					String tail = current.substring( this.matcher.end() );
+					this.getExpansions( key ).forEach( s -> pending.put( head + s + tail ) );
+				} else {
+					results.add( current );
+				}
+			}			
 		}
 
 		return results.stream();

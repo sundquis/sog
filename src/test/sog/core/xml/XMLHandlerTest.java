@@ -97,6 +97,10 @@ public class XMLHandlerTest extends Test.Container {
 			super( Adapter.getReader( label, filter ) );
 		}
 		
+		private Adapter( Path path ) throws IOException {
+			super( path );
+		}
+		
 		@Override 
 		public void accept( T result ) { this.result = result; }
 		
@@ -314,22 +318,29 @@ public class XMLHandlerTest extends Test.Container {
 	// EXT-XML		<B/>
 	// EXT-XML		<C/>
 	// EXT-XML	</A>
-	
+
+	// LESSON-LEARNED: Unable to get SAX to report system or public ID
 	@Test.Impl( 
 		member = "method: String XMLHandler.Location.getPublicId()", 
 		description = "Apparently always unknown for SAX parser?" 
 	)
 	public void tm_0A1F8B79C( Test.Case tc ) throws IOException {
+		Commented source = new Commented() {};
 		
-		Path path = new LocalDir( false ).sub( "tmp" ).getFile( "TEST", LocalDir.Type.DTD );
-		Iterable<String> it = new Commented() {}.getCommentedLines( "EXT-DTD" )::iterator;
-		Files.write( path, it, 
+		Path dtdPath = new LocalDir( false ).sub( "tmp" ).getFile( "TEST", LocalDir.Type.DTD );
+		Iterable<String> dtdLines = source.getCommentedLines( "EXT-DTD" )::iterator;
+		Files.write( dtdPath, dtdLines, 
 			StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING );
 		
-		Macro macro = new Macro().expand( "EXT-DTD", path.toString() );
-		tc.assertEqual( "unknown", new Adapter<String>( "EXT-XML", macro ) {
+		Macro macro = new Macro().expand( "EXT-DTD", dtdPath.toString() );
+		Path xmlPath = new LocalDir( false ).sub( "tmp" ).getFile( "TEST", LocalDir.Type.XML );
+		Iterable<String> xmlLines = source.getCommentedLines( "EXT-XML" ).flatMap( macro )::iterator;
+		Files.write( xmlPath, xmlLines, 
+			StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING );
+		
+		tc.assertEqual( "xxxunknown", new Adapter<String>( xmlPath ) {
 			@Override public void startElement( String name, Map<String, String> atts ) {
-				this.accept( this.getLocation().getPublicId() );
+				this.accept( this.getLocation().getSystemId() );
 			}
 		}.get() );
 	}
@@ -950,5 +961,6 @@ public class XMLHandlerTest extends Test.Container {
 	public static void main( String[] args ) {
 		Test.eval( XMLHandler.class );
 		//Test.evalPackage( XMLHandler.class );
+		//Test.evalAll();
 	}
 }

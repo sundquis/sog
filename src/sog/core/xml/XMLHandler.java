@@ -101,6 +101,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
+		this.source.setPublicId( path.toString() );
 	}
 
 	

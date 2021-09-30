@@ -28,7 +28,9 @@
 ]>
 
 <system description="Developmental demonstration version.">
-
+<!-- 
+Multiline comment
+ -->
 	<!-- Properties for TestResultSet -->
 	<class fullname="sog.core.test.TestResultSet">
 		<property name="verbose" value="false" />
