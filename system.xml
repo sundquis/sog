@@ -2,7 +2,7 @@
 
 <!-- Either need to hard-code location of DTD or use internal. -->
 <!-- FIXME: Verify this and/or fix. -->
-<!-- <!DOCTYPE system SYSTEM "/home/sundquis/book/sog/system.dtd">  -->
+<!-- <!DOCTYPE system SYSTEM "file://home/sundquis/book/sog/system.dtd">  -->
 
 <!DOCTYPE system [
     <!ELEMENT system (class)* >

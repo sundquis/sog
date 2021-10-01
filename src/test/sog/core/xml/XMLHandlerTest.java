@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import sog.core.AppException;
 import sog.core.LocalDir;
@@ -313,7 +314,8 @@ public class XMLHandlerTest extends Test.Container {
 	// EXT-DTD	<!ELEMENT C EMPTY>
 	
 	// EXT-XML	<?xml version="1.0" encoding="UTF-8"?>
-	// EXT-XML	<!DOCTYPE A SYSTEM "${ EXT-DTD }">
+	// EXT-XML	<!DOCTYPE A SYSTEM "tmp/${ EXT-DTD }">
+	// file://localhost
 	// EXT-XML	<A name="My Name">
 	// EXT-XML		<B/>
 	// EXT-XML		<C/>
@@ -332,14 +334,21 @@ public class XMLHandlerTest extends Test.Container {
 		Files.write( dtdPath, dtdLines, 
 			StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING );
 		
-		Macro macro = new Macro().expand( "EXT-DTD", dtdPath.toString() );
+		Macro macro = new Macro().expand( "EXT-DTD", dtdPath.getFileName().toString() );
 		Path xmlPath = new LocalDir( false ).sub( "tmp" ).getFile( "TEST", LocalDir.Type.XML );
 		Iterable<String> xmlLines = source.getCommentedLines( "EXT-XML" ).flatMap( macro )::iterator;
 		Files.write( xmlPath, xmlLines, 
 			StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING );
 		
 		tc.assertEqual( "xxxunknown", new Adapter<String>( xmlPath ) {
-			@Override public void startElement( String name, Map<String, String> atts ) {
+			//@Override public void startElement( String name, Map<String, String> atts ) {
+			@Override public void startDocument() {
+				System.out.println(">>> START: " + this.getLocation().getSystemId() );
+			}
+			@Override public void startDTD( String name, String publicId, String systemId ) {
+				//System.out.println(">>> PUBLIC: " + publicId );
+				System.out.println(">>> SYSTEM: " + systemId );
+				System.out.println(">>> LOC.SYSTEM: " + this.getLocation().getSystemId() );
 				this.accept( this.getLocation().getSystemId() );
 			}
 		}.get() );

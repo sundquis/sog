@@ -45,6 +45,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 import sog.core.Assert;
 import sog.core.Fatal;
+import sog.core.Property;
 import sog.core.Test;
 
 /**
@@ -71,6 +72,11 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	public XMLHandler( InputSource source ) {
 		this.source = Assert.nonNull( source );
 	}
+	
+	// FIXME
+	// Move Property.SYSTEM_DIR here
+	// Set publicId here to SYSTEM_DIR
+	// Alter constructor from path. If relative then use SYSTEM_DIR
 
 	/**
 	 * Construct a handler that will process xml from the given {@code Reader}.
@@ -101,7 +107,10 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
-		this.source.setPublicId( path.toString() );
+		//this.source.setSystemId( "file://localhost" + path.toString() );
+		//this.source.setSystemId( "FOO" );
+		//System.out.println(">>> Property.SYSTEM = " + Property.SYSTEM_DIR);
+		this.source.setSystemId( "file://localhost" + Property.SYSTEM_DIR + "/" );
 	}
 
 	

@@ -53,7 +53,7 @@ public class Property {
 	// The system.dir property must be defined, for example as a JVM arg:
 	//     -Dsystem.dir=...
 	// The property must be an absolute path to the directory serving as the root for the application
-	private static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
+	public static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
 
 	private static final String SYSTEM_NAME = "system.xml";
 
