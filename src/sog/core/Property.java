@@ -34,30 +34,22 @@ import sog.core.xml.XMLHandler;
  * Usage:
  * 		public T myT = Property.get( name, default, parser );
  * 
- * An application must define the single System property: "system.dir"
- * This must be a path to a directory containing the xml property file "system.xml"
+ * This class is one of the lowest level classes in the application framework. Any client call to 
+ * App or Property results in a call to XMLHandler to load the root system xml configuration file. 
  * 
- * App depends on this class, so it should not have any dependencies on other core classes.
- * It does depend on the XMLHandler class.
+ * The location of the configuration file is determined here based on the required environment variable 
+ * "system.dir", which must name an absolute path to the directory containing the configuration file.
+ * It is typically set as a JVM arg, for example:
+ * 		-Dsystem.dir="/.../"
+ * 
+ * The name of the configuration file is determined by the optional environment variable "system.xml"
+ * which defaults to "system.xml" but can be overridden. 
+ * 
+ * To avoid circular class-loading dependencies this class should not have any dependencies on other 
+ * core classes. It does depend on the XMLHandler class.
  */
 @Test.Subject( "test." )
 public class Property {
-	
-	
-	@FunctionalInterface
-	public static interface Parser<T> {
-		public T value( String s );
-	}
-	
-
-	// The system.dir property must be defined, for example as a JVM arg:
-	//     -Dsystem.dir=...
-	// The property must be an absolute path to the directory serving as the root for the application
-	public static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
-
-	private static final String SYSTEM_NAME = "system.xml";
-
-	private static final Property INSTANCE = new Property();
 	
 	
 	/** Retrieve a configurable property from the system property file */
@@ -78,7 +70,7 @@ public class Property {
 
 		String className = Property.getClassName();
 		String key = className + "." + name;
-		String stringValue = Property.INSTANCE.getStringValue( key );
+		String stringValue = Property.getInstance().getStringValue( key );
 
 		if ( stringValue == null ) {
 			System.err.println( "WARNING: Property not found:" );
@@ -107,7 +99,7 @@ public class Property {
 		
 		String className = Property.getClassName();
 		String key = className + "." + name;
-		String value = Property.INSTANCE.getTextValue( key );
+		String value = Property.getInstance().getTextValue( key );
 		
 		if ( value == null ) {
 			value = "";
@@ -139,19 +131,23 @@ public class Property {
 	}
 	
 	
+	@FunctionalInterface
+	public interface Parser<T> { public T value( String s ); }
+	
+
 	// Convenience parsers. Add as needed.
 	
 	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Integer> INTEGER = (s) -> Integer.parseInt(s);
+	public static final Parser<Integer> INTEGER = Integer::parseInt;
 
 	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Long> LONG = (s) -> Long.parseLong(s);
+	public static final Parser<Long> LONG = Long::parseLong;
 	
 	@Test.Decl( "Returns false for mal-formed string" )
 	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Boolean> BOOLEAN = (s) -> Boolean.parseBoolean(s);
+	public static final Parser<Boolean> BOOLEAN = Boolean::parseBoolean;
 	
 	@Test.Decl( "Correct for sample cases" )
 	public static final Parser<String> STRING = (s) -> s;
@@ -167,10 +163,37 @@ public class Property {
 	@Test.Decl( "Empty list not allowed" )
 	@Test.Decl( "White space after comma ignored" )
 	public static final Parser<List<String>> LIST = (s) -> Arrays.asList( CSV.value(s) );
+
+	
+	
+	private static Property INSTANCE = null;
+
+	private static Property getInstance() {
+		if ( Property.INSTANCE == null ) {
+			synchronized( Property.class ) {
+				if ( Property.INSTANCE == null ) {
+					Property.INSTANCE = new Property();
+				}
+			}
+		}
+		
+		return Property.INSTANCE;
+	}
+	
 	
 
 	
 
+	// MOVE to constructor, non-static, with checks
+	
+	// The system.dir property must be defined, for example as a JVM arg:
+	//     -Dsystem.dir=...
+	// The property must be an absolute path to the directory serving as the root for the application
+	public static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
+
+	private static final String SYSTEM_NAME = "system.xml";
+
+	
 	
 	private boolean loaded = false;
 	
@@ -180,6 +203,8 @@ public class Property {
 
 	private Property() {}
 	
+	
+	// move to constructor
 	private void ensureLoaded() {
 		if ( ! this.loaded ) {
 			synchronized ( Property.class ) {

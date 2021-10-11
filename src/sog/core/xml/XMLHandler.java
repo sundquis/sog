@@ -51,15 +51,11 @@ import sog.core.Test;
 /**
  * Provides default no-op implementations of the SAX xml parsing call-backs, and minimizes
  * application contact with the SAX api.
- * 
- * Applications define a handler by extending XMLHandler and overriding the call-backs of interest.
- * Overloaded constructors allow specification of the xml source. The parse() method configures
- * a SAX xml reader and calls it's parse method on the xml source, which in turn fire call-backs
- * as parsing events occur. 
  */
 @Test.Subject( "test." )
 public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, LexicalHandler {
 
+	
 	private final InputSource source;
 	private Locator locator;
 
@@ -110,9 +106,11 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		//this.source.setSystemId( "file://localhost" + path.toString() );
 		//this.source.setSystemId( "FOO" );
 		//System.out.println(">>> Property.SYSTEM = " + Property.SYSTEM_DIR);
-		this.source.setSystemId( "file://localhost" + Property.SYSTEM_DIR + "/" );
-	}
+		this.source.setSystemId( Property.SYSTEM_DIR + "/" );
+	} //"file://localhost" + 
 
+	// FIXME:
+	// additional constructor with two paths, one a root dir set to the SystemId
 	
 	
 	/**
