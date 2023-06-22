@@ -43,6 +43,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 
+import sog.core.App;
 import sog.core.Assert;
 import sog.core.Fatal;
 import sog.core.Property;
@@ -69,11 +70,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		this.source = Assert.nonNull( source );
 	}
 	
-	// FIXME
-	// Move Property.SYSTEM_DIR here
-	// Set publicId here to SYSTEM_DIR
-	// Alter constructor from path. If relative then use SYSTEM_DIR
-
 	/**
 	 * Construct a handler that will process xml from the given {@code Reader}.
 	 * 
@@ -95,7 +91,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	}
 	
 	/**
-	 * Construct a handler that will process xml from the given {@code Path}.
+	 * Construct a handler that will process xml from the given {@code Path},
+	 * an absolute Path to the xml file.
 	 * 
 	 * @param reader
 	 */
@@ -103,14 +100,27 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
-		//this.source.setSystemId( "file://localhost" + path.toString() );
-		//this.source.setSystemId( "FOO" );
-		//System.out.println(">>> Property.SYSTEM = " + Property.SYSTEM_DIR);
-		this.source.setSystemId( Property.SYSTEM_DIR + "/" );
-	} //"file://localhost" + 
+	}
 
-	// FIXME:
-	// additional constructor with two paths, one a root dir set to the SystemId
+
+	/**
+	 * Construct a handler that will process the xml file specified by the
+	 * given root directory and relative path. The SystemId is set to the root
+	 * location, so relative paths in the file will be properly resolved.
+	 * 
+	 * @param root
+	 * @param relative
+	 * @throws IOException
+	 */
+	@Test.Decl( "Throws AssertionError for null root" )
+	@Test.Decl( "Throws AssertionError for null relative" )
+	@Test.Decl( "Throws NoSuchFileException if the directory is missing" )
+	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
+	@Test.Decl( "Relative references are properly resolved" )
+	public XMLHandler( Path root, Path relative ) throws IOException {
+		this( Assert.nonNull( root ).resolve( Assert.nonNull( relative ) ) );
+		this.source.setSystemId( root.toUri().toString() );
+	}
 	
 	
 	/**

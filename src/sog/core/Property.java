@@ -51,6 +51,10 @@ import sog.core.xml.XMLHandler;
 @Test.Subject( "test." )
 public class Property {
 	
+	// FIXME:
+	// Revert. Replace parsers, Property is a standalone singleton
+	// Reads System properties
+	// Provides properties statically including app.root
 	
 	/** Retrieve a configurable property from the system property file */
 	@Test.Decl( "Throws AssertionError for null name" )
@@ -112,73 +116,22 @@ public class Property {
 		return value;
 	}
 	
-	// To avoid issues with initialization we cannot use the service provided by App.get().getCallingClass( offset )
-	private static String getClassName() {
-		// FRAGILE:
-		StackTraceElement[] stackTrace = (new Exception()).getStackTrace();
-		// Stack:
-		//		Property.getClassName
-		//		Property.get/getText
-		//		<class declaring a property>
-		Assert.isTrue( stackTrace.length > 2 );
-		
-		// This original regular expression was not documented and seems wrong
-		//String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
+    private static String getClassName() {
+        // FRAGILE:
+        StackTraceElement[] stackTrace = (new Exception()).getStackTrace();
+        // Stack:
+        //              Property.getClassName
+        //              Property.get/getText
+        //              <class declaring a property>
+        Assert.isTrue( stackTrace.length > 2 );
+        
+        // This original regular expression was not documented and seems wrong
+        //String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
 
-		// Replaced with expression that matches inner class names that contain "$n"
-		String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
-		return Assert.nonEmpty( className );
-	}
-	
-	
-	@FunctionalInterface
-	public interface Parser<T> { public T value( String s ); }
-	
-
-	// Convenience parsers. Add as needed.
-	
-	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
-	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Integer> INTEGER = Integer::parseInt;
-
-	@Test.Decl( "Throws NumberFormatException for mal-formed string" )
-	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Long> LONG = Long::parseLong;
-	
-	@Test.Decl( "Returns false for mal-formed string" )
-	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<Boolean> BOOLEAN = Boolean::parseBoolean;
-	
-	@Test.Decl( "Correct for sample cases" )
-	public static final Parser<String> STRING = (s) -> s;
-
-	@Test.Decl( "Collection of common cases" )
-	@Test.Decl( "Array of length one allowed" )
-	@Test.Decl( "Empty array not allowed" )
-	@Test.Decl( "White space after comma ignored" )
-	public static final Parser<String[]> CSV = (s) -> s.split( ",\\s*" );
-	
-	@Test.Decl( "Collection of common cases" )
-	@Test.Decl( "List of length one allowed" )
-	@Test.Decl( "Empty list not allowed" )
-	@Test.Decl( "White space after comma ignored" )
-	public static final Parser<List<String>> LIST = (s) -> Arrays.asList( CSV.value(s) );
-
-	
-	
-	private static Property INSTANCE = null;
-
-	private static Property getInstance() {
-		if ( Property.INSTANCE == null ) {
-			synchronized( Property.class ) {
-				if ( Property.INSTANCE == null ) {
-					Property.INSTANCE = new Property();
-				}
-			}
-		}
-		
-		return Property.INSTANCE;
-	}
+        // Replaced with expression that matches inner class names that contain "$n"
+        String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
+        return Assert.nonEmpty( className );
+}
 	
 	
 
