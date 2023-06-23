@@ -38,7 +38,7 @@ import sog.core.test.TestResultSet;
  * 			A class identifies itself as a subject by using the Test.Subject annotation, 
  * 			which indicates the test container class using the following naming conventions:
  * 				.MemberName		Search for a member Test.Container class in the subject.
- * 				packagePrefix.	Prepend packagePrefix to the full subject class name and append "Test".
+ * 				packagePrefix.	Prepend packagePrefix to the full subject class name and append "Test" to the class name.
  * 				ClassName		Look in the same package as the subject for ClassName.
  * 				Otherwise		The name, which must contain a ".", is a fully qualified class name.
  * 			Each valid subject is represented by a sog.core.test.TestResult instance.
@@ -54,7 +54,7 @@ import sog.core.test.TestResultSet;
  * 		@Test.Decl( description )
  * 			A subject class declares test cases using Test.Decl annotations on members. The declaration
  * 			gives a description which serves as additional documentation of behavior and properties
- * 			associated with the member. Each Test.Decl annotation is represented by an
+ * 			associated with the member. Each Test.Decl annotation is represented by a
  * 			sog.core.test.TestDecl instance.
  * 
  * 		@Test.Decls
@@ -123,7 +123,7 @@ import sog.core.test.TestResultSet;
  * 			+ import sog.core.Test;
  * 			+ public static void main( String[] args ) { Test.eval( SubjectClass.class ); }
  * 			+ Run main.
- * 			+ Copy subs into container body.
+ * 			+ Copy stubs into container body.
  * 			+ Rerun main to confirm no ERRORS, no STUBS, and all cases fail.
  * 			+ Implement test methods, run, and debug subject code.
  * 			+ Goal: 100% pass rate, no ERRORS, no STUBS, reasonable SKIPS.
@@ -164,7 +164,7 @@ import sog.core.test.TestResultSet;
  * 				Extends Result to represent the results after running the test case.
  * 				Holds a TestContainer and TestImpl.
  * 				Implements Test.Case and is given to the TestImpl test method to interact with the testing framework.
- * 				Implements Runnable be executing the given test method and recording results.
+ * 				Implements Runnable by executing the given test method and recording results.
  * 				Implements Comparable by using the priority (if any) of the given TestImpl.
  * 			Services: 
  * 				Implements Printable.print( ... ) to include details for failing test cases.
@@ -267,7 +267,7 @@ public class Test {
 	
 	
 	/**
-	 * Subject classes use to identify as a class needing testing. The value identifies 
+	 * Subject classes use this annotation to identify as a class needing testing. The value identifies 
 	 * the location of the Test.Container that holds test method implementations.
 	 */
 	@Retention( RetentionPolicy.RUNTIME )
@@ -681,7 +681,7 @@ public class Test {
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */
-	@Test.Skip( "Massive validatoin through repeated use" )
+	@Test.Skip( "Massive validation through repeated use" )
 	public static void eval() {
 		Test.eval( App.get().getCallingClass( 2 ) );
 	}

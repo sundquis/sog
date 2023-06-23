@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import sog.core.AppException;
 import sog.core.LocalDir;
