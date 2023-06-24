@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ package sog.core;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,19 +41,15 @@ import sog.core.xml.XMLHandler;
  * 		-Dsystem.dir="/.../"
  * 
  * The name of the configuration file is determined by the optional environment variable "system.xml"
- * which defaults to "system.xml" but can be overridden. 
+ * which defaults to "system.xml" but can be changed by setting the JVM arg system.name.
  * 
  * To avoid circular class-loading dependencies this class should not have any dependencies on other 
  * core classes. It does depend on the XMLHandler class.
  */
 @Test.Subject( "test." )
-public class Property {
+public class Property extends XMLHandler {
 	
-	// FIXME:
-	// Revert. Replace parsers, Property is a standalone singleton
-	// Reads System properties
-	// Provides properties statically including app.root
-	
+
 	/** Retrieve a configurable property from the system property file */
 	@Test.Decl( "Throws AssertionError for null name" )
 	@Test.Decl( "Throws AssertionError for empty name" )
@@ -68,6 +62,7 @@ public class Property {
 	@Test.Decl( "Prints declaration for missing property" )
 	@Test.Decl( "Last value for repeated elements" )
 	@Test.Decl( "Uses default for missing" )
+	@Test.Decl( "Prints instructions when system property file not found" )
 	public static <T> T get( String name, T defaultValue, Parser<T> parser ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( parser );
@@ -83,7 +78,7 @@ public class Property {
 			System.err.println( "</class>" );
 		}
 		
-		return stringValue == null ? defaultValue : parser.value( stringValue );
+		return stringValue == null ? defaultValue : parser.fromString( stringValue );
 	}
 	
 	/** Retrieve a configurable block of text from the system property file */
@@ -98,6 +93,7 @@ public class Property {
 	@Test.Decl( "Can retrieve empty" )
 	@Test.Decl( "Can use property name" )
 	@Test.Decl( "Last value for multiple elements" )
+	@Test.Decl( "Prints instructions when system property file not found" )
 	public static String getText( String name ) {
 		Assert.nonEmpty( name );
 		
@@ -116,7 +112,8 @@ public class Property {
 		return value;
 	}
 	
-    private static String getClassName() {
+	
+	private static String getClassName() {
         // FRAGILE:
         StackTraceElement[] stackTrace = (new Exception()).getStackTrace();
         // Stack:
@@ -125,129 +122,135 @@ public class Property {
         //              <class declaring a property>
         Assert.isTrue( stackTrace.length > 2 );
         
-        // This original regular expression was not documented and seems wrong
-        //String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
-
-        // Replaced with expression that matches inner class names that contain "$n"
+        // Convert name of anonymous class to be the enclosing class, so strip of the $nn..."
         String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
+        
         return Assert.nonEmpty( className );
-}
-	
-	
+    }
+ 
 
-	
-
-	// MOVE to constructor, non-static, with checks
-	
-	// The system.dir property must be defined, for example as a JVM arg:
-	//     -Dsystem.dir=...
-	// The property must be an absolute path to the directory serving as the root for the application
-	public static final String SYSTEM_DIR = System.getProperty( "system.dir", "FATAL" );
-
-	private static final String SYSTEM_NAME = "system.xml";
-
+	private static Property instance = null;
 	
 	
-	private boolean loaded = false;
-	
-	private Map<String, String> values = null;
-	
-	private Map<String, String> text = null;
-
-	private Property() {}
-	
-	
-	// move to constructor
-	private void ensureLoaded() {
-		if ( ! this.loaded ) {
+	private static Property getInstance() {
+		if ( Property.instance == null ) {
 			synchronized ( Property.class ) {
-				if ( ! this.loaded ) {
-					this.values = new TreeMap<>();
-					this.text = new TreeMap<>();
-					this.load();
-					this.loaded = true;
+				if ( Property.instance == null ) {
+					Property.makeInstance();
 				}
 			}
 		}
+		
+		return Assert.nonNull( Property.instance );
+	}
+	
+
+	private static final String ERR_MSG = ""
+		+ "The system property 'system.dir' must be set to an absolute path to the directory continaing\n"
+		+ "the properties file. Typically this is set as a JVM arg, for example:\n"
+		+ "\t-Dsystem.dir=/home/user/apps/sog/";
+	
+	
+	private static void makeInstance() {
+		String systemDir = System.getProperty( "system.dir" );
+		if ( systemDir == null || systemDir.isEmpty() ) {
+			Fatal.error( ERR_MSG );
+		}
+		String systemName = System.getProperty( "system.name", "system.xml" );
+		
+		Path path = Paths.get( systemDir, systemName );
+		Assert.readableFile( path );
+		
+		try {
+			Property.instance = new Property( path );
+		} catch ( IOException ex ) {
+			Fatal.error( "Unable to open system properties", ex );
+		}
+	}
+	
+	
+	
+	
+
+	/* Holds property values */
+	private final Map<String, String> values = new TreeMap<>();
+	
+	/* Holds text values */
+	private final Map<String, String> text = new TreeMap<>();
+
+	/* Used during the initial parse */
+	private String currentClassName = null;
+	
+	/* Used during the initial parse */
+	private String currentTextKey = null;
+	
+	/* Used during the initial parse */
+	private StringBuilder buf = new StringBuilder();
+	
+	private Property( Path path ) throws IOException {
+		super( path );
+		
+		this.parse();
+	}
+	
+	@Override
+	@Test.Decl( "Class name set on class elements" )
+	@Test.Decl( "Property added on property elements" )
+	@Test.Decl( "Buffer reset on text elements" )
+	@Test.Decl( "Key set on text elements" )
+	public void startElement( String name, Map<String, String> attributes ) {
+		Assert.nonEmpty( name );
+		Assert.nonNull( attributes );
+
+		if ( name.equals( "class" ) ) {
+			this.currentClassName = Assert.nonEmpty( attributes.get( "fullname" ) );
+		}
+		
+		if ( name.equals( "property" ) ) {
+			String propName = Assert.nonEmpty( attributes.get( "name" ) );
+			String key = this.currentClassName + "." + propName;
+			String value = Assert.nonEmpty( attributes.get( "value" ) );
+			this.values.put( key,  value );
+		}
+		
+		if ( name.equals( "text" ) ) {
+			String propName = Assert.nonEmpty( attributes.get( "name" ) );
+			this.currentTextKey = this.currentClassName + "." + propName;
+			this.buf.setLength( 0 );
+		}
+	}
+	
+	@Override
+	@Test.Decl( "Text elements terminated" )
+	public void endElement( String name ) {
+		Assert.nonEmpty( name );
+		
+		if ( name.equals( "text" ) ) {
+			Assert.nonEmpty( this.currentTextKey );
+			
+			Property.this.text.put( this.currentTextKey,  this.buf.toString() );
+		}
 	}
 
+	@Override
+	@Test.Decl( "Characters added" )
+	public void characters( char[] ch, int start, int length ) {
+		this.buf.append( ch, start, length );
+	}
+
+
 	private String getStringValue( String key ) {
-		this.ensureLoaded();
-		
 		return this.values.get( key );
 	}
 	
 	private String getTextValue( String key ) {
-		this.ensureLoaded();
-		
 		return this.text.get( key );
 	}
 
-	private void load() {
-		Path path = Paths.get( Property.SYSTEM_DIR, Property.SYSTEM_NAME );
-		Assert.readableFile( path );
-
-		try {
-			XMLHandler handler = new SystemHandler( path );
-			handler.parse();
-		} catch ( IOException e ) {
-			Fatal.impossible( "Assert should make this impossible",  e );
-		}
-	}
 	
-	// Tied to the structure defined in system.dtd
-	@Test.Skip( "FIXME" )
-	private class SystemHandler extends XMLHandler {
-		
-		private String currentClassName = null;
-		
-		private String currentTextKey = null;
-		
-		private StringBuilder buf = null;
-
-		public SystemHandler( Path path ) throws IOException {
-			super( path );
-			this.buf = new StringBuilder();
-		}
-		
-		@Override
-		public void startElement( String name, Map<String, String> attributes ) {
-			Assert.nonEmpty( name );
-			Assert.nonNull( attributes );
-
-			if ( name.equals( "class" ) ) {
-				this.currentClassName = Assert.nonEmpty( attributes.get( "fullname" ) );
-			}
-			
-			if ( name.equals( "property" ) ) {
-				String propName = Assert.nonEmpty( attributes.get( "name" ) );
-				String key = this.currentClassName + "." + propName;
-				String value = Assert.nonEmpty( attributes.get( "value" ) );
-				Property.this.values.put( key,  value );
-			}
-			
-			if ( name.equals( "text" ) ) {
-				String propName = Assert.nonEmpty( attributes.get( "name" ) );
-				this.currentTextKey = this.currentClassName + "." + propName;
-				this.buf.setLength( 0 );
-			}
-		}
-		
-		@Override
-		public void endElement( String name ) {
-			Assert.nonEmpty( name );
-			
-			if ( name.equals( "text" ) ) {
-				Assert.nonEmpty( this.currentTextKey );
-				
-				Property.this.text.put( this.currentTextKey,  this.buf.toString() );
-			}
-		}
-
-		@Override
-		public void characters( char[] ch, int start, int length ) {
-			this.buf.append( ch, start, length );
-		}
+	
+	public static void main( String[] args ) {
+		Test.eval();
 	}
 	
 

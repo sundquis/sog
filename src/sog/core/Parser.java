@@ -64,6 +64,10 @@ public interface Parser<T> {
 	@Test.Decl( "Empty list not allowed" )
 	@Test.Decl( "White space after comma ignored" )
 	public static final Parser<List<String>> LIST = (s) -> Arrays.asList( CSV.fromString(s) );
+	
+	public static void main( String args[] ) {
+		Test.eval();
+	}
 
 	
 }

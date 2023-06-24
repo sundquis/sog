@@ -68,19 +68,15 @@ public class App implements Runnable {
 	
 	private final String startDateTime;
 	
-	//FIXME: app.root and app.config
-	// Two required JMV args
 	private App() {
-		String rootDirName = System.getProperty( "app.root" );
-		//Assert.nonEmpty( Property.get( "root", null, Property.STRING ) );
+		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Parser.STRING ) );
 		this.root = Assert.rwDirectory( Path.of( rootDirName ) );
-		this.description = "foo";	//Assert.nonEmpty( Property.get( "description",  "<none>",  Property.STRING ) );
-		this.sourceDirs = List.of();
-//				Property.get( "source.dirs", List.of(), Property.LIST )
-//			.stream()
-//			.map( Path::of )
-//			.collect( Collectors.toList() );
-//		Assert.isTrue( ! this.sourceDirs.isEmpty() );
+		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Parser.STRING ) );
+		this.sourceDirs = Property.get( "source.dirs", List.of(), Parser.LIST )
+			.stream()
+			.map( Path::of )
+			.collect( Collectors.toList() );
+		Assert.isTrue( ! this.sourceDirs.isEmpty() );
 		this.objectsForShutdown = new LinkedList<OnShutdown>();
 		Runtime.getRuntime().addShutdownHook( new Thread( this ) );
 		
@@ -398,24 +394,6 @@ public class App implements Runnable {
 		);
 	}
 
-	// FIXME
-	// To avoid issues with initialization we cannot use the service provided by App.get().getCallingClass( offset )
-	private static String getClassName() {
-		// FRAGILE:
-		StackTraceElement[] stackTrace = (new Exception()).getStackTrace();
-		// Stack:
-		//		Property.getClassName
-		//		Property.get/getText
-		//		<class declaring a property>
-		Assert.isTrue( stackTrace.length > 2 );
-		
-		// This original regular expression was not documented and seems wrong
-		//String className = stackTrace[2].getClassName().replaceAll( "\\D*\\d+[_a-zA-Z]*$", "" );
-
-		// Replaced with expression that matches inner class names that contain "$n"
-		String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
-		return Assert.nonEmpty( className );
-	}
 	
 	@Test.Decl( "Throws AssertionError for negative offset" )
 	@Test.Decl( "Throws AppExcpetion for offset larger than stack depth" )
@@ -447,11 +425,13 @@ public class App implements Runnable {
 		//Arrays.stream( Package.getPackages() ).forEach( System.out::println );
 		//App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "" ) ).forEach( System.out::println );
 		
-		System.out.println( ">>> ROOT = " + App.get().root() );
-		System.out.println( ">>> URI  = " + App.get().root().toUri() );
-		System.out.println( ">>> DESC = " + App.get().description() );
-		System.out.println( ">>> STRT = " + App.get().startDateTime() );
-		System.out.println( ">>> CNFG = " + System.getProperty( "app.config" ) );
+		//System.out.println( ">>> ROOT = " + App.get().root() );
+		//System.out.println( ">>> URI  = " + App.get().root().toUri() );
+		//System.out.println( ">>> DESC = " + App.get().description() );
+		//System.out.println( ">>> STRT = " + App.get().startDateTime() );
+		//System.out.println( ">>> CNFG = " + System.getProperty( "app.config" ) );
+		
+		Test.evalAll();
 		System.out.println( "Done!" );
 	}
 	

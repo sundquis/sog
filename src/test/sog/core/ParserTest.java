@@ -19,7 +19,11 @@
 
 package test.sog.core;
 
+import java.util.List;
+
+import sog.core.Objects;
 import sog.core.Parser;
+import sog.core.Strings;
 import sog.core.Test;
 
 /**
@@ -32,11 +36,187 @@ public class ParserTest extends Test.Container {
 		super( Parser.class );
 	}
 	
-	
+
+	private <T> void test( Test.Case tc, Parser<T> p, String s, T target ) {
+		T value = p.fromString( s );
+		if ( Objects.deepEquals( target, value ) ) {
+			tc.assertPass();
+		} else {
+			tc.assertFail( "String = " + s + ", Target = " + Strings.toString( target ) + ", Value = " + Strings.toString( value ) );
+		}
+	}
+
 	
 	// TEST CASES
 	
+	@Test.Impl( 
+		member = "field: Parser Parser.BOOLEAN", 
+		description = "Correct for sample cases" 
+	)
+	public void tm_00B219A8E( Test.Case tc ) {
+		this.test( tc, Parser.BOOLEAN, "true", true );
+		this.test( tc, Parser.BOOLEAN, "TRUE", true );
+		this.test( tc, Parser.BOOLEAN, "True", true );
+		this.test( tc, Parser.BOOLEAN, "false", false );
+		this.test( tc, Parser.BOOLEAN, "FALSE", false );
+		this.test( tc, Parser.BOOLEAN, "False", false );
+	}
+				
+	@Test.Impl( 
+		member = "field: Parser Parser.BOOLEAN", 
+		description = "Returns false for mal-formed string" 
+	)
+	public void tm_0126A770A( Test.Case tc ) {
+		this.test( tc, Parser.BOOLEAN, "malformed", false );
+	}
+			
 	
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "Array of length one allowed" 
+	)
+	public void tm_0E023B276( Test.Case tc ) {
+		this.test( tc, Parser.CSV, "foo", new String[] { "foo" } );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "Collection of common cases" 
+	)
+	public void tm_07DACD82B( Test.Case tc ) {
+		this.test( tc, Parser.CSV, "1, 2, 3", new String[] { "1", "2", "3" } );
+		this.test( tc, Parser.CSV, "1, , 3", new String[] { "1", "", "3" } );
+		this.test( tc, Parser.CSV, "1,2,3", new String[] { "1", "2", "3" } );
+		this.test( tc, Parser.CSV, ",,", new String[] { "", "", "" } );
+		this.test( tc, Parser.CSV, " , , ", new String[] { "", "", "" } );
+		this.test( tc, Parser.CSV, " a string with spaces, another string ", new String[] { " a string with spaces", "another string " } );
+		this.test( tc, Parser.CSV, "!@#,$%^,&*(", new String[] { "!@#", "$%^", "&*(" } );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "Empty array not allowed" 
+	)
+	public void tm_03B9F0E21( Test.Case tc ) {
+		this.test( tc, Parser.CSV, "", new String[] { "" } );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "White space after comma ignored" 
+	)
+	public void tm_0C4FA16D2( Test.Case tc ) {
+		this.test( tc, Parser.CSV, "one,      spaces", new String[]  { "one", "spaces" } );
+		this.test( tc, Parser.CSV, "one,\ttab", new String[] { "one", "tab" } );
+		this.test( tc, Parser.CSV, "one,  \t\t  \tmultiple", new String[] { "one", "multiple" } );
+		this.test( tc, Parser.CSV, "one  ,      before", new String[]  { "one  ", "before" } );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.INTEGER", 
+		description = "Correct for sample cases" 
+	)
+	public void tm_0F9726538( Test.Case tc ) {
+		this.test( tc, Parser.INTEGER, "1", 1 );
+		this.test( tc, Parser.INTEGER, "-1", -1 );
+		this.test( tc, Parser.INTEGER, "1000000", 1000000 );
+		this.test( tc, Parser.INTEGER, "0001000", 1000 );
+		this.test( tc, Parser.INTEGER, "-123456789", -123456789 );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.INTEGER", 
+		description = "Throws NumberFormatException for mal-formed string" 
+	)
+	public void tm_0BDC1B61C( Test.Case tc ) {
+		tc.expectError( NumberFormatException.class );
+		this.test( tc, Parser.INTEGER, "123.456", 123 );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "Collection of common cases" 
+	)
+	public void tm_094A5682D( Test.Case tc ) {
+		this.test( tc, Parser.LIST, "A, B, C", List.of( "A", "B", "C" ) );
+		this.test( tc, Parser.LIST, "A, , C", List.of( "A", "", "C" ) );
+		this.test( tc, Parser.LIST, "A,B,C", List.of( "A", "B", "C" ) );
+		this.test( tc, Parser.LIST, "A B C, A B C, A B C", List.of( "A B C", "A B C", "A B C" ) );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "Empty list not allowed" 
+	)
+	public void tm_00FF6C544( Test.Case tc ) {
+		this.test( tc, Parser.LIST, "", List.of( "" ) );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "List of length one allowed" 
+	)
+	public void tm_0AAE09653( Test.Case tc ) {
+		this.test( tc, Parser.LIST, "foo", List.of( "foo" ) );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "White space after comma ignored" 
+	)
+	public void tm_006453810( Test.Case tc ) {
+		this.test( tc, Parser.LIST, "one,      spaces", List.of( "one", "spaces" ) );
+		this.test( tc, Parser.LIST, "one,\ttab", List.of( "one", "tab" ) );
+		this.test( tc, Parser.LIST, "one,  \t\t  \tmultiple", List.of( "one", "multiple" ) );
+		this.test( tc, Parser.LIST, "one  ,      before", List.of( "one  ", "before" ) );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LONG", 
+		description = "Correct for sample cases" 
+	)
+	public void tm_06105CA54( Test.Case tc ) {
+		this.test( tc, Parser.LONG, "1", 1L );
+		this.test( tc, Parser.LONG, "0", 0L );
+		this.test( tc, Parser.LONG, "000", 0L );
+		this.test( tc, Parser.LONG, "1234567890123456789", 1234567890123456789L );
+		this.test( tc, Parser.LONG, "-1234567890123456789", -1234567890123456789L );
+		this.test( tc, Parser.LONG, "0101010", 101010L );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LONG", 
+		description = "Throws NumberFormatException for mal-formed string" 
+	)
+	public void tm_0440EB038( Test.Case tc ) {
+		tc.expectError( NumberFormatException.class );
+		this.test( tc, Parser.LONG, "0xABC", 0L );
+	}
+			
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.STRING", 
+		description = "Correct for sample cases" 
+	)
+	public void tm_026D0199F( Test.Case tc ) {
+		this.test( tc, Parser.STRING, "this parser is the identity function", "this parser is the identity function" );
+		this.test( tc, Parser.STRING, "", "" );
+		this.test( tc, Parser.STRING, " ", " " );
+		this.test( tc, Parser.STRING, "'a b'", "'a b'" );
+	}
+			
+
 	
 	
 
