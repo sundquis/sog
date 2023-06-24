@@ -37,21 +37,21 @@ public class ByteFile implements AutoCloseable {
 	private static long GB = 1_000_000_000L;
 
 	/* Configurable max data file length in bytes (1 GB default) */
-	private static long MAX_LENGTH = Property.get( "maxLength", 1L * GB, Property.LONG );
+	private static long MAX_LENGTH = Property.get( "maxLength", 1L * GB, Parser.LONG );
 
 	/*
 	 * Configurable data usage limit.
 	 * When the total (across all ByteFlie instances) data usage reaches this limit, calls to
 	 * add additional bytes trigger warning messages.
 	 */
-	private static long WARN_LIMIT = Property.get( "warnLimit", 2L * GB, Property.LONG );
+	private static long WARN_LIMIT = Property.get( "warnLimit", 2L * GB, Parser.LONG );
 	
 	/*
 	 * Configurable data usage limit.
 	 * When the total (across all ByteFlie instances) data usage reaches this limit, the nex
 	 * call to add additional bytes triggers an Error.
 	 */
-	private static long FAIL_LIMIT = Property.get( "failLimit", 5L * GB, Property.LONG );
+	private static long FAIL_LIMIT = Property.get( "failLimit", 5L * GB, Parser.LONG );
 	
 
 	/*

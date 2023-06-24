@@ -30,10 +30,10 @@ public final class Strings {
 	
 
 	/* If a collection has more than this many elements then toString() omits some elements. */
-	private static final int COLLECTION_MAX_LENGTH = Property.get( "collection.max.length", 7, Property.INTEGER );
+	private static final int COLLECTION_MAX_LENGTH = Property.get( "collection.max.length", 7, Parser.INTEGER );
 	
 	/* If an array has more than this many elements then toString() omits some elements. */
-	private static final int ARRAY_MAX_LENGTH = Property.get( "array.max.length", 7, Property.INTEGER );
+	private static final int ARRAY_MAX_LENGTH = Property.get( "array.max.length", 7, Parser.INTEGER );
 
 
 	/** Not intended to be instantiated. */

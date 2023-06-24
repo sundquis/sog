@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
+import sog.core.Parser;
 import sog.core.Property;
 import sog.core.Strings;
 import sog.core.Test;
@@ -56,9 +57,9 @@ import sog.util.Printable;
 public class TestResult extends Result {
 	
 	
-	private static boolean PROGRESS = Property.get( "progress", false, Property.BOOLEAN );
+	private static boolean PROGRESS = Property.get( "progress", false, Parser.BOOLEAN );
 	
-	private static int WRAP = Property.get( "wrap", 20, Property.INTEGER );
+	private static int WRAP = Property.get( "wrap", 20, Parser.INTEGER );
 	
 	private static int numTestCase = 0;
 	

@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
+import sog.core.Parser;
 import sog.core.Property;
 import sog.core.Test;
 import sog.util.IndentWriter;
@@ -52,7 +53,7 @@ public class TestResultSet extends Result {
 	
 	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
 	
-	private static boolean VERBOSE = Property.get( "verbose", false, Property.BOOLEAN );
+	private static boolean VERBOSE = Property.get( "verbose", false, Parser.BOOLEAN );
 	
 
 	

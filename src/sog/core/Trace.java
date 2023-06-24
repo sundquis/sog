@@ -58,16 +58,16 @@ public class Trace implements Runnable, OnShutdown {
 	
 	
 	/* Subdirectory of <root> holding trace files. */
-	private static final String TRACE_DIR_NAME = Property.get( "dir.name",  "trace",  Property.STRING );
+	private static final String TRACE_DIR_NAME = Property.get( "dir.name",  "trace",  Parser.STRING );
 
 	/* After this many messages have been added the buffer is written to the current trace file. */
-	private static final Integer BUFFER_LIMIT = Property.get( "buffer.limit", 100, Property.INTEGER );
+	private static final Integer BUFFER_LIMIT = Property.get( "buffer.limit", 100, Parser.INTEGER );
 	
 	/* After this many lines have been written to a trace file a new file is opened. */
-	private static final Integer LINE_LIMIT = Property.get( "line.limit", 10_000, Property.INTEGER );
+	private static final Integer LINE_LIMIT = Property.get( "line.limit", 10_000, Parser.INTEGER );
 	
 	/* After this many files have been written a Fatal.error is triggered. */
-	private static final Integer FILE_LIMIT = Property.get( "file.limit", 100, Property.INTEGER );
+	private static final Integer FILE_LIMIT = Property.get( "file.limit", 100, Parser.INTEGER );
 	
 	
 

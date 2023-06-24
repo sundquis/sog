@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,10 +43,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 
-import sog.core.App;
 import sog.core.Assert;
 import sog.core.Fatal;
-import sog.core.Property;
 import sog.core.Test;
 
 /**

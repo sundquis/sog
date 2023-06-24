@@ -78,7 +78,7 @@ public class SoftString implements Comparable<SoftString> {
 
 	
 	/* Configurable minimum string length for soft references */
-	private static Integer THRESHOLD = Property.get( "threshold", 50, Property.INTEGER );
+	private static Integer THRESHOLD = Property.get( "threshold", 50, Parser.INTEGER );
 
 	
 	

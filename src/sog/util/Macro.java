@@ -20,10 +20,9 @@ import java.util.stream.Stream;
 
 import sog.core.AppException;
 import sog.core.Assert;
+import sog.core.Parser;
 import sog.core.Property;
 import sog.core.Test;
-//import sog.util.FifoQueue;
-//import sog.util.Queue;
 
 /**
  * @author sundquis
@@ -32,7 +31,7 @@ import sog.core.Test;
 public class Macro implements Function<String, Stream<String>> {
 	
 	/* Maximum recursive depth allowed */
-	private static final int MAX_ITERATIONS = Property.get( "maxIterations",  100,  Property.INTEGER );
+	private static final int MAX_ITERATIONS = Property.get( "maxIterations",  100,  Parser.INTEGER );
 
 	/*
 	 * The pattern for matching key occurrences of the form:

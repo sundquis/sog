@@ -22,6 +22,7 @@ package test.sog.core;
 import java.util.List;
 
 import sog.core.Objects;
+import sog.core.Parser;
 import sog.core.Property;
 import sog.core.Strings;
 import sog.core.Test;
@@ -37,8 +38,8 @@ public class PropertyTest extends Test.Container {
 	}
 	
 
-	private <T> void test( Test.Case tc, Property.Parser<T> p, String s, T target ) {
-		T value = p.value( s );
+	private <T> void test( Test.Case tc, Parser<T> p, String s, T target ) {
+		T value = p.fromString( s );
 		if ( Objects.deepEquals( target, value ) ) {
 			tc.assertPass();
 		} else {
@@ -55,12 +56,12 @@ public class PropertyTest extends Test.Container {
 		description = "Correct for sample cases" 
 	)
 	public void tm_07C8234C7( Test.Case tc ) {
-		this.test( tc, Property.BOOLEAN, "true", true );
-		this.test( tc, Property.BOOLEAN, "TRUE", true );
-		this.test( tc, Property.BOOLEAN, "True", true );
-		this.test( tc, Property.BOOLEAN, "false", false );
-		this.test( tc, Property.BOOLEAN, "FALSE", false );
-		this.test( tc, Property.BOOLEAN, "False", false );
+		this.test( tc, Parser.BOOLEAN, "true", true );
+		this.test( tc, Parser.BOOLEAN, "TRUE", true );
+		this.test( tc, Parser.BOOLEAN, "True", true );
+		this.test( tc, Parser.BOOLEAN, "false", false );
+		this.test( tc, Parser.BOOLEAN, "FALSE", false );
+		this.test( tc, Parser.BOOLEAN, "False", false );
 	}
 		
 	@Test.Impl( 
@@ -68,7 +69,7 @@ public class PropertyTest extends Test.Container {
 		description = "Returns false for mal-formed string" 
 	)
 	public void tm_0F106679B( Test.Case tc ) {
-		this.test( tc, Property.BOOLEAN, "malformed", false );
+		this.test( tc, Parser.BOOLEAN, "malformed", false );
 	}
 		
 	@Test.Impl( 
@@ -76,7 +77,7 @@ public class PropertyTest extends Test.Container {
 		description = "Array of length one allowed" 
 	)
 	public void tm_01D9A6D1D( Test.Case tc ) {
-		this.test( tc, Property.CSV, "foo", new String[] { "foo" } );
+		this.test( tc, Parser.CSV, "foo", new String[] { "foo" } );
 	}
 		
 	@Test.Impl( 
@@ -84,13 +85,13 @@ public class PropertyTest extends Test.Container {
 		description = "Collection of common cases" 
 	)
 	public void tm_0A0B0ACA4( Test.Case tc ) {
-		this.test( tc, Property.CSV, "1, 2, 3", new String[] { "1", "2", "3" } );
-		this.test( tc, Property.CSV, "1, , 3", new String[] { "1", "", "3" } );
-		this.test( tc, Property.CSV, "1,2,3", new String[] { "1", "2", "3" } );
+		this.test( tc, Parser.CSV, "1, 2, 3", new String[] { "1", "2", "3" } );
+		this.test( tc, Parser.CSV, "1, , 3", new String[] { "1", "", "3" } );
+		this.test( tc, Parser.CSV, "1,2,3", new String[] { "1", "2", "3" } );
 		//this.test( tc, Property.CSV, ",,", new String[] { "", "", "" } );
 		//this.test( tc, Property.CSV, " , , ", new String[] { "", "", "" } );
-		this.test( tc, Property.CSV, " a string with spaces, another string ", new String[] { " a string with spaces", "another string " } );
-		this.test( tc, Property.CSV, "!@#,$%^,&*(", new String[] { "!@#", "$%^", "&*(" } );
+		this.test( tc, Parser.CSV, " a string with spaces, another string ", new String[] { " a string with spaces", "another string " } );
+		this.test( tc, Parser.CSV, "!@#,$%^,&*(", new String[] { "!@#", "$%^", "&*(" } );
 	}
 		
 	@Test.Impl( 
@@ -98,7 +99,7 @@ public class PropertyTest extends Test.Container {
 		description = "Empty array not allowed" 
 	)
 	public void tm_0A31EFA55( Test.Case tc ) {
-		this.test( tc, Property.CSV, "", new String[] { "" } );
+		this.test( tc, Parser.CSV, "", new String[] { "" } );
 	}
 		
 	@Test.Impl( 
@@ -106,10 +107,10 @@ public class PropertyTest extends Test.Container {
 		description = "White space after comma ignored" 
 	)
 	public void tm_09DB525F9( Test.Case tc ) {
-		this.test( tc, Property.CSV, "one,      spaces", new String[]  { "one", "spaces" } );
-		this.test( tc, Property.CSV, "one,\ttab", new String[] { "one", "tab" } );
-		this.test( tc, Property.CSV, "one,  \t\t  \tmultiple", new String[] { "one", "multiple" } );
-		this.test( tc, Property.CSV, "one  ,      before", new String[]  { "one  ", "before" } );
+		this.test( tc, Parser.CSV, "one,      spaces", new String[]  { "one", "spaces" } );
+		this.test( tc, Parser.CSV, "one,\ttab", new String[] { "one", "tab" } );
+		this.test( tc, Parser.CSV, "one,  \t\t  \tmultiple", new String[] { "one", "multiple" } );
+		this.test( tc, Parser.CSV, "one  ,      before", new String[]  { "one  ", "before" } );
 	}
 		
 	@Test.Impl( 
@@ -117,11 +118,11 @@ public class PropertyTest extends Test.Container {
 		description = "Correct for sample cases" 
 	)
 	public void tm_06AD2FF71( Test.Case tc ) {
-		this.test( tc, Property.INTEGER, "1", 1 );
-		this.test( tc, Property.INTEGER, "-1", -1 );
-		this.test( tc, Property.INTEGER, "1000000", 1000000 );
-		this.test( tc, Property.INTEGER, "0001000", 1000 );
-		this.test( tc, Property.INTEGER, "-123456789", -123456789 );
+		this.test( tc, Parser.INTEGER, "1", 1 );
+		this.test( tc, Parser.INTEGER, "-1", -1 );
+		this.test( tc, Parser.INTEGER, "1000000", 1000000 );
+		this.test( tc, Parser.INTEGER, "0001000", 1000 );
+		this.test( tc, Parser.INTEGER, "-123456789", -123456789 );
 	}
 		
 	@Test.Impl( 
@@ -130,7 +131,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_0045EE845( Test.Case tc ) {
 		tc.expectError( NumberFormatException.class );
-		this.test( tc, Property.INTEGER, "123.456", 123 );
+		this.test( tc, Parser.INTEGER, "123.456", 123 );
 	}
 		
 	@Test.Impl( 
@@ -138,7 +139,7 @@ public class PropertyTest extends Test.Container {
 		description = "List of length one allowed" 
 	)
 	public void tm_0199DBCED( Test.Case tc ) {
-		this.test( tc, Property.LIST, "foo", List.of( "foo" ) );
+		this.test( tc, Parser.LIST, "foo", List.of( "foo" ) );
 	}
 		
 	@Test.Impl( 
@@ -146,10 +147,10 @@ public class PropertyTest extends Test.Container {
 		description = "Collection of common cases" 
 	)
 	public void tm_0D21C22D4( Test.Case tc ) {
-		this.test( tc, Property.LIST, "A, B, C", List.of( "A", "B", "C" ) );
-		this.test( tc, Property.LIST, "A, , C", List.of( "A", "", "C" ) );
-		this.test( tc, Property.LIST, "A,B,C", List.of( "A", "B", "C" ) );
-		this.test( tc, Property.LIST, "A B C, A B C, A B C", List.of( "A B C", "A B C", "A B C" ) );
+		this.test( tc, Parser.LIST, "A, B, C", List.of( "A", "B", "C" ) );
+		this.test( tc, Parser.LIST, "A, , C", List.of( "A", "", "C" ) );
+		this.test( tc, Parser.LIST, "A,B,C", List.of( "A", "B", "C" ) );
+		this.test( tc, Parser.LIST, "A B C, A B C, A B C", List.of( "A B C", "A B C", "A B C" ) );
 	}
 		
 	@Test.Impl( 
@@ -157,7 +158,7 @@ public class PropertyTest extends Test.Container {
 		description = "Empty list not allowed" 
 	)
 	public void tm_056171A25( Test.Case tc ) {
-		this.test( tc, Property.LIST, "", List.of( "" ) );
+		this.test( tc, Parser.LIST, "", List.of( "" ) );
 	}
 		
 	@Test.Impl( 
@@ -165,10 +166,10 @@ public class PropertyTest extends Test.Container {
 		description = "White space after comma ignored" 
 	)
 	public void tm_044EC0DC9( Test.Case tc ) {
-		this.test( tc, Property.LIST, "one,      spaces", List.of( "one", "spaces" ) );
-		this.test( tc, Property.LIST, "one,\ttab", List.of( "one", "tab" ) );
-		this.test( tc, Property.LIST, "one,  \t\t  \tmultiple", List.of( "one", "multiple" ) );
-		this.test( tc, Property.LIST, "one  ,      before", List.of( "one  ", "before" ) );
+		this.test( tc, Parser.LIST, "one,      spaces", List.of( "one", "spaces" ) );
+		this.test( tc, Parser.LIST, "one,\ttab", List.of( "one", "tab" ) );
+		this.test( tc, Parser.LIST, "one,  \t\t  \tmultiple", List.of( "one", "multiple" ) );
+		this.test( tc, Parser.LIST, "one  ,      before", List.of( "one  ", "before" ) );
 	}
 		
 	@Test.Impl( 
@@ -176,12 +177,12 @@ public class PropertyTest extends Test.Container {
 		description = "Correct for sample cases" 
 	)
 	public void tm_06A6902BB( Test.Case tc ) {
-		this.test( tc, Property.LONG, "1", 1L );
-		this.test( tc, Property.LONG, "0", 0L );
-		this.test( tc, Property.LONG, "000", 0L );
-		this.test( tc, Property.LONG, "1234567890123456789", 1234567890123456789L );
-		this.test( tc, Property.LONG, "-1234567890123456789", -1234567890123456789L );
-		this.test( tc, Property.LONG, "0101010", 101010L );
+		this.test( tc, Parser.LONG, "1", 1L );
+		this.test( tc, Parser.LONG, "0", 0L );
+		this.test( tc, Parser.LONG, "000", 0L );
+		this.test( tc, Parser.LONG, "1234567890123456789", 1234567890123456789L );
+		this.test( tc, Parser.LONG, "-1234567890123456789", -1234567890123456789L );
+		this.test( tc, Parser.LONG, "0101010", 101010L );
 	}
 		
 	@Test.Impl( 
@@ -190,7 +191,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_0B70A018F( Test.Case tc ) {
 		tc.expectError( NumberFormatException.class );
-		this.test( tc, Property.LONG, "0xABC", 0L );
+		this.test( tc, Parser.LONG, "0xABC", 0L );
 	}
 		
 	@Test.Impl( 
@@ -198,10 +199,10 @@ public class PropertyTest extends Test.Container {
 		description = "Correct for sample cases" 
 	)
 	public void tm_06446D446( Test.Case tc ) {
-		this.test( tc, Property.STRING, "this parser is the identity function", "this parser is the identity function" );
-		this.test( tc, Property.STRING, "", "" );
-		this.test( tc, Property.STRING, " ", " " );
-		this.test( tc, Property.STRING, "'a b'", "'a b'" );
+		this.test( tc, Parser.STRING, "this parser is the identity function", "this parser is the identity function" );
+		this.test( tc, Parser.STRING, "", "" );
+		this.test( tc, Parser.STRING, " ", " " );
+		this.test( tc, Parser.STRING, "'a b'", "'a b'" );
 	}
 		
 	@Test.Impl( 
@@ -209,7 +210,7 @@ public class PropertyTest extends Test.Container {
 		description = "Last value for repeated elements" 
 	)
 	public void tm_0559203CB( Test.Case tc ) {
-		tc.assertEqual( "bar", Property.get( "repeated", "foo", Property.STRING ) );
+		tc.assertEqual( "bar", Property.get( "repeated", "foo", Parser.STRING ) );
 	}
 		
 	@Test.Impl( 
@@ -228,12 +229,12 @@ public class PropertyTest extends Test.Container {
 		
 	public static class Inner {
 		
-		public static final String MSG = Property.get( "message", "foo", Property.STRING );
+		public static final String MSG = Property.get( "message", "foo", Parser.STRING );
 		
 		public static final String TEXT = Property.getText( "message" );
 		
 		public static class Nested {
-			public static final String MSG = Property.get( "message", "foo", Property.STRING );
+			public static final String MSG = Property.get( "message", "foo", Parser.STRING );
 			public static final String TEXT = Property.getText( "message" );
 		}
 	
@@ -260,7 +261,7 @@ public class PropertyTest extends Test.Container {
 		description = "Retrieves properties for top level classes" 
 	)
 	public void tm_02FAD2C58( Test.Case tc ) {
-		tc.assertEqual( "bar", Property.get( "message", "foo", Property.STRING ) );
+		tc.assertEqual( "bar", Property.get( "message", "foo", Parser.STRING ) );
 	}
 		
 	@Test.Impl( 
@@ -269,7 +270,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_0E5D30F77( Test.Case tc ) {
 		String s = new Object() { 
-			@Override public String toString() { return Property.get( "message", "foo", Property.STRING ); }
+			@Override public String toString() { return Property.get( "message", "foo", Parser.STRING ); }
 		}.toString();
 		tc.assertEqual( "bar", s );
 	}
@@ -280,7 +281,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_05D390A50( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Property.get( "", "foo", Property.STRING );
+		Property.get( "", "foo", Parser.STRING );
 	}
 		
 	@Test.Impl( 
@@ -289,7 +290,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_0E024C6E2( Test.Case tc ) {
 		class Local {
-			@Override public String toString() { return Property.get( "message", "foo", Property.STRING ); }
+			@Override public String toString() { return Property.get( "message", "foo", Parser.STRING ); }
 		}
 		String s = new Local().toString();
 		tc.assertEqual( "bar", s );
@@ -301,7 +302,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_0BBEC9E48( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Property.get( null, "foo", Property.STRING );
+		Property.get( null, "foo", Parser.STRING );
 	}
 		
 	@Test.Impl( 
@@ -310,7 +311,7 @@ public class PropertyTest extends Test.Container {
 	)
 	public void tm_04C6CD25C( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Property.Parser<String> p = null;
+		Parser<String> p = null;
 		Property.get( "message", "foo", p );
 	}
 		
