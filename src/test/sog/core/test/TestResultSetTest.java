@@ -26,8 +26,8 @@ import java.util.stream.Stream;
 import sog.core.App;
 import sog.core.Test;
 import sog.core.test.Result;
-import sog.core.test.TestResult;
-import sog.core.test.TestResultSet;
+import sog.core.test.TestSubject;
+import sog.core.test.TestSet;
 import sog.util.IndentWriter;
 import sog.util.StringOutputStream;
 
@@ -38,23 +38,23 @@ import sog.util.StringOutputStream;
 public class TestResultSetTest extends Test.Container {
 	
 	public TestResultSetTest() {
-		super( TestResultSet.class );
+		super( TestSet.class );
 	}
 	
 	
 	
-	public Set<Result> getResults( TestResultSet trs ) {
+	public Set<Result> getResults( TestSet trs ) {
 		return this.getSubjectField( trs, "results", null );
 	}
 	
 	
-	public List<String> getSkippedClases( TestResultSet trs ) {
+	public List<String> getSkippedClases( TestSet trs ) {
 		return this.getSubjectField( trs, "skippedClasses", null );
 	}
 	
 	
 	public void print( Class<?> subject ) {
-		TestResult.forSubject( subject ).print( new IndentWriter( System.out, "\t" ) );
+		TestSubject.forSubject( subject ).print( new IndentWriter( System.out, "\t" ) );
 	}
 	
 	public static class MyResult extends Result {
@@ -79,30 +79,30 @@ public class TestResultSetTest extends Test.Container {
 	// TEST CASES
 	
 	@Test.Impl( 
-		member = "constructor: TestResultSet(String)", 
+		member = "constructor: TestSet(String)", 
 		description = "Throws AssertionError for empty label" 
 	)
 	public void tm_0E5BF9170( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		new TestResultSet( "" );
+		new TestSet( "" );
 	}
 		
 	@Test.Impl( 
-		member = "constructor: TestResultSet(String)", 
+		member = "constructor: TestSet(String)", 
 		description = "Throws AssertionError for null label" 
 	)
 	public void tm_0A1C6DF82( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		new TestResultSet( null );
+		new TestSet( null );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(Class)", 
-		description = "Adds one TestResult",
+		member = "method: TestSet TestSet.addClass(Class)", 
+		description = "Adds one TestSubject",
 		weight = 3
 	)
 	public void tm_02334FB7C( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		int before = this.getResults( trs ).size();
 		trs.addClass( App.class );
 		int after = this.getResults( trs ).size();
@@ -120,44 +120,44 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(Class)", 
-		description = "Return is this TestResultSet instance" 
+		member = "method: TestSet TestSet.addClass(Class)", 
+		description = "Return is this TestSet instance" 
 	)
 	public void tm_0337F4643( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		tc.assertEqual( trs, trs.addClass( App.class ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(Class)", 
+		member = "method: TestSet TestSet.addClass(Class)", 
 		description = "Throws AssertionError for null class" 
 	)
 	public void tm_0FAD19EEE( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		Class<?> c = null;
 		trs.addClass( c );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(String)", 
-		description = "Adds one TestResult" 
+		member = "method: TestSet TestSet.addClass(String)", 
+		description = "Adds one TestSubject" 
 	)
 	public void tm_0A82CCD55( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		int before = this.getResults( trs ).size();
-		trs.addClass( "sog.core.test.TestResult" );
+		trs.addClass( "sog.core.test.TestSubject" );
 		int after = this.getResults( trs ).size();
 		tc.assertEqual( before + 1, after );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(String)", 
+		member = "method: TestSet TestSet.addClass(String)", 
 		description = "Records error message if class is not found",
 		weight = 2
 	)
 	public void tm_0B778BFB9( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		int before = this.getResults( trs ).size();
 		trs.addClass( "sog.core.test.Foo" );
 		int after = this.getSkippedClases( trs ).size();
@@ -170,72 +170,72 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(String)", 
-		description = "Return is this TestResultSet instance" 
+		member = "method: TestSet TestSet.addClass(String)", 
+		description = "Return is this TestSet instance" 
 	)
 	public void tm_077F1B3DC( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		tc.assertEqual( trs, trs.addClass( "sog.core.Test" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(String)", 
+		member = "method: TestSet TestSet.addClass(String)", 
 		description = "Throws AssertionError for empty class name" 
 	)
 	public void tm_0D15DAF7C( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		trs.addClass( "" );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClass(String)", 
+		member = "method: TestSet TestSet.addClass(String)", 
 		description = "Throws AssertionError for null class name" 
 	)
 	public void tm_0D0425EEC( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		Class<?> c = null;
 		trs.addClass( c );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClasses(Stream)", 
-		description = "Adds one TestResult for each valid class name" 
+		member = "method: TestSet TestSet.addClasses(Stream)", 
+		description = "Adds one TestSubject for each valid class name" 
 	)
 	public void tm_022AD7F13( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		Stream.of( App.class, Test.class, Object.class ).map( Class::getName ).forEach( trs::addClass );
 		tc.assertEqual( 3, this.getResults( trs ).size() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClasses(Stream)", 
-		description = "Return is this TestResultSet instance" 
+		member = "method: TestSet TestSet.addClasses(Stream)", 
+		description = "Return is this TestSet instance" 
 	)
 	public void tm_02A4BB5FB( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		Stream<String> stream = Stream.of( App.class, Test.class, Object.class ).map( Class::getName );
 		tc.assertEqual( trs, trs.addClasses( stream ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addClasses(Stream)", 
+		member = "method: TestSet TestSet.addClasses(Stream)", 
 		description = "Throws AssertionError for null class names stream" 
 	)
 	public void tm_0830D4A18( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		Stream<String> stream = null;
 		trs.addClasses( stream );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addResult(Result)", 
+		member = "method: TestSet TestSet.addResult(Result)", 
 		description = "Elapsed time reflects new total" 
 	)
 	public void tm_06E3B48EE( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		long before = trs.getElapsedTime();
 		trs.addResult( TestResultSetTest.RESULT );
 		long after = trs.getElapsedTime();
@@ -243,37 +243,37 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addResult(Result)", 
+		member = "method: TestSet TestSet.addResult(Result)", 
 		description = "Fail count reflects new total" 
 	)
 	public void tm_0BDAFF652( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		trs.addResult( TestResultSetTest.RESULT );
 		tc.assertEqual( MyResult.FAIL_COUNT, trs.getFailCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addResult(Result)", 
+		member = "method: TestSet TestSet.addResult(Result)", 
 		description = "Pass count reflects new total" 
 	)
 	public void tm_0C19DE97F( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		trs.addResult( TestResultSetTest.RESULT );
 		tc.assertEqual( MyResult.PASS_COUNT, trs.getPassCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.addResult(Result)", 
-		description = "Return is this TestResultSet instance" 
+		member = "method: TestSet TestSet.addResult(Result)", 
+		description = "Return is this TestSet instance" 
 	)
 	public void tm_03C567283( Test.Case tc ) {
-		TestResultSet trs = new TestResultSet( "LABEL" );
+		TestSet trs = new TestSet( "LABEL" );
 		tc.assertEqual( trs, trs.addResult( TestResultSetTest.RESULT ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forAllSourceDirs()", 
-		description = "Aggregates TestResult instances for every class under every source directory" 
+		member = "method: TestSet TestSet.forAllSourceDirs()", 
+		description = "Aggregates TestSubject instances for every class under every source directory" 
 	)
 	public void tm_004D9EEC5( Test.Case tc ) {
 		tc.addMessage( "Manually verified" );
@@ -281,45 +281,45 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forAllSourceDirs()", 
+		member = "method: TestSet TestSet.forAllSourceDirs()", 
 		description = "Return is not null" 
 	)
 	public void tm_0C565278F( Test.Case tc ) {
 		// Causes infinite loop:
-		// tc.assertNonNull( TestResultSet.forAllSourceDirs() );
+		// tc.assertNonNull( TestSet.forAllSourceDirs() );
 		tc.addMessage( "Manually verified." );
 		tc.assertTrue( true );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackage(Class)", 
-		description = "Aggregates TestResult instances for every class in the same package as the given class" 
+		member = "method: TestSet TestSet.forPackage(Class)", 
+		description = "Aggregates TestSubject instances for every class in the same package as the given class" 
 	)
 	public void tm_0A1A84C84( Test.Case tc ) {
-		TestResultSet trs = TestResultSet.forPackage( test.sog.core.test.foo.C1.class );
+		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
 		tc.assertEqual( 3, this.getResults( trs ).size() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackage(Class)", 
+		member = "method: TestSet TestSet.forPackage(Class)", 
 		description = "Return is not null" 
 	)
 	public void tm_037C6939D( Test.Case tc ) {
-		tc.assertNonNull( TestResultSet.forPackage( test.sog.core.test.foo.C1.class ) );
+		tc.assertNonNull( TestSet.forPackage( test.sog.core.test.foo.C1.class ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackage(Class)", 
+		member = "method: TestSet TestSet.forPackage(Class)", 
 		description = "Throws AssertionError for null class" 
 	)
 	public void tm_0A01E3E54( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet.forPackage( null );
+		TestSet.forPackage( null );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forSourceDir(Path)", 
-		description = "Aggregates TestResult instances for every class under the given source directory" 
+		member = "method: TestSet TestSet.forSourceDir(Path)", 
+		description = "Aggregates TestSubject instances for every class under the given source directory" 
 	)
 	public void tm_0D63BED47( Test.Case tc ) {
 		tc.addMessage( "Manually verified" );
@@ -327,7 +327,7 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forSourceDir(Path)", 
+		member = "method: TestSet TestSet.forSourceDir(Path)", 
 		description = "Return is not null" 
 	)
 	public void tm_0491CBEDA( Test.Case tc ) {
@@ -336,70 +336,70 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forSourceDir(Path)", 
+		member = "method: TestSet TestSet.forSourceDir(Path)", 
 		description = "Throws AssertionError for null source path" 
 	)
 	public void tm_08EB90389( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet.forSourceDir( null );
+		TestSet.forSourceDir( null );
 	}
 			
 	@Test.Impl( 
-		member = "method: int TestResultSet.getFailCount()", 
+		member = "method: int TestSet.getFailCount()", 
 		description = "Value is the sum of all failing weights for all tests" 
 	)
 	public void tm_06A537EE4( Test.Case tc ) {
-		TestResultSet trs = TestResultSet.forPackage( test.sog.core.test.foo.C1.class );
+		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
 		tc.assertEqual( 9, trs.getFailCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: int TestResultSet.getPassCount()", 
+		member = "method: int TestSet.getPassCount()", 
 		description = "Value is the sum of all passing weights for all tests" 
 	)
 	public void tm_0584C9B7E( Test.Case tc ) {
-		TestResultSet trs = TestResultSet.forPackage( test.sog.core.test.foo.C1.class );
+		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
 		tc.assertEqual( 12, trs.getPassCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: long TestResultSet.getElapsedTime()", 
+		member = "method: long TestSet.getElapsedTime()", 
 		description = "Value is the total elapsed time for all tests" 
 	)
 	public void tm_0ED41C40C( Test.Case tc ) {
-		TestResultSet trs = TestResultSet.forPackage( test.sog.core.test.foo.C1.class );
+		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
 		tc.assertTrue( trs.getElapsedTime() >= 21L );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResultSet.print(IndentWriter)", 
+		member = "method: void TestSet.print(IndentWriter)", 
 		description = "Includes messages for each bad classname" 
 	)
 	public void tm_067F458BE( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		TestResultSet.forPackage( test.sog.core.test.foo.C1.class ).addClass( "foo.bar" ).print( new IndentWriter( sos, " " ) );
+		TestSet.forPackage( test.sog.core.test.foo.C1.class ).addClass( "foo.bar" ).print( new IndentWriter( sos, " " ) );
 		tc.assertTrue( sos.toString().contains( "Skipped Classes" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResultSet.print(IndentWriter)", 
-		description = "Includes summary for each TestResult" 
+		member = "method: void TestSet.print(IndentWriter)", 
+		description = "Includes summary for each TestSubject" 
 	)
 	public void tm_06F277C47( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		TestResultSet.forPackage( test.sog.core.test.foo.C1.class ).print( new IndentWriter( sos, " " ) );
+		TestSet.forPackage( test.sog.core.test.foo.C1.class ).print( new IndentWriter( sos, " " ) );
 		String output = sos.toString();
 		Stream.of( test.sog.core.test.foo.C1.class, test.sog.core.test.foo.C2.class, test.sog.core.test.foo.C3.class )
 			.map( Class::getName ).forEach( s -> tc.assertTrue( output.contains( s ) ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResultSet.print(IndentWriter)", 
+		member = "method: void TestSet.print(IndentWriter)", 
 		description = "Results are printed in alphabetaical order" 
 	)
 	public void tm_0119BF2CF( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		new TestResultSet( "TESTING" )
+		new TestSet( "TESTING" )
 			.addClass( test.sog.core.test.foo.C3.class )
 			.addClass( test.sog.core.test.foo.C2.class )
 			.addClass( test.sog.core.test.foo.C1.class )
@@ -412,17 +412,17 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResultSet.print(IndentWriter)", 
+		member = "method: void TestSet.print(IndentWriter)", 
 		description = "Throws AssertionError for null writer" 
 	)
 	public void tm_06C10F0A5( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		new TestResultSet( "Testing" ).print( null );
+		new TestSet( "Testing" ).print( null );
 	}
 
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
-		description = "Aggregates TestResult instances for every class under the given directory" 
+		member = "method: TestSet TestSet.forPackages(Path, Path)", 
+		description = "Aggregates TestSubject instances for every class under the given directory" 
 	)
 	public void tm_0FBB7A244( Test.Case tc ) {
 		tc.addMessage( "Manually verified" );
@@ -430,31 +430,31 @@ public class TestResultSetTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		member = "method: TestSet TestSet.forPackages(Path, Path)", 
 		description = "Return is not null" 
 	)
 	public void tm_0984A45D4( Test.Case tc ) {
 		Path sourceDir = App.get().sourceDir( App.class );
 		Path sub = Path.of( "sog", "core", "xml" );
-		tc.assertNonNull( TestResultSet.forPackages( sourceDir, sub ) );
+		tc.assertNonNull( TestSet.forPackages( sourceDir, sub ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		member = "method: TestSet TestSet.forPackages(Path, Path)", 
 		description = "Throws AssertionError for null source directory" 
 	)
 	public void tm_0046B215F( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet.forPackages( null, Path.of( "sog" ) );
+		TestSet.forPackages( null, Path.of( "sog" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResultSet TestResultSet.forPackages(Path, Path)", 
+		member = "method: TestSet TestSet.forPackages(Path, Path)", 
 		description = "Throws AssertionError for null sub-directory" 
 	)
 	public void tm_00B5612DF( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResultSet.forPackages( App.get().sourceDir( App.class ), null );
+		TestSet.forPackages( App.get().sourceDir( App.class ), null );
 	}
 
 	
@@ -462,8 +462,8 @@ public class TestResultSetTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( TestResultSet.class );
-		//Test.evalPackage( TestResultSet.class );
+		//Test.eval( TestSet.class );
+		//Test.evalPackage( TestSet.class );
 		//Test.evalDir( Test.class, "sog", "core" );
 		Test.evalAll();
 	}

@@ -40,7 +40,7 @@ import sog.util.Printable;
 /**
  * 		Responsibilities: 
  * 			Given a subject class, assembles and executes the set of test cases associated with the subject.
- * 			Defines error reporting logic for mis-configured tests.
+ * 			Defines error reporting logic for misconfigured tests.
  * 		Structure:
  * 			Extends Result.
  * 			Holds the subject class and container name.
@@ -54,7 +54,7 @@ import sog.util.Printable;
  * 
  */
 @Test.Subject( "test." )
-public class TestResult extends Result {
+public class TestSubject extends Result {
 	
 	
 	private static boolean PROGRESS = Property.get( "progress", false, Parser.BOOLEAN );
@@ -119,9 +119,9 @@ public class TestResult extends Result {
 	@Test.Decl( "If there are any errors all test cases are counted as failures" )
 	@Test.Decl( "If there are no errors all test cases are run" )
 	@Test.Decl( "If a test container was constructed afterAll is called after all cases have run" )
-	public static TestResult forSubject( Class<?> subjectClass ) {
-		TestResult result = new TestResult( Assert.nonNull( subjectClass ).getName() );
-		
+	public static TestSubject forSubject( Class<?> subjectClass ) {
+		TestSubject result = new TestSubject( Assert.nonNull( subjectClass ).getName() );
+
 		result.loadSubject( subjectClass );
 		result.scanSubject();
 
@@ -136,7 +136,7 @@ public class TestResult extends Result {
 
 
 
-	/* The subject class for which this TestResult holds results. Set by loadSubject(). */
+	/* The subject class for which this TestSubject holds results. Set by loadSubject(). */
 	private Class<?> subjectClass;
 	
 	/*
@@ -199,7 +199,7 @@ public class TestResult extends Result {
 	
 	
 	/* Instances are obtained using the public static builder. */
-	private TestResult( String label ) {
+	private TestSubject( String label ) {
 		super( label );
 	}
 	
@@ -308,7 +308,7 @@ public class TestResult extends Result {
 			);
 		} else {
 			result = Stream.of();
-			this.addSkip( clazz, skip.value() );
+			this.addSkip( TestMember.getSimpleName( clazz ), skip.value() );
 		}
 		
 		return result;
@@ -434,10 +434,10 @@ public class TestResult extends Result {
 		this.passCount += tc.getPassCount();
 		this.failCount += tc.getFailCount();
 		
-		if ( TestResult.PROGRESS ) {
-			TestResult.numTestCase++;
+		if ( TestSubject.PROGRESS ) {
+			TestSubject.numTestCase++;
 			System.err.print( "." );
-			if ( TestResult.numTestCase % TestResult.WRAP == 0 ) {
+			if ( TestSubject.numTestCase % TestSubject.WRAP == 0 ) {
 				System.err.println();
 			}
 		}

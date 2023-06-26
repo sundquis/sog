@@ -21,15 +21,15 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 import sog.util.IndentWriter;
-import sog.core.test.TestResult;
-import sog.core.test.TestResultSet;
+import sog.core.test.TestSubject;
+import sog.core.test.TestSet;
 
 /**
  * All classes import Test as the single public access to the testing framework.
  * 
- * Resources fall into two categories. Classes intending to be tested, "subject classes", use annotations to
- * declare test cases. The framework generates method stubs for each declared test case, which are
- * implemented in a "container class." 
+ * Resources fall into two categories, SUBJECT and CONTAINER. Classes intending to be tested, 
+ * "subject classes", use annotations to declare test cases. The framework generates method stubs 
+ * for each declared test case, which are implemented in a "container class." 
  * 
  * 
  *	SUBJECT: A class that is the subject of one or more tests.
@@ -41,7 +41,7 @@ import sog.core.test.TestResultSet;
  * 				packagePrefix.	Prepend packagePrefix to the full subject class name and append "Test" to the class name.
  * 				ClassName		Look in the same package as the subject for ClassName.
  * 				Otherwise		The name, which must contain a ".", is a fully qualified class name.
- * 			Each valid subject is represented by a sog.core.test.TestResult instance.
+ * 			Each valid subject is represented by a sog.core.test.TestSubject instance.
  * 			Members in a subject are represented by sog.core.test.TestMember instances.
  * 
  * 		@Test.Skip( rationale )
@@ -216,7 +216,7 @@ import sog.core.test.TestResultSet;
  * 				public boolean ieRequired()
  * 				public Stream<TestDec> getDecls()
  * 
- * 		sog.core.test.TestResult
+ * 		sog.core.test.TestSubject
  * 			Responsibilities: 
  * 				Given a subject class, assembles and executes the set of test cases associated with the subject.
  * 				Defines error reporting logic for mis-configured tests.
@@ -231,12 +231,12 @@ import sog.core.test.TestResultSet;
  * 					and run the tests.
  * 				Implements Printable.print( ... ) to include details on errors, skips, stubs, and failed cases.
  * 
- * 		sog.core.test.TestResultSet
+ * 		sog.core.test.TestSet
  * 			Responsibilities:
  * 				Aggregate results for multiple classes into a single Result.
  * 			Structure:
  * 				Extends Result to represent the results after running the test case.
- * 				Holds a Set of TestResult instance sorted by classname.
+ * 				Holds a Set of TestSubject instance sorted by classname.
  * 			Services:
  *  			Mutator to set the verbosity level.
  *  			Static helper methods for assembling sets of results by package or directory tree.
@@ -675,7 +675,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for one subject class */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
-		TestResult tr = TestResult.forSubject( Assert.nonNull( subjectClass ) );
+		TestSubject tr = TestSubject.forSubject( Assert.nonNull( subjectClass ) );
 		System.err.println();
 		tr.print( new IndentWriter( System.out, "\t" ) );
 	}
@@ -689,7 +689,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for the package containing the given subject */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void evalPackage( Class<?> subjectClass ) {
-		TestResultSet trs = TestResultSet.forPackage( Assert.nonNull( subjectClass ) );
+		TestSet trs = TestSet.forPackage( Assert.nonNull( subjectClass ) );
 		System.err.println();
 		trs.print( new IndentWriter( System.out, "\t" ) );
 	}
@@ -706,14 +706,14 @@ public class Test {
 		for ( int i = 0; i < components.length; i++ ) {
 			subDir = subDir.resolve( Path.of( components[i] ) );
 		}
-		TestResultSet trs = TestResultSet.forPackages( sourceDir, sourceDir.resolve( subDir ) );
+		TestSet trs = TestSet.forPackages( sourceDir, sourceDir.resolve( subDir ) );
 		System.err.println();
 		trs.print( new IndentWriter( System.out, "\t" ) );
 	}
 
 	@Test.Skip( "FIXME/Manually verified" )
 	public static void evalAll() {
-		TestResultSet trs = TestResultSet.forAllSourceDirs();
+		TestSet trs = TestSet.forAllSourceDirs();
 		System.err.println();
 		trs.print( new IndentWriter( System.out, "\t" ) );
 	}

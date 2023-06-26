@@ -186,7 +186,7 @@ public enum Policy implements Protection {
 	@Test.Decl( "Map include ALL" )
 	private final static Map<String, Policy> INSTANCES = Arrays.stream( Policy.values() )
 		.collect( Collectors.toMap( Policy::name, Function.identity() ) );
-		
+	
 	/** The current Policy being enforced. */
 	@Test.Decl( "Current Policy is not null" )
 	private static Policy currentPolicy = Property.get( "current.policy", Policy.DEFAULT, Policy.INSTANCES::get );

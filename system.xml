@@ -31,16 +31,16 @@
 <!-- 
 Multiline comment
  -->
-	<!-- Properties for TestResultSet -->
-	<class fullname="sog.core.test.TestResultSet">
-		<property name="verbose" value="false" />
+	<!-- Properties for TestSet -->
+	<class fullname="sog.core.test.TestSet">
+		<property name="verbose" value="true" />
 	</class>
 
 	
-	<!-- Properties for TestResult -->
-	<class fullname="sog.core.test.TestResult">
-		<property name="progress" value="true" />
-		<property name="wrap" value="80" />
+	<!-- Properties for TestSubject -->
+	<class fullname="sog.core.test.TestSubject">
+		<property name="progress" value="false" />
+		<property name="wrap" value="40" />
 	</class>
 
 

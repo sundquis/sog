@@ -40,26 +40,46 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class TestMember {
 
+
+	/* Naming policy for classes suppresses package information. */
+	@Test.Decl( "Package suppressed for java.lang classes" )
+	@Test.Decl( "Package suppressed for library classes" )
+	@Test.Decl( "Package suppressed for application classes" )
+	@Test.Decl( "Package suppressed for member classes" )
+	@Test.Decl( "Primitive types handled correctly" )
+	@Test.Decl( "Array types handled correctly" )
+	@Test.Decl( "Static member classes show containing class name" )
+	@Test.Decl( "Instance member classes show containing class name" )
+	@Test.Decl( "Throws AppException for anonymous local classes" )
+	@Test.Decl( "Throws AssertionError for null class" )
+	public static String getTypeName( Class<?> clazz ) {
+		Assert.nonNull( clazz );
+		return (clazz.isMemberClass() ? getTypeName( clazz.getEnclosingClass() ) + "." : "") + clazz.getSimpleName();
+	}
 	
 	/* Naming policy for member classes. */
 	@Test.Decl( "Name is non-empty" )
 	@Test.Decl( "Name should be short and descriptive" )
 	@Test.Decl( "Names for nested classes indicate enclosure" )
-	private static String getSimpleName( Class<?> clazz ) {
-		return (clazz.isMemberClass() ? getSimpleName(clazz.getEnclosingClass()) + "." : "") + clazz.getSimpleName();
+	@Test.Decl( "Throws AssertionError for null class" )
+	public static String getSimpleName( Class<?> clazz ) {
+		Assert.nonNull( clazz );
+		return "class: " + getTypeName( clazz );
 	}
 	
 	/* Naming policy for constructors. */
 	@Test.Decl( "Name is non-empty" )
 	@Test.Decl( "Name should be short and descriptive" )
 	@Test.Decl( "Name includes information about arguments" )
-	private static String getSimpleName( Constructor<?> constructor ) {
+	@Test.Decl( "Throws AssertionError for null constructor" )
+	public static String getSimpleName( Constructor<?> constructor ) {
+		Assert.nonNull( constructor );
 		return new StringBuilder()
 			.append( "constructor: " )
-			.append( getSimpleName( constructor.getDeclaringClass() ) )
+			.append( getTypeName( constructor.getDeclaringClass() ) )
 			.append( "(" )
 			.append( Arrays.stream( constructor.getParameterTypes() )
-				.map( TestMember::getSimpleName )
+				.map( TestMember::getTypeName )
 				.collect( Collectors.joining( ", " ) ) )
 			.append( ")" )
 			.toString();
@@ -69,12 +89,14 @@ public class TestMember {
 	@Test.Decl( "Name is non-empty" )
 	@Test.Decl( "Name should be short and descriptive" )
 	@Test.Decl( "Name includes information about type" )
-	private static String getSimpleName( Field field ) {
+	@Test.Decl( "Throws AssertionError for null field" )
+	public static String getSimpleName( Field field ) {
+		Assert.nonNull( field );
 		return new StringBuilder()
 			.append( "field: " )
-			.append( getSimpleName( field.getType() ) )
+			.append( getTypeName( field.getType() ) )
 			.append( " " )
-			.append( getSimpleName( field.getDeclaringClass() ) )
+			.append( getTypeName( field.getDeclaringClass() ) )
 			.append( "." )
 			.append( field.getName() )
 			.toString();
@@ -85,17 +107,19 @@ public class TestMember {
 	@Test.Decl( "Return should be short and descriptive" )
 	@Test.Decl( "Name includes information about arguments" )
 	@Test.Decl( "Name includes information about return type" )
-	private static String getSimpleName( Method method ) {
+	@Test.Decl( "Throws AssertionError for null method" )
+	public static String getSimpleName( Method method ) {
+		Assert.nonNull( method );
 		return new StringBuilder()
 			.append( "method: " )
-			.append( getSimpleName( method.getReturnType() ) )
+			.append( getTypeName( method.getReturnType() ) )
 			.append( " " )
-			.append( getSimpleName( method.getDeclaringClass() ) )
+			.append( getTypeName( method.getDeclaringClass() ) )
 			.append( "." )
 			.append( method.getName() )
 			.append( "(" )
 			.append( Arrays.stream( method.getParameterTypes() )
-				.map( TestMember::getSimpleName )
+				.map( TestMember::getTypeName )
 				.collect( Collectors.joining( ", " ) ) )
 			.append( ")" )
 			.toString();
@@ -227,5 +251,6 @@ public class TestMember {
 	public String toString() {
 		return this.memberName;
 	}
+
 
 }

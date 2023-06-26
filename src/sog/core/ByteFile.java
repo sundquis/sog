@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,11 +56,11 @@ public class ByteFile implements AutoCloseable {
 
 	/*
 	 * The total (across all ByteFil instances) number of bytes being stored.
-	 * Used to trigger warnings and an Error
+	 * Used to trigger warnings and Errors
 	 */
 	private static volatile long TOTAL_BYTES = 0L;
 
-	/* Adjust the total number of bytes used and trigger warnings or an error if needed. */
+	/* Adjust the total number of bytes used and trigger warning or error if needed. */
 	private static void newBytes( int count ) {
 		TOTAL_BYTES += (long) count;
 		if ( TOTAL_BYTES > WARN_LIMIT ) {

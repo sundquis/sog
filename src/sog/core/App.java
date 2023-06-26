@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,16 @@ import java.util.stream.StreamSupport;
 
 /**
  * Singleton used to expose access to application level resources:
+ * 		Description of the current application
+ * 		Date and time the application started
+ * 		Location of the root (home) directory of the application
+ * 		Services related to locating source files and directories
+ * 		Set of classes in a package, directory, or directory tree
+ * 		Services related to cleanup code to be run at shutdown
+ * 		Location services for providing links to code location
+ * 		Methods for returning calling class or method
+ * 		
+ * 
  */
 @Test.Subject( "test." )
 public class App implements Runnable {
@@ -69,8 +79,7 @@ public class App implements Runnable {
 	private final String startDateTime;
 	
 	private App() {
-		String rootDirName = Assert.nonEmpty( Property.get( "root", null, Parser.STRING ) );
-		this.root = Assert.rwDirectory( Path.of( rootDirName ) );
+		this.root = Assert.rwDirectory( Property.get( "root", null, Path::of ) );
 		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Parser.STRING ) );
 		this.sourceDirs = Property.get( "source.dirs", List.of(), Parser.LIST )
 			.stream()
@@ -196,7 +205,9 @@ public class App implements Runnable {
 	@Test.Decl( "Secondary classes are not included" )
 	@Test.Decl( "Non-source files are excluded" )
 	public Stream<String> classesInPackage( Class<?> clazz ) {
-		final Path sourceDir = this.sourceDir( Assert.nonNull( clazz ) );
+		Assert.nonNull( clazz );
+		
+		final Path sourceDir = this.sourceDir( clazz );
 		final Path packageDir = this.sourceFile( clazz ).getParent();
 		
 		try {
@@ -417,23 +428,6 @@ public class App implements Runnable {
 		);
 	}
 	
-	
-	
-	public static void main( String[] args ) {
-		//Test.eval();
-		//App.get().classesUnderPackage( App.class ).forEach( System.out::println );
-		//Arrays.stream( Package.getPackages() ).forEach( System.out::println );
-		//App.get().classesUnderDir( App.get().sourceDir( App.class ), Path.of( "" ) ).forEach( System.out::println );
-		
-		//System.out.println( ">>> ROOT = " + App.get().root() );
-		//System.out.println( ">>> URI  = " + App.get().root().toUri() );
-		//System.out.println( ">>> DESC = " + App.get().description() );
-		//System.out.println( ">>> STRT = " + App.get().startDateTime() );
-		//System.out.println( ">>> CNFG = " + System.getProperty( "app.config" ) );
-		
-		Test.evalAll();
-		System.out.println( "Done!" );
-	}
 	
 	
 }

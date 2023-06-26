@@ -42,14 +42,14 @@ import sog.util.IndentWriter;
  * 
  * 	Structure:
  * 		Extends Result to represent the results after running the test case.
- * 		Holds a Set of TestResult instance sorted by classname.
+ * 		Holds a Set of TestSubject instance sorted by classname.
  * 		
  * 	Services:
  *  	Mutator to set the verbosity level.
  *  	Static helper methods for assembling sets of results by package or directory tree.
  */
 @Test.Subject( "test." )
-public class TestResultSet extends Result {
+public class TestSet extends Result {
 	
 	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
 	
@@ -69,10 +69,10 @@ public class TestResultSet extends Result {
 	
 	@Test.Decl( "Throws AssertionError for empty label" )
 	@Test.Decl( "Throws AssertionError for null label" )
-	public TestResultSet( String label ) {
+	public TestSet( String label ) {
 		super( Assert.nonEmpty( label ) );
 		
-		this.results = new TreeSet<Result>( TestResultSet.COMP );
+		this.results = new TreeSet<Result>( TestSet.COMP );
 	}
 
 	
@@ -96,7 +96,7 @@ public class TestResultSet extends Result {
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "Includes summary for each TestResult" )
+	@Test.Decl( "Includes summary for each TestSubject" )
 	@Test.Decl( "Includes messages for each bad classname" )
 	@Test.Decl( "Results are printed in alphabetaical order" )
 	public void print( IndentWriter out ) {
@@ -119,16 +119,19 @@ public class TestResultSet extends Result {
 	}
 	
 	
-	private void addSkippedClass( String className, Throwable error ) {
-		this.skippedClasses.add( className + ": " + ( error == null ? "Skipped" : error.toString() ) );
-	}
+//	private void addSkippedClass( String className, Throwable error ) {
+//		this.skippedClasses.add( className + ": " + ( error == null ? "Skipped" : error.toString() ) );
+//	}
 	
+	private void addSkippedClass( String className, String reason ) {
+		this.skippedClasses.add( className + ": " + reason );
+	}
 
-	@Test.Decl( "Return is this TestResultSet instance" )
+	@Test.Decl( "Return is this TestSet instance" )
 	@Test.Decl( "Elapsed time reflects new total" )
 	@Test.Decl( "Pass count reflects new total" )
 	@Test.Decl( "Fail count reflects new total" )
-	public TestResultSet addResult( Result result ) {
+	public TestSet addResult( Result result ) {
 		this.results.add( Assert.nonNull( result ) );
 		this.elapsedTime += result.getElapsedTime();
 		this.passCount += result.getPassCount();
@@ -138,13 +141,14 @@ public class TestResultSet extends Result {
 	
 	
 	@Test.Decl( "Throws AssertionError for null class" )
-	@Test.Decl( "Adds one TestResult" )
-	@Test.Decl( "Return is this TestResultSet instance" )
-	public TestResultSet addClass( Class<?> clazz ) {
-		if ( Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class ) == null ) {
-			return this.addResult( TestResult.forSubject( Assert.nonNull( clazz ) ) );
+	@Test.Decl( "Adds one TestSubject" )
+	@Test.Decl( "Return is this TestSet instance" )
+	public TestSet addClass( Class<?> clazz ) {
+		Test.Skip skip = Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class );
+		if ( skip == null ) {
+			return this.addResult( TestSubject.forSubject( clazz ) );
 		} else {
-			this.addSkippedClass( clazz.getName(), null );
+			this.addSkippedClass( TestMember.getSimpleName( clazz ), skip.value() );
 			return this;
 		}
 	}
@@ -153,14 +157,14 @@ public class TestResultSet extends Result {
 	@Test.Decl( "Throws AssertionError for empty class name" )
 	@Test.Decl( "Throws AssertionError for null class name" )
 	@Test.Decl( "Records error message if class is not found" )
-	@Test.Decl( "Adds one TestResult" )
-	@Test.Decl( "Return is this TestResultSet instance" )
-	public TestResultSet addClass( String className ) {
+	@Test.Decl( "Adds one TestSubject" )
+	@Test.Decl( "Return is this TestSet instance" )
+	public TestSet addClass( String className ) {
 		try {
 			Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass( Assert.nonEmpty( className ) );
 			this.addClass( clazz );
 		} catch ( ClassNotFoundException ex ) {
-			this.addSkippedClass( className, ex );
+			this.addSkippedClass( className, ex.getMessage() );
 		}
 		
 		return this;
@@ -168,19 +172,19 @@ public class TestResultSet extends Result {
 	
 
 	@Test.Decl( "Throws AssertionError for null class names stream" )
-	@Test.Decl( "Adds one TestResult for each valid class name" )
-	@Test.Decl( "Return is this TestResultSet instance" )
-	public TestResultSet addClasses( Stream<String> classnames ) {
+	@Test.Decl( "Adds one TestSubject for each valid class name" )
+	@Test.Decl( "Return is this TestSet instance" )
+	public TestSet addClasses( Stream<String> classnames ) {
 		Assert.nonNull( classnames ).forEach( this::addClass );
 		
 		return this;
 	}
 	
 	
-	@Test.Decl( "Aggregates TestResult instances for every class under every source directory" )
+	@Test.Decl( "Aggregates TestSubject instances for every class under every source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestResultSet forAllSourceDirs() {
-		final TestResultSet trs = new TestResultSet( "ALL:\t" 
+	public static TestSet forAllSourceDirs() {
+		final TestSet trs = new TestSet( "ALL:\t" 
 			+ new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
 		
 		Consumer<Path> action = p -> { trs.addClasses( App.get().classesUnderDir( p ) ); };
@@ -191,10 +195,10 @@ public class TestResultSet extends Result {
 	
 
 	@Test.Decl( "Throws AssertionError for null source path" )
-	@Test.Decl( "Aggregates TestResult instances for every class under the given source directory" )
+	@Test.Decl( "Aggregates TestSubject instances for every class under the given source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestResultSet forSourceDir( Path sourceDir ) {
-		TestResultSet trs = new TestResultSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
+	public static TestSet forSourceDir( Path sourceDir ) {
+		TestSet trs = new TestSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
 		
 		trs.addClasses( App.get().classesUnderDir( sourceDir ) );
 		
@@ -204,10 +208,10 @@ public class TestResultSet extends Result {
 
 	@Test.Decl( "Throws AssertionError for null source directory" )
 	@Test.Decl( "Throws AssertionError for null sub-directory" )
-	@Test.Decl( "Aggregates TestResult instances for every class under the given directory" )
+	@Test.Decl( "Aggregates TestSubject instances for every class under the given directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestResultSet forPackages( Path sourceDir, Path sub ) {
-		TestResultSet trs = new TestResultSet( "PKGS:\t" + Assert.nonNull( sub ) );
+	public static TestSet forPackages( Path sourceDir, Path sub ) {
+		TestSet trs = new TestSet( "PKGS:\t" + Assert.nonNull( sub ) );
 		
 		trs.addClasses( App.get().classesUnderDir( Assert.nonNull( sourceDir ), sub ) );
 		
@@ -217,10 +221,10 @@ public class TestResultSet extends Result {
 	
 	
 	@Test.Decl( "Throws AssertionError for null class" )
-	@Test.Decl( "Aggregates TestResult instances for every class in the same package as the given class" )
+	@Test.Decl( "Aggregates TestSubject instances for every class in the same package as the given class" )
 	@Test.Decl( "Return is not null" )
-	public static TestResultSet forPackage( Class<?> clazz ) {
-		TestResultSet trs = new TestResultSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
+	public static TestSet forPackage( Class<?> clazz ) {
+		TestSet trs = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
 		
 		trs.addClasses( App.get().classesInPackage( clazz ) );
 		
@@ -235,13 +239,15 @@ public class TestResultSet extends Result {
 		System.out.println();
 		
 		// TESTS
-		//TestResultSet.forPackage( Test.class ).setVerbose( true ).print( new IndentWriter( System.err, "\t" ) );
-		//TestResultSet.forSourceDir( Path.of( "/", "home", "sundquis", "book", "sog", "src" ) ).print( new IndentWriter( System.err ) );
-		TestResultSet.forAllSourceDirs().print( new IndentWriter( System.err, "\t" ) );
-		//Test.evalPackage( TestResultSet.class );
+		//TestSet.forPackage( Test.class ).setVerbose( true ).print( new IndentWriter( System.err, "\t" ) );
+		//TestSet.forSourceDir( Path.of( "/", "home", "sundquis", "book", "sog", "src" ) ).print( new IndentWriter( System.err ) );
+		//TestSet.forAllSourceDirs().print( new IndentWriter( System.err, "\t" ) );
+		//Test.evalPackage( TestSet.class );
 		//Test.eval();
 		
-		//App.get().classesInPackage( TestResultSet.class ).forEach( System.out::println );
+		//App.get().classesInPackage( TestSet.class ).forEach( System.out::println );
+		
+		Test.eval( sog.core.xml.XML.class );
 		
 		System.out.println("\nDone!");
 

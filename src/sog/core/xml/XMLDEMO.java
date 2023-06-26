@@ -54,7 +54,7 @@ import sog.util.StreamReader;
  * @author sundquis
  *
  */
-@Test.Skip
+@Test.Skip( "Initial testing and lessons learned" )
 public class XMLDEMO implements ContentHandler, DTDHandler, ErrorHandler, DeclHandler, LexicalHandler {
 	
 	private Locator locator = null;

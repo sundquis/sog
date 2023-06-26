@@ -29,7 +29,7 @@ import sog.core.Test;
 import sog.core.test.Policy;
 import sog.core.test.TestCase;
 import sog.core.test.TestDecl;
-import sog.core.test.TestResult;
+import sog.core.test.TestSubject;
 import sog.util.IndentWriter;
 import sog.util.StringOutputStream;
 
@@ -42,7 +42,7 @@ public class TestResultTest extends Test.Container {
 	private final Policy originalPolicy;
 
 	public TestResultTest() {
-		super( TestResult.class );
+		super( TestSubject.class );
 		this.originalPolicy = Policy.get();
 		Policy.set( Policy.ALL );
 	}
@@ -52,36 +52,36 @@ public class TestResultTest extends Test.Container {
 		return () -> { Policy.set( this.originalPolicy ); };
 	}
 	
-	public int declarationCount( TestResult tr ) {
+	public int declarationCount( TestSubject tr ) {
 		Map<String, TestDecl> declMap = null;
 		return this.getSubjectField( tr, "declMap", declMap ).size();
 	}
 	
-	public int testCaseCount( TestResult tr ) {
+	public int testCaseCount( TestSubject tr ) {
 		Set<TestCase> testCases = null;
 		return this.getSubjectField( tr, "testCases", testCases ).size();
 	}
 	
-	public void print( TestResult tr ) {
+	public void print( TestSubject tr ) {
 		tr.print( new IndentWriter( System.out, "\t" ) );
 	}
 	
-	public String skipMessages( TestResult tr ) {
+	public String skipMessages( TestSubject tr ) {
 		List<String> skips = null;
 		return this.getSubjectField( tr, "skips", skips ).stream().collect( Collectors.joining( ", " ) );
 	}
 	
-	public String messages( TestResult tr ) {
+	public String messages( TestSubject tr ) {
 		StringOutputStream sos = new StringOutputStream();
 		tr.print( new IndentWriter( sos, "" ) );
 		return sos.toString();
 	}
 	
-	public String containerLocation( TestResult tr ) {
+	public String containerLocation( TestSubject tr ) {
 		return this.getSubjectField( tr, "containerLocation", "" );
 	}
 	
-	public Test.Container getContainer( TestResult tr ) {
+	public Test.Container getContainer( TestSubject tr ) {
 		return this.getSubjectField( tr, "container", null );
 	}
 
@@ -92,30 +92,30 @@ public class TestResultTest extends Test.Container {
 	// TEST CASES
 	
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Each valid test declaration is recorded in the declaration mapping" 
 	)
 	public void tm_06E84278C( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertEqual( 9, this.declarationCount( tr ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Each valid test method implementation has a corresponding TestCase saved" 
 	)
 	public void tm_0D219DD38( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertEqual( 9, this.testCaseCount( tr ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has a skip message if member is marked as skipped and does not have test declarations",
 		weight = 4
 	)
 	public void tm_0DFF844E5( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		String skipMessages = this.skipMessages( tr );
 		tc.assertTrue( skipMessages.contains( "Skip member class for testing" ) );
 		tc.assertTrue( skipMessages.contains( "Skip constructor for testing" ) );
@@ -124,362 +124,362 @@ public class TestResultTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has a skip message if subject is marked as skipped and not marked as subject" 
 	)
 	public void tm_0276B3961( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SkippedSubject.class );
+		TestSubject tr = TestSubject.forSubject( SkippedSubject.class );
 		String skipMessages = this.skipMessages( tr );
 		tc.assertTrue( skipMessages.contains( "Skip this subject" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error if the test container does not name the correct subject class" 
 	)
 	public void tm_06466FC21( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ContainerNamesTheWrongSubject.class );
+		TestSubject tr = TestSubject.forSubject( ContainerNamesTheWrongSubject.class );
 		tc.assertTrue( this.messages( tr ).contains( "Container names the wrong subject" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message for non-skipped members that do not have declarations and are required by the current policy" 
 	)
 	public void tm_082C22D5C( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( UntestedMemberRequiredByTheCurrentPolicy.class );
+		TestSubject tr = TestSubject.forSubject( UntestedMemberRequiredByTheCurrentPolicy.class );
 		tc.assertTrue( this.messages( tr ).contains( "Untested member required by the current policy" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message for test method implementations without a corresponding test declaration" 
 	)
 	public void tm_0550BC710( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( OrphanedTestImplementation.class );
+		TestSubject tr = TestSubject.forSubject( OrphanedTestImplementation.class );
 		tc.assertTrue( this.messages( tr ).contains( "Orphaned test implementation" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if a member is marked as skipped and has test declaration(s)" 
 	)
 	public void tm_09AD22058( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( MemberHasDeclarationsAndAsMarkedForSkipping.class );
+		TestSubject tr = TestSubject.forSubject( MemberHasDeclarationsAndAsMarkedForSkipping.class );
 		tc.assertTrue( this.messages( tr ).contains( "Member has declarations and is marked for skipping" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if a memeber has two identical test declarations" 
 	)
 	public void tm_00DC5F430( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TwoIdenticalTestDeclarations.class );
+		TestSubject tr = TestSubject.forSubject( TwoIdenticalTestDeclarations.class );
 		tc.assertTrue( this.messages( tr ).contains( "Duplicate declaration" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if an instance of the test container can not be constructed" 
 	)
 	public void tm_068B56D8B( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( BadContainer.class  );
+		TestSubject tr = TestSubject.forSubject( BadContainer.class  );
 		tc.assertTrue( this.messages( tr ).contains( "Cannot construct container" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if one test declaration has multiple test method implementations" 
 	)
 	public void tm_08C2EB022( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TwoTestImplementations.class );
+		TestSubject tr = TestSubject.forSubject( TwoTestImplementations.class );
 		tc.assertTrue( this.messages( tr ).contains( "Duplicate test implementation" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if subject is marked as subject and marked skipped" 
 	)
 	public void tm_002F2CD43( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SubjectAndSkipped.class );
+		TestSubject tr = TestSubject.forSubject( SubjectAndSkipped.class );
 		tc.assertTrue( this.messages( tr ).contains( "Subject is also marked to be skipped" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if subject is not a top-level class" 
 	)
 	public void tm_0D820B0FE( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( NotTopLevel.Inner.class );
+		TestSubject tr = TestSubject.forSubject( NotTopLevel.Inner.class );
 		tc.assertTrue( this.messages( tr ).contains( "Subject class is not a top-level class" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if subject is not marked as subject and not marked skipped" 
 	)
 	public void tm_0863481DD( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SubjectNotAnnotated.class );
+		TestSubject tr = TestSubject.forSubject( SubjectNotAnnotated.class );
 		tc.assertTrue( this.messages( tr ).contains( "Subject class is not annotated" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Has an error message if the container location in the Test.Subject annotation is empty" 
 	)
 	public void tm_0FAF3F88D( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( EmptyContainerLocation.class );
+		TestSubject tr = TestSubject.forSubject( EmptyContainerLocation.class );
 		tc.assertTrue( this.messages( tr ).contains( "Subject annotation has empty container location" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If a parallel test container class is used the classname has 'Test' appended" 
 	)
 	public void tm_067B2BCB1( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ParallelTestContainer.class );
+		TestSubject tr = TestSubject.forSubject( ParallelTestContainer.class );
 		tc.assertTrue( this.messages( tr ).contains( "ParallelTestContainerTest" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If a test container was constructed afterAll is called after all cases have run" 
 	)
 	public void tm_0C883E562( Test.Case tc ) {
-		TestResult.forSubject( AfterAllCalled.class );
+		TestSubject.forSubject( AfterAllCalled.class );
 		tc.assertTrue( AfterAllCalled.TEST.executed );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If not marked as skipped and has valid subject annotation then container location is not empty" 
 	)
 	public void tm_08BCB74C6( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertTrue( !this.containerLocation( tr ).isEmpty() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If subject is marked as skipped and not marked as subject there are no test cases" 
 	)
 	public void tm_05A5284F2( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SkippedSubject.class );
+		TestSubject tr = TestSubject.forSubject( SkippedSubject.class );
 		tc.assertEqual( 0, this.testCaseCount( tr ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If the container location has internal dots the named test container class is used" 
 	)
 	public void tm_065FF5F4A( Test.Case tc ) {
-		TestResult.forSubject( SubjectWithSpecificContainer.class );
+		TestSubject.forSubject( SubjectWithSpecificContainer.class );
 		tc.assertTrue( SpecificContainer.found );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If the container location has no dots a test container class in the same package is used" 
 	)
 	public void tm_0E1E1B12D( Test.Case tc ) {
-		TestResult.forSubject( SubjectWithSamePackageContainer.class );
+		TestSubject.forSubject( SubjectWithSamePackageContainer.class );
 		tc.assertTrue( SamePackageContainer.found );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If the container location starts with a dot a member class test container is used" 
 	)
 	public void tm_0F3E8A40D( Test.Case tc ) {
-		TestResult.forSubject( SubjectWithMemberContainer.class );
+		TestSubject.forSubject( SubjectWithMemberContainer.class );
 		tc.assertTrue( SubjectWithMemberContainer.Member.found );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If there are any errors all test cases are counted as failures" 
 	)
 	public void tm_0CE25B846( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( AllFailWithErrors.class );
+		TestSubject tr = TestSubject.forSubject( AllFailWithErrors.class );
 		tc.assertTrue( tr.getFailCount() > 0 );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If there are any errors no test cases are run" 
 	)
 	public void tm_0CADCECD0( Test.Case tc ) {
-		TestResult.forSubject( AllFailWithErrors.class );
+		TestSubject.forSubject( AllFailWithErrors.class );
 		tc.assertFalse( AllFailWithErrors.TEST.executed );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "If there are no errors all test cases are run" 
 	)
 	public void tm_08A2F76A7( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Members of skipped member classes are ignored" 
 	)
 	public void tm_088C372EB( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SkippedMemberClassesIgnored.class );
+		TestSubject tr = TestSubject.forSubject( SkippedMemberClassesIgnored.class );
 		tc.assertTrue( tr.getPassCount() > 0 );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Return is not null" 
 	)
 	public void tm_0FD93921D( Test.Case tc ) {
-		tc.assertNonNull( TestResult.forSubject( Object.class ) );
+		tc.assertNonNull( TestSubject.forSubject( Object.class ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Subject constructors are scanned for test obligations" 
 	)
 	public void tm_0E5F0A2C0( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TestObligations.class );
+		TestSubject tr = TestSubject.forSubject( TestObligations.class );
 		// FRAGILE. Could try to retrieve and access individual Err instances.
 		tc.assertTrue( this.messages( tr ).contains( "constructor: TestObligations()" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Subject fields are scanned for test obligations" 
 	)
 	public void tm_0282D26C0( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TestObligations.class );
+		TestSubject tr = TestSubject.forSubject( TestObligations.class );
 		// FRAGILE. Could try to retrieve and access individual Err instances.
 		tc.assertTrue( this.messages( tr ).contains( "field: int TestObligations.testableField" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Subject member classes are recursively scanned" 
 	)
 	public void tm_07D880F1A( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TestObligations.class );
+		TestSubject tr = TestSubject.forSubject( TestObligations.class );
 		// FRAGILE. Could try to retrieve and access individual Err instances.
 		tc.assertTrue( this.messages( tr ).contains( "field: int TestObligations.Inner.testableInnerField" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Subject methods are scanned for test obligations" 
 	)
 	public void tm_05FC179DF( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TestObligations.class );
+		TestSubject tr = TestSubject.forSubject( TestObligations.class );
 		// FRAGILE. Could try to retrieve and access individual Err instances.
 		tc.assertTrue( this.messages( tr ).contains( "method: void TestObligations.testableMethod" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Test container class is scanned for test method implementations" 
 	)
 	public void tm_04818361B( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Test container methods without Test.Impl annotations are ignored" 
 	)
 	public void tm_03E79E116( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Throws AssertionError for null subject" 
 	)
 	public void tm_05A0636B4( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResult.forSubject( null );
+		TestSubject.forSubject( null );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "Unimplemented test declarations count as test failures" 
 	)
 	public void tm_05E38A64D( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( UnimplementedDeclarations.class );
+		TestSubject tr = TestSubject.forSubject( UnimplementedDeclarations.class );
 		tc.assertEqual( 3, tr.getFailCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: TestResult TestResult.forSubject(Class)", 
+		member = "method: TestSubject TestSubject.forSubject(Class)", 
 		description = "if the container location ends with a dot a test container class in a parallel package is used" 
 	)
 	public void tm_090A089C9( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( TestResult.class );
+		TestSubject tr = TestSubject.forSubject( TestSubject.class );
 		String containerLocation = this.containerLocation( tr );
 		tc.assertTrue( containerLocation.endsWith( "." ) );
 		String containerClassname = this.getContainer( tr ).getClass().getName();
 		tc.assertTrue( containerClassname.startsWith( containerLocation ) );
-		tc.assertTrue( containerClassname.endsWith( TestResult.class.getName() + "Test" ) );
+		tc.assertTrue( containerClassname.endsWith( TestSubject.class.getName() + "Test" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: int TestResult.getFailCount()", 
+		member = "method: int TestSubject.getFailCount()", 
 		description = "Return is the sum of the weights of all failing cases" 
 	)
 	public void tm_0F73C8FE7( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( FailCount.class );
+		TestSubject tr = TestSubject.forSubject( FailCount.class );
 		tc.assertEqual( 6, tr.getFailCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: int TestResult.getPassCount()", 
+		member = "method: int TestSubject.getPassCount()", 
 		description = "Return is the sum of the weights of all passing cases" 
 	)
 	public void tm_0EAD3A681( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( PassCount.class );
+		TestSubject tr = TestSubject.forSubject( PassCount.class );
 		tc.assertEqual( 6, tr.getPassCount() );
 	}
 		
 	@Test.Impl( 
-		member = "method: long TestResult.getElapsedTime()", 
+		member = "method: long TestSubject.getElapsedTime()", 
 		description = "Reported time is the sum of the times of all test cases" 
 	)
 	public void tm_03A708E7D( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ElapsdedTime.class );
+		TestSubject tr = TestSubject.forSubject( ElapsdedTime.class );
 		tc.assertTrue( tr.getElapsedTime() >= 60L );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		member = "method: void TestSubject.addError(Throwable, String, Object[])", 
 		description = "Detail objects are included in message" 
 	)
 	public void tm_0CFB722F7( Test.Case tc ) {
 		Object detail = new Object() {};
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		this.evalSubjectMethod( tr, "addError", null, new Exception(), "Message", new Object[] { detail } );
 		tc.assertTrue( this.messages( tr ).contains( detail.toString() ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		member = "method: void TestSubject.addError(Throwable, String, Object[])", 
 		description = "Error messages include description" 
 	)
 	public void tm_0E40BFC36( Test.Case tc ) {
 		Object detail = new Object() {};
 		String message = "A really strange message";
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		this.evalSubjectMethod( tr, "addError", null, new Exception(), message, new Object[] { detail } );
 		tc.assertTrue( this.messages( tr ).contains( message ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		member = "method: void TestSubject.addError(Throwable, String, Object[])", 
 		description = "If error is not null includes information on cause(s)" 
 	)
 	public void tm_00804D5A6( Test.Case tc ) {
@@ -489,14 +489,14 @@ public class TestResultTest extends Test.Container {
 		String err2 = "Second error message";
 		Exception e1 = new Exception( err1 );
 		Exception e2 = new Exception( err2, e1 );
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		this.evalSubjectMethod( tr, "addError", null, e2, message, new Object[] { detail } );
 		tc.assertTrue( this.messages( tr ).contains( err1 ) );
 		tc.assertTrue( this.messages( tr ).contains( err2 ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addError(Throwable, String, Object[])", 
+		member = "method: void TestSubject.addError(Throwable, String, Object[])", 
 		description = "If error is not null location information is printed" 
 	)
 	public void tm_0B12B5572( Test.Case tc ) {
@@ -505,28 +505,28 @@ public class TestResultTest extends Test.Container {
 		String err = "First error message in exception";
 		Exception e = new Exception( err );
 		String location = App.get().getLocation( e ).findFirst().get();
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		this.evalSubjectMethod( tr, "addError", null, e, message, new Object[] { detail } );
 		tc.assertTrue( this.messages( tr ).contains( location ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addSkip(Object, String)", 
+		member = "method: void TestSubject.addSkip(Object, String)", 
 		description = "Skip message includes the reason" 
 	)
 	public void tm_0A8E65AEF( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		String message = "Reason to skip somoe memeber";
 		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { null, message} );
 		tc.assertTrue( this.skipMessages( tr ).contains( message ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.addSkip(Object, String)", 
+		member = "method: void TestSubject.addSkip(Object, String)", 
 		description = "Skip message includes the source member" 
 	)
 	public void tm_0F7103BCA( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		Object source = new Object() {};
 		String message = "Reason to skip somoe memeber";
 		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { source, message} );
@@ -534,57 +534,57 @@ public class TestResultTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "If no errors then result details are included" 
 	)
 	public void tm_01937DAA6( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertTrue( this.messages( tr ).contains( "RESULTS" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "If there are errors then details are included" 
 	)
 	public void tm_074B4DD86( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( AllFailWithErrors.class );
+		TestSubject tr = TestSubject.forSubject( AllFailWithErrors.class );
 		tc.assertTrue( this.messages( tr ).contains( "ERRORS" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "Includes details on members that have been skipped" 
 	)
 	public void tm_023D7CCFF( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( SkippedMemberClassesIgnored.class );
+		TestSubject tr = TestSubject.forSubject( SkippedMemberClassesIgnored.class );
 		tc.assertTrue( this.messages( tr ).contains( "SKIPS" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "Includes global summary statistics" 
 	)
 	public void tm_0C9B26B94( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tc.assertTrue( this.messages( tr ).contains( tr.toString() ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "Includes stubs for unimplemented methods" 
 	)
 	public void tm_0F59F5383( Test.Case tc ) {
-		TestResult tr = TestResult.forSubject( UnimplementedDeclarations.class );
+		TestSubject tr = TestSubject.forSubject( UnimplementedDeclarations.class );
 		tc.assertTrue( this.messages( tr ).contains( "STUBS" ) );
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestResult.print(IndentWriter)", 
+		member = "method: void TestSubject.print(IndentWriter)", 
 		description = "Throws AssertionError for null writer" 
 	)
 	public void tm_0A4F4F335( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		TestResult tr = TestResult.forSubject( ValidSubject.class );
+		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tr.print( null );
 	}
 
@@ -593,8 +593,8 @@ public class TestResultTest extends Test.Container {
 		
 
 	public static void main( String[] args ) {
-		Test.eval( TestResult.class );
-		//Test.evalPackage( TestResult.class );
+		Test.eval( TestSubject.class );
+		//Test.evalPackage( TestSubject.class );
 	}
 }
 

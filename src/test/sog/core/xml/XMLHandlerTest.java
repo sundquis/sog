@@ -353,32 +353,32 @@ public class XMLHandlerTest extends Test.Container {
 		}.get() );
 	}
 				
-	@Test.Impl( 
-		member = "method: String XMLHandler.Location.getPublicId()", 
-		description = "Is not empty" 
-	)
-	public void tm_0F3D79C23( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-				
-				@Test.Impl( 
-					member = "method: String XMLHandler.Location.getSystemId()", 
-					description = "Apparently always unknown for SAX parser?" 
-				)
-				public void tm_0C587FE62( Test.Case tc ) {
-					tc.addMessage( "GENERATED STUB" );
-				}
-				
-				@Test.Impl( 
-					member = "method: String XMLHandler.Location.getSystemId()", 
-					description = "Is not empty" 
-				)
-				public void tm_066E4941D( Test.Case tc ) {
-					tc.addMessage( "GENERATED STUB" );
-				}
-				
-				
-				
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getPublicId()", 
+				description = "Is not empty" 
+			)
+			public void tm_0F3D79C23( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getSystemId()", 
+				description = "Apparently always unknown for SAX parser?" 
+			)
+			public void tm_0C587FE62( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "method: String XMLHandler.Location.getSystemId()", 
+				description = "Is not empty" 
+			)
+			public void tm_066E4941D( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+	
+	
 		@Test.Impl( 
 			member = "method: int XMLHandler.Location.getColumnNumber()", 
 			description = "Greater or equal to zero while parsing" 
@@ -962,13 +962,53 @@ public class XMLHandlerTest extends Test.Container {
 		public void tm_068491C42( Test.Case tc ) {
 			tc.addMessage( "GENERATED STUB" );
 		}
+		
+		@Test.Impl( 
+				member = "constructor: XMLHandler(Path, Path)", 
+				description = "Relative references are properly resolved" 
+			)
+			public void tm_06F3C1473( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "constructor: XMLHandler(Path, Path)", 
+				description = "Throws AssertionError for null relative" 
+			)
+			public void tm_05F83C4AF( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "constructor: XMLHandler(Path, Path)", 
+				description = "Throws AssertionError for null root" 
+			)
+			public void tm_043009145( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "constructor: XMLHandler(Path, Path)", 
+				description = "Throws NoSuchFileException if the directory is missing" 
+			)
+			public void tm_067F776BB( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
+			
+			@Test.Impl( 
+				member = "constructor: XMLHandler(Path, Path)", 
+				description = "Throws NoSuchFileException if the file is missing" 
+			)
+			public void tm_0A7AEDFF2( Test.Case tc ) {
+				tc.addMessage( "GENERATED STUB" );
+			}
 	
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( XMLHandler.class );
-		//Test.evalPackage( XMLHandler.class );
+		//Test.eval( XMLHandler.class );
+		Test.evalPackage( XMLHandler.class );
 		//Test.evalAll();
 	}
 }
