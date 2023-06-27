@@ -101,12 +101,14 @@ public class App implements Runnable {
 		return this.root;
 	}
 
+	/** A brief description of the application. */
 	@Test.Decl( "Is not empty" )
 	@Test.Decl( "Is not null" )
 	public String description() {
 		return this.description;
 	}
 
+	/** Date and time that the application was started. */
 	@Test.Decl( "Return is non-empty" )
 	@Test.Decl( "Return indicates the date that the application started" )
 	@Test.Decl( "Return indicates the time that the application started" )
@@ -114,12 +116,20 @@ public class App implements Runnable {
 		return this.startDateTime;
 	}
 	
+	/** A list of path instances locating the roots of the source directories. */
 	@Test.Decl( "Is not empty" )
 	@Test.Decl( "Is not null" )
 	public List<Path> sourceDirs() {
 		return this.sourceDirs;
 	}
 	
+	/**
+	 * Find the directory that is the root of the source code tree for the given non-null class.
+	 * The class cannot be a secondary class, but can be local or nested.
+	 * 
+	 * @param clazz	The non-null class object.
+	 * @return	The non-null Path to the source directory.
+	 */
 	@Test.Decl( "Throws assertion error for null class" )
 	@Test.Decl( "Throws AppException for missing source dir" )
 	@Test.Decl( "Throws AppException for secondary class" )
@@ -148,7 +158,14 @@ public class App implements Runnable {
 			.findAny()
 			.orElseGet( () -> { Fatal.error( "No source directory for " + clazz ); return null; } );
 	}
-		
+
+	/**
+	 * Find the source file where the given non-null class is defined.
+	 * The class cannot be a secondary class, but can be local or nested.
+	 * 
+	 * @param clazz	The non-null class object.
+	 * @return	The non-null Path to the source file.
+	 */
 	@Test.Decl( "Throws assertion error for null class" )
 	@Test.Decl( "Throws AppException for missing source file" )
 	@Test.Decl( "Throws AppException for secondary class" )
@@ -177,17 +194,30 @@ public class App implements Runnable {
 			.orElseGet( () -> { Fatal.error( "No source file for " + clazz ); return null; } );
 	}
 	
-	
+
+	/**
+	 * A predicate for identifying java source files.
+	 */
 	@Test.Decl( "True for every java source file" )
 	@Test.Decl( "False for null paths" )
 	@Test.Decl( "False for empty paths" )
 	@Test.Decl( "False for directories" )
 	@Test.Decl( "False for non-java files" )
-	public static final Predicate<Path> SOURCE_FILE = p -> 
+	public final Predicate<Path> SOURCE_FILE = p -> 
 		p != null && Files.isRegularFile( p ) && p.getFileName().toString().endsWith( ".java" );
 
-	
-	private String relativePathToClassname( Path relativePath ) {
+	/**
+	 * Produce the fully qualified class name corresponding to the path, relative
+	 * to a source code directory, of a java source file.
+	 * 
+	 * @param relativePath	The non-null relative path identifying a java source file.
+	 * @return	The corresponding class name.
+	 */
+	@Test.Decl( "Throws AssertionError for null realtivePath" )
+	@Test.Decl( "Throws AssertionError if not a java source file" )
+	@Test.Decl( "Agrees with classname of top-level classes" )
+	public String relativePathToClassname( Path relativePath ) {
+		Assert.nonNull( relativePath );
 		String result = StreamSupport.stream( relativePath.spliterator(), false )
 			.map( Object::toString )
 			.collect( Collectors.joining( "." ) );
@@ -195,7 +225,14 @@ public class App implements Runnable {
 		return result.replace( ".java",  "" );
 	}
 		
-		
+
+	/**
+	 * Return a stream of fully qualified classnames for the top-level classes in the
+	 * same package as the given class.
+	 * 
+	 * @param clazz
+	 * @return
+	 */
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
@@ -212,7 +249,7 @@ public class App implements Runnable {
 		
 		try {
 			return Files.list( packageDir )
-				.filter( App.SOURCE_FILE )
+				.filter( this.SOURCE_FILE )
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
@@ -220,7 +257,14 @@ public class App implements Runnable {
 		}
 	}
 	
-	
+
+	/**
+	 * Return a stream of fully qualified class names for all classes in the given source directory or
+	 * its sub-directories.
+	 * 
+	 * @param sourceDir
+	 * @return
+	 */
 	@Test.Decl( "Throws AssertionError for null class source directory" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
@@ -232,7 +276,7 @@ public class App implements Runnable {
 	public Stream<String> classesUnderDir( Path sourceDir ) {
 		try {
 			return Files.walk( Assert.nonNull( sourceDir ) )
-				.filter( App.SOURCE_FILE )
+				.filter( this.SOURCE_FILE )
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
@@ -241,6 +285,13 @@ public class App implements Runnable {
 	}
 	
 
+	/**
+	 * Return a stream of fully qualified class names for all classes in the given subdirectory 
+	 * of a source directory, or its sub-directories.
+	 * 
+	 * @param sourceDir
+	 * @return
+	 */
 	@Test.Decl( "Throws AssertionError for null class source directory" )
 	@Test.Decl( "Throws AssertionError for null sub-directory" )
 	@Test.Decl( "Return is non-null" )
@@ -252,7 +303,7 @@ public class App implements Runnable {
 	public Stream<String> classesUnderDir( Path sourceDir, Path sub ) {
 		try {
 			return Files.walk( Assert.nonNull( sourceDir ).resolve( Assert.nonNull( sub ) ) )
-				.filter( App.SOURCE_FILE )
+				.filter( this.SOURCE_FILE )
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
@@ -285,7 +336,11 @@ public class App implements Runnable {
 			}
 		}
 	}
-	
+
+	/**
+	 * The string representations of instances contain links to the file and line number
+	 * corresponding to an execution point.
+	 */
 	public static class Location {
 		
 		private final String className;
@@ -383,6 +438,12 @@ public class App implements Runnable {
 	}
 	
 
+	/**
+	 * Return the fully qualified class name for the class containing the executing method.
+	 * 
+	 * @param offset
+	 * @return
+	 */
 	@Test.Decl( "Throws AssertionError for negative offset" )
 	@Test.Decl( "Throws AppExcpetion for offset larger than stack depth" )
 	@Test.Decl( "Return is non-null" )
@@ -406,6 +467,12 @@ public class App implements Runnable {
 	}
 
 	
+	/**
+	 * Return the fully name of the executing method.
+	 * 
+	 * @param offset
+	 * @return
+	 */
 	@Test.Decl( "Throws AssertionError for negative offset" )
 	@Test.Decl( "Throws AppExcpetion for offset larger than stack depth" )
 	@Test.Decl( "Return is non-null" )
@@ -427,7 +494,5 @@ public class App implements Runnable {
 			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
 		);
 	}
-	
-	
 	
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public class SoftString implements Comparable<SoftString> {
 			this.offset = file.append( data );
 			this.length = data.length;
 		}
-		
+	
 		@Override
 		@Test.Decl( "Consistent with constructed value" )
 		public String toString() {
@@ -94,8 +94,6 @@ public class SoftString implements Comparable<SoftString> {
 	 *  
 	 * @param s
 	 * 		The string to represent
-	 * @param threshold
-	 * 		Strings this length or longer are held via a soft reference and can be GC'd
 	 */
 	@Test.Decl( "Throws assertion error for null strings" )
 	@Test.Decl( "Can construct empty" )
@@ -160,7 +158,7 @@ public class SoftString implements Comparable<SoftString> {
 	}
 	
 	@Override
-	@Test.Decl( "If equlas then hashCodes are the same" )
+	@Test.Decl( "If equals then hashCodes are the same" )
 	public int hashCode() {
 		return this.toString().hashCode();
 	}

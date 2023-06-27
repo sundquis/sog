@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import java.nio.file.Path;
 public class LocalDir {
 
 	/**
-	 * The enumerated type for possible extensions.
+	 * The enumerated type for possible extensions. Add new types as needed.
 	 */
 	public static enum Type {
 

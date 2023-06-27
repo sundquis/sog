@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ import java.util.Iterator;
 @Test.Subject( "test." )
 public class Objects {
 	
-	// Static functions only
+	/* Not intended to be instantiated. */
 	private Objects() {}
 	
 	
-	/*
+	/**
 	 * Replication of java.util.Objects
 	 * Included for completeness
 	 */
@@ -50,8 +50,8 @@ public class Objects {
 		return o1.equals( o2 );
 	}
 
-	/*
-	 * If objects are collections or arrays compare components using equal()
+	/**
+	 * If objects are collections or arrays compare components using shallowEquals()
 	 * Otherwise use equal()
 	 */
 	@SuppressWarnings("unchecked")
@@ -85,8 +85,8 @@ public class Objects {
 		return o1.equals( o2 );		
 	}
 	
-	/*
-	 * If objects are collections or arrays compare components using deepEequal()
+	/**
+	 * If objects are collections or arrays compare components using deepEquals()
 	 * Otherwise use equal()
 	 */
 	@SuppressWarnings("unchecked")
@@ -121,7 +121,7 @@ public class Objects {
 	}
 
 	
-	/*
+	/**
 	 * Shallow check for equality of two arrays
 	 */
 	@Test.Decl( "Throws Assertion error for non array first arg" )
@@ -156,7 +156,7 @@ public class Objects {
 	}
 
 	
-	/*
+	/**
 	 * Deep check for equality of two arrays
 	 */
 	@Test.Decl( "Throws Assertion error for non array first arg" )
@@ -190,7 +190,7 @@ public class Objects {
 	}
 	
 	
-	/*
+	/**
 	 * Shallow check for equality of two Collection objects
 	 * Examines elements in the order presented by the iterators.
 	 */
@@ -221,7 +221,7 @@ public class Objects {
 	}
 
 	
-	/*
+	/**
 	 * Deep check for equality of two Collection objects
 	 * Examines elements in the order presented by the iterators.
 	 */

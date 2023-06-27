@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 package test.sog.core;
 
- import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -550,6 +550,5 @@ public class ObjectsTest extends Test.Container {
 		Test.eval( Objects.class );
 		//Test.evalPackage( Objects.class );
 		//Test.evalAll();
-		//Test.evalDir( Objects.class, Path.of( "sog" ) );
 	}
 }

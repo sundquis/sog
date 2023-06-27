@@ -297,7 +297,7 @@ public class LocalDirTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( LocalDir.class );
-		Test.evalPackage( LocalDir.class );
+		Test.eval( LocalDir.class );
+		//Test.evalPackage( LocalDir.class );
 	}
 }

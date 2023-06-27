@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,8 +112,8 @@ public class FatalTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( Fatal.class );
+		Test.eval( Fatal.class );
 		//Test.evalPackage( Fatal.class );
-		Test.evalAll();
+		//Test.evalAll();
 	}
 }

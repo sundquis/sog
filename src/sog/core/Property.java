@@ -62,7 +62,6 @@ public class Property extends XMLHandler {
 	@Test.Decl( "Prints declaration for missing property" )
 	@Test.Decl( "Last value for repeated elements" )
 	@Test.Decl( "Uses default for missing" )
-	@Test.Decl( "Prints instructions when system property file not found" )
 	public static <T> T get( String name, T defaultValue, Parser<T> parser ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( parser );
@@ -93,7 +92,6 @@ public class Property extends XMLHandler {
 	@Test.Decl( "Can retrieve empty" )
 	@Test.Decl( "Can use property name" )
 	@Test.Decl( "Last value for multiple elements" )
-	@Test.Decl( "Prints instructions when system property file not found" )
 	public static String getText( String name ) {
 		Assert.nonEmpty( name );
 		
@@ -122,7 +120,7 @@ public class Property extends XMLHandler {
         //              <class declaring a property>
         Assert.isTrue( stackTrace.length > 2 );
         
-        // Convert name of anonymous class to be the enclosing class, so strip of the $nn..."
+        // Convert name of anonymous class to be the enclosing class, so strip off the $nn..."
         String className = stackTrace[2].getClassName().replaceAll( "\\$\\d+[_a-zA-Z$]*$", "" );
         
         return Assert.nonEmpty( className );
@@ -146,11 +144,12 @@ public class Property extends XMLHandler {
 	
 
 	private static final String ERR_MSG = ""
-		+ "The system property 'system.dir' must be set to an absolute path to the directory continaing\n"
+		+ "\n\nThe system property 'system.dir' must be set to an absolute path to the directory continaing\n"
 		+ "the properties file. Typically this is set as a JVM arg, for example:\n"
-		+ "\t-Dsystem.dir=/home/user/apps/sog/";
+		+ "\t-Dsystem.dir=/home/user/apps/sog/\n";
 	
 	
+	@Test.Decl( "Prints instructions when system property file not found" )
 	private static void makeInstance() {
 		String systemDir = System.getProperty( "system.dir" );
 		if ( systemDir == null || systemDir.isEmpty() ) {
@@ -192,12 +191,26 @@ public class Property extends XMLHandler {
 		
 		this.parse();
 	}
-	
+
+	/*
+	 * This method overrides the noop implementation inherited from XMLHandler.
+	 * 
+	 * The DTD specifies that there are three types of elements that can be encountered.
+	 * 
+	 * The top-level elements are <code>class</code> elements that contain nested configuration information.
+	 * When a <code>class</code> element is encountered we record the class name (<code>fullname</code>)
+	 * to be used to generate keys.
+	 * 
+	 * A nested <code>property</code> element signals a <code>(name, value)</code> association, which is
+	 * stored in the <code>properties</code> map.
+	 * 
+	 * A nested <code>text</code> element can have content (CDATA). To prepare for character data, we
+	 * record the key that will be used to store the data, and clear out the buffer that will be
+	 * used to store characters.
+	 */
 	@Override
-	@Test.Decl( "Class name set on class elements" )
-	@Test.Decl( "Property added on property elements" )
-	@Test.Decl( "Buffer reset on text elements" )
-	@Test.Decl( "Key set on text elements" )
+	@Test.Decl("Throws AssertionError for empty name" )
+	@Test.Decl("Throws AssertionError for null attributes" )
 	public void startElement( String name, Map<String, String> attributes ) {
 		Assert.nonEmpty( name );
 		Assert.nonNull( attributes );
@@ -210,7 +223,7 @@ public class Property extends XMLHandler {
 			String propName = Assert.nonEmpty( attributes.get( "name" ) );
 			String key = this.currentClassName + "." + propName;
 			String value = Assert.nonEmpty( attributes.get( "value" ) );
-			this.values.put( key,  value );
+			this.values.put( key, value );
 		}
 		
 		if ( name.equals( "text" ) ) {
@@ -219,7 +232,11 @@ public class Property extends XMLHandler {
 			this.buf.setLength( 0 );
 		}
 	}
-	
+
+	/*
+	 * The end of a <code>text</code> element signals that the character data is complete, so
+	 * we capture and store the contents of the buffer.
+	 */
 	@Override
 	@Test.Decl( "Text elements terminated" )
 	public void endElement( String name ) {
@@ -232,6 +249,9 @@ public class Property extends XMLHandler {
 		}
 	}
 
+	/*
+	 * Character data gets appended to the buffer.
+	 */
 	@Override
 	@Test.Decl( "Characters added" )
 	public void characters( char[] ch, int start, int length ) {
@@ -246,13 +266,6 @@ public class Property extends XMLHandler {
 	private String getTextValue( String key ) {
 		return this.text.get( key );
 	}
-
-	
-	
-	public static void main( String[] args ) {
-		Test.eval();
-	}
-	
 
 
 }

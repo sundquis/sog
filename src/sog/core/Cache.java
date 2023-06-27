@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import java.util.TreeMap;
  * A Cache implementation built on java SoftReferences.
  * 
  * Elements are stored as (key, value) pairs. The keys (type parameter K) are Comparable
- * and values (type parameter V) rae retrieved from a map using soft references. When a softly
+ * and values (type parameter V) are retrieved from a map using soft references. When a softly
  * held value is garbage-collected the association is removed from the map and if subsequently
  * needed, the missing value is reconstructed on demand by the associated Builder.
  */
@@ -155,7 +155,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	@Test.Decl( "Greater than zero when the size of the map decreases" )
 	@Test.Decl( "collected() + size() is invariant across collections" )
 	public int collected() {
-		return collected;
+		return this.collected;
 	}
 	
 	/**

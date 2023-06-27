@@ -994,7 +994,7 @@ public class AppTest extends Test.Container{
 		description = "False for directories" 
 	)
 	public void tm_028A41449( Test.Case tc ) {
-		tc.assertFalse( App.SOURCE_FILE.test( App.get().sourceDir( AppTest.class ) ) );
+		tc.assertFalse( App.get().SOURCE_FILE.test( App.get().sourceDir( AppTest.class ) ) );
 	}
 		
 	@Test.Impl( 
@@ -1003,7 +1003,7 @@ public class AppTest extends Test.Container{
 	)
 	public void tm_01CF0F4D9( Test.Case tc ) {
 		Path dir = App.get().sourceDir( AppTest.class );
-		tc.assertFalse( App.SOURCE_FILE.test( dir.relativize( dir ) ) );
+		tc.assertFalse( App.get().SOURCE_FILE.test( dir.relativize( dir ) ) );
 	}
 		
 	@Test.Impl( 
@@ -1013,7 +1013,7 @@ public class AppTest extends Test.Container{
 	public void tm_02BDC4691( Test.Case tc ) {
 		Path p = App.get().sourceFile( test.sog.core.foo.A.class ).getParent();
 		p = p.resolve( Path.of( "README.txt" ) );
-		tc.assertFalse( App.SOURCE_FILE.test( p ) );
+		tc.assertFalse( App.get().SOURCE_FILE.test( p ) );
 	}
 		
 	@Test.Impl( 
@@ -1021,7 +1021,7 @@ public class AppTest extends Test.Container{
 		description = "False for null paths" 
 	)
 	public void tm_09253592D( Test.Case tc ) {
-		tc.assertFalse( App.SOURCE_FILE.test( null ) );
+		tc.assertFalse( App.get().SOURCE_FILE.test( null ) );
 	}
 		
 	@Test.Impl( 
@@ -1031,7 +1031,7 @@ public class AppTest extends Test.Container{
 	public void tm_0C7545DE3( Test.Case tc ) {
 		tc.assertEqual( 3L, Stream.of( AppTest.class, App.class, test.sog.core.foo.A.class )
 			.map( App.get()::sourceFile )
-			.filter( App.SOURCE_FILE )
+			.filter( App.get().SOURCE_FILE )
 			.count()
 		);
 	}
@@ -1148,6 +1148,42 @@ public class AppTest extends Test.Container{
 	)
 	public void tm_076A7FC18( Test.Case tc ) {
 		tc.assertNotEmpty( App.get().startDateTime() );
+	}
+
+	@Test.Impl( 
+			member = "method: String App.relativePathToClassname(Path)", 
+			description = "Agrees with classname of top-level classes" 
+			)
+	public void tm_0503B4157( Test.Case tc ) {
+		// For a given class c, c.getName() should be relativeClassname( sourceDir(c).relativize( sourceFile(c) ) )
+		Class<?>[] classes = {
+			App.class,
+			AppTest.class,
+			sog.core.Test.class,
+			sog.core.test.TestMember.class
+		};
+		for ( Class<?> c : classes ) {
+			tc.assertEqual( c.getName(), 
+				App.get().relativePathToClassname( App.get().sourceDir( c ).relativize( App.get().sourceFile( c ) ) ) );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.relativePathToClassname(Path)", 
+		description = "Throws AssertionError for null realtivePath" 
+	)
+	public void tm_017D5EF08( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().relativePathToClassname( null );
+	}
+		
+	@Test.Impl( 
+		member = "method: String App.relativePathToClassname(Path)", 
+		description = "Throws AssertionError if not a java source file" 
+	)
+	public void tm_00EADC2B1( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		App.get().relativePathToClassname( App.get().root() );
 	}
 
 	

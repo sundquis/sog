@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -329,7 +329,7 @@ public class SoftStringTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int SoftString.hashCode()", 
-		description = "If equlas then hashCodes are the same" 
+		description = "If equals then hashCodes are the same" 
 	)
 	public void tm_00D32EC0D( Test.Case tc ) {
 		// !equals OR hasCode == hashCode

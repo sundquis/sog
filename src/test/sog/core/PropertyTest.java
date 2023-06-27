@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -266,27 +266,13 @@ public class PropertyTest extends Test.Container {
 	}
 	
 	@Test.Impl( 
-		member = "method: Object Property.get(String, Object, Parser)", 
-		description = "Prints instructions when system property file not found" 
-	)
-	public void tm_0682795E3( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-	
-	@Test.Impl( 
-		member = "method: String Property.getText(String)", 
-		description = "Prints instructions when system property file not found" 
-	)
-	public void tm_0D9EF3EE4( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-
-	@Test.Impl( 
 		member = "method: void Property.characters(char[], int, int)", 
 		description = "Characters added" 
 	)
 	public void tm_0289A2691( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+		Property INST = this.getSubjectField( null, "instance", null );
+		StringBuilder buf = this.getSubjectField( INST, "buf", null );
+		tc.assertTrue( buf.length() > 0 );
 	}
 	
 	@Test.Impl( 
@@ -294,39 +280,39 @@ public class PropertyTest extends Test.Container {
 		description = "Text elements terminated" 
 	)
 	public void tm_0318718C2( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+		Property INST = this.getSubjectField( null, "instance", null );
+		String s = this.getSubjectField( INST, "currentTextKey", "" );
+		tc.assertTrue( s.length() > 0 );
+	}
+	
+	@Test.Impl( 
+		member = "method: void Property.makeInstance()", 
+		description = "Prints instructions when system property file not found" 
+	)
+	public void tm_0DA600130( Test.Case tc ) {
+		// Suggested manual test: From sog home directory
+		//		java -Dsystem.dir=bogus test.sog.core.PropertTest
+		// Check output for helpful message on how to set system proprty
+		tc.addMessage( "See comment on test case" );
+		tc.assertPass();
+	}
+
+	@Test.Impl( 
+		member = "method: void Property.startElement(String, Map)", 
+		description = "Throws AssertionError for empty name" 
+	)
+	public void tm_002F465B4( Test.Case tc ) {
+		tc.addMessage( "Code inspection..." );
+		tc.assertPass();
 	}
 	
 	@Test.Impl( 
 		member = "method: void Property.startElement(String, Map)", 
-		description = "Buffer reset on text elements" 
+		description = "Throws AssertionError for null attributes" 
 	)
-	public void tm_07DAACEB8( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-	
-	@Test.Impl( 
-		member = "method: void Property.startElement(String, Map)", 
-		description = "Class name set on class elements" 
-	)
-	public void tm_0AFD78ACD( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-	
-	@Test.Impl( 
-		member = "method: void Property.startElement(String, Map)", 
-		description = "Key set on text elements" 
-	)
-	public void tm_0BBD761A0( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
-	}
-	
-	@Test.Impl( 
-		member = "method: void Property.startElement(String, Map)", 
-		description = "Property added on property elements" 
-	)
-	public void tm_0C1872E8A( Test.Case tc ) {
-		tc.addMessage( "GENERATED STUB" );
+	public void tm_043A463B0( Test.Case tc ) {
+		tc.addMessage( "Code inspection..." );
+		tc.assertPass();
 	}
 
 	

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,9 +87,10 @@ public class ParserTest extends Test.Container {
 	public void tm_07DACD82B( Test.Case tc ) {
 		this.test( tc, Parser.CSV, "1, 2, 3", new String[] { "1", "2", "3" } );
 		this.test( tc, Parser.CSV, "1, , 3", new String[] { "1", "", "3" } );
+		this.test( tc, Parser.CSV, "1, , , , 3", new String[] { "1", "", "", "", "3" } );
 		this.test( tc, Parser.CSV, "1,2,3", new String[] { "1", "2", "3" } );
-		this.test( tc, Parser.CSV, ",,", new String[] { "", "", "" } );
-		this.test( tc, Parser.CSV, " , , ", new String[] { "", "", "" } );
+		this.test( tc, Parser.CSV, "1,,2", new String[] { "1", "", "2" } );
+		this.test( tc, Parser.CSV, "1, , , , 42", new String[] { "1", "", "", "", "42" } );
 		this.test( tc, Parser.CSV, " a string with spaces, another string ", new String[] { " a string with spaces", "another string " } );
 		this.test( tc, Parser.CSV, "!@#,$%^,&*(", new String[] { "!@#", "$%^", "&*(" } );
 	}
@@ -216,6 +217,134 @@ public class ParserTest extends Test.Container {
 		this.test( tc, Parser.STRING, "'a b'", "'a b'" );
 	}
 			
+
+	@Test.Impl( 
+		member = "field: Parser Parser.BOOLEAN", 
+		description = "Parser.BOOLEAN satisfies F1" 
+	)
+	public void tm_052AA55B3( Test.Case tc ) {
+		Boolean[] values = { Boolean.TRUE, Boolean.FALSE };
+		for ( Boolean b : values ) {
+			tc.assertEqual( b, Parser.BOOLEAN.fromString( b.toString() ) );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.BOOLEAN", 
+		description = "Parser.BOOLEAN does not satisfy F2" 
+	)
+	public void tm_052AA5974( Test.Case tc ) {
+		String bad = "FALSE";
+		tc.assertNotEqual( bad, Parser.BOOLEAN.fromString( bad ).toString() );
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.INTEGER", 
+		description = "Parser.INTEGER satisfies F1" 
+	)
+	public void tm_0381CEEF3( Test.Case tc ) {
+		Integer[] values = { 42, 0, -2, Integer.MAX_VALUE, Integer.MIN_VALUE, 1_000_000 };
+		for ( Integer n : values ) {
+			tc.assertEqual( n, Parser.INTEGER.fromString( n.toString() ) );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.INTEGER", 
+		description = "Parser.INTEGER does not satisfy F2" 
+	)
+	public void tm_0381CF2B4( Test.Case tc ) {
+		String bad = "+42";
+		tc.assertNotEqual( bad, Parser.INTEGER.fromString( bad ).toString() );
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.LONG", 
+		description = "Parser.LONG satisfies F1" 
+	)
+	public void tm_0DF13BCD9( Test.Case tc ) {
+		Long[] values = { 42L, 0L, -213L, Long.MAX_VALUE, Long.MIN_VALUE, 1_000_000_000_000L };
+		for ( Long n : values ) {
+			tc.assertEqual( n, Parser.LONG.fromString( n.toString() ) );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.LONG", 
+		description = "Parser.LONG does not satisfy F2" 
+	)
+	public void tm_0DF13C09A( Test.Case tc ) {
+		String bad = "+42";
+		tc.assertNotEqual( bad, Parser.LONG.fromString( bad ).toString() );
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.STRING", 
+		description = "Parser.STRING satisfies F1" 
+	)
+	public void tm_07B279F2F( Test.Case tc ) {
+		String[] values = {
+			"some string",
+			"Hello world!",
+			"+42",
+			"this rep is the identity"
+		};
+		for ( String s : values ) {
+			tc.assertEqual( s, Parser.STRING.fromString( s.toString() ) );
+		}
+	}
+		
+	@Test.Impl( 
+		member = "field: Parser Parser.STRING", 
+		description = "Parser.STRING satisfies F2" 
+	)
+	public void tm_07B27A2F0( Test.Case tc ) {
+		String[] values = {
+			"some string",
+			"Hello world!",
+			"+42",
+			"this rep is the identity"
+		};
+		for ( String s : values ) {
+			tc.assertEqual( s, Parser.STRING.fromString( s ).toString() );
+		}
+	}
+
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "Parser.CSV does not satisfy F1" 
+	)
+	public void tm_04B0717A9( Test.Case tc ) {
+		String[] bad = { "Hello", "world!" };
+		tc.assertNotEqual( bad, Parser.CSV.fromString( bad.toString() ) );
+	}
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.CSV", 
+		description = "Parser.CSV does not satisfy F2" 
+	)
+	public void tm_04B071B6A( Test.Case tc ) {
+		String bad = "4,2";
+		tc.assertNotEqual( bad, Parser.CSV.fromString( bad ).toString() );
+	}
+			
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "Parser.LIST does not satisfy F1" 
+	)
+	public void tm_051046047( Test.Case tc ) {
+		List<Integer> bad = List.of( 1, 2, 3 );
+		tc.assertNotEqual( bad, Parser.LIST.fromString( bad.toString() ) );
+	}
+	
+	@Test.Impl( 
+		member = "field: Parser Parser.LIST", 
+		description = "Parser.LSIT does not satisfy F2" 
+	)
+	public void tm_0A2D7D15C( Test.Case tc ) {
+		String bad = "1, 2, 3";
+		tc.assertNotEqual( bad, Parser.LIST.fromString( bad ).toString() );
+	}
 
 	
 	
