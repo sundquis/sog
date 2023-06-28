@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ public class SwitchTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( Switch.class );
-		Test.evalPackage( Switch.class );
+		Test.eval( Switch.class );
+		//Test.evalPackage( Switch.class );
 	}
 }

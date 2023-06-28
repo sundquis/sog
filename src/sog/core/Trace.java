@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ import sog.util.Queue;
  * Static methods allow tracing to be disabled and enabled, and allow for the Trace facility to be
  * completely terminated.
  * 
- * FIXME: FixedWidth results is so much truncation and onformation loss; this should be replaced
+ * FIXME: FixedWidth results in truncation and information loss; this should be replaced
  * with a new CSV formatter.
  */
 @Test.Subject( "test." )
@@ -257,7 +257,5 @@ public class Trace implements Runnable, OnShutdown {
 	}
 	
 	
-	// Hi.
-
 
 }

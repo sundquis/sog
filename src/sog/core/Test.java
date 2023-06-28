@@ -1,8 +1,20 @@
 /**
- * Copyright (C) 2017 -- 2021 by TS Sundquist
- * *** *** * 
- * All rights reserved.
+ * Copyright (C) 2021, 2023
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
 
 package sog.core;
@@ -20,7 +32,6 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-import sog.util.IndentWriter;
 import sog.core.test.TestSubject;
 import sog.core.test.TestSet;
 
@@ -77,7 +88,7 @@ import sog.core.test.TestSet;
  * 			noop implementations of the procedures run before and after each test case. Concrete
  * 			containers override these as necessary. In addition, the base class provides convenience
  * 			methods for getting and setting values on a subject, and for producing a file
- * 			location identifier that can used for debugging.
+ * 			location identifier that can be used for debugging.
  * 
  * 		@Test.Impl
  * 			Methods in the container with this annotation are the implementations of tests declared
@@ -143,7 +154,7 @@ import sog.core.test.TestSet;
  * 				Each policy is defined by the status of the 12 types of members: constructors, fields, 
  * 				and methods from the four protection levels.
  * 			Services: 
- * 				Convenience methods for determining if a given method is required.
+ * 				Convenience methods for determining if a given member requires testing.
  * 				
  * 		sog.core.test.Result
  * 			Responsibilities: 
@@ -532,7 +543,7 @@ public class Test {
 		
 		
 		/**
-		 * Procedure to call after the current method (in a Test.Container) completes
+		 * Procedure to call after the current method (in a Test.Container) completes.
 		 * Will be called even if the method throws an exception.
 		 * 
 		 * @param callafter
@@ -560,8 +571,7 @@ public class Test {
 		// 
 		// When the first line starts "/* */" the first assertion is live, causing the case to pass.
 		// When the first line starts "//* */" the second assertion is live, causing the case to fail.
-		// 
-		// Before the toggle block, messages explain how to visually check the test case.
+		// Messages should be used to describe how to determine (manually) that the case passes.
 		public Test.Case addMessage( String message );
 
 
@@ -675,9 +685,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for one subject class */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void eval( Class<?> subjectClass ) {
-		TestSubject tr = TestSubject.forSubject( Assert.nonNull( subjectClass ) );
-		System.err.println();
-		tr.print( new IndentWriter( System.out, "\t" ) );
+		TestSubject.forSubject( Assert.nonNull( subjectClass ) ).print();
 	}
 	
 	/** Convenience method to evaluate and print results for the calling class class */
@@ -689,9 +697,7 @@ public class Test {
 	/** Convenience method to evaluate and print results for the package containing the given subject */
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static void evalPackage( Class<?> subjectClass ) {
-		TestSet trs = TestSet.forPackage( Assert.nonNull( subjectClass ) );
-		System.err.println();
-		trs.print( new IndentWriter( System.out, "\t" ) );
+		TestSet.forPackage( Assert.nonNull( subjectClass ) ).print();
 	}
 	
 	/** 
@@ -702,20 +708,14 @@ public class Test {
 	@Test.Decl( "Throws AppException for components not on source path" )
 	public static void evalDir( Class<?> subjectClass, String... components  ) {
 		Path sourceDir = App.get().sourceDir( Assert.nonNull( subjectClass ) );
-		Path subDir = Path.of( "" );
-		for ( int i = 0; i < components.length; i++ ) {
-			subDir = subDir.resolve( Path.of( components[i] ) );
-		}
-		TestSet trs = TestSet.forPackages( sourceDir, sourceDir.resolve( subDir ) );
-		System.err.println();
-		trs.print( new IndentWriter( System.out, "\t" ) );
+		Path subDir = Path.of( "", components );
+		TestSet.forPackages( sourceDir, sourceDir.resolve( subDir ) ).print();
+		
 	}
 
-	@Test.Skip( "FIXME/Manually verified" )
+	@Test.Skip( "Massive validation through repeated use" )
 	public static void evalAll() {
-		TestSet trs = TestSet.forAllSourceDirs();
-		System.err.println();
-		trs.print( new IndentWriter( System.out, "\t" ) );
+		TestSet.forAllSourceDirs().print();
 	}
-	
+		
 }

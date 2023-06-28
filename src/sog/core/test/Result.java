@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,14 +69,13 @@ public abstract class Result implements Printable {
 		int totalCount = this.getPassCount() + this.getFailCount();
 		double success = (double) 100 * this.getPassCount() / (totalCount == 0 ? 1 : totalCount);
 		double seconds = (double) this.getElapsedTime() / 1000.0;
-		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d)", this.label,
-				success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
+		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d)", 
+			this.label, success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
 
 	/** Implementations first print this instance, then indent for details. */
 	@Override
 	public abstract void print( IndentWriter out );
-	
-	
+		
 
 }

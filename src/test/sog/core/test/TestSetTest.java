@@ -35,9 +35,9 @@ import sog.util.StringOutputStream;
  * 
  */
 @Test.Skip( "Container" )
-public class TestResultSetTest extends Test.Container {
+public class TestSetTest extends Test.Container {
 	
-	public TestResultSetTest() {
+	public TestSetTest() {
 		super( TestSet.class );
 	}
 	
@@ -121,7 +121,7 @@ public class TestResultSetTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: TestSet TestSet.addClass(Class)", 
-		description = "Return is this TestSet instance" 
+		description = "Return is this TestSet instance to allow chaining" 
 	)
 	public void tm_0337F4643( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
@@ -171,7 +171,7 @@ public class TestResultSetTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: TestSet TestSet.addClass(String)", 
-		description = "Return is this TestSet instance" 
+		description = "Return is this TestSet instance to allow chaining" 
 	)
 	public void tm_077F1B3DC( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
@@ -211,7 +211,7 @@ public class TestResultSetTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: TestSet TestSet.addClasses(Stream)", 
-		description = "Return is this TestSet instance" 
+		description = "Return is this TestSet instance to allow chaining" 
 	)
 	public void tm_02A4BB5FB( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
@@ -237,7 +237,7 @@ public class TestResultSetTest extends Test.Container {
 	public void tm_06E3B48EE( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
 		long before = trs.getElapsedTime();
-		trs.addResult( TestResultSetTest.RESULT );
+		trs.addResult( TestSetTest.RESULT );
 		long after = trs.getElapsedTime();
 		tc.assertTrue( after >= before + MyResult.ELAPSED_TIME );
 	}
@@ -248,7 +248,7 @@ public class TestResultSetTest extends Test.Container {
 	)
 	public void tm_0BDAFF652( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
-		trs.addResult( TestResultSetTest.RESULT );
+		trs.addResult( TestSetTest.RESULT );
 		tc.assertEqual( MyResult.FAIL_COUNT, trs.getFailCount() );
 	}
 		
@@ -258,17 +258,17 @@ public class TestResultSetTest extends Test.Container {
 	)
 	public void tm_0C19DE97F( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
-		trs.addResult( TestResultSetTest.RESULT );
+		trs.addResult( TestSetTest.RESULT );
 		tc.assertEqual( MyResult.PASS_COUNT, trs.getPassCount() );
 	}
 		
 	@Test.Impl( 
 		member = "method: TestSet TestSet.addResult(Result)", 
-		description = "Return is this TestSet instance" 
+		description = "Return is this TestSet instance to allow chaining" 
 	)
 	public void tm_03C567283( Test.Case tc ) {
 		TestSet trs = new TestSet( "LABEL" );
-		tc.assertEqual( trs, trs.addResult( TestResultSetTest.RESULT ) );
+		tc.assertEqual( trs, trs.addResult( TestSetTest.RESULT ) );
 	}
 		
 	@Test.Impl( 
@@ -456,15 +456,88 @@ public class TestResultSetTest extends Test.Container {
 		tc.expectError( AssertionError.class );
 		TestSet.forPackages( App.get().sourceDir( App.class ), null );
 	}
+	
+	
+	@Test.Impl( 
+			member = "method: TestSet TestSet.forAllSourceDirs()", 
+			description = "Return is this TestSet instance to allow chaining" 
+		)
+		public void tm_0B0F6ADF5( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.forPackage(Class)", 
+			description = "Return is this TestSet instance to allow chaining" 
+		)
+		public void tm_00E4145B7( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.forPackages(Path, Path)", 
+			description = "Return is this TestSet instance to allow chaining" 
+		)
+		public void tm_033394E34( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.forSourceDir(Path)", 
+			description = "Return is this TestSet instance to allow chaining" 
+		)
+		public void tm_08366ACC0( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.print()", 
+			description = "Includes messages for each bad classname" 
+		)
+		public void tm_0D1AC502A( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.print()", 
+			description = "Includes summary for each TestSubject" 
+		)
+		public void tm_02163F9AC( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.print()", 
+			description = "Results are printed in alphabetaical order" 
+		)
+		public void tm_0ED33BF3B( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.print()", 
+			description = "Return is this TestSet instance to allow chaining" 
+		)
+		public void tm_013CC8689( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: TestSet TestSet.print()", 
+			description = "Throws AssertionError for null writer" 
+		)
+		public void tm_09BCE10B9( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+
 
 	
 	
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( TestSet.class );
+		Test.eval( TestSet.class );
 		//Test.evalPackage( TestSet.class );
-		//Test.evalDir( Test.class, "sog", "core" );
-		Test.evalAll();
+		//Test.evalAll();
 	}
 }

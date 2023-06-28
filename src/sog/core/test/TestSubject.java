@@ -488,6 +488,18 @@ public class TestSubject extends Result {
 
 		out.decreaseIndent();
 	}
+
+	/**
+	 * Convenience method to print results using the default IndentWriter
+	 */
+	@Test.Decl( "Includes global summary statistics" )
+	@Test.Decl( "If there are errors then details are included" )
+	@Test.Decl( "If no errors then result details are included" )
+	@Test.Decl( "Includes details on members that have been skipped" )
+	@Test.Decl( "Includes stubs for unimplemented methods" )
+	public void print() {
+		this.print( new IndentWriter( System.out, "\t" ) );
+	}
 	
 	@Override
 	@Test.Decl( "Reported time is the sum of the times of all test cases" )

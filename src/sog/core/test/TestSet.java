@@ -118,6 +118,25 @@ public class TestSet extends Result {
 		out.decreaseIndent();
 	}
 	
+	@Test.Decl( "Throws AssertionError for null writer" )
+	@Test.Decl( "Includes summary for each TestSubject" )
+	@Test.Decl( "Includes messages for each bad classname" )
+	@Test.Decl( "Results are printed in alphabetaical order" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
+	public TestSet print() {
+		this.print( new IndentWriter( System.out, "\t" ) );
+		return this;
+	}
+	
+
+	@Test.Decl( "After setVerbosity(true) details are shown" )
+	@Test.Decl( "After setVerbosity(false) details are not shown" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
+	public TestSet setVerbosity( boolean verbose ) {
+		TestSet.VERBOSE = verbose;
+		return this;
+	}
+	
 	
 //	private void addSkippedClass( String className, Throwable error ) {
 //		this.skippedClasses.add( className + ": " + ( error == null ? "Skipped" : error.toString() ) );
@@ -127,10 +146,10 @@ public class TestSet extends Result {
 		this.skippedClasses.add( className + ": " + reason );
 	}
 
-	@Test.Decl( "Return is this TestSet instance" )
 	@Test.Decl( "Elapsed time reflects new total" )
 	@Test.Decl( "Pass count reflects new total" )
 	@Test.Decl( "Fail count reflects new total" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public TestSet addResult( Result result ) {
 		this.results.add( Assert.nonNull( result ) );
 		this.elapsedTime += result.getElapsedTime();
@@ -142,7 +161,7 @@ public class TestSet extends Result {
 	
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Adds one TestSubject" )
-	@Test.Decl( "Return is this TestSet instance" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public TestSet addClass( Class<?> clazz ) {
 		Test.Skip skip = Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class );
 		if ( skip == null ) {
@@ -158,7 +177,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null class name" )
 	@Test.Decl( "Records error message if class is not found" )
 	@Test.Decl( "Adds one TestSubject" )
-	@Test.Decl( "Return is this TestSet instance" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public TestSet addClass( String className ) {
 		try {
 			Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass( Assert.nonEmpty( className ) );
@@ -173,7 +192,7 @@ public class TestSet extends Result {
 
 	@Test.Decl( "Throws AssertionError for null class names stream" )
 	@Test.Decl( "Adds one TestSubject for each valid class name" )
-	@Test.Decl( "Return is this TestSet instance" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public TestSet addClasses( Stream<String> classnames ) {
 		Assert.nonNull( classnames ).forEach( this::addClass );
 		
@@ -183,6 +202,7 @@ public class TestSet extends Result {
 	
 	@Test.Decl( "Aggregates TestSubject instances for every class under every source directory" )
 	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public static TestSet forAllSourceDirs() {
 		final TestSet trs = new TestSet( "ALL:\t" 
 			+ new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
@@ -197,6 +217,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null source path" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given source directory" )
 	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public static TestSet forSourceDir( Path sourceDir ) {
 		TestSet trs = new TestSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
 		
@@ -210,6 +231,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null sub-directory" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given directory" )
 	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public static TestSet forPackages( Path sourceDir, Path sub ) {
 		TestSet trs = new TestSet( "PKGS:\t" + Assert.nonNull( sub ) );
 		
@@ -223,6 +245,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Aggregates TestSubject instances for every class in the same package as the given class" )
 	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public static TestSet forPackage( Class<?> clazz ) {
 		TestSet trs = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
 		
