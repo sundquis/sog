@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -681,6 +681,129 @@ public class TestMemberTest extends Test.Container {
 		tc.assertTrue( new TestMember( this.getField( "skippedField" ) ).isSkipped() );
 	}
 	
+	
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Class)", 
+		description = "Throws AssertionError for null class" 
+	)
+	public void tm_07734BC8B( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Class<?> c = null;
+		TestMember.getSimpleName( c );
+	}
+		
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Constructor)", 
+		description = "Throws AssertionError for null constructor" 
+	)
+	public void tm_0AC59028F( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Constructor<?> c = null;
+		TestMember.getSimpleName( c );
+	}
+		
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Field)", 
+		description = "Throws AssertionError for null field" 
+	)
+	public void tm_0EC3C508F( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Field f = null;
+		TestMember.getSimpleName( f );
+	}
+		
+	@Test.Impl( 
+		member = "method: String TestMember.getSimpleName(Method)", 
+		description = "Throws AssertionError for null method" 
+	)
+	public void tm_0737656A7( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Method m = null;
+		TestMember.getSimpleName( m );
+	}
+		
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Array types handled correctly" 
+	)
+	public void tm_051271F45( Test.Case tc ) {
+		String[] args = new String[] {};
+		Class<?> c = args.getClass();
+		tc.assertFail( TestMember.getTypeName( c ) );
+	}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Instance member classes show containing class name" 
+		)
+		public void tm_04890588D( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Package suppressed for application classes" 
+		)
+		public void tm_025A7ABC3( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Package suppressed for java.lang classes" 
+		)
+		public void tm_0E54364AD( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Package suppressed for library classes" 
+		)
+		public void tm_011534A6E( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Package suppressed for member classes" 
+		)
+		public void tm_0945C8669( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Primitive types handled correctly" 
+		)
+		public void tm_0356D69D3( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Static member classes show containing class name" 
+		)
+		public void tm_091C8B3A6( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Throws AppException for anonymous local classes" 
+		)
+		public void tm_0034756A8( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+		
+		@Test.Impl( 
+			member = "method: String TestMember.getTypeName(Class)", 
+			description = "Throws AssertionError for null class" 
+		)
+		public void tm_0A3B4BA53( Test.Case tc ) {
+			tc.addMessage( "GENERATED STUB" );
+		}
+
 	
 	
 	

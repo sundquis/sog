@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,14 +129,22 @@ public class TestMember {
 	
 	
 	private final String memberName;
+	
 	private final Test.Skip skip;
+	
 	private final Test.Decl[] decls;
+	
 	private final boolean isRequired;
+	
 	private final boolean isSynthetic;
+	
 	private final boolean isMain;
+	
 	private final boolean isAbstract;
+	
 	private final boolean isEnumSpecial;
 
+	
 	@Test.Decl( "Throws AssertionError for null constructor" )
 	public TestMember( Constructor<?> constructor ) {
 		this.memberName = TestMember.getSimpleName( Assert.nonNull( constructor ) );
@@ -242,8 +250,6 @@ public class TestMember {
 	public Stream<TestDecl> getDecls() { 
 		return Arrays.stream( this.decls ).map( d -> new TestDecl( TestMember.this.memberName, d.value() ) );
 	}
-	
-
 	
 	
 	@Override

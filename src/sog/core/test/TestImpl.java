@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ public class TestImpl extends TestIdentifier {
 	/* The executable test method */
 	private final Method method;
 
-	@Test.Skip( "Factory guarantees impl and method are non-null" )
+	/* Only called from the factory, which guarantees impl and method are non-null. */
 	private TestImpl( Test.Impl impl, Method method ) {
 		super( impl.member(), impl.description() );
 		
@@ -73,7 +73,7 @@ public class TestImpl extends TestIdentifier {
 		this.method = method;
 	}
 
-	@Test.Skip( "One instance used to indiacte non-test method TestImpl" )
+	/* One instance used to indicate non-test method TestImpl. */
 	private TestImpl() {
 		super( "INVALID_MEMBER", "INVALID_DESCRIPTION" );
 		this.impl = null;
