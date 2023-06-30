@@ -36,6 +36,7 @@ import sog.core.Test;
 import sog.core.test.Policy;
 import sog.core.test.TestIdentifier;
 import sog.core.test.TestMember;
+import sog.util.Pair;
 import sog.util.Printable;
 
 /**
@@ -721,88 +722,107 @@ public class TestMemberTest extends Test.Container {
 		Method m = null;
 		TestMember.getSimpleName( m );
 	}
+	
+	private static class InnerStatic {
+		private static class Inner2 {}
+	}
 		
 	@Test.Impl( 
 		member = "method: String TestMember.getTypeName(Class)", 
 		description = "Array types handled correctly" 
 	)
 	public void tm_051271F45( Test.Case tc ) {
-		String[] args = new String[] {};
-		Class<?> c = args.getClass();
-		tc.assertFail( TestMember.getTypeName( c ) );
+		Stream.of(
+			new Pair<Object, String>( new String[] {}, "String[]" ),
+			new Pair<Object, String>( new TestMember[][] {}, "TestMember[][]" ),
+			new Pair<Object, String>( new InnerStatic[] {}, "TestMemberTest.InnerStatic[]" ),
+			new Pair<Object, String>( new InnerStatic.Inner2[][][] {}, "TestMemberTest.InnerStatic.Inner2[][][]" )
+		).forEach( p -> tc.assertEqual( p.getY(), TestMember.getTypeName( p.getX().getClass() ) ) );
+	}
+
+	private class InnerInstance {}
+	
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Instance member classes show containing class name" 
+	)
+	public void tm_04890588D( Test.Case tc ) {
+		InnerInstance ii = new InnerInstance();
+		tc.assertEqual( "TestMemberTest.InnerInstance", TestMember.getTypeName( ii.getClass() ) );
 	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Instance member classes show containing class name" 
-		)
-		public void tm_04890588D( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Package suppressed for application classes" 
+	)
+	public void tm_025A7ABC3( Test.Case tc ) {
+		Object obj = this;
+		String packageName = obj.getClass().getPackageName();
+		tc.assertTrue( obj.getClass().getName().startsWith( packageName ) );
+		tc.assertFalse( TestMember.getTypeName( obj.getClass() ).startsWith( packageName ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Package suppressed for application classes" 
-		)
-		public void tm_025A7ABC3( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Package suppressed for java.lang classes" 
+	)
+	public void tm_0E54364AD( Test.Case tc ) {
+		Object obj = "";
+		String packageName = obj.getClass().getPackageName();
+		tc.assertTrue( obj.getClass().getName().startsWith( packageName ) );
+		tc.assertFalse( TestMember.getTypeName( obj.getClass() ).startsWith( packageName ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Package suppressed for java.lang classes" 
-		)
-		public void tm_0E54364AD( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Package suppressed for library classes" 
+	)
+	public void tm_011534A6E( Test.Case tc ) {
+		Object obj = new java.util.Date();
+		String packageName = obj.getClass().getPackageName();
+		tc.assertTrue( obj.getClass().getName().startsWith( packageName ) );
+		tc.assertFalse( TestMember.getTypeName( obj.getClass() ).startsWith( packageName ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Package suppressed for library classes" 
-		)
-		public void tm_011534A6E( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Package suppressed for member classes" 
+	)
+	public void tm_0945C8669( Test.Case tc ) {
+		Object obj = new InnerInstance();
+		String packageName = obj.getClass().getPackageName();
+		tc.assertTrue( obj.getClass().getName().startsWith( packageName ) );
+		tc.assertFalse( TestMember.getTypeName( obj.getClass() ).startsWith( packageName ) );
+	}
+
+	void myFooMethod() {}
+	int myFooMethod( int n ) { return 42; }
+	
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Primitive types handled correctly" 
+	)
+	public void tm_0356D69D3( Test.Case tc ) throws NoSuchMethodException, SecurityException {
+		tc.assertEqual( "void", TestMember.getTypeName( this.getClass().getDeclaredMethod( "myFooMethod" ).getReturnType() ) );
+		tc.assertEqual( "int", TestMember.getTypeName( this.getClass().getDeclaredMethod( "myFooMethod", int.class ).getReturnType() ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Package suppressed for member classes" 
-		)
-		public void tm_0945C8669( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Static member classes show containing class name" 
+	)
+	public void tm_091C8B3A6( Test.Case tc ) {
+		tc.assertEqual( "TestMemberTest.InnerStatic", TestMember.getTypeName( InnerStatic.class ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Primitive types handled correctly" 
-		)
-		public void tm_0356D69D3( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Static member classes show containing class name" 
-		)
-		public void tm_091C8B3A6( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Throws AppException for anonymous local classes" 
-		)
-		public void tm_0034756A8( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: String TestMember.getTypeName(Class)", 
-			description = "Throws AssertionError for null class" 
-		)
-		public void tm_0A3B4BA53( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: String TestMember.getTypeName(Class)", 
+		description = "Throws AssertionError for null class" 
+	)
+	public void tm_0A3B4BA53( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		TestMember.getTypeName( null );
+	}
 
 	
 	

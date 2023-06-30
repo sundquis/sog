@@ -50,11 +50,14 @@ public class TestMember {
 	@Test.Decl( "Array types handled correctly" )
 	@Test.Decl( "Static member classes show containing class name" )
 	@Test.Decl( "Instance member classes show containing class name" )
-	@Test.Decl( "Throws AppException for anonymous local classes" )
 	@Test.Decl( "Throws AssertionError for null class" )
 	public static String getTypeName( Class<?> clazz ) {
 		Assert.nonNull( clazz );
-		return (clazz.isMemberClass() ? getTypeName( clazz.getEnclosingClass() ) + "." : "") + clazz.getSimpleName();
+		if ( clazz.isArray() ) {
+			return TestMember.getTypeName( clazz.getComponentType() ) + "[]";
+		} else {
+			return (clazz.isMemberClass() ? getTypeName( clazz.getEnclosingClass() ) + "." : "") + clazz.getSimpleName();
+		}
 	}
 	
 	/* Naming policy for member classes. */

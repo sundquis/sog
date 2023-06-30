@@ -44,11 +44,13 @@ public class StringOutputStream extends OutputStream {
 	
 	@Override
 	public String toString() {
-		if ( this.value == null ) {
-			this.close();
-		}
-		
+		this.close();
 		return this.value;
+	}
+	
+	public void reset() {
+		this.value = null;
+		this.bytes.clear();
 	}
 	
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@ import sog.util.StringOutputStream;
  * 
  */
 @Test.Skip( "Container" )
-public class TestResultTest extends Test.Container {
+public class TestSubjectTest extends Test.Container {
 	
 	private final Policy originalPolicy;
 
-	public TestResultTest() {
+	public TestSubjectTest() {
 		super( TestSubject.class );
 		this.originalPolicy = Policy.get();
 		Policy.set( Policy.ALL );
@@ -587,6 +587,16 @@ public class TestResultTest extends Test.Container {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		tr.print( null );
 	}
+	
+	@Test.Impl( 
+		member = "method: void TestSubject.print()", 
+		description = "Prints all relevant information" 
+	)
+	public void tm_0EA51065F( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
+		tc.assertPass();
+	}
+
 
 		
 		

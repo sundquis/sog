@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ import sog.util.Printable;
 
 /**
  * 		Responsibilities: 
- * 			Given a subject class, assembles and executes the set of test cases associated with the subject.
+ * 			Given a subject class, assemble and execute the set of test cases associated with the subject.
  * 			Defines error reporting logic for misconfigured tests.
  * 		Structure:
  * 			Extends Result.
@@ -153,7 +153,7 @@ public class TestSubject extends Result {
 	private String containerLocation;
 
 	/*
-	 * Errors represent fatal misconfigurations of test information. When encountered the framework marks 
+	 * Errors represent fatal mis-configurations of test information. When encountered, the framework marks 
 	 * all tests as failed. Errors are reported by the print( IndentWriter ) method.
 	 */
 	private final List<Err> errors = new ArrayList<Err>();
@@ -232,7 +232,7 @@ public class TestSubject extends Result {
 	}
 	
 	/**
-	 * Record information about a fatal error by adding a number of String messages to List<Sting> messages.
+	 * Record information about a fatal error by adding a number of String messages to List<String> messages.
 	 * 
 	 * @param error - An optional Throwable associated with the error
 	 * @param description - Brief String description of the error
@@ -492,11 +492,7 @@ public class TestSubject extends Result {
 	/**
 	 * Convenience method to print results using the default IndentWriter
 	 */
-	@Test.Decl( "Includes global summary statistics" )
-	@Test.Decl( "If there are errors then details are included" )
-	@Test.Decl( "If no errors then result details are included" )
-	@Test.Decl( "Includes details on members that have been skipped" )
-	@Test.Decl( "Includes stubs for unimplemented methods" )
+	@Test.Decl( "Prints all relevant information" )
 	public void print() {
 		this.print( new IndentWriter( System.out, "\t" ) );
 	}

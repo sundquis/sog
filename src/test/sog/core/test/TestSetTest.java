@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package test.sog.core.test;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
@@ -425,8 +426,15 @@ public class TestSetTest extends Test.Container {
 		description = "Aggregates TestSubject instances for every class under the given directory" 
 	)
 	public void tm_0FBB7A244( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
-		tc.assertPass();
+		Path sourceDir = App.get().sourceDir( test.sog.core.test.PolicyTest.class );
+		Path sub = Path.of( "test", "sog", "core", "foo" );
+		TestSet ts = TestSet.forPackages( sourceDir, sub );
+		String skips = this.getSkippedClases( ts ).stream().collect( Collectors.joining( "," ) );
+		tc.assertTrue( skips.contains( "A" ) );
+		tc.assertTrue( skips.contains( "B" ) );
+		tc.assertTrue( skips.contains( "C" ) );
+		tc.assertTrue( skips.contains( "Sub1" ) );
+		tc.assertTrue( skips.contains( "Sub2" ) );
 	}
 		
 	@Test.Impl( 
@@ -434,8 +442,8 @@ public class TestSetTest extends Test.Container {
 		description = "Return is not null" 
 	)
 	public void tm_0984A45D4( Test.Case tc ) {
-		Path sourceDir = App.get().sourceDir( App.class );
-		Path sub = Path.of( "sog", "core", "xml" );
+		Path sourceDir = App.get().sourceDir( test.sog.core.test.PolicyTest.class );
+		Path sub = Path.of( "test", "sog", "core", "foo" );
 		tc.assertNonNull( TestSet.forPackages( sourceDir, sub ) );
 	}
 		
@@ -459,77 +467,45 @@ public class TestSetTest extends Test.Container {
 	
 	
 	@Test.Impl( 
-			member = "method: TestSet TestSet.forAllSourceDirs()", 
-			description = "Return is this TestSet instance to allow chaining" 
-		)
-		public void tm_0B0F6ADF5( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+		member = "method: TestSet TestSet.print()", 
+		description = "Return is this TestSet instance to allow chaining" 
+	)
+	public void tm_013CC8689( Test.Case tc ) {
+		tc.addMessage( "Manually verified" );
+		tc.assertPass();
+	}
 		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.forPackage(Class)", 
-			description = "Return is this TestSet instance to allow chaining" 
-		)
-		public void tm_00E4145B7( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
+	@Test.Impl( 
+		member = "method: TestSet TestSet.setVerbosity(boolean)", 
+		description = "After setVerbosity(false) details are not shown" 
+	)
+	public void tm_031BECDB8( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		TestSet ts = TestSet.forPackage( test.sog.core.test.foo.C1.class ).setVerbosity( false );
+		ts.print( new IndentWriter( sos ) );
+		tc.assertFalse( sos.toString().contains( "RESULTS" ) );
+	}
+			
+	@Test.Impl( 
+		member = "method: TestSet TestSet.setVerbosity(boolean)", 
+		description = "After setVerbosity(true) details are shown" 
+	)
+	public void tm_0FFDDEC20( Test.Case tc ) {
+		StringOutputStream sos = new StringOutputStream();
+		TestSet ts = TestSet.forPackage( test.sog.core.test.foo.C1.class ).setVerbosity( true );
+		ts.print( new IndentWriter( sos ) );
+		tc.assertTrue( sos.toString().contains( "RESULTS" ) );
+	}
+			
+	@Test.Impl( 
+		member = "method: TestSet TestSet.setVerbosity(boolean)", 
+		description = "Return is this TestSet instance to allow chaining" 
+	)
+	public void tm_049F5539B( Test.Case tc ) {
+		TestSet ts = new TestSet( "LABEL" );
+		tc.assertEqual( ts, ts.setVerbosity( false ) );
+	}
 		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.forPackages(Path, Path)", 
-			description = "Return is this TestSet instance to allow chaining" 
-		)
-		public void tm_033394E34( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.forSourceDir(Path)", 
-			description = "Return is this TestSet instance to allow chaining" 
-		)
-		public void tm_08366ACC0( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.print()", 
-			description = "Includes messages for each bad classname" 
-		)
-		public void tm_0D1AC502A( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.print()", 
-			description = "Includes summary for each TestSubject" 
-		)
-		public void tm_02163F9AC( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.print()", 
-			description = "Results are printed in alphabetaical order" 
-		)
-		public void tm_0ED33BF3B( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.print()", 
-			description = "Return is this TestSet instance to allow chaining" 
-		)
-		public void tm_013CC8689( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-		
-		@Test.Impl( 
-			member = "method: TestSet TestSet.print()", 
-			description = "Throws AssertionError for null writer" 
-		)
-		public void tm_09BCE10B9( Test.Case tc ) {
-			tc.addMessage( "GENERATED STUB" );
-		}
-
 
 	
 	
