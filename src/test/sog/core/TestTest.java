@@ -726,49 +726,19 @@ public class TestTest extends Test.Container {
     	tc.expectError( AssertionError.class );
     	this.container.setSubjectField( this, null, null );
     }
-        
+
     @Test.Impl( 
-    	member = "method: void Test.eval(Class)", 
+    	member = "method: Result Test.eval(Class)", 
     	description = "Throws AssertionError for null subject" 
     )
-    public void tm_05FAEFD2F( Test.Case tc ) {
+    public void tm_0E44493D8( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
     	Test.eval( null );
     }
 
-    @Test.Impl( 
-    	member = "method: void Test.evalPackage(Class)", 
-    	description = "Throws AssertionError for null subject" 
-    )
-    public void tm_0FEED7639( Test.Case tc ) {
-    	tc.expectError( AssertionError.class );
-    	Test.evalPackage( null );
-    }
-
-	@Test.Impl( 
-		member = "method: void Test.evalDir(Class, String[])", 
-		description = "Throws AppException for components not on source path" 
-	)
-	public void tm_04AA69422( Test.Case tc ) {
-		tc.expectError( AppException.class );
-		Test.evalDir( sog.core.Test.class, "sog", "foo" );
-	}
-		
-	@Test.Impl( 
-		member = "method: void Test.evalDir(Class, String[])", 
-		description = "Throws AssertionError for null subject class" 
-	)
-	public void tm_0B372F19F( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		Test.evalDir( null, "sog" );
-	}
-
-
 		
 
 	public static void main( String[] args ) {
-		Test.eval( Test.class );
-		//Test.evalPackage( Test.class );
-		//Test.evalDir( Test.class, "sog" );
+		Test.eval( Test.class ).showDetails( true ).print();
 	}
 }

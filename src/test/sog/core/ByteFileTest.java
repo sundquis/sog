@@ -1315,7 +1315,6 @@ public class ByteFileTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( ByteFile.class );
-		//Test.evalPackage( ByteFile.class );
+		Test.eval( ByteFile.class ).showDetails( true ).print();
 	}
 }

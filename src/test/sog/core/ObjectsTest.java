@@ -547,8 +547,6 @@ public class ObjectsTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Objects.class );
-		//Test.evalPackage( Objects.class );
-		//Test.evalAll();
+		Test.eval( Objects.class ).showDetails( true ).print();
 	}
 }

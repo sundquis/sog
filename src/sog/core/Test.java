@@ -28,12 +28,11 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
 import sog.core.test.TestSubject;
-import sog.core.test.TestSet;
+import sog.core.test.Result;
 
 /**
  * All classes import Test as the single public access to the testing framework.
@@ -682,40 +681,11 @@ public class Test {
 	
 	
 	
-	/** Convenience method to evaluate and print results for one subject class */
+	/** Convenience method to evaluate and print results for one subject class. */
 	@Test.Decl( "Throws AssertionError for null subject" )
-	public static void eval( Class<?> subjectClass ) {
-		TestSubject.forSubject( Assert.nonNull( subjectClass ) ).print();
+	public static Result eval( Class<?> subject ) {
+		return TestSubject.forSubject( Assert.nonNull( subject ) );
 	}
 	
-	/** Convenience method to evaluate and print results for the calling class class */
-	@Test.Skip( "Massive validation through repeated use" )
-	public static void eval() {
-		Test.eval( App.get().getCallingClass( 2 ) );
-	}
-	
-	/** Convenience method to evaluate and print results for the package containing the given subject */
-	@Test.Decl( "Throws AssertionError for null subject" )
-	public static void evalPackage( Class<?> subjectClass ) {
-		TestSet.forPackage( Assert.nonNull( subjectClass ) ).print();
-	}
-	
-	/** 
-	 * Relative to the source directory of the given subject class, print results for classes under
-	 * the sub-directory (sub-package) determined by the components.
-	 */
-	@Test.Decl( "Throws AssertionError for null subject class" )
-	@Test.Decl( "Throws AppException for components not on source path" )
-	public static void evalDir( Class<?> subjectClass, String... components  ) {
-		Path sourceDir = App.get().sourceDir( Assert.nonNull( subjectClass ) );
-		Path subDir = Path.of( "", components );
-		TestSet.forPackages( sourceDir, sourceDir.resolve( subDir ) ).print();
-		
-	}
-
-	@Test.Skip( "Massive validation through repeated use" )
-	public static void evalAll() {
-		TestSet.forAllSourceDirs().print();
-	}
 		
 }

@@ -658,8 +658,7 @@ public class PolicyTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( Policy.class );
-		//Test.evalPackage( Policy.class );
+		Test.eval( Policy.class ).showDetails( true ).print();
 	}
 
 }

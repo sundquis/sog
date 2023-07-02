@@ -1190,9 +1190,8 @@ public class AppTest extends Test.Container{
 	
 
 	public static void main( String[] args ) {
-		Test.eval( App.class );
-		//Test.evalPackage( App.class );
-		//TestSet.forPackage( App.class ).setVerbosity( false ).print();
+		//Test.eval( App.class ).showDetails( true ).print();
+		sog.core.test.TestSet.forPackage( App.class, true ).showDetails( false ).print();
 	}
 }
 

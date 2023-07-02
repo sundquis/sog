@@ -112,8 +112,6 @@ public class FatalTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Fatal.class );
-		//Test.evalPackage( Fatal.class );
-		//Test.evalAll();
+		Test.eval( Fatal.class ).showDetails( true ).print();
 	}
 }

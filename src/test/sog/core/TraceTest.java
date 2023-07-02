@@ -381,7 +381,6 @@ public class TraceTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Trace.class );
-		//Test.evalPackage( Trace.class );
+		Test.eval( Trace.class ).showDetails( true ).print();
 	}
 }

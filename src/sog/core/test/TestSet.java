@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
-import sog.core.Parser;
-import sog.core.Property;
 import sog.core.Test;
 import sog.util.IndentWriter;
 
@@ -52,8 +50,6 @@ import sog.util.IndentWriter;
 public class TestSet extends Result {
 	
 	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
-	
-	private static boolean VERBOSE = Property.get( "verbose", false, Parser.BOOLEAN );
 	
 
 	
@@ -111,10 +107,10 @@ public class TestSet extends Result {
 	@Test.Decl( "Includes messages for each bad classname" )
 	@Test.Decl( "Results are printed in alphabetaical order" )
 	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println( this.toString() );
+		Assert.nonNull( out ).println().println( this.toString() );
 		
 		out.increaseIndent();
-		if ( VERBOSE ) {
+		if ( this.showDetails() ) {
 			this.results.stream().forEach( out::println );
 		} else {
 			this.results.stream().map( Object::toString ).forEach( out::println );
@@ -129,32 +125,6 @@ public class TestSet extends Result {
 		out.decreaseIndent();
 	}
 
-	/**
-	 * Convenience method to print results using standard output.
-	 * 
-	 * @return		This TestSet instance to allow chaining.
-	 */
-	@Test.Decl( "Return is this TestSet instance to allow chaining" )
-	public TestSet print() {
-		this.print( new IndentWriter( System.out, "\t" ) );
-		return this;
-	}
-	
-
-	/**
-	 * When true, details are included when results are printed.
-	 * 
-	 * @param verbose
-	 * @return		This TestSet instance to allow chaining.
-	 */
-	@Test.Decl( "After setVerbosity(true) details are shown" )
-	@Test.Decl( "After setVerbosity(false) details are not shown" )
-	@Test.Decl( "Return is this TestSet instance to allow chaining" )
-	public TestSet setVerbosity( boolean verbose ) {
-		TestSet.VERBOSE = verbose;
-		return this;
-	}
-	
 	
 	private void addSkippedClass( String className, String reason ) {
 		this.skippedClasses.add( className + ": " + reason );
@@ -246,7 +216,8 @@ public class TestSet extends Result {
 	 */
 	@Test.Decl( "Aggregates TestSubject instances for every class under every source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forAllSourceDirs() {
+	public static TestSet forAllSourceDirs( boolean showProgress ) {
+		Result.showProgress( showProgress );
 		final TestSet trs = new TestSet( "ALL:\t" 
 			+ new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
 		
@@ -266,7 +237,8 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null source path" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forSourceDir( Path sourceDir ) {
+	public static TestSet forSourceDir( Path sourceDir, boolean showProgress ) {
+		Result.showProgress( showProgress );
 		TestSet trs = new TestSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
 		
 		trs.addClasses( App.get().classesUnderDir( sourceDir ) );
@@ -274,6 +246,10 @@ public class TestSet extends Result {
 		return trs;
 	}
 	
+	@Test.Decl( "Default is no progress" )
+	public static TestSet forSourceDir( Path sourceDir ) {
+		return TestSet.forSourceDir( sourceDir, false );
+	}
 
 	/**
 	 * Construct a set of test results corresponding to all packages and sub-packages relative
@@ -287,14 +263,19 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null sub-directory" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forPackages( Path sourceDir, Path sub ) {
+	public static TestSet forPackages( Path sourceDir, Path sub, boolean showProgress ) {
+		Result.showProgress( showProgress );
 		TestSet trs = new TestSet( "PKGS:\t" + Assert.nonNull( sub ) );
 		
 		trs.addClasses( App.get().classesUnderDir( Assert.nonNull( sourceDir ), sub ) );
 		
 		return trs;
 	}
-	
+
+	@Test.Decl( "Default is no progress" )
+	public static TestSet forPackages( Path sourceDir, Path sub ) {
+		return TestSet.forPackages( sourceDir, sub, false );
+	}
 	
 
 	/**
@@ -307,13 +288,20 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Aggregates TestSubject instances for every class in the same package as the given class" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forPackage( Class<?> clazz ) {
+	public static TestSet forPackage( Class<?> clazz, boolean showProgress ) {
+		Result.showProgress( showProgress );
 		TestSet trs = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
+		System.out.println( "Starting " + trs );
 		
 		trs.addClasses( App.get().classesInPackage( clazz ) );
 		
 		return trs;
 	}
 
+	@Test.Decl( "Throws AssertionError for null class" )
+	@Test.Decl( "Default is no progress" )
+	public static TestSet forPackage( Class<?> clazz ) {
+		return TestSet.forPackage( clazz, false );
+	}
 
 }

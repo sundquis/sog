@@ -350,7 +350,6 @@ public class ParserTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Parser.class );
-		//Test.evalPackage( Parser.class );
+		Test.eval( Parser.class ).showDetails( true ).print();
 	}
 }

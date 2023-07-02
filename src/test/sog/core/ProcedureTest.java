@@ -105,8 +105,6 @@ public class ProcedureTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Procedure.class );
-		//Test.evalPackage( Procedure.class );
-		//Test.evalDir( Procedure.class, "sog" );
+		Test.eval( Procedure.class ).showDetails( true ).print();
 	}
 }

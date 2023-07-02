@@ -940,7 +940,6 @@ public class StringsTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Strings.class );
-		//Test.evalPackage( Strings.class );
+		Test.eval( Strings.class ).showDetails( true ).print();
 	}
 }

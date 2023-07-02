@@ -320,8 +320,6 @@ public class PropertyTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Property.class );
-		//Test.evalPackage( Property.class );
-		//Test.evalDir( Property.class, "sog" );
+		Test.eval( Property.class ).showDetails( true ).print();
 	}
 }

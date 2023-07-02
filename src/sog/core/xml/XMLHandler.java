@@ -90,37 +90,20 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	
 	/**
 	 * Construct a handler that will process xml from the given {@code Path},
-	 * an absolute Path to the xml file.
+	 * an absolute Path to the xml file. The SystemId is set to the root
+	 * location, so relative paths in the file will be properly resolved.
 	 * 
 	 * @param reader
 	 */
 	@Test.Decl( "Throws AssertionError for null path" )
 	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
+	@Test.Decl( "External DTD is read" )
 	public XMLHandler( Path path ) throws IOException {
 		this( Files.newInputStream( Assert.nonNull( path ) ) );
+		this.source.setSystemId( path.toUri().toString() );
 	}
 
 
-	/**
-	 * Construct a handler that will process the xml file specified by the
-	 * given root directory and relative path. The SystemId is set to the root
-	 * location, so relative paths in the file will be properly resolved.
-	 * 
-	 * @param root
-	 * @param relative
-	 * @throws IOException
-	 */
-	@Test.Decl( "Throws AssertionError for null root" )
-	@Test.Decl( "Throws AssertionError for null relative" )
-	@Test.Decl( "Throws NoSuchFileException if the directory is missing" )
-	@Test.Decl( "Throws NoSuchFileException if the file is missing" )
-	@Test.Decl( "Relative references are properly resolved" )
-	public XMLHandler( Path root, Path relative ) throws IOException {
-		this( Assert.nonNull( root ).resolve( Assert.nonNull( relative ) ) );
-		this.source.setSystemId( root.toUri().toString() );
-	}
-	
-	
 	/**
 	 * Parse the document provided by the ({@code InputSource}
 	 * This {@code XMLHandler} will receive parsing events
@@ -169,32 +152,24 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	public class Location {
 		
-		private String publicId = "unknown";
-		private String systemId = "unknown";
-		private int line = -1;
-		private int col = -1;
+		private final String publicId;
+		private final String systemId;
+		private final int line;
+		private final int col;
 		
 		private Location( Locator locator ) {
-			if ( locator != null ) {
-				if ( locator.getPublicId() != null ) {
-					this.publicId = locator.getPublicId();
-				}
-				if ( locator.getSystemId() != null ) {
-					this.systemId = locator.getSystemId();
-				}
-				this.line = locator.getLineNumber();
-				this.col = locator.getColumnNumber();
-			}
+			this.publicId = (locator == null || locator.getPublicId() == null) ? "unknown" : locator.getPublicId();
+			this.systemId = (locator == null || locator.getPublicId() == null) ? "unknown" : locator.getSystemId();
+			this.line = locator == null ? -1 : locator.getLineNumber();
+			this.col = locator == null ? -1 : locator.getColumnNumber();
 		}
 		
-		@Test.Decl( "Is not empty" )
-		@Test.Decl( "Apparently always unknown for SAX parser?" )
+		@Test.Decl( "Must be set if using a public resources" )
 		public String getPublicId() {
 			return this.publicId;
 		}
 		
-		@Test.Decl( "Is not empty" )
-		@Test.Decl( "Apparently always unknown for SAX parser?" )
+		@Test.Decl( "Can be set when using a file" )
 		public String getSystemId() {
 			return this.systemId;
 		}
@@ -278,7 +253,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		Map<String, String> result = atts.getLength() > 0 ? new TreeMap<>() : Collections.emptyMap();
 		
 		for ( int i = 0; i < atts.getLength(); i++ ) {
-			result.put( atts.getQName(i),  atts.getValue(i) );
+			result.put( atts.getQName(i), atts.getValue(i) );
 		}
 		
 		return result;
@@ -391,7 +366,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
 	 */
 	@Override
-	@Test.Skip( "Unable to trigger..." )
+	@Test.Decl( "Unable to trigger..." )
 	public void warning( SAXParseException exception ) throws SAXException {
 	}
 

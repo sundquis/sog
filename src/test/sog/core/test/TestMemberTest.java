@@ -829,7 +829,6 @@ public class TestMemberTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( TestMember.class );
-		//Test.evalPackage( TestMember.class );
+		Test.eval( TestMember.class ).showDetails( true ).print();
 	}
 }

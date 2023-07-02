@@ -45,44 +45,67 @@ public class IndentWriter {
 		this( os, "    " );
 	}
 	
+	@Test.Decl( "Default OutputStream" )
+	public IndentWriter( String indent ) {
+		this( System.out, indent);
+	}
+	
+	@Test.Decl( "No-arg uses both defaults" )
+	public IndentWriter() {
+		this( "    " );
+	}
+	
 	@Test.Decl( "Can increase indent" )
 	@Test.Decl( "Increase indent increases indent" )
 	@Test.Decl( "Increase empty indent is noop" )
-	public void increaseIndent() {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter increaseIndent() {
 		this.prefix.push( this.prefix.peek() + this.indent );
+		return this;
 	}
 	
 	@Test.Decl( "Custom indent used" )
 	@Test.Decl( "Custom indent used after default" )
-	public void increaseIndent( String in ) {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter increaseIndent( String in ) {
 		this.prefix.push( this.prefix.peek() + in );
+		return this;
 	}
 	
 	@Test.Decl( "Can decrease after increase" )
 	@Test.Decl( "Illegal state for decrease before increase" )
 	@Test.Decl( "Illegal state for more decreases than increases" )
 	@Test.Decl( "Custom indent removed" )
-	public void decreaseIndent() throws IllegalStateException {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter decreaseIndent() throws IllegalStateException {
 		if ( this.prefix.size() == 1 ) {
 			throw new IllegalStateException( "Indent already at minimum" );
 		}
 		this.prefix.pop();
+		return this;
 	}
 	
 	@Test.Decl( "Prints prefix" )
 	@Test.Decl( "Before increase no prefix" )
-	public void println( String s ) {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter println( String s ) {
 		this.out.println( this.prefix.peek() + s );
+		return this;
 	}
 	
 	// WARNING: A Printable class cannot implement its Printable.print( out ) method using
 	// out.println( this ) since this results in a recursive loop. What is probably intended
 	// is something like out.println( this.toString() )
-	public void println( Printable p ) {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter println( Printable p ) {
 		p.print( this );
+		return this;
 	}
 	
-	public void printErr( Throwable error ) {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	@Test.Decl( "Throws Assertion Error for null error" )
+	@Test.Decl( "Details of the error are included" )
+	public IndentWriter printErr( Throwable error ) {
 		this.println( "Error: " + error );
 		this.increaseIndent();
 		App.get().getLocation( error ).forEach( this::println );
@@ -95,22 +118,32 @@ public class IndentWriter {
 			App.get().getLocation( cause ).forEach( this::println );
 			this.decreaseIndent();
 			cause = cause.getCause();
-		}		
+		}
+		
+		return this;
 	}
 
-	public void println( Object obj ) {
+	@Test.Decl( "Null object is allowed" )
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter println( Object obj ) {
 		this.println( Strings.toString( obj ) );
+		return this;
 	}
 	
 	
-	public void println() {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	public IndentWriter println() {
 		this.out.println();
+		return this;
 	}
 	
-	public void close() {
+	@Test.Decl( "Return this IndentWriter to allow chaining" )
+	@Test.Decl( "Write fails after close" )
+	public IndentWriter close() {
 		if ( this.out != null ) {
 			this.out.close();
 		}
+		return this;
 	}
 	
 	

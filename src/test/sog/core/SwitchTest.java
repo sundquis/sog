@@ -161,7 +161,6 @@ public class SwitchTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Switch.class );
-		//Test.evalPackage( Switch.class );
+		Test.eval( Switch.class ).showDetails( true ).print();
 	}
 }

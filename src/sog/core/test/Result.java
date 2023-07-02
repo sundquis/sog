@@ -19,6 +19,8 @@
 package sog.core.test;
 
 import sog.core.Assert;
+import sog.core.Parser;
+import sog.core.Property;
 import sog.core.Test;
 import sog.util.IndentWriter;
 import sog.util.Printable;
@@ -34,7 +36,38 @@ import sog.util.Printable;
  */
 @Test.Subject( "test." )
 public abstract class Result implements Printable {
+	
+	/* 
+	 * Controls the behavior of the print methods.
+	 * If true, a Result instance first prints its one-line toString() summary,
+	 * then indents and prints any details. Otherwise, only the summary is printed.
+	 */
+	private static boolean SHOW_DETAILS = Property.get( "showDetails", false, Parser.BOOLEAN );
+	
+	/*
+	 * Impacts the behavior of TestCase.run()
+	 * If true, after each test case is run, TestCase.run() will print a progress indicator.
+	 */
+	private static boolean SHOW_PROGRESS = Property.get( "showProgress", false, Parser.BOOLEAN );
 
+	/*
+	 * Impacts the behavior of TestCase.run()
+	 * When SHOW_PROGRESS is true, TestCase.run() will print a new line after this many
+	 * progress indicators have been printed.
+	 */
+	private static int WRAP_PROGRESS = Property.get( "wrapProgress", 80, Parser.INTEGER );
+
+	
+	@Test.Decl( "Progress is included when true" )
+	@Test.Decl( "Progress is excluded when false" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public static void showProgress( boolean showProgress ) {
+		Result.SHOW_PROGRESS = showProgress;
+	}
+	
+
+
+	
 	/** Short descriptive string identifying the test */
 	private final String label;
 
@@ -72,10 +105,62 @@ public abstract class Result implements Printable {
 		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d)", 
 			this.label, success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
+	
+	/**
+	 * Set the boolean flag for when instances should include test details.
+	 * 
+	 * @param details
+	 * @return
+	 */
+	@Test.Decl( "Details are included when true" )
+	@Test.Decl( "Details are excluded when false" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public Result showDetails( boolean showDetails ) {
+		Result.SHOW_DETAILS = showDetails;
+		return this;
+	}
 
-	/** Implementations first print this instance, then indent for details. */
+	/**
+	 * Concrete subclasses use this to determine the level of detail in printed output.
+	 * @return
+	 */
+	@Test.Decl( "True after showDetails(true)" )
+	@Test.Decl( "False after showDetails(false)" )
+	protected boolean showDetails() {
+		return Result.SHOW_DETAILS;
+	}
+	
+	/**
+	 * TestCase checks this after every case is run.
+	 * @return
+	 */
+	@Test.Decl( "True after showProgress(true)" )
+	@Test.Decl( "False after showProgress(false)" )
+	protected boolean showProgress() {
+		return Result.SHOW_PROGRESS;
+	}
+	
+	/**
+	 * TestCase checks this after every case is run.
+	 * @return
+	 */
+	@Test.Decl( "Throws Assertion Error if not positive" )
+	protected int wrapProgress() {
+		return Assert.positive( Result.WRAP_PROGRESS );
+	}
+
+	/**
+	 * Implementations first print this instance using the toString() one-line summary.
+	 * If SHOW_DETAILS is true the instance indents the writer and prints details for the test Result.
+	 */
 	@Override
 	public abstract void print( IndentWriter out );
-		
+	
+
+	@Test.Decl( "Defaults to standard out" )
+	public void print() {
+		this.print( new IndentWriter() );
+	}
+
 
 }

@@ -481,8 +481,8 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_031BECDB8( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		TestSet ts = TestSet.forPackage( test.sog.core.test.foo.C1.class ).setVerbosity( false );
-		ts.print( new IndentWriter( sos ) );
+		TestSet.forPackage( test.sog.core.test.foo.C1.class )
+			.showDetails( false ).print( new IndentWriter( sos ) );
 		tc.assertFalse( sos.toString().contains( "RESULTS" ) );
 	}
 			
@@ -492,8 +492,8 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_0FFDDEC20( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
-		TestSet ts = TestSet.forPackage( test.sog.core.test.foo.C1.class ).setVerbosity( true );
-		ts.print( new IndentWriter( sos ) );
+		TestSet.forPackage( test.sog.core.test.foo.C1.class )
+			.showDetails( true ).print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( "RESULTS" ) );
 	}
 			
@@ -503,7 +503,7 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_049F5539B( Test.Case tc ) {
 		TestSet ts = new TestSet( "LABEL" );
-		tc.assertEqual( ts, ts.setVerbosity( false ) );
+		tc.assertEqual( ts, ts.showDetails( false ) );
 	}
 		
 
@@ -512,8 +512,6 @@ public class TestSetTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( TestSet.class );
-		//Test.evalPackage( TestSet.class );
-		//Test.evalAll();
+		Test.eval( TestSet.class ).showDetails( true ).print();
 	}
 }

@@ -1508,7 +1508,6 @@ public class AssertTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Assert.class );
-		//Test.evalPackage( Assert.class );
+		Test.eval( Assert.class ).showDetails( true ).print();
 	}
 }

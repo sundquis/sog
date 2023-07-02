@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.Assert;
-import sog.core.Parser;
-import sog.core.Property;
 import sog.core.Strings;
 import sog.core.Test;
 import sog.util.IndentWriter;
@@ -57,14 +55,6 @@ import sog.util.Printable;
 public class TestSubject extends Result {
 	
 	
-	private static boolean PROGRESS = Property.get( "progress", false, Parser.BOOLEAN );
-	
-	private static int WRAP = Property.get( "wrap", 20, Parser.INTEGER );
-	
-	private static int numTestCase = 0;
-	
-	
-
 	/**
 	 * Builder to construct an instance representing the results of evaluating the tests associated
 	 * with the given subject class.
@@ -433,14 +423,6 @@ public class TestSubject extends Result {
 		this.elapsedTime += tc.getElapsedTime();
 		this.passCount += tc.getPassCount();
 		this.failCount += tc.getFailCount();
-		
-		if ( TestSubject.PROGRESS ) {
-			TestSubject.numTestCase++;
-			System.err.print( "." );
-			if ( TestSubject.numTestCase % TestSubject.WRAP == 0 ) {
-				System.err.println();
-			}
-		}
 	}
 	
 	
@@ -452,7 +434,11 @@ public class TestSubject extends Result {
 	@Test.Decl( "Includes details on members that have been skipped" )
 	@Test.Decl( "Includes stubs for unimplemented methods" )
 	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println( this.toString() );
+		Assert.nonNull( out ).println().println( this.toString() );
+		
+		if ( !this.showDetails() ) {
+			return;
+		}
 		
 		out.increaseIndent();
 		
@@ -484,19 +470,9 @@ public class TestSubject extends Result {
 			this.unimplemented.forEach( out::println );
 			out.decreaseIndent();
 		}
-		out.println();
-
 		out.decreaseIndent();
 	}
 
-	/**
-	 * Convenience method to print results using the default IndentWriter
-	 */
-	@Test.Decl( "Prints all relevant information" )
-	public void print() {
-		this.print( new IndentWriter( System.out, "\t" ) );
-	}
-	
 	@Override
 	@Test.Decl( "Reported time is the sum of the times of all test cases" )
 	public long getElapsedTime() {

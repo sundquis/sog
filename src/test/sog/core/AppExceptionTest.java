@@ -101,7 +101,6 @@ public class AppExceptionTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( AppException.class );
-		//Test.evalPackage( AppException.class );
+		Test.eval( AppException.class ).showDetails( true ).print();
 	}
 }

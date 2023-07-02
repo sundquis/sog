@@ -43,7 +43,9 @@ import sog.util.IndentWriter;
  */
 @Test.Subject( "test." )
 public class TestCase extends Result implements Test.Case, Comparable<TestCase>, Runnable {
+
 	
+	private static int numTestCase = 0;
 	
 	
 	/**
@@ -280,6 +282,13 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 				this.fail( "Exception in afterEach." );
 			}
 			this.elapsedTime = System.currentTimeMillis() - start;
+		}
+		if ( this.showProgress() ) {
+			TestCase.numTestCase++;
+			System.out.print( "." );
+			if ( TestCase.numTestCase % this.wrapProgress() == 0 ) {
+				System.out.println();
+			}
 		}
 	}
 
@@ -654,7 +663,11 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Prints stack trace when excpetion is thrown" )
 	@Test.Decl( "Prints causes when excpetion is thrown" )
 	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println( this.toString() );
+		Assert.nonNull( out ).println().println( this.toString() );
+
+		if ( ! this.showDetails() ) {
+			return;
+		}
 		
 		out.increaseIndent();
 		

@@ -359,8 +359,6 @@ public class CacheTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Cache.class );
-		//Test.evalPackage( Cache.class );
-		//Test.evalAll();
+		Test.eval( Cache.class ).showDetails( true ).print();
 	}
 }

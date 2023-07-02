@@ -79,7 +79,6 @@ public class XMLTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( XML.class );
-		Test.evalPackage( XML.class );
+		Test.eval( XML.class ).showDetails( true ).print();
 	}
 }

@@ -603,8 +603,7 @@ public class TestSubjectTest extends Test.Container {
 		
 
 	public static void main( String[] args ) {
-		Test.eval( TestSubject.class );
-		//Test.evalPackage( TestSubject.class );
+		Test.eval( TestSubject.class ).showDetails( true ).print();
 	}
 }
 

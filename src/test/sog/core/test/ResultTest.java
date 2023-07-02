@@ -110,8 +110,7 @@ public class ResultTest extends Test.Container {
 
 	
 	public static void main( String[] args ) {
-		Test.eval( Result.class );
-		//Test.evalPackage( Result.class );
+		Test.eval( Result.class ).showDetails( true ).print();
 	}
         
 }
