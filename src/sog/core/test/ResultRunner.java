@@ -19,11 +19,16 @@
 
 package sog.core.test;
 
+import java.util.SortedSet;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
+import sog.util.FifoQueue;
+import sog.util.MultiQueue;
 import sog.util.Queue;
 
 /**
@@ -31,6 +36,18 @@ import sog.util.Queue;
  */
 @Test.Subject( "test." )
 public class ResultRunner<R extends Result> extends Thread {
+	
+	static <R extends Result> void run( SortedSet<R> tests, Consumer<R> consumer, int threads ) {
+		final Queue<R> results = new MultiQueue<R>( new FifoQueue<R>() );
+		tests.forEach( results::put );
+		results.close();
+		
+		Stream.generate( () -> new ResultRunner<R>( results, consumer ) )
+			.limit( threads )
+			.map( ResultRunner::init )
+			.collect( Collectors.toList() )
+			.forEach( ResultRunner::quietJoin );
+	}
 
 	private final Queue<R> results;
 	

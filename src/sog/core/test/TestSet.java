@@ -26,16 +26,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.FifoQueue;
 import sog.util.IndentWriter;
-import sog.util.MultiQueue;
-import sog.util.Queue;
 
 /**
  * 	Responsibilities:
@@ -105,17 +101,8 @@ public class TestSet extends Result {
 	@Override
 	protected void run() {
 		if ( this.hasRun ) { return; }
-		
-		final Queue<TestSubject> results = 
-			new MultiQueue<TestSubject>( new FifoQueue<TestSubject>() );
-		this.testSubjects.forEach( results::put );
-		results.close();
-		
-		Stream.generate( () -> new ResultRunner<TestSubject>( results, this::addResult ) )
-			.limit( this.concurrentSetThreads() )
-			.map( ResultRunner::init )
-			.collect( Collectors.toList() )
-			.forEach( ResultRunner::quietJoin );
+
+		ResultRunner.run( this.testSubjects, this::addResult, this.concurrentSetThreads() );
 		
 		this.hasRun = true;
 	}

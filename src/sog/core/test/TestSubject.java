@@ -32,11 +32,8 @@ import java.util.stream.Stream;
 import sog.core.Assert;
 import sog.core.Strings;
 import sog.core.Test;
-import sog.util.FifoQueue;
 import sog.util.IndentWriter;
-import sog.util.MultiQueue;
 import sog.util.Printable;
-import sog.util.Queue;
 
 /**
  * 		Responsibilities: 
@@ -427,16 +424,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 
 	private void runTests() {
-		final Queue<TestCase> results = 
-			new MultiQueue<TestCase>( new FifoQueue<TestCase>() );
-		this.testCases.forEach( results::put );
-		results.close();
-			
-		Stream.generate( () -> new ResultRunner<TestCase>( results, this::addResult ) )
-			.limit( this.concurrentSubjectThreads() )
-			.map( ResultRunner::init )
-			.collect( Collectors.toList() )
-			.forEach( ResultRunner::quietJoin );
+		ResultRunner.run( this.testCases, this::addResult, this.concurrentSubjectThreads() );
 	}
 
 	private void addResult( Result result ) {
