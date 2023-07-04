@@ -32,40 +32,64 @@ import sog.util.Printable;
  * 
  * There are two levels of detail for test results. The toString() method returns a printable
  * summary including elapsed time and pass/fail counts. The Printable.print() method gives
- * more details starting with the summary, followed by details for any components of the test.
+ * more details starting with the summary, followed by details for any components of the test, 
+ * depending on the status of SHOW_RESULTS.
+ * 
+ * This package has three concrete Result classes covering three levels of testing. TestCase
+ * represents a single test method exercising a single testable property as described by
+ * a Test.Decl. TestSubject represents the collection of test cases for a single subject class.
+ * TestSet aggregates tests for various sets of subject classes.
+ * 
+ * Result instances are Runnable. Concrete classes implement Runnable.run() by executing their
+ * contained test(s) and tabulating the pass/fail results. 
+ * 
+ * Various mutators allow properties to be customized before the tests are executed.
  */
 @Test.Subject( "test." )
 public abstract class Result implements Printable {
+
+	/*
+	 * The following properties are used to configure the behavior of tests. Each has:
+	 * 		1. A configured default property from system.xml
+	 * 		2. A static value
+	 * 		3. Instance level mutator to alter values
+	 * 		4. Instance level getter
+	 */
 	
 	/* 
 	 * Controls the behavior of the print methods.
 	 * If true, a Result instance first prints its one-line toString() summary,
 	 * then indents and prints any details. Otherwise, only the summary is printed.
 	 */
-	private static boolean SHOW_DETAILS = Property.get( "showDetails", false, Parser.BOOLEAN );
+	private static boolean showDetails = Property.get( "showDetails", false, Parser.BOOLEAN );
 	
 	/*
 	 * Impacts the behavior of TestCase.run()
 	 * If true, after each test case is run, TestCase.run() will print a progress indicator.
 	 */
-	private static boolean SHOW_PROGRESS = Property.get( "showProgress", false, Parser.BOOLEAN );
+	private static boolean showProgress = Property.get( "showProgress", false, Parser.BOOLEAN );
 
 	/*
 	 * Impacts the behavior of TestCase.run()
-	 * When SHOW_PROGRESS is true, TestCase.run() will print a new line after this many
+	 * When showProgress is true, TestCase.run() will print a new line after this many
 	 * progress indicators have been printed.
 	 */
-	private static int WRAP_PROGRESS = Property.get( "wrapProgress", 80, Parser.INTEGER );
+	private static int wrapProgress = Property.get( "wrapProgress", 80, Parser.INTEGER );
+
+	/*
+	 * TestSubject instances hold a collection of TestCase Result instances.
+	 * This property determines the number of threads to use for these test cases.
+	 */
+	private static int concurrentSubjectThreads = Property.get( "concurrentSubjectThreads", 1, Parser.INTEGER );
+	
+	/*
+	 * TestSet instances hold a collection of TestSubject Result instances.
+	 * This property determines the number of threads to use for these test cases.
+	 */
+	private static int concurrentSetThreads = Property.get( "concurrentSetThreads", 1, Parser.INTEGER );
 
 	
-	@Test.Decl( "Progress is included when true" )
-	@Test.Decl( "Progress is excluded when false" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public static void showProgress( boolean showProgress ) {
-		Result.SHOW_PROGRESS = showProgress;
-	}
 	
-
 
 	
 	/** Short descriptive string identifying the test */
@@ -82,6 +106,13 @@ public abstract class Result implements Printable {
 	protected Result( String label ) {
 		this.label = Assert.nonEmpty( label );
 	}
+	
+	/*
+	 * Subclass Obligations
+	 */
+	
+	/** Execute the test(s) associated with this Result */
+	protected abstract void run();
 
 	/** Total execution time for Method and framework monitoring. */
 	public abstract long getElapsedTime();
@@ -91,6 +122,22 @@ public abstract class Result implements Printable {
 
 	/** The total weight of all components if the case failed, otherwise zero. */
 	public abstract int getFailCount();
+
+	/**
+	 * Implementations first print this instance using the toString() one-line summary.
+	 * If showDetails is true the instance indents the writer and prints details for the test Result.
+	 */
+	@Override
+	public abstract void print( IndentWriter out );
+	
+
+	/**
+	 * Convenience method to use the default System.out IndentWriter
+	 */
+	@Test.Decl( "Defaults to standard out" )
+	public void print() {
+		this.print( new IndentWriter() );
+	}
 
 
 	@Override
@@ -106,6 +153,12 @@ public abstract class Result implements Printable {
 			this.label, success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
 	
+	@Test.Decl( "Is not null" )
+	@Test.Decl( "Is consistent with constructed value" )
+	protected String getLabel() {
+		return this.label;
+	}
+	
 	/**
 	 * Set the boolean flag for when instances should include test details.
 	 * 
@@ -116,7 +169,7 @@ public abstract class Result implements Printable {
 	@Test.Decl( "Details are excluded when false" )
 	@Test.Decl( "Returns this Result instance to allow chaining" )
 	public Result showDetails( boolean showDetails ) {
-		Result.SHOW_DETAILS = showDetails;
+		Result.showDetails = showDetails;
 		return this;
 	}
 
@@ -127,7 +180,22 @@ public abstract class Result implements Printable {
 	@Test.Decl( "True after showDetails(true)" )
 	@Test.Decl( "False after showDetails(false)" )
 	protected boolean showDetails() {
-		return Result.SHOW_DETAILS;
+		return Result.showDetails;
+	}
+
+	/**
+	 * Set the boolean flag for wen TestCase should indicate completion of each 
+	 * individual test method.
+	 * 
+	 * @param showProgress
+	 * @return
+	 */
+	@Test.Decl( "Progress is included when true" )
+	@Test.Decl( "Progress is excluded when false" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public Result showProgress( boolean showProgress ) {
+		Result.showProgress = showProgress;
+		return this;
 	}
 	
 	/**
@@ -137,7 +205,20 @@ public abstract class Result implements Printable {
 	@Test.Decl( "True after showProgress(true)" )
 	@Test.Decl( "False after showProgress(false)" )
 	protected boolean showProgress() {
-		return Result.SHOW_PROGRESS;
+		return Result.showProgress;
+	}
+
+	/**
+	 * Set the display width for showing progress.
+	 * 
+	 * @param wrapProgress
+	 * @return
+	 */
+	@Test.Decl( "Progress indicator limited to this many columns" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public Result wrapProgress( int wrapProgress ) {
+		Result.wrapProgress = wrapProgress;
+		return this;
 	}
 	
 	/**
@@ -146,21 +227,58 @@ public abstract class Result implements Printable {
 	 */
 	@Test.Decl( "Throws Assertion Error if not positive" )
 	protected int wrapProgress() {
-		return Assert.positive( Result.WRAP_PROGRESS );
+		return Assert.positive( Result.wrapProgress );
 	}
 
 	/**
-	 * Implementations first print this instance using the toString() one-line summary.
-	 * If SHOW_DETAILS is true the instance indents the writer and prints details for the test Result.
+	 * Set the number of Threads when TestSubject uses multiple threads to run tests.
+	 * 
+	 * @param concurrentSubjects
+	 * @return
 	 */
-	@Override
-	public abstract void print( IndentWriter out );
-	
-
-	@Test.Decl( "Defaults to standard out" )
-	public void print() {
-		this.print( new IndentWriter() );
+	@Test.Decl( "Concurrent processing used when creater than 1" )
+	@Test.Decl( "Concurrent processing not used when 1" )
+	@Test.Decl( "Throws AssertionError when not positive" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public Result concurrentSubjectThreads( int concurrentSubjectThreads ) {
+		Result.concurrentSubjectThreads = Assert.positive( concurrentSubjectThreads );
+		return this;
 	}
-
+	
+	/**
+	 * TestSubject checks this when running its TestCase instances.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Consistent with specified value" )
+	protected int concurrentSubjectThreads() {
+		return Result.concurrentSubjectThreads;
+	}
+	
+	/**
+	 * Set the number of Threads when TestSet uses multiple threads to run tests.
+	 * 
+	 * @param concurrentSets
+	 * @return
+	 */
+	@Test.Decl( "Concurrent processing used when creater than 1" )
+	@Test.Decl( "Concurrent processing not used when 1" )
+	@Test.Decl( "Throws AssertionError when not positive" )
+	@Test.Decl( "Returns this Result instance to allow chaining" )
+	public Result concurrentSetThreads( int concurrentSetThreads ) {
+		Result.concurrentSetThreads = Assert.positive( concurrentSetThreads );
+		return this;
+	}
+	
+	/**
+	 * TestSet checks this when running its TestSubject instances.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Consistent with specified value" )
+	protected int concurrentSetThreads() {
+		return Result.concurrentSetThreads;
+	}
+	
 
 }

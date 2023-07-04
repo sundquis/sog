@@ -96,7 +96,7 @@ public class App implements Runnable {
 	/** Root directory for all application resources */
 	@Test.Decl( "Is not null" )
 	@Test.Decl( "Is readable" )
-	@Test.Decl( "Is wrieable" )
+	@Test.Decl( "Is writeable" )
 	public Path root() {
 		return this.root;
 	}

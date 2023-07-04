@@ -1315,6 +1315,12 @@ public class ByteFileTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
+//		new sog.core.test.TestSet( "Concurrency" )
+//			.addClass( ByteFile.class )
+//			.addClass( sog.core.SoftString.class )
+//			.concurrentSetThreads( 1 )
+//			.showDetails( true )
+//			.print();
 		Test.eval( ByteFile.class ).showDetails( true ).print();
 	}
 }

@@ -128,7 +128,9 @@ public class TestCaseTest extends Test.Container {
 	
 	public TestCase getTimed( String name, long time ) {
 		TestCaseTest.setTime( name, time );
-		this.current = new TestCase( Assert.nonNull( this.TEST_IMPLS.get( name ) ), this.container );
+		this.current = new TestCase( Assert.nonNull( this.TEST_IMPLS.get( name ) ), this.container ) {
+			@Override public String toString() { this.run(); return super.toString(); }
+		};
 		return this.current;
 	}
 	
@@ -409,7 +411,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_06AED5866( Test.Case tc ) {
     	TestCase fail = this.getCase( "failMethod" );
     	tc.assertFalse( fail.toString().startsWith( "FAIL" ) );
-    	fail.run();
+    	fail.toString();
     	tc.assertTrue( fail.toString().startsWith( "FAIL" ) );
     }
         
@@ -420,7 +422,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0B31DEC4C( Test.Case tc ) {
     	TestCase pass = this.getCase( "passMethod" );
     	tc.assertFalse( pass.toString().startsWith( "PASS" ) );
-    	pass.run();
+    	pass.toString();
     	tc.assertTrue( pass.toString().startsWith( "PASS" ) );
     }
         
@@ -431,7 +433,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_03590B1F1( Test.Case tc ) {
     	TestCase open = this.getCase( "openMethod" );
     	tc.assertTrue( open.toString().startsWith( "OPEN" ) );
-    	open.run();
+    	open.toString();
     	tc.assertTrue( open.toString().startsWith( "OPEN" ) );
     }
         
@@ -442,21 +444,21 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0928753F0( Test.Case tc ) {
     	TestCase tstCase = this.getCase( "openMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	TestCase.State before = this.getState();
     	tstCase.addMessage( "Hello world!" );
     	TestCase.State after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "passMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	before = this.getState();
     	tstCase.addMessage( "Hello world!" );
     	after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "failMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	before = this.getState();
     	tstCase.addMessage( "Hello world!" );
     	after = this.getState();
@@ -520,21 +522,21 @@ public class TestCaseTest extends Test.Container {
     	Procedure p = () -> {};
     	
     	TestCase tstCase = this.getCase( "openMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	TestCase.State before = this.getState();
     	tstCase.afterThis( p );
     	TestCase.State after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "passMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	before = this.getState();
     	tstCase.afterThis( p );
     	after = this.getState();
     	tc.assertEqual( before, after );
     	
     	tstCase = this.getCase( "failMethod" );
-    	tstCase.run();
+    	tstCase.toString();
     	before = this.getState();
     	tstCase.afterThis( p );
     	after = this.getState();
@@ -1029,7 +1031,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0F6E3A253( Test.Case tc ) {
     	TestCase timed = this.getTimed( "noErrorPASS", 5L );
-    	timed.run();
+    	timed.toString();
     	tc.assertTrue( this.getElapsedTime() >= 5L );
     }
         
@@ -1190,7 +1192,7 @@ public class TestCaseTest extends Test.Container {
 		String msg = "Some unique error message";
 		this.container.setUnexpectedError( new Error( msg ) );
 		TestCase error = this.getTimed( "throwUnexpectedError", 0L );
-		error.run();
+		error.toString();
 		error.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( msg ) );
 	}
@@ -1207,7 +1209,7 @@ public class TestCaseTest extends Test.Container {
 		err = new Error( messages.get( 2 ), err );
 		this.container.setUnexpectedError( err );
 		TestCase error = this.getTimed( "throwUnexpectedError", 0L );
-		error.run();
+		error.toString();
 		error.print( new IndentWriter( sos ) );
 		messages.forEach( s -> tc.assertTrue( sos.toString().contains( s ) ) );
 	}
@@ -1219,7 +1221,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_0DAA1815C( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
     	TestCase tst = this.getCase( "noErrorPASS" );
-    	tst.run();
+    	tst.toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1232,7 +1234,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase tst = this.getCase( "noErrorPASS" );
     	TestProcedure proc = new TestProcedure( 0L, null );
     	tst.afterThis( proc );
-    	tst.run();
+    	tst.toString();
     	tc.assertTrue( proc.executed );
     }
         
@@ -1243,7 +1245,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_02BC82946( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
     	TestCase noErr = this.getTimed( "noErrorPASS", 3L );
-    	noErr.run();
+    	noErr.toString();
     	tc.assertTrue( this.getElapsedTime() >= 5L );
     }
         
@@ -1254,7 +1256,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_06CA682CB( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
     	TestCase noErr = this.getCase( "noErrorPASS" );
-    	noErr.run();
+    	noErr.toString();
     	tc.assertNonNull( this.getUnexpectedError() );
     }
         
@@ -1266,7 +1268,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	noError.afterThis( errProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1281,7 +1283,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	noError.afterThis( errProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( verify.executed );
     }
         
@@ -1293,7 +1295,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase noError = this.getTimed( "noErrorPASS", 2L );
     	TestProcedure errProc = new TestProcedure( 1L, new Error() );
     	noError.afterThis( errProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
@@ -1305,7 +1307,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
     	noError.afterThis( errProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertNonNull( this.getUnexpectedError() );
     }
         
@@ -1318,7 +1320,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
-    	noError.run();
+    	noError.toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1334,7 +1336,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setAfterEach( verifyProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1349,7 +1351,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	noError.afterThis( verifyProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1362,7 +1364,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 4L );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
@@ -1375,7 +1377,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setBeforeEach( errProc );
     	
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
-    	noError.run();
+    	noError.toString();
     	tc.assertNonNull( this.getUnexpectedError() );
     }
         
@@ -1385,7 +1387,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0C16BBBF5( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
-    	expectedError.run();
+    	expectedError.toString();
     	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
         
@@ -1398,7 +1400,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setAfterEach( verifyProc );
     	
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
-    	expectedError.run();
+    	expectedError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1410,7 +1412,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	expectedError.afterThis( verifyProc );
-    	expectedError.run();
+    	expectedError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1420,7 +1422,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0376D2C20( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 3L );
-    	expectedError.run();
+    	expectedError.toString();
     	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
@@ -1430,7 +1432,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0842D59B1( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
-    	expectedError.run();
+    	expectedError.toString();
     	tc.assertIsNull( this.getUnexpectedError() );
     }
 
@@ -1440,7 +1442,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_035A5C409( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
-    	unexpectedError.run();
+    	unexpectedError.toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1453,7 +1455,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setAfterEach( verifyProc );
     	
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
-    	unexpectedError.run();
+    	unexpectedError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1466,7 +1468,7 @@ public class TestCaseTest extends Test.Container {
     	
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
     	unexpectedError.afterThis( verifyProc );
-    	unexpectedError.run();
+    	unexpectedError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1476,7 +1478,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_06500F9F9( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
-    	unexpectedError.run();
+    	unexpectedError.toString();
     	tc.assertTrue( this.getElapsedTime() >= 2L );
     }
         
@@ -1486,7 +1488,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_07FBC2025( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
-    	unexpectedError.run();
+    	unexpectedError.toString();
     	tc.assertNonNull( this.getUnexpectedError() );
     }
 
@@ -1496,7 +1498,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0116ED75D( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
-    	gotWrongError.run();
+    	gotWrongError.toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1509,7 +1511,7 @@ public class TestCaseTest extends Test.Container {
     	this.container.setAfterEach( verifyProc );
     	
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
-    	gotWrongError.run();
+    	gotWrongError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1521,7 +1523,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
     	gotWrongError.afterThis( verifyProc );
-    	gotWrongError.run();
+    	gotWrongError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1531,7 +1533,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0314F4025( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 3L );
-    	gotWrongError.run();
+    	gotWrongError.toString();
     	tc.assertTrue( this.getElapsedTime() >= 3L );
     }
         
@@ -1541,7 +1543,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_046BDB9F8( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
-    	gotWrongError.run();
+    	gotWrongError.toString();
     	tc.assertNotEqual( 
     		this.getUnexpectedError().getClass(),
     		this.getExpectedError()
@@ -1553,7 +1555,7 @@ public class TestCaseTest extends Test.Container {
     	description = "Got wrong error: unexpectedError is not null" 
     )
     public void tm_04CA6D079( Test.Case tc ) {
-       	this.getTimed( "gotWrongError", 0L ).run();
+       	this.getTimed( "gotWrongError", 0L ).toString();
     	tc.assertNonNull( this.getUnexpectedError() );
     }
         
@@ -1562,7 +1564,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No error: State is FAIL if assertion fails" 
     )
     public void tm_0BAA5AB1D( Test.Case tc ) {
-    	this.getTimed( "noErrorFAIL", 0L ).run();
+    	this.getTimed( "noErrorFAIL", 0L ).toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1571,7 +1573,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No error: State is PASS if assertion succeeds" 
     )
     public void tm_00A82C0B2( Test.Case tc ) {
-    	this.getTimed( "noErrorPASS", 0L ).run();
+    	this.getTimed( "noErrorPASS", 0L ).toString();
     	tc.assertEqual( TestCase.State.PASS, this.getState() );
     }
 
@@ -1580,7 +1582,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No error: State is OPEN if no assertions" 
     )
     public void tm_0914BABEA( Test.Case tc ) {
-    	this.getTimed( "noErrorOPEN", 0L ).run();
+    	this.getTimed( "noErrorOPEN", 0L ).toString();
     	tc.assertEqual( TestCase.State.OPEN, this.getState() );
     }        
         
@@ -1591,7 +1593,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_075818E0E( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	this.container.setAfterEach( verifyProc );
-    	this.getTimed( "noErrorPASS", 0L ).run();
+    	this.getTimed( "noErrorPASS", 0L ).toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1603,7 +1605,7 @@ public class TestCaseTest extends Test.Container {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	noError.afterThis( verifyProc );
-    	noError.run();
+    	noError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1612,7 +1614,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No error: elapsedTime recorded" 
     )
     public void tm_0701E0055( Test.Case tc ) {
-    	this.getTimed( "noErrorPASS", 6L ).run();
+    	this.getTimed( "noErrorPASS", 6L ).toString();
     	tc.assertTrue( this.getElapsedTime() >= 6L );
     }
         
@@ -1621,7 +1623,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No error: unexpectedError is null" 
     )
     public void tm_0ADF41D5C( Test.Case tc ) {
-    	this.getTimed( "noErrorPASS", 0L ).run();
+    	this.getTimed( "noErrorPASS", 0L ).toString();
     	tc.assertIsNull( this.getUnexpectedError() );
     }
         
@@ -1630,7 +1632,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No expected error: State is FAIL" 
     )
     public void tm_0DD9A5B7F( Test.Case tc ) {
-    	this.getTimed( "noExpectedError", 0L ).run();
+    	this.getTimed( "noExpectedError", 0L ).toString();
     	tc.assertEqual( TestCase.State.FAIL, this.getState() );
     }
         
@@ -1641,7 +1643,7 @@ public class TestCaseTest extends Test.Container {
     public void tm_01270A67C( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	this.container.setAfterEach( verifyProc );
-    	this.getTimed( "noExpectedError", 0L ).run();
+    	this.getTimed( "noExpectedError", 0L ).toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1653,7 +1655,7 @@ public class TestCaseTest extends Test.Container {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
     	TestCase noExpectedError = this.getTimed( "noExpectedError", 0L );
     	noExpectedError.afterThis( verifyProc );
-    	noExpectedError.run();
+    	noExpectedError.toString();
     	tc.assertTrue( verifyProc.executed );
     }
         
@@ -1662,7 +1664,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No expected error: elapsedTime recorded" 
     )
     public void tm_055CF31C3( Test.Case tc ) {
-    	this.getTimed( "noExpectedError", 4L ).run();
+    	this.getTimed( "noExpectedError", 4L ).toString();
     	tc.assertTrue( this.getElapsedTime() >= 4L );
     }
         
@@ -1671,7 +1673,7 @@ public class TestCaseTest extends Test.Container {
     	description = "No expected error: unexpectedError is null" 
     )
     public void tm_0351B4D2E( Test.Case tc ) {
-    	this.getTimed( "noExpectedError", 0L ).run();
+    	this.getTimed( "noExpectedError", 0L ).toString();
     	tc.assertIsNull( this.getUnexpectedError() );
     }
 
@@ -1738,7 +1740,7 @@ public class TestCaseTest extends Test.Container {
 	)
 	public void tm_03E469684( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertFail", 0L );
-		test.run();
+		test.toString();
 		tc.assertEqual( TestCase.State.FAIL, this.getState() );
 	}
 		
@@ -1748,7 +1750,7 @@ public class TestCaseTest extends Test.Container {
 	)
 	public void tm_01784AA72( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertFail", 0L );
-		test.run();
+		test.toString();
 		tc.assertNotEmpty( this.getFileLocation() );
 	}
 		
@@ -1776,7 +1778,7 @@ public class TestCaseTest extends Test.Container {
 	)
 	public void tm_03AC7014A( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertPass", 0L );
-		test.run();
+		test.toString();
 		tc.assertEqual( TestCase.State.PASS, this.getState() );
 	}
 		
@@ -1786,7 +1788,7 @@ public class TestCaseTest extends Test.Container {
 	)
 	public void tm_0E591072E( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertPass", 0L );
-		test.run();
+		test.toString();
 		tc.assertNotEmpty( this.getFileLocation() );
 	}
 		

@@ -21,18 +21,21 @@ package sog.core.test;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
+import sog.util.FifoQueue;
 import sog.util.IndentWriter;
+import sog.util.MultiQueue;
+import sog.util.Queue;
 
 /**
  * 	Responsibilities:
@@ -40,18 +43,14 @@ import sog.util.IndentWriter;
  * 
  * 	Structure:
  * 		Extends Result to represent the results after running the test case.
- * 		Holds a Set of TestSubject instances sorted by classname.
+ * 		Holds a SortedSet of TestSubject instances sorted by classname.
  * 		
  * 	Services:
- *  	Mutator to set the verbosity level.
  *  	Static helper methods for assembling sets of results by package or directory tree.
  */
 @Test.Subject( "test." )
 public class TestSet extends Result {
 	
-	private static final Comparator<Result> COMP = (tr1, tr2) -> tr1.toString().compareTo( tr2.toString() );
-	
-
 	
 	private long elapsedTime = 0L;
 	
@@ -59,10 +58,12 @@ public class TestSet extends Result {
 	
 	private int failCount = 0;
 	
+	private boolean hasRun = false;
+	
 	private final List<String> skippedClasses = new ArrayList<String>();
 
-	private final Set<Result> results;
-
+	private final SortedSet<TestSubject> testSubjects;
+	
 	/**
 	 * Constructs an empty TestSet. The required label identifies the context of the set of test results
 	 * The various "add" methods aggregate tests for various categories of classes.
@@ -73,11 +74,10 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null label" )
 	public TestSet( String label ) {
 		super( Assert.nonEmpty( label ) );
-		
-		this.results = new TreeSet<Result>( TestSet.COMP );
+
+		this.testSubjects = new TreeSet<TestSubject>();
 	}
 
-	
 
 	@Override
 	@Test.Decl( "Value is the total elapsed time for all tests" )
@@ -97,55 +97,33 @@ public class TestSet extends Result {
 	public int getFailCount() {
 		return this.failCount;
 	}
-
-	/**
-	 * Used to show detailed results.
-	 */
-	@Override
-	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "Includes summary for each TestSubject" )
-	@Test.Decl( "Includes messages for each bad classname" )
-	@Test.Decl( "Results are printed in alphabetaical order" )
-	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println().println( this.toString() );
-		
-		out.increaseIndent();
-		if ( this.showDetails() ) {
-			this.results.stream().forEach( out::println );
-		} else {
-			this.results.stream().map( Object::toString ).forEach( out::println );
-		}
-		if ( this.skippedClasses.size() > 0 ) {
-			out.println();
-			out.println( "Skipped Classes:" );
-			out.increaseIndent();
-			this.skippedClasses.forEach( out::println );
-			out.decreaseIndent();
-		}
-		out.decreaseIndent();
-	}
-
 	
 	private void addSkippedClass( String className, String reason ) {
 		this.skippedClasses.add( className + ": " + reason );
 	}
 
-	/**
-	 * Add one result to the current set of test results.
-	 * 
-	 * @param result
-	 * @return		This TestSet instance to allow chaining.
-	 */
-	@Test.Decl( "Elapsed time reflects new total" )
-	@Test.Decl( "Pass count reflects new total" )
-	@Test.Decl( "Fail count reflects new total" )
-	@Test.Decl( "Return is this TestSet instance to allow chaining" )
-	public TestSet addResult( Result result ) {
-		this.results.add( Assert.nonNull( result ) );
+	@Override
+	protected void run() {
+		if ( this.hasRun ) { return; }
+		
+		final Queue<TestSubject> results = 
+			new MultiQueue<TestSubject>( new FifoQueue<TestSubject>() );
+		this.testSubjects.forEach( results::put );
+		results.close();
+		
+		Stream.generate( () -> new ResultRunner<TestSubject>( results, this::addResult ) )
+			.limit( this.concurrentSetThreads() )
+			.map( ResultRunner::init )
+			.collect( Collectors.toList() )
+			.forEach( ResultRunner::quietJoin );
+		
+		this.hasRun = true;
+	}
+
+	private void addResult( Result result ) {
 		this.elapsedTime += result.getElapsedTime();
 		this.passCount += result.getPassCount();
 		this.failCount += result.getFailCount();
-		return this;
 	}
 	
 
@@ -156,16 +134,17 @@ public class TestSet extends Result {
 	 * @return		This TestSet instance to allow chaining.
 	 */
 	@Test.Decl( "Throws AssertionError for null class" )
-	@Test.Decl( "Adds one TestSubject" )
+	@Test.Decl( "Adds one TestSubject if not skipped" )
+	@Test.Decl( "Skipped classes not added" )
 	@Test.Decl( "Return is this TestSet instance to allow chaining" )
 	public TestSet addClass( Class<?> clazz ) {
 		Test.Skip skip = Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class );
 		if ( skip == null ) {
-			return this.addResult( TestSubject.forSubject( clazz ) );
+			this.testSubjects.add( TestSubject.forSubject( clazz ) );
 		} else {
 			this.addSkippedClass( TestMember.getSimpleName( clazz ), skip.value() );
-			return this;
 		}
+		return this;
 	}
 	
 
@@ -216,15 +195,14 @@ public class TestSet extends Result {
 	 */
 	@Test.Decl( "Aggregates TestSubject instances for every class under every source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forAllSourceDirs( boolean showProgress ) {
-		Result.showProgress( showProgress );
-		final TestSet trs = new TestSet( "ALL:\t" 
+	public static TestSet forAllSourceDirs() {
+		final TestSet set = new TestSet( "ALL:\t" 
 			+ new SimpleDateFormat( "YYYY-MM-dd HH:mm:ss" ).format( new Date() ) );
 		
-		Consumer<Path> action = p -> { trs.addClasses( App.get().classesUnderDir( p ) ); };
+		Consumer<Path> action = p -> { set.addClasses( App.get().classesUnderDir( p ) ); };
 		App.get().sourceDirs().forEach( action );
 
-		return trs;
+		return set;
 	}
 	
 
@@ -237,20 +215,14 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null source path" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given source directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forSourceDir( Path sourceDir, boolean showProgress ) {
-		Result.showProgress( showProgress );
-		TestSet trs = new TestSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
+	public static TestSet forSourceDir( Path sourceDir ) {
+		TestSet set = new TestSet( "DIR:\t" + Assert.nonNull( sourceDir ) );
 		
-		trs.addClasses( App.get().classesUnderDir( sourceDir ) );
+		set.addClasses( App.get().classesUnderDir( sourceDir ) );
 		
-		return trs;
+		return set;
 	}
 	
-	@Test.Decl( "Default is no progress" )
-	public static TestSet forSourceDir( Path sourceDir ) {
-		return TestSet.forSourceDir( sourceDir, false );
-	}
-
 	/**
 	 * Construct a set of test results corresponding to all packages and sub-packages relative
 	 * to the given subdirectory of a source directory.
@@ -263,20 +235,13 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null sub-directory" )
 	@Test.Decl( "Aggregates TestSubject instances for every class under the given directory" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forPackages( Path sourceDir, Path sub, boolean showProgress ) {
-		Result.showProgress( showProgress );
-		TestSet trs = new TestSet( "PKGS:\t" + Assert.nonNull( sub ) );
-		
-		trs.addClasses( App.get().classesUnderDir( Assert.nonNull( sourceDir ), sub ) );
-		
-		return trs;
-	}
-
-	@Test.Decl( "Default is no progress" )
 	public static TestSet forPackages( Path sourceDir, Path sub ) {
-		return TestSet.forPackages( sourceDir, sub, false );
+		TestSet set = new TestSet( "PKGS:\t" + Assert.nonNull( sub ) );
+		
+		set.addClasses( App.get().classesUnderDir( Assert.nonNull( sourceDir ), sub ) );
+		
+		return set;
 	}
-	
 
 	/**
 	 * Construct a set of test results corresponding to subject classes in the same package
@@ -288,20 +253,47 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null class" )
 	@Test.Decl( "Aggregates TestSubject instances for every class in the same package as the given class" )
 	@Test.Decl( "Return is not null" )
-	public static TestSet forPackage( Class<?> clazz, boolean showProgress ) {
-		Result.showProgress( showProgress );
-		TestSet trs = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
-		System.out.println( "Starting " + trs );
-		
-		trs.addClasses( App.get().classesInPackage( clazz ) );
-		
-		return trs;
-	}
-
-	@Test.Decl( "Throws AssertionError for null class" )
-	@Test.Decl( "Default is no progress" )
 	public static TestSet forPackage( Class<?> clazz ) {
-		return TestSet.forPackage( clazz, false );
+		TestSet set = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
+		
+		set.addClasses( App.get().classesInPackage( clazz ) );
+		
+		return set;
 	}
 
+	
+	/**
+	 * Used to show detailed results.
+	 */
+	@Override
+	@Test.Decl( "Throws AssertionError for null writer" )
+	@Test.Decl( "Includes summary for each TestSubject" )
+	@Test.Decl( "Includes messages for each bad classname" )
+	@Test.Decl( "Includes messages for each skipped class" )
+	@Test.Decl( "Results are printed in alphabetaical order" )
+	public void print( IndentWriter out ) {
+		if ( !this.hasRun ) {
+			this.run();
+		}
+		
+		Assert.nonNull( out ).println().println( this.toString() );
+		
+		out.increaseIndent();
+		if ( this.showDetails() ) {
+			this.testSubjects.stream().forEach( out::println );
+		} else {
+			this.testSubjects.stream().map( Object::toString ).forEach( out::println );
+		}
+		
+		if ( this.skippedClasses.size() > 0 ) {
+			out.println();
+			out.println( "Skipped Classes:" );
+			out.increaseIndent();
+			this.skippedClasses.forEach( out::println );
+			out.decreaseIndent();
+		}
+		out.decreaseIndent();
+	}
+
+	
 }

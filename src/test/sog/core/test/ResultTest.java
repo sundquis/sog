@@ -40,6 +40,7 @@ public class ResultTest extends Test.Container {
 		@Override public int getFailCount() { return 2000; }
 		@Override public int getPassCount() { return 3000; }
 		@Override public void print( IndentWriter out ) {}
+		@Override protected void run() {}
 	}
 	
 	

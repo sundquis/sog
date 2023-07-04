@@ -72,6 +72,8 @@ public class TestSetTest extends Test.Container {
 		@Override public int getFailCount() { return MyResult.FAIL_COUNT; }
 
 		@Override public void print( IndentWriter out ) {}
+		
+		@Override public void run() {}
 	}
 	
 	public static final Result RESULT = new MyResult();
@@ -229,47 +231,6 @@ public class TestSetTest extends Test.Container {
 		TestSet trs = new TestSet( "LABEL" );
 		Stream<String> stream = null;
 		trs.addClasses( stream );
-	}
-		
-	@Test.Impl( 
-		member = "method: TestSet TestSet.addResult(Result)", 
-		description = "Elapsed time reflects new total" 
-	)
-	public void tm_06E3B48EE( Test.Case tc ) {
-		TestSet trs = new TestSet( "LABEL" );
-		long before = trs.getElapsedTime();
-		trs.addResult( TestSetTest.RESULT );
-		long after = trs.getElapsedTime();
-		tc.assertTrue( after >= before + MyResult.ELAPSED_TIME );
-	}
-		
-	@Test.Impl( 
-		member = "method: TestSet TestSet.addResult(Result)", 
-		description = "Fail count reflects new total" 
-	)
-	public void tm_0BDAFF652( Test.Case tc ) {
-		TestSet trs = new TestSet( "LABEL" );
-		trs.addResult( TestSetTest.RESULT );
-		tc.assertEqual( MyResult.FAIL_COUNT, trs.getFailCount() );
-	}
-		
-	@Test.Impl( 
-		member = "method: TestSet TestSet.addResult(Result)", 
-		description = "Pass count reflects new total" 
-	)
-	public void tm_0C19DE97F( Test.Case tc ) {
-		TestSet trs = new TestSet( "LABEL" );
-		trs.addResult( TestSetTest.RESULT );
-		tc.assertEqual( MyResult.PASS_COUNT, trs.getPassCount() );
-	}
-		
-	@Test.Impl( 
-		member = "method: TestSet TestSet.addResult(Result)", 
-		description = "Return is this TestSet instance to allow chaining" 
-	)
-	public void tm_03C567283( Test.Case tc ) {
-		TestSet trs = new TestSet( "LABEL" );
-		tc.assertEqual( trs, trs.addResult( TestSetTest.RESULT ) );
 	}
 		
 	@Test.Impl( 

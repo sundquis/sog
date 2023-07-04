@@ -735,6 +735,16 @@ public class TestTest extends Test.Container {
     	tc.expectError( AssertionError.class );
     	Test.eval( null );
     }
+    
+    
+    @Test.Impl( 
+    	member = "method: Result Test.evalPackage(Class)", 
+    	description = "Throws AssertionError for null subject" 
+    )
+    public void tm_09CA9BF70( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	Test.evalPackage( null );
+    }
 
 		
 

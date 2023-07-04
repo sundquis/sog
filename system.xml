@@ -34,9 +34,11 @@ Multiline comment
  
  	<!-- Properties that alter printing behavior -->
 	<class fullname="sog.core.test.Result">
-		<property name="showDetails" value="false" />
+		<property name="showDetails" value="true" />
 		<property name="showProgress" value="false" />
 		<property name="wrapProgress" value="80" />
+		<property name="concurrentSubjectThreads" value="1"/>
+		<property name="concurrentSetThreads" value="1"/>
 	</class>
 
 

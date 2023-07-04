@@ -42,7 +42,7 @@ import sog.util.IndentWriter;
  * method executes the test.
  */
 @Test.Subject( "test." )
-public class TestCase extends Result implements Test.Case, Comparable<TestCase>, Runnable {
+public class TestCase extends Result implements Test.Case, Comparable<TestCase> {
 
 	
 	private static int numTestCase = 0;
@@ -249,8 +249,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Error in afterEach: unexpectedError is not null" )
 	@Test.Decl( "Error in afterEach: afterThis called" )
 
-	@Override
-	public void run() {
+	@Override 
+	protected void run() {
 		long start = System.currentTimeMillis();
 		try {
 			this.container.beforeEach().exec();
@@ -283,9 +283,10 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 			}
 			this.elapsedTime = System.currentTimeMillis() - start;
 		}
+		
 		if ( this.showProgress() ) {
 			TestCase.numTestCase++;
-			System.out.print( "." );
+			System.out.print( "+" );
 			if ( TestCase.numTestCase % this.wrapProgress() == 0 ) {
 				System.out.println();
 			}
@@ -663,7 +664,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase>,
 	@Test.Decl( "Prints stack trace when excpetion is thrown" )
 	@Test.Decl( "Prints causes when excpetion is thrown" )
 	public void print( IndentWriter out ) {
-		Assert.nonNull( out ).println().println( this.toString() );
+		Assert.nonNull( out ).println( this.toString() );
 
 		if ( ! this.showDetails() ) {
 			return;

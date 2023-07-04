@@ -225,7 +225,7 @@ public class AppTest extends Test.Container{
 		
 	@Test.Impl( 
 		member = "method: Path App.root()", 
-		description = "Is wrieable" 
+		description = "Is writeable" 
 	)
 	public void tm_0E8E0AABD( Test.Case tc ) {
 		tc.assertTrue( Files.isWritable( App.get().root() ) );
@@ -1190,8 +1190,10 @@ public class AppTest extends Test.Container{
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( App.class ).showDetails( true ).print();
-		sog.core.test.TestSet.forPackage( App.class, true ).showDetails( false ).print();
+		//Test.eval( App.class ).showDetails( true ).concurrentSubjectThreads( 4 ).showProgress( true ).print();
+		
+		// Some tests can fail with multiple threads due to exceeding specified resource limits.
+		Test.evalPackage( App.class ).concurrentSubjectThreads( 4 ).showProgress( true ).showDetails( false ).print();
 	}
 }
 

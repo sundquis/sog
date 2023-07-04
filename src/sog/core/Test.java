@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import sog.core.test.TestSubject;
 import sog.core.test.Result;
+import sog.core.test.TestSet;
 
 /**
  * All classes import Test as the single public access to the testing framework.
@@ -685,6 +686,12 @@ public class Test {
 	@Test.Decl( "Throws AssertionError for null subject" )
 	public static Result eval( Class<?> subject ) {
 		return TestSubject.forSubject( Assert.nonNull( subject ) );
+	}
+	
+	/** Convenience method to evaluate and print results for the package containing the given subject class. */
+	@Test.Decl( "Throws AssertionError for null subject" )
+	public static Result evalPackage( Class<?> subject ) {
+		return TestSet.forPackage( Assert.nonNull( subject ) );
 	}
 	
 		
