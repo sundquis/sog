@@ -1193,7 +1193,7 @@ public class AppTest extends Test.Container{
 		//Test.eval( App.class ).showDetails( true ).concurrentSubjectThreads( 8 ).showProgress( true ).print();
 		
 		// Some tests can fail with multiple threads due to exceeding specified resource limits.
-		Test.evalPackage( App.class ).concurrentSubjectThreads( 1 ).showProgress( true ).showDetails( false ).print();
+		Test.evalPackage( App.class ).concurrentSets( true ).showProgress( true ).showDetails( true ).print();
 	}
 }
 

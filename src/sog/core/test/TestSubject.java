@@ -424,7 +424,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 
 	private void runTests() {
-		ResultRunner.run( this.testCases, this::addResult, this.concurrentSubjectThreads() );
+		ResultRunner.run( this.testCases, this::addResult, this.concurrentSubjects() );
 	}
 
 	private void addResult( Result result ) {

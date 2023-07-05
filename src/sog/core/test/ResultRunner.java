@@ -26,24 +26,33 @@ import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
+import sog.core.Parser;
+import sog.core.Property;
 import sog.core.Test;
 import sog.util.FifoQueue;
 import sog.util.MultiQueue;
 import sog.util.Queue;
 
 /**
- * 
+ * TODO: Learn how to use java.util.concurrent
  */
 @Test.Subject( "test." )
 public class ResultRunner<R extends Result> extends Thread {
 	
-	static <R extends Result> void run( SortedSet<R> tests, Consumer<R> consumer, int threads ) {
+	private static final int numberOfThreads = Property.get( "numberOfThreads", 4, Parser.INTEGER );
+
+	@Test.Decl( "Throws AsserionError for null set of tests" )
+	@Test.Decl( "Throws AssertionError for null consumer" )
+	@Test.Decl( "All threads started before joining" )
+	@Test.Decl( "Single thread used when concurrent is false" )
+	@Test.Decl( "Configured number of threads used when concurent is true" )
+	static <R extends Result> void run( SortedSet<R> tests, Consumer<R> consumer, boolean concurrent ) {
 		final Queue<R> results = new MultiQueue<R>( new FifoQueue<R>() );
 		tests.forEach( results::put );
 		results.close();
 		
 		Stream.generate( () -> new ResultRunner<R>( results, consumer ) )
-			.limit( threads )
+			.limit( concurrent ? ResultRunner.numberOfThreads : 1 )
 			.map( ResultRunner::init )
 			.collect( Collectors.toList() )
 			.forEach( ResultRunner::quietJoin );

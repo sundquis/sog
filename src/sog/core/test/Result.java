@@ -78,15 +78,15 @@ public abstract class Result implements Printable {
 
 	/*
 	 * TestSubject instances hold a collection of TestCase Result instances.
-	 * This property determines the number of threads to use for these test cases.
+	 * This property determines whether to use concurrent processing for these test cases.
 	 */
-	private static int concurrentSubjectThreads = Property.get( "concurrentSubjectThreads", 1, Parser.INTEGER );
+	private static boolean concurrentSubjects = Property.get( "concurrentSubjects", false, Parser.BOOLEAN );
 	
 	/*
 	 * TestSet instances hold a collection of TestSubject Result instances.
-	 * This property determines the number of threads to use for these test cases.
+	 * This property determines whether to use concurrent processing for these test cases.
 	 */
-	private static int concurrentSetThreads = Property.get( "concurrentSetThreads", 1, Parser.INTEGER );
+	private static boolean concurrentSets = Property.get( "concurrentSets", false, Parser.BOOLEAN );
 
 	
 	
@@ -231,17 +231,14 @@ public abstract class Result implements Printable {
 	}
 
 	/**
-	 * Set the number of Threads when TestSubject uses multiple threads to run tests.
-	 * 
-	 * @param concurrentSubjects
-	 * @return
+	 * Specify that TestSubject should use concurrent processing for the multiple
+	 * contained TestCase instances.
 	 */
-	@Test.Decl( "Concurrent processing used when creater than 1" )
-	@Test.Decl( "Concurrent processing not used when 1" )
-	@Test.Decl( "Throws AssertionError when not positive" )
+	@Test.Decl( "Concurrent processing used when true" )
+	@Test.Decl( "Concurrent processing not used when false" )
 	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result concurrentSubjectThreads( int concurrentSubjectThreads ) {
-		Result.concurrentSubjectThreads = Assert.positive( concurrentSubjectThreads );
+	public Result concurrentSubjects( boolean concurrentSubjects ) {
+		Result.concurrentSubjects = concurrentSubjects;
 		return this;
 	}
 	
@@ -251,22 +248,19 @@ public abstract class Result implements Printable {
 	 * @return
 	 */
 	@Test.Decl( "Consistent with specified value" )
-	protected int concurrentSubjectThreads() {
-		return Result.concurrentSubjectThreads;
+	protected boolean concurrentSubjects() {
+		return Result.concurrentSubjects;
 	}
 	
 	/**
-	 * Set the number of Threads when TestSet uses multiple threads to run tests.
-	 * 
-	 * @param concurrentSets
-	 * @return
+	 * Specify that TestSet should use concurrent processing for the multiple
+	 * contained TestSubject instances.
 	 */
-	@Test.Decl( "Concurrent processing used when creater than 1" )
-	@Test.Decl( "Concurrent processing not used when 1" )
-	@Test.Decl( "Throws AssertionError when not positive" )
+	@Test.Decl( "Concurrent processing used when true" )
+	@Test.Decl( "Concurrent processing not used when false" )
 	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result concurrentSetThreads( int concurrentSetThreads ) {
-		Result.concurrentSetThreads = Assert.positive( concurrentSetThreads );
+	public Result concurrentSets( boolean concurrentSets ) {
+		Result.concurrentSets = concurrentSets;
 		return this;
 	}
 	
@@ -276,8 +270,8 @@ public abstract class Result implements Printable {
 	 * @return
 	 */
 	@Test.Decl( "Consistent with specified value" )
-	protected int concurrentSetThreads() {
-		return Result.concurrentSetThreads;
+	protected boolean concurrentSets() {
+		return Result.concurrentSets;
 	}
 	
 

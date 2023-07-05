@@ -102,7 +102,7 @@ public class TestSet extends Result {
 	protected void run() {
 		if ( this.hasRun ) { return; }
 
-		ResultRunner.run( this.testSubjects, this::addResult, this.concurrentSetThreads() );
+		ResultRunner.run( this.testSubjects, this::addResult, this.concurrentSets() );
 		
 		this.hasRun = true;
 	}
