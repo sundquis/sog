@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
+import sog.util.Evaluator;
 import sog.util.IndentWriter;
 
 /**
@@ -46,6 +48,22 @@ import sog.util.IndentWriter;
  */
 @Test.Subject( "test." )
 public class TestSet extends Result {
+	
+
+	private static Evaluator evaluator = null;
+
+	/* All TestSet instances share a common evaluator */
+	private static Evaluator getEvaluator() {
+		if ( TestSet.evaluator == null ) {
+			synchronized( TestSet.class ) {
+				if ( TestSet.evaluator == null ) {
+					TestSet.evaluator = new Evaluator( "TestSet", 6 );
+				}
+			}
+		}
+		return Assert.nonNull(  TestSet.evaluator );
+	}
+	
 	
 	
 	private long elapsedTime = 0L;
@@ -101,12 +119,16 @@ public class TestSet extends Result {
 	@Override
 	protected void run() {
 		if ( this.hasRun ) { return; }
-
-		ResultRunner.run( this.testSubjects, this::addResult, this.concurrentSets() );
 		
+		Function<TestSubject, TestSubject> mapper = (ts) -> { ts.run(); return ts; }; 
+
+		TestSet.getEvaluator()
+			.apply( mapper, this.testSubjects.stream(), this.concurrentSets() )
+			.forEach( this::addResult );
+
 		this.hasRun = true;
 	}
-
+	
 	private void addResult( Result result ) {
 		this.elapsedTime += result.getElapsedTime();
 		this.passCount += result.getPassCount();

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 import sog.core.Assert;
 import sog.core.Strings;
 import sog.core.Test;
+import sog.util.Evaluator;
 import sog.util.IndentWriter;
 import sog.util.Printable;
 
@@ -119,6 +121,20 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		result.scanContainer();
 		
 		return result;
+	}
+	
+	
+	private static Evaluator evaluator = null;
+	
+	private static Evaluator getEvaluator() {
+		if ( TestSubject.evaluator == null ) {
+			synchronized( TestSubject.class ) {
+				if ( TestSubject.evaluator == null ) {
+					TestSubject.evaluator  = new Evaluator( "TestSubject", 8 );
+				}
+			}
+		}
+		return TestSubject.evaluator;
 	}
 
 
@@ -424,7 +440,11 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 
 	private void runTests() {
-		ResultRunner.run( this.testCases, this::addResult, this.concurrentSubjects() );
+		Function<TestCase, TestCase> mapper = (tc) -> { tc.run(); return tc; };
+		
+		TestSubject.getEvaluator()
+			.apply( mapper, this.testCases.stream(), this.concurrentSubjects() )
+			.forEach( this::addResult );
 	}
 
 	private void addResult( Result result ) {
