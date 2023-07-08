@@ -183,7 +183,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	/**
 	 * Executes the test Method and monitors the results.
 	 * 
-	 * NOTE: Should not be run by multi-threaded workers since Test.Container implementations
+	 * NOTE: Normally should not be run by multi-threaded workers since Test.Container implementations
 	 * generally will not be thread-safe. BUT: Could be run in a separate thread and monitored 
 	 * for timely termination. In that case the implementation should consult Test.Impl.timeout.
 	 * 
@@ -283,13 +283,12 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 			}
 			this.elapsedTime = System.currentTimeMillis() - start;
 		}
-		
-		if ( this.showProgress() ) {
-			TestCase.numTestCase++;
-			System.out.print( "+" );
-			if ( TestCase.numTestCase % this.wrapProgress() == 0 ) {
-				System.out.println();
-			}
+
+		// Indicates progress
+		TestCase.numTestCase++;
+		System.err.print( "+" );
+		if ( TestCase.numTestCase % 80 == 0 ) {
+			System.err.println();
 		}
 	}
 
@@ -666,7 +665,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out ).println( this.toString() );
 
-		if ( ! this.showDetails() ) {
+		if ( !Result.showDetails() ) {
 			return;
 		}
 		

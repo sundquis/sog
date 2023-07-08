@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.Evaluator;
+import sog.util.Concurrent;
 import sog.util.IndentWriter;
 
 /**
@@ -50,18 +50,18 @@ import sog.util.IndentWriter;
 public class TestSet extends Result {
 	
 
-	private static Evaluator evaluator = null;
+	private static Concurrent concurrent = null;
 
-	/* All TestSet instances share a common evaluator */
-	private static Evaluator getEvaluator() {
-		if ( TestSet.evaluator == null ) {
+	/* All TestSet instances share a common concurrent */
+	private static Concurrent getConcurrent() {
+		if ( TestSet.concurrent == null ) {
 			synchronized( TestSet.class ) {
-				if ( TestSet.evaluator == null ) {
-					TestSet.evaluator = new Evaluator( "TestSet", 6 );
+				if ( TestSet.concurrent == null ) {
+					TestSet.concurrent = new Concurrent( "TestSet", 6 );
 				}
 			}
 		}
-		return Assert.nonNull(  TestSet.evaluator );
+		return Assert.nonNull( TestSet.concurrent );
 	}
 	
 	
@@ -120,11 +120,15 @@ public class TestSet extends Result {
 	protected void run() {
 		if ( this.hasRun ) { return; }
 		
-		Function<TestSubject, TestSubject> mapper = (ts) -> { ts.run(); return ts; }; 
-
-		TestSet.getEvaluator()
-			.apply( mapper, this.testSubjects.stream(), this.concurrentSets() )
-			.forEach( this::addResult );
+		Function<TestSubject, TestSubject> mapper = (ts) -> { ts.run(); return ts; };
+		
+		if ( Result.concurrentSets() ) {
+			TestSet.getConcurrent()
+				.map( mapper, this.testSubjects.stream() )
+				.forEach( this::addResult );
+		} else {
+			this.testSubjects.stream().map( mapper ).forEach( this::addResult );
+		}
 
 		this.hasRun = true;
 	}
@@ -264,7 +268,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Return is not null" )
 	public static TestSet forPackage( Class<?> clazz ) {
 		TestSet set = new TestSet( "PKG:\t" + Assert.nonNull( clazz ).getPackageName() );
-		
+
 		set.addClasses( App.get().classesInPackage( clazz ) );
 		
 		return set;
@@ -285,23 +289,29 @@ public class TestSet extends Result {
 			this.run();
 		}
 		
+		// Mandatory summary
 		Assert.nonNull( out ).println().println( this.toString() );
-		
-		out.increaseIndent();
-		if ( this.showDetails() ) {
-			this.testSubjects.stream().forEach( out::println );
-		} else {
-			this.testSubjects.stream().map( Object::toString ).forEach( out::println );
-		}
-		
+
+		// Always show list of skipped classes
 		if ( this.skippedClasses.size() > 0 ) {
-			out.println();
-			out.println( "Skipped Classes:" );
+			out.increaseIndent();
+			out.println().println( "SKIPPED CLASSES:" );
 			out.increaseIndent();
 			this.skippedClasses.forEach( out::println );
 			out.decreaseIndent();
+			out.decreaseIndent();
 		}
-		out.decreaseIndent();
+
+		// If showDetails is false, print subject summaries and be done
+		if ( !Result.showDetails() ) {
+			out.println().increaseIndent();
+			this.testSubjects.stream().map( Object::toString ).forEach( out::println );
+			out.decreaseIndent();
+			return;
+		}
+
+		// If showDetails is true, each TestSubject adds its details
+		this.testSubjects.stream().forEach( out::println );
 	}
 
 	

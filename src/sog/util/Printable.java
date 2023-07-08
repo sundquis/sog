@@ -7,12 +7,14 @@
 
 package sog.util;
 
+import sog.core.Test;
 
 /**
  * @author sundquis
  *
  */
 @FunctionalInterface
+@Test.Subject( "test." )
 public interface Printable {
 
 	/**
@@ -23,8 +25,16 @@ public interface Printable {
 	 * 		Increase indent
 	 * 		print nested components
 	 * 		Decrease indent
+	 * 
 	 * @param out
+	 * @param showDetails
 	 */
 	public void print( IndentWriter out );
+
+	@Test.Decl( "Default uses System.out" )
+	default public void print() {
+		this.print( new IndentWriter() );
+	}
+
 	
 }

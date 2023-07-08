@@ -658,7 +658,11 @@ public class PolicyTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( Policy.class ).showDetails( true ).print();
+		//Test.eval( Policy.class ).showDetails( true ).print();
+		Test.evalPackage( Policy.class ).showDetails( false ).print();
+//		sog.core.test.TestSet ts = new sog.core.test.TestSet( "TEST" );
+//		ts.addClass( Policy.class ).addClass( sog.core.test.TestDecl.class );
+//		ts.showDetails( true ).print();
 	}
 
 }

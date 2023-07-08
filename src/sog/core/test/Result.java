@@ -33,7 +33,7 @@ import sog.util.Printable;
  * There are two levels of detail for test results. The toString() method returns a printable
  * summary including elapsed time and pass/fail counts. The Printable.print() method gives
  * more details starting with the summary, followed by details for any components of the test, 
- * depending on the status of SHOW_RESULTS.
+ * depending on the status of showDetails.
  * 
  * This package has three concrete Result classes covering three levels of testing. TestCase
  * represents a single test method exercising a single testable property as described by
@@ -49,11 +49,10 @@ import sog.util.Printable;
 public abstract class Result implements Printable {
 
 	/*
-	 * The following properties are used to configure the behavior of tests. Each has:
+	 * The following global properties are used to configure the behavior of tests. Each has:
 	 * 		1. A configured default property from system.xml
-	 * 		2. A static value
-	 * 		3. Instance level mutator to alter values
-	 * 		4. Instance level getter
+	 * 		2. Instance mutator to alter values (for all instances)
+	 * 		3. Static getter
 	 */
 	
 	/* 
@@ -63,19 +62,6 @@ public abstract class Result implements Printable {
 	 */
 	private static boolean showDetails = Property.get( "showDetails", false, Parser.BOOLEAN );
 	
-	/*
-	 * Impacts the behavior of TestCase.run()
-	 * If true, after each test case is run, TestCase.run() will print a progress indicator.
-	 */
-	private static boolean showProgress = Property.get( "showProgress", false, Parser.BOOLEAN );
-
-	/*
-	 * Impacts the behavior of TestCase.run()
-	 * When showProgress is true, TestCase.run() will print a new line after this many
-	 * progress indicators have been printed.
-	 */
-	private static int wrapProgress = Property.get( "wrapProgress", 80, Parser.INTEGER );
-
 	/*
 	 * TestSubject instances hold a collection of TestCase Result instances.
 	 * This property determines whether to use concurrent processing for these test cases.
@@ -89,8 +75,6 @@ public abstract class Result implements Printable {
 	private static boolean concurrentSets = Property.get( "concurrentSets", false, Parser.BOOLEAN );
 
 	
-	
-
 	
 	/** Short descriptive string identifying the test */
 	private final String label;
@@ -130,14 +114,6 @@ public abstract class Result implements Printable {
 	@Override
 	public abstract void print( IndentWriter out );
 	
-
-	/**
-	 * Convenience method to use the default System.out IndentWriter
-	 */
-	@Test.Decl( "Defaults to standard out" )
-	public void print() {
-		this.print( new IndentWriter() );
-	}
 
 
 	@Override
@@ -179,55 +155,8 @@ public abstract class Result implements Printable {
 	 */
 	@Test.Decl( "True after showDetails(true)" )
 	@Test.Decl( "False after showDetails(false)" )
-	protected boolean showDetails() {
+	protected static boolean showDetails() {
 		return Result.showDetails;
-	}
-
-	/**
-	 * Set the boolean flag for wen TestCase should indicate completion of each 
-	 * individual test method.
-	 * 
-	 * @param showProgress
-	 * @return
-	 */
-	@Test.Decl( "Progress is included when true" )
-	@Test.Decl( "Progress is excluded when false" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result showProgress( boolean showProgress ) {
-		Result.showProgress = showProgress;
-		return this;
-	}
-	
-	/**
-	 * TestCase checks this after every case is run.
-	 * @return
-	 */
-	@Test.Decl( "True after showProgress(true)" )
-	@Test.Decl( "False after showProgress(false)" )
-	protected boolean showProgress() {
-		return Result.showProgress;
-	}
-
-	/**
-	 * Set the display width for showing progress.
-	 * 
-	 * @param wrapProgress
-	 * @return
-	 */
-	@Test.Decl( "Progress indicator limited to this many columns" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result wrapProgress( int wrapProgress ) {
-		Result.wrapProgress = wrapProgress;
-		return this;
-	}
-	
-	/**
-	 * TestCase checks this after every case is run.
-	 * @return
-	 */
-	@Test.Decl( "Throws Assertion Error if not positive" )
-	protected int wrapProgress() {
-		return Assert.positive( Result.wrapProgress );
 	}
 
 	/**
@@ -248,7 +177,7 @@ public abstract class Result implements Printable {
 	 * @return
 	 */
 	@Test.Decl( "Consistent with specified value" )
-	protected boolean concurrentSubjects() {
+	protected static boolean concurrentSubjects() {
 		return Result.concurrentSubjects;
 	}
 	
@@ -270,7 +199,7 @@ public abstract class Result implements Printable {
 	 * @return
 	 */
 	@Test.Decl( "Consistent with specified value" )
-	protected boolean concurrentSets() {
+	protected static boolean concurrentSets() {
 		return Result.concurrentSets;
 	}
 	

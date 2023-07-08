@@ -44,7 +44,7 @@ public class TestSubjectTest extends Test.Container {
 	public TestSubjectTest() {
 		super( TestSubject.class );
 		this.originalPolicy = Policy.get();
-		Policy.set( Policy.ALL );
+		//Policy.set( Policy.ALL );		// WTF?
 	}
 	
 	@Override
