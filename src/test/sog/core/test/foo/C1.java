@@ -32,6 +32,7 @@ public class C1 {
 
 	@Test.Skip( "container" )
 	public static class TEST extends Test.Container implements Sleep {
+		
 		TEST() { super( C1.class ); }
 
 		@Test.Impl( member = "constructor: C1()", description = "fail w = 2", weight = 2 )
@@ -40,6 +41,7 @@ public class C1 {
 		@Test.Impl( member = "method: void C1.m()", description = "pass w = 3", weight = 3 )
 		public void tm_0374FA689( Test.Case tc ) { this.sleep( 3L ); tc.assertTrue( true ); }
 	}
+	
 }
 
 interface Sleep {

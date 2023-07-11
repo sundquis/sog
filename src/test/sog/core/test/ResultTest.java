@@ -109,140 +109,38 @@ public class ResultTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Result Result.concurrentSets(boolean)", 
-    	description = "Concurrent processing not used when false" 
+    	member = "method: String Result.getLabel()", 
+    	description = "Is consistent with constructed value" 
     )
-    public void tm_07BAF6ECD( Test.Case tc ) {
+    public void tm_01099BDEB( Test.Case tc ) {
+    	String label = "Some Label";
+    	tc.assertEqual( label, new MyResult( label ).getLabel() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String Result.getLabel()", 
+    	description = "Is not null" 
+    )
+    public void tm_0B993845A( Test.Case tc ) {
+    	String label = "Some Label";
+    	tc.assertNonNull( new MyResult( label ).getLabel() );
+    }
+    
+    
+    @Test.Impl( 
+    	member = "method: void Result.print()", 
+    	description = "Default uses System.out" 
+    )
+    public void tm_0741890F8( Test.Case tc ) {
     	tc.assertPass();
     	tc.addMessage( "Manually checked" );
     }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.concurrentSets(boolean)", 
-    	description = "Concurrent processing used when true" 
-    )
-    public void tm_028BB198D( Test.Case tc ) {
-    	tc.assertPass();
-    	tc.addMessage( "Manually checked" );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.concurrentSets(boolean)", 
-    	description = "Returns this Result instance to allow chaining" 
-    )
-    public void tm_0480D5528( Test.Case tc ) {
-    	Result result = new MyResult( "test" );
-    	tc.assertEqual( result, result.concurrentSets( true ) );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.concurrentSubjects(boolean)", 
-    	description = "Concurrent processing not used when false" 
-    )
-    public void tm_0E50BBD17( Test.Case tc ) {
-    	tc.assertPass();
-    	tc.addMessage( "Manually checked" );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.concurrentSubjects(boolean)", 
-    	description = "Concurrent processing used when true" 
-    )
-    public void tm_08D858503( Test.Case tc ) {
-    	tc.assertPass();
-    	tc.addMessage( "Manually checked" );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.concurrentSubjects(boolean)", 
-    	description = "Returns this Result instance to allow chaining" 
-    )
-    public void tm_0F078651E( Test.Case tc ) {
-    	Result result = new MyResult( "test" );
-    	tc.assertEqual( result, result.concurrentSubjects( true ) );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.showDetails(boolean)", 
-    	description = "Details are excluded when false" 
-    )
-    public void tm_096B7E46A( Test.Case tc ) {
-    	tc.assertPass();
-    	tc.addMessage( "Manually checked" );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.showDetails(boolean)", 
-    	description = "Details are included when true" 
-    )
-    public void tm_0D49BB16F( Test.Case tc ) {
-    	tc.assertPass();
-    	tc.addMessage( "Manually checked" );
-    }
-        
-    @Test.Impl( 
-    	member = "method: Result Result.showDetails(boolean)", 
-    	description = "Returns this Result instance to allow chaining" 
-    )
-    public void tm_0D9AB46E5( Test.Case tc ) {
-    	//Result result = new MyResult( "test" );
-    	//tc.assertEqual( result, result.showDetails( true ) );
-    }
-        
-        @Test.Impl( 
-        	member = "method: String Result.getLabel()", 
-        	description = "Is consistent with constructed value" 
-        )
-        public void tm_01099BDEB( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: String Result.getLabel()", 
-        	description = "Is not null" 
-        )
-        public void tm_0B993845A( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: boolean Result.concurrentSets()", 
-        	description = "Consistent with specified value" 
-        )
-        public void tm_01C1A8202( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: boolean Result.concurrentSubjects()", 
-        	description = "Consistent with specified value" 
-        )
-        public void tm_0D86562F8( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: boolean Result.showDetails()", 
-        	description = "False after showDetails(false)" 
-        )
-        public void tm_05D6BD804( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
-        
-        @Test.Impl( 
-        	member = "method: boolean Result.showDetails()", 
-        	description = "True after showDetails(true)" 
-        )
-        public void tm_074BB375C( Test.Case tc ) {
-        	tc.addMessage( "GENERATED STUB" );
-        }
+
         
 
 
 	
 	public static void main( String[] args ) {
-		Test.eval( Result.class ).showDetails( false ).print();
-		//Test.evalPackage( Result.class ).showDetails( true ).print();
 	}
         
 }

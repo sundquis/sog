@@ -25,6 +25,7 @@ public interface Printable {
 	 * 		Increase indent
 	 * 		print nested components
 	 * 		Decrease indent
+	 * Return the given IndentWriter to allow chaining.
 	 * 
 	 * @param out
 	 * @param showDetails

@@ -547,6 +547,20 @@ public class ObjectsTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Objects.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Objects.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Objects.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

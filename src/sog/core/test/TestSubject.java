@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,13 +105,6 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	@Test.Decl( "Has an error message for test method implementations without a corresponding test declaration" )
 	@Test.Decl( "Has an error message if one test declaration has multiple test method implementations" )
 	@Test.Decl( "Each valid test method implementation has a corresponding TestCase saved" )
-	
-	// Properties from runTests()
-	@Test.Decl( "Unimplemented test declarations count as test failures" )
-	@Test.Decl( "If there are any errors no test cases are run" )
-	@Test.Decl( "If there are any errors all test cases are counted as failures" )
-	@Test.Decl( "If there are no errors all test cases are run" )
-	@Test.Decl( "If a test container was constructed afterAll is called after all cases have run" )
 	public static TestSubject forSubject( Class<?> subjectClass ) {
 		TestSubject result = new TestSubject( Assert.nonNull( subjectClass ).getName() );
 
@@ -124,17 +118,17 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 	
 	
-	private static Concurrent concurrent = null;
+	private static Concurrent evaluator = null;
 	
 	private static Concurrent getConcurrent() {
-		if ( TestSubject.concurrent == null ) {
+		if ( TestSubject.evaluator == null ) {
 			synchronized( TestSubject.class ) {
-				if ( TestSubject.concurrent == null ) {
-					TestSubject.concurrent  = new Concurrent( "TestSubject", 8 );
+				if ( TestSubject.evaluator == null ) {
+					TestSubject.evaluator  = new Concurrent( "TestSubject", 8 );
 				}
 			}
 		}
-		return TestSubject.concurrent;
+		return TestSubject.evaluator;
 	}
 
 
@@ -204,6 +198,12 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	/* Set this flag when tests are run. Results should not be printed until after running. */
 	private boolean hasRun = false;
 	
+	/* If true, print details of the contained TestCase results. */
+	private boolean showDetails = true;
+	
+	/* If true, use evaluator Worker threads for the contained TestCase instances. */
+	private boolean concurrent = false;
+	
 	
 	/* Instances are obtained using the public static builder. */
 	private TestSubject( String label ) {
@@ -231,7 +231,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 			out.increaseIndent();
 			Arrays.stream( this.details ).forEach( out::println );
 			if ( this.error != null ) {
-				out.printErr( this.error );
+				out.printErr( this.error, "sog" );
 			}
 			out.decreaseIndent();
 		}
@@ -420,7 +420,14 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 	
 	
+	// Properties from runTests()
 	@Override
+	@Test.Decl( "Unimplemented test declarations count as test failures" )
+	@Test.Decl( "If there are any errors no test cases are run" )
+	@Test.Decl( "If there are any errors all test cases are counted as failures" )
+	@Test.Decl( "If there are no errors all test cases are run" )
+	@Test.Decl( "If there are no errors afterAll is called after all cases have run" )
+	@Test.Decl( "If there are no errors beforeAll is called before any cases have run" )
 	protected void run() {
 		if ( this.hasRun ) { return; }
 		
@@ -429,10 +436,8 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		this.failCount += this.unimplemented.size();
 
 		if ( this.noErorrs() ) {
+			this.container.beforeAll().exec();
 			this.runTests();
-		}
-		
-		if ( this.container != null ) {
 			this.container.afterAll().exec();
 		}
 		
@@ -440,11 +445,19 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 
 	private void runTests() {
+		
 		Function<TestCase, TestCase> mapper = (tc) -> { tc.run(); return tc; };
 		
-		if ( Result.concurrentSubjects() ) {
-			TestSubject.getConcurrent()
-				.map( mapper, this.testCases.stream() )
+		if ( this.concurrent ) {
+			this.testCases.stream()
+				.filter( TestCase::threadsafe )
+				.map( TestSubject.getConcurrent().wrapGetLater( mapper ) )
+				.collect( Collectors.toList() ).stream()
+				.map( Supplier::get )
+				.forEach( this::addResult );
+			this.testCases.stream()
+				.filter( (tc) -> !tc.threadsafe() )
+				.map( mapper )
 				.forEach( this::addResult );
 		} else {
 			this.testCases.stream().map( mapper ).forEach( this::addResult );
@@ -494,7 +507,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		}
 
 		// If showDetails is false, print case summaries and be done
-		if ( !Result.showDetails() ) {
+		if ( !this.showDetails ) {
 			out.println().increaseIndent();
 			this.testCases.stream().map( Object::toString ).forEach( out::println );
 			out.decreaseIndent();
@@ -521,6 +534,20 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 			out.decreaseIndent();
 		}
 	}
+	
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
+	@Test.Decl( "If true threadsafe TestCase instances are run concurrently" )
+	public TestSubject concurrent( boolean concurrent ) {
+		this.concurrent = concurrent;
+		return this;
+	}
+
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
+	@Test.Decl( "If true TestCase details are printed" )
+	public TestSubject showDetails( boolean showDetails ) {
+		this.showDetails = showDetails;
+		return this;
+	}
 
 	@Override
 	@Test.Decl( "Reported time is the sum of the times of all test cases" )
@@ -542,7 +569,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 
 	@Test.Decl( "False after error" )
 	public boolean noErorrs() {
-		return this.errors.isEmpty();
+		return this.container != null && this.errors.isEmpty();
 	}
 	
 	@Override

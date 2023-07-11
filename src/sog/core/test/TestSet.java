@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
-import sog.util.Concurrent;
 import sog.util.IndentWriter;
 
 /**
@@ -50,22 +49,6 @@ import sog.util.IndentWriter;
 public class TestSet extends Result {
 	
 
-	private static Concurrent concurrent = null;
-
-	/* All TestSet instances share a common concurrent */
-	private static Concurrent getConcurrent() {
-		if ( TestSet.concurrent == null ) {
-			synchronized( TestSet.class ) {
-				if ( TestSet.concurrent == null ) {
-					TestSet.concurrent = new Concurrent( "TestSet", 6 );
-				}
-			}
-		}
-		return Assert.nonNull( TestSet.concurrent );
-	}
-	
-	
-	
 	private long elapsedTime = 0L;
 	
 	private int passCount = 0;
@@ -76,7 +59,11 @@ public class TestSet extends Result {
 	
 	private final List<String> skippedClasses = new ArrayList<String>();
 
-	private final SortedSet<TestSubject> testSubjects;
+	private final SortedSet<TestSubject> testSubjects = new TreeSet<TestSubject>();
+	
+	private boolean showDetails = false;
+	
+	private boolean concurrent = false;
 	
 	/**
 	 * Constructs an empty TestSet. The required label identifies the context of the set of test results
@@ -88,8 +75,6 @@ public class TestSet extends Result {
 	@Test.Decl( "Throws AssertionError for null label" )
 	public TestSet( String label ) {
 		super( Assert.nonEmpty( label ) );
-
-		this.testSubjects = new TreeSet<TestSubject>();
 	}
 
 
@@ -117,19 +102,15 @@ public class TestSet extends Result {
 	}
 
 	@Override
+	@Test.Decl( "Ignored after first call" )
+	@Test.Decl( "If concurrentSets = false and concurrentSubject = false all tests use same thread" )
+	@Test.Decl( "If concurrentSets = true and concurrentSubject = false all tests use same Worker thread" )
 	protected void run() {
 		if ( this.hasRun ) { return; }
 		
 		Function<TestSubject, TestSubject> mapper = (ts) -> { ts.run(); return ts; };
+		this.testSubjects.stream().map( mapper ).forEach( this::addResult );
 		
-		if ( Result.concurrentSets() ) {
-			TestSet.getConcurrent()
-				.map( mapper, this.testSubjects.stream() )
-				.forEach( this::addResult );
-		} else {
-			this.testSubjects.stream().map( mapper ).forEach( this::addResult );
-		}
-
 		this.hasRun = true;
 	}
 	
@@ -153,7 +134,11 @@ public class TestSet extends Result {
 	public TestSet addClass( Class<?> clazz ) {
 		Test.Skip skip = Assert.nonNull( clazz ).getDeclaredAnnotation( Test.Skip.class );
 		if ( skip == null ) {
-			this.testSubjects.add( TestSubject.forSubject( clazz ) );
+			this.testSubjects.add( 
+				TestSubject.forSubject( clazz )
+					.showDetails( this.showDetails )
+					.concurrent( this.concurrent )
+			);
 		} else {
 			this.addSkippedClass( TestMember.getSimpleName( clazz ), skip.value() );
 		}
@@ -283,6 +268,7 @@ public class TestSet extends Result {
 	@Test.Decl( "Includes summary for each TestSubject" )
 	@Test.Decl( "Includes messages for each bad classname" )
 	@Test.Decl( "Includes messages for each skipped class" )
+	@Test.Decl( "Includes details when Result.showDetails is true" )
 	@Test.Decl( "Results are printed in alphabetaical order" )
 	public void print( IndentWriter out ) {
 		if ( !this.hasRun ) {
@@ -303,7 +289,7 @@ public class TestSet extends Result {
 		}
 
 		// If showDetails is false, print subject summaries and be done
-		if ( !Result.showDetails() ) {
+		if ( !this.showDetails ) {
 			out.println().increaseIndent();
 			this.testSubjects.stream().map( Object::toString ).forEach( out::println );
 			out.decreaseIndent();
@@ -312,6 +298,20 @@ public class TestSet extends Result {
 
 		// If showDetails is true, each TestSubject adds its details
 		this.testSubjects.stream().forEach( out::println );
+	}
+
+
+	public TestSet showDetails( boolean showDetails ) {
+		this.showDetails = showDetails;
+		this.testSubjects.forEach( (ts) -> ts.showDetails( showDetails ) );
+		return this;
+	}
+
+
+	public TestSet concurrent( boolean concurrent ) {
+		this.concurrent = concurrent;
+		this.testSubjects.forEach( (ts) -> ts.concurrent( concurrent ) );
+		return this;
 	}
 
 	

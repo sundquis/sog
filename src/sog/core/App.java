@@ -428,13 +428,34 @@ public class App implements Runnable {
 	@Test.Decl( "Throws AssertionError for null Throwable" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Return can be empty" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links work for secondary classes" )
+	@Test.Decl( "Elements correspond to the stack trace" )
+	@Test.Decl( "Elements have classes matching the given class name prefix" )
+	@Test.Decl( "Throws AssertionError for null prefix" )
+	@Test.Decl( "Prefix can be empty" )
+	public Stream<String> getLocation( Throwable th, String prefix ) {
+		Assert.nonNull( prefix );
+		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
+			.filter( (ste) -> ste.getClassName().startsWith( prefix ) )
+			.map( Location::new )
+			.map( Location::toString );
+	}
+	
+
+	/**
+	 * Return a stream of file locations corresponding to the stack trace elements of the
+	 * given Throwable object.
+	 */
+	@Test.Decl( "Throws AssertionError for null Throwable" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
 	@Test.Decl( "Elements are file links" )
 	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the stack trace" )
 	public Stream<String> getLocation( Throwable th ) {
-		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
-			.map( Location::new )
-			.map( Location::toString );
+		return this.getLocation( th, "" );
 	}
 	
 
@@ -495,6 +516,6 @@ public class App implements Runnable {
 		);
 	}
 	
-	
+
 	
 }

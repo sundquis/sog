@@ -105,6 +105,20 @@ public class ProcedureTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Procedure.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Procedure.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Procedure.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

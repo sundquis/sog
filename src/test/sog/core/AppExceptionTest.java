@@ -101,6 +101,20 @@ public class AppExceptionTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( AppException.class ).showDetails( true ).concurrentSubjects( true ).print();
+		/* Toggle class results
+		Test.eval( AppException.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( AppException.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

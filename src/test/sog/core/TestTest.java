@@ -728,7 +728,7 @@ public class TestTest extends Test.Container {
     }
 
     @Test.Impl( 
-    	member = "method: Result Test.eval(Class)", 
+    	member = "method: TestSubject Test.eval(Class)", 
     	description = "Throws AssertionError for null subject" 
     )
     public void tm_0E44493D8( Test.Case tc ) {
@@ -736,19 +736,44 @@ public class TestTest extends Test.Container {
     	Test.eval( null );
     }
     
-    
     @Test.Impl( 
-    	member = "method: Result Test.evalPackage(Class)", 
+    	member = "method: TestSet Test.evalPackage(Class)", 
     	description = "Throws AssertionError for null subject" 
     )
     public void tm_09CA9BF70( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
     	Test.evalPackage( null );
     }
+    
+    @Test.Impl( 
+    	member = "method: Procedure Test.Container.beforeAll()", 
+    	description = "Default is NOOP" 
+    )
+    public void tm_0B2EAC36F( Test.Case tc ) {
+    	class SomeContainer extends Test.Container { public SomeContainer() { super( Test.class ); } };
+    	Test.Container c = new SomeContainer();
+    	tc.assertEqual( Procedure.NOOP, c.beforeAll() );
+    }
+
 
 		
 
 	public static void main( String[] args ) {
-		Test.eval( Test.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Test.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		// Some tests can fail with multiple threads due to exceeding specified resource limits.
+		Test.evalPackage( Test.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

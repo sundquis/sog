@@ -19,8 +19,6 @@
 package sog.core.test;
 
 import sog.core.Assert;
-import sog.core.Parser;
-import sog.core.Property;
 import sog.core.Test;
 import sog.util.IndentWriter;
 import sog.util.Printable;
@@ -54,26 +52,6 @@ public abstract class Result implements Printable {
 	 * 		2. Instance mutator to alter values (for all instances)
 	 * 		3. Static getter
 	 */
-	
-	/* 
-	 * Controls the behavior of the print methods.
-	 * If true, a Result instance first prints its one-line toString() summary,
-	 * then indents and prints any details. Otherwise, only the summary is printed.
-	 */
-	private static boolean showDetails = Property.get( "showDetails", false, Parser.BOOLEAN );
-	
-	/*
-	 * TestSubject instances hold a collection of TestCase Result instances.
-	 * This property determines whether to use concurrent processing for these test cases.
-	 */
-	private static boolean concurrentSubjects = Property.get( "concurrentSubjects", false, Parser.BOOLEAN );
-	
-	/*
-	 * TestSet instances hold a collection of TestSubject Result instances.
-	 * This property determines whether to use concurrent processing for these test cases.
-	 */
-	private static boolean concurrentSets = Property.get( "concurrentSets", false, Parser.BOOLEAN );
-
 	
 	
 	/** Short descriptive string identifying the test */
@@ -113,7 +91,14 @@ public abstract class Result implements Printable {
 	 */
 	@Override
 	public abstract void print( IndentWriter out );
+
 	
+	@Override
+	@Test.Decl( "Default uses System.out" )
+	public void print() {
+		System.err.flush();
+		this.print( new IndentWriter() );
+	}
 
 
 	@Override
@@ -125,82 +110,14 @@ public abstract class Result implements Printable {
 		int totalCount = this.getPassCount() + this.getFailCount();
 		double success = (double) 100 * this.getPassCount() / (totalCount == 0 ? 1 : totalCount);
 		double seconds = (double) this.getElapsedTime() / 1000.0;
-		return String.format( "%s: Success = %.1f%%, Time = %.1fs, Count = %d (P = %d, F = %d)", 
+		return String.format( "%s: Success = %.1f%%, Time = %.2fs, Count = %d (P = %d, F = %d)", 
 			this.label, success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
 	
 	@Test.Decl( "Is not null" )
 	@Test.Decl( "Is consistent with constructed value" )
-	protected String getLabel() {
+	public String getLabel() {
 		return this.label;
-	}
-	
-	/**
-	 * Set the boolean flag for when instances should include test details.
-	 * 
-	 * @param details
-	 * @return
-	 */
-	@Test.Decl( "Details are included when true" )
-	@Test.Decl( "Details are excluded when false" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result showDetails( boolean showDetails ) {
-		Result.showDetails = showDetails;
-		return this;
-	}
-
-	/**
-	 * Concrete subclasses use this to determine the level of detail in printed output.
-	 * @return
-	 */
-	@Test.Decl( "True after showDetails(true)" )
-	@Test.Decl( "False after showDetails(false)" )
-	protected static boolean showDetails() {
-		return Result.showDetails;
-	}
-
-	/**
-	 * Specify that TestSubject should use concurrent processing for the multiple
-	 * contained TestCase instances.
-	 */
-	@Test.Decl( "Concurrent processing used when true" )
-	@Test.Decl( "Concurrent processing not used when false" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result concurrentSubjects( boolean concurrentSubjects ) {
-		Result.concurrentSubjects = concurrentSubjects;
-		return this;
-	}
-	
-	/**
-	 * TestSubject checks this when running its TestCase instances.
-	 * 
-	 * @return
-	 */
-	@Test.Decl( "Consistent with specified value" )
-	protected static boolean concurrentSubjects() {
-		return Result.concurrentSubjects;
-	}
-	
-	/**
-	 * Specify that TestSet should use concurrent processing for the multiple
-	 * contained TestSubject instances.
-	 */
-	@Test.Decl( "Concurrent processing used when true" )
-	@Test.Decl( "Concurrent processing not used when false" )
-	@Test.Decl( "Returns this Result instance to allow chaining" )
-	public Result concurrentSets( boolean concurrentSets ) {
-		Result.concurrentSets = concurrentSets;
-		return this;
-	}
-	
-	/**
-	 * TestSet checks this when running its TestSubject instances.
-	 * 
-	 * @return
-	 */
-	@Test.Decl( "Consistent with specified value" )
-	protected static boolean concurrentSets() {
-		return Result.concurrentSets;
 	}
 	
 

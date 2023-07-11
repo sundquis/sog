@@ -45,28 +45,30 @@ public class SoftString implements Comparable<SoftString> {
 		private final int fileIndex;
 		private final int offset;
 		private final int length;
-		
+				
 		private Location( String s ) {
 			byte[] data = s.getBytes();
-			
-			ByteFile file = null;
-			int i = 0;
-			while ( file == null && i < BYTE_FILES.size() ) {
-				if ( BYTE_FILES.get( i ).canAppend( data.length ) ) {
-					file = BYTE_FILES.get( i );
-				} else {
-					i++;
+
+			synchronized ( Location.BYTE_FILES ) {
+				ByteFile file = null;
+				int i = 0;
+				while ( file == null && i < BYTE_FILES.size() ) {
+					if ( BYTE_FILES.get( i ).canAppend( data.length ) ) {
+						file = BYTE_FILES.get( i );
+					} else {
+						i++;
+					}
 				}
+				
+				if ( file == null ) {
+					file = new ByteFile();
+					BYTE_FILES.add( file );
+				}
+				
+				this.fileIndex = i;
+				this.offset = file.append( data );
+				this.length = data.length;
 			}
-			
-			if ( file == null ) {
-				file = new ByteFile();
-				BYTE_FILES.add( file );
-			}
-			
-			this.fileIndex = i;
-			this.offset = file.append( data );
-			this.length = data.length;
 		}
 	
 		@Override
@@ -99,7 +101,7 @@ public class SoftString implements Comparable<SoftString> {
 	@Test.Decl( "Can construct empty" )
 	@Test.Decl( "Can construct short strings" )
 	@Test.Decl( "Can construct long strings" )
-	@Test.Decl( "Strings longer than threshold are soft" )
+	@Test.Decl( "Strings longer or equal to threshold are soft" )
 	public SoftString( String s ) {
 		Assert.nonNull( s );
 		

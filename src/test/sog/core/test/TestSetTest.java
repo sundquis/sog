@@ -45,7 +45,7 @@ public class TestSetTest extends Test.Container {
 	
 	
 	public Set<Result> getResults( TestSet trs ) {
-		return this.getSubjectField( trs, "results", null );
+		return this.getSubjectField( trs, "testSubjects", null );
 	}
 	
 	
@@ -101,7 +101,7 @@ public class TestSetTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: TestSet TestSet.addClass(Class)", 
-		description = "Adds one TestSubject",
+		description = "Adds one TestSubject if not skipped",
 		weight = 3
 	)
 	public void tm_02334FB7C( Test.Case tc ) {
@@ -312,6 +312,7 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_06A537EE4( Test.Case tc ) {
 		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
+		trs.print( IndentWriter.stringIndentWriter() );
 		tc.assertEqual( 9, trs.getFailCount() );
 	}
 		
@@ -321,6 +322,7 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_0584C9B7E( Test.Case tc ) {
 		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
+		trs.print( IndentWriter.stringIndentWriter() );
 		tc.assertEqual( 12, trs.getPassCount() );
 	}
 		
@@ -330,6 +332,7 @@ public class TestSetTest extends Test.Container {
 	)
 	public void tm_0ED41C40C( Test.Case tc ) {
 		TestSet trs = TestSet.forPackage( test.sog.core.test.foo.C1.class );
+		trs.print( IndentWriter.stringIndentWriter() );
 		tc.assertTrue( trs.getElapsedTime() >= 21L );
 	}
 		
@@ -340,7 +343,7 @@ public class TestSetTest extends Test.Container {
 	public void tm_067F458BE( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
 		TestSet.forPackage( test.sog.core.test.foo.C1.class ).addClass( "foo.bar" ).print( new IndentWriter( sos, " " ) );
-		tc.assertTrue( sos.toString().contains( "Skipped Classes" ) );
+		tc.assertTrue( sos.toString().contains( "SKIPPED" ) );
 	}
 		
 	@Test.Impl( 
@@ -426,53 +429,88 @@ public class TestSetTest extends Test.Container {
 		TestSet.forPackages( App.get().sourceDir( App.class ), null );
 	}
 	
+	@Test.Skip( "Testing" )
+	private class SkippedClass {}
 	
-	@Test.Impl( 
-		member = "method: TestSet TestSet.print()", 
-		description = "Return is this TestSet instance to allow chaining" 
-	)
-	public void tm_013CC8689( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
-		tc.assertPass();
-	}
-		
-	@Test.Impl( 
-		member = "method: TestSet TestSet.setVerbosity(boolean)", 
-		description = "After setVerbosity(false) details are not shown" 
-	)
-	public void tm_031BECDB8( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
-		TestSet.forPackage( test.sog.core.test.foo.C1.class )
-			.showDetails( false ).print( new IndentWriter( sos ) );
-		tc.assertFalse( sos.toString().contains( "RESULTS" ) );
-	}
-			
-	@Test.Impl( 
-		member = "method: TestSet TestSet.setVerbosity(boolean)", 
-		description = "After setVerbosity(true) details are shown" 
-	)
-	public void tm_0FFDDEC20( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
-		TestSet.forPackage( test.sog.core.test.foo.C1.class )
-			.showDetails( true ).print( new IndentWriter( sos ) );
-		tc.assertTrue( sos.toString().contains( "RESULTS" ) );
-	}
-			
-	@Test.Impl( 
-		member = "method: TestSet TestSet.setVerbosity(boolean)", 
-		description = "Return is this TestSet instance to allow chaining" 
-	)
-	public void tm_049F5539B( Test.Case tc ) {
-		TestSet ts = new TestSet( "LABEL" );
-		tc.assertEqual( ts, ts.showDetails( false ) );
-	}
-		
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.addClass(Class)", 
+    	description = "Skipped classes not added" 
+    )
+    public void tm_0267DADA8( Test.Case tc ) {
+		TestSet trs = new TestSet( "LABEL" );
+		int before = this.getResults( trs ).size();
+		trs.addClass( SkippedClass.class );
+		int after = this.getResults( trs ).size();
+		tc.assertEqual( before, after );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.print(IndentWriter)", 
+    	description = "Includes messages for each skipped class" 
+    )
+    public void tm_0C6120AE1( Test.Case tc ) {
+		TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class );
+		set.addClass( SkippedClass.class ).addClass( Object.class ).addClass( "bogus" );
+		tc.assertEqual( 2, this.getSkippedClases( set ).size() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.run()", 
+    	description = "Ignored after first call" 
+    )
+    public void tm_05D6E8C25( Test.Case tc ) {
+		TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class );
+		this.evalSubjectMethod( set, "run", null );
+		int before = set.getPassCount();
+		this.evalSubjectMethod( set, "run", null );
+		tc.assertEqual( before, set.getPassCount() );
+    }
+
+    @Test.Impl( 
+    	member = "method: void TestSet.run()", 
+    	description = "If concurrentSets = false and concurrentSubject = false all tests use same thread" 
+    )
+    public void tm_0F0C120D5( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.run()", 
+    	description = "If concurrentSets = true and concurrentSubject = false all tests use same Worker thread" 
+    )
+    public void tm_07FE3DDA8( Test.Case tc ) {
+//    	boolean original = Result.concurrentSets();
+//    	tc.afterThis( () -> TestSetTest.RESULT.concurrentSets( original ) );
+//    	TestSetTest.RESULT.concurrentSets( true );
+//
+//    	IndentWriter out = IndentWriter.stringIndentWriter();
+//    	new TestSet("Test").addClass( Concurrent.class ).print( out );
+//    	tc.addMessage( out.toString() );
+//    	tc.assertFail( "hi" );
+    }
+
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.print(IndentWriter)", 
+    	description = "Includes details when Result.showDetails is true" 
+    )
+    public void tm_0C480A0ED( Test.Case tc ) {
+//    	boolean original = Result.showDetails();
+//    	tc.afterThis( () -> TestSetTest.RESULT.showDetails( original ) );
+//    	TestSetTest.RESULT.showDetails( true );
+//    	IndentWriter out = IndentWriter.stringIndentWriter();
+//		new TestSet( "TESTING" )
+//			.addClass( test.sog.core.test.foo.C3.class )
+//			.addClass( test.sog.core.test.foo.C2.class )
+//			.addClass( test.sog.core.test.foo.C1.class )
+//			.print( out );
+//		tc.assertTrue( out.toString().contains( "SKIPPED" ) );
+    }
 
 	
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( TestSet.class ).showDetails( true ).print();
 	}
 }

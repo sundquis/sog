@@ -141,7 +141,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Initially OPEN" )
 	private State state;
 	
-	
 	/* 
 	 * A printable link to the file location of this test case. Filled in by setFileLocation 
 	 * when a Container test method calls any Test.Case method.
@@ -152,7 +151,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	/* Total execution time for the test method and test framework monitoring. */
 	@Test.Decl( "Initially zero" )
 	private long elapsedTime;
-
+	
 	
 	@Test.Decl( "Throws AssertionError for null TestImpl" )
 	@Test.Decl( "Throws AssertionError for null Test.Container" )
@@ -261,7 +260,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		} catch ( InvocationTargetException ex ) {
 			if ( this.expectedError == null || !this.expectedError.equals( ex.getCause().getClass() ) ) {
 				this.unexpectedError = ex.getCause();
-				this.fail( "Expected " + this.expectedError + " but got " + ex.getCause() );
+				this.fail( "Expected " + (this.expectedError == null ? "no error" : this.expectedError) + " but got " + ex.getCause() );
 			} else {
 				this.pass();
 			}
@@ -665,10 +664,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	public void print( IndentWriter out ) {
 		Assert.nonNull( out ).println( this.toString() );
 
-		if ( !Result.showDetails() ) {
-			return;
-		}
-		
 		out.increaseIndent();
 		
 		if ( this.getFailCount() > 0 && this.messages.size() > 0 ) {
@@ -679,7 +674,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		}
 		
 		if ( this.unexpectedError != null ) {
-			out.printErr( this.unexpectedError );
+			out.printErr( this.unexpectedError, "sog" );
 		}
 		
 		out.decreaseIndent();
@@ -701,6 +696,12 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		return result;
 	}
 	
+
+	@Test.Decl( "Consistent with configured value" )
+	public boolean threadsafe() {
+		return this.impl.threadsafe();
+	}
+	
 	
 	@Override
 	@Test.Decl( "If compareTo not zero then not equal" )
@@ -719,7 +720,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	public int hashCode() {
 		return this.impl.toString().hashCode();
 	}
-	
 
 
 }

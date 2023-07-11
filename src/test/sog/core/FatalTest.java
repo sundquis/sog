@@ -112,6 +112,20 @@ public class FatalTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Fatal.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Fatal.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Fatal.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

@@ -320,6 +320,20 @@ public class PropertyTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Property.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Property.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Property.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

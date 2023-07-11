@@ -55,13 +55,13 @@ public class ByteFile implements AutoCloseable {
 	
 
 	/*
-	 * The total (across all ByteFil instances) number of bytes being stored.
+	 * The total (across all ByteFile instances) number of bytes being stored.
 	 * Used to trigger warnings and Errors
 	 */
 	private static volatile long TOTAL_BYTES = 0L;
 
 	/* Adjust the total number of bytes used and trigger warning or error if needed. */
-	private static void newBytes( int count ) {
+	private static synchronized void newBytes( int count ) {
 		TOTAL_BYTES += (long) count;
 		if ( TOTAL_BYTES > WARN_LIMIT ) {
 			Fatal.warning( "Total bytes stored exceeds " + WARN_LIMIT );

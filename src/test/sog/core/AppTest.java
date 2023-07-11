@@ -21,8 +21,10 @@ package test.sog.core;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
@@ -764,12 +766,12 @@ public class AppTest extends Test.Container{
 	}
 		
 	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
+		member = "method: Stream App.getLocation(Throwable, String)", 
 		description = "Elements are file links" 
 	)
 	public void tm_0901581E8( Test.Case tc ) {
 		Exception e = new Exception();
-		App.get().getLocation( e ).forEach( tc::addMessage );
+		App.get().getLocation( e, "sog" ).forEach( tc::addMessage );
 		tc.addMessage( "  " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
@@ -778,10 +780,103 @@ public class AppTest extends Test.Container{
 	}
 		
 	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
+		member = "method: Stream App.getLocation(Throwable, String)", 
 		description = "Elements correspond to the stack trace" 
 	)
 	public void tm_0DF0FD879( Test.Case tc ) {
+		Exception e = new Exception();
+		StringOutputStream sos = new StringOutputStream();
+		e.printStackTrace( new PrintStream( sos, true ) );
+		tc.addMessage( "STACK TRACE:" );
+		tc.addMessage( sos.toString() );
+		tc.addMessage( " " );
+		tc.addMessage( "LOCATION:" );
+		App.get().getLocation( e, "sog" ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
+		tc.assertPass();
+		/* */
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable, String)", 
+		description = "Links work for secondary classes" 
+	)
+	public void tm_05CA13CC0( Test.Case tc ) {
+		A.getLocationException( "test" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationExceptionSecondary" ); /*
+		tc.assertPass();
+		/* */
+	}
+
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable, String)", 
+		description = "Return is non-null" 
+	)
+	public void tm_0CC8A86E5( Test.Case tc ) {
+		tc.assertNonNull( App.get().getLocation( new Throwable(), "test" ) );
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable, String)", 
+		description = "Return is not terminated" 
+	)
+	public void tm_0ED3DB76E( Test.Case tc ) {
+		App.get().getLocation( new Throwable(), "test" ).map( Function.identity() );
+		tc.assertPass();
+	}
+		
+	@Test.Impl( 
+		member = "method: Stream App.getLocation(Throwable, String)", 
+		description = "Throws AssertionError for null Throwable" 
+	)
+	public void tm_03BC3785D( Test.Case tc ) {
+		tc.expectError( AssertionError.class );
+		Throwable t = null;
+		App.get().getLocation( t, "test" );
+	}
+	
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Throws AssertionError for null Throwable" 
+    )
+    public void tm_03BC3785D2( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	Throwable th = null;
+    	App.get().getLocation( th );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Elements are file links" 
+    )
+    public void tm_0901581E8dup( Test.Case tc ) {
+		Exception e = new Exception();
+		App.get().getLocation( e ).forEach( tc::addMessage );
+		tc.addMessage( "  " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
+		tc.assertPass();
+		/* */
+    }
+
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	description = "Return can be empty" 
+    )
+    public void tm_0A9184DA9( Test.Case tc ) {
+		Exception e = new Exception();
+		tc.assertEqual( 0, App.get().getLocation( e, "bogus" ).collect( Collectors.toList() ).size() );
+    }
+
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Elements correspond to the stack trace" 
+    )
+    public void tm_0DF0FD879dup( Test.Case tc ) {
 		Exception e = new Exception();
 		StringOutputStream sos = new StringOutputStream();
 		e.printStackTrace( new PrintStream( sos, true ) );
@@ -795,47 +890,66 @@ public class AppTest extends Test.Container{
 		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
 		tc.assertPass();
 		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
-		description = "Links work for secondary classes" 
-	)
-	public void tm_05CA13CC0( Test.Case tc ) {
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_0096543B3( Test.Case tc ) {
 		A.getLocationException().forEach( tc::addMessage );
 		tc.addMessage( " " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Test link for method getLocationExceptionSecondary" ); /*
 		tc.assertPass();
 		/* */
-	}
-
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
-		description = "Return is non-null" 
-	)
-	public void tm_0CC8A86E5( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocation( new Throwable() ) );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
-		description = "Return is not terminated" 
-	)
-	public void tm_0ED3DB76E( Test.Case tc ) {
-		App.get().getLocation( new Throwable() ).map( Function.identity() );
-		tc.assertPass();
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable)", 
-		description = "Throws AssertionError for null Throwable" 
-	)
-	public void tm_03BC3785D( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		Throwable t = null;
-		App.get().getLocation( t );
-	}
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Return is non-null" 
+    )
+    public void tm_0CC8A86E5dup( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocation( new Exception() ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_0ED3DB76Edup( Test.Case tc ) {
+    	App.get().getLocation( new Exception() ).map( Function.identity() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	description = "Elements have classes matching the given class name prefix" 
+    )
+    public void tm_0144A68B0( Test.Case tc ) {
+    	String prefix = "test";
+    	List<String> elements = App.get().getLocation( new Exception(), prefix ).collect( Collectors.toList() );
+    	tc.assertFalse( elements.isEmpty() );
+    	elements.forEach( s -> tc.assertTrue( s.startsWith( prefix ) ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	description = "Prefix can be empty" 
+    )
+    public void tm_0BB502807( Test.Case tc ) {
+    	App.get().getLocation( new Exception(), "" );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	description = "Throws AssertionError for null prefix" 
+    )
+    public void tm_0CCF3F746( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocation( new Exception(), null );
+    }
 		
 	@Test.Impl( 
 		member = "method: String App.Location.toString()", 
@@ -1190,10 +1304,21 @@ public class AppTest extends Test.Container{
 	
 
 	public static void main( String[] args ) {
-		//Test.eval( App.class ).showDetails( true ).concurrentSubjectThreads( 8 ).showProgress( true ).print();
+		/* Toggle class results
+		Test.eval( App.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
 		
-		// Some tests can fail with multiple threads due to exceeding specified resource limits.
-		Test.evalPackage( App.class ).concurrentSets( false ).concurrentSubjects( false ).showDetails( false ).print();
+		/* Toggle package results
+		Test.evalPackage( App.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }
 

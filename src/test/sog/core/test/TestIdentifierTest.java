@@ -217,7 +217,6 @@ public class TestIdentifierTest extends Test.Container {
 
 	
 	public static void main( String[] args ) {
-		Test.eval( TestIdentifier.class ).showDetails( true ).print();
 	}
 	
 }

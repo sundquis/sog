@@ -40,6 +40,8 @@ public class TraceTest extends Test.Container {
 		super( Trace.class );
 	}
 
+	// These tests use shared instance values and are not concurrent in thier present version.
+	// FIXME: Could rewrite to be concurrent and test thread-safety of the Trace interface
 	
 	private StringOutputStream sos;
 	private PrintWriter out;
@@ -106,7 +108,8 @@ public class TraceTest extends Test.Container {
 	
 	@Test.Impl( 
 		member = "method: boolean Trace.isEnabled()", 
-		description = "After enable(false) returns false" 
+		description = "After enable(false) returns false",
+		threadsafe = false
 	)
 	public void tm_0A611564F( Test.Case tc ) {
 		Trace.enable( false );
@@ -115,7 +118,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Trace.isEnabled()", 
-		description = "After enable(true) returns true" 
+		description = "After enable(true) returns true",
+		threadsafe = false
 	)
 	public void tm_073CA6073( Test.Case tc ) {
 		Trace.enable( true );
@@ -124,7 +128,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.enable(boolean)", 
-		description = "After enable(false) messages are ignored" 
+		description = "After enable(false) messages are ignored",
+		threadsafe = false
 	)
 	public void tm_0E392F861( Test.Case tc ) {
 		Trace.enable( false );
@@ -134,7 +139,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.enable(boolean)", 
-		description = "After enable(true) message are enqueued for logging" 
+		description = "After enable(true) message are enqueued for logging",
+		threadsafe = false
 	)
 	public void tm_0EF1563EE( Test.Case tc ) {
 		Trace.enable( true );
@@ -146,7 +152,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.run()", 
-		description = "Throws AppException when called from an external thread" 
+		description = "Throws AppException when called from an external thread",
+		threadsafe = false
 	)
 	public void tm_0DBED2B2C( Test.Case tc ) {
 		Trace INSTANCE = this.getSubjectField( null, "INSTANCE", null );
@@ -156,7 +163,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.terminate()", 
-		description = "After termination, messages are ignored" 
+		description = "After termination, messages are ignored",
+		threadsafe = false
 	)
 	public void tm_01AFC3B42( Test.Case tc ) {
 		tc.addMessage( "Manually verified" ).assertPass();
@@ -164,7 +172,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.terminate()", 
-		description = "Pending messages are written to the trace file" 
+		description = "Pending messages are written to the trace file",
+		threadsafe = false
 	)
 	public void tm_09E508AC5( Test.Case tc ) {
 		tc.addMessage( "Manually verified" ).assertPass();
@@ -172,7 +181,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Message is written to file before application exits" 
+		description = "Message is written to file before application exits",
+		threadsafe = false
 	)
 	public void tm_033B9403F( Test.Case tc ) {
 		tc.addMessage( "Manually verified" ).assertPass();
@@ -180,7 +190,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Throws AssertionError for empty message" 
+		description = "Throws AssertionError for empty message",
+		threadsafe = false
 	)
 	public void tm_0EFE80A0C( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -189,7 +200,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Throws AssertionError for null source" 
+		description = "Throws AssertionError for null source",
+		threadsafe = false
 	)
 	public void tm_07023E5EC( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -198,7 +210,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Trace message includes details on the calling class" 
+		description = "Trace message includes details on the calling class",
+		threadsafe = false
 	)
 	public void tm_01D86EC21( Test.Case tc ) {
 		String s = this.getClass().getName();
@@ -207,7 +220,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Trace message includes details on the calling method" 
+		description = "Trace message includes details on the calling method",
+		threadsafe = false
 	)
 	public void tm_04FA6EAAE( Test.Case tc ) {
 		String s = "tm_04FA6EAAE";
@@ -216,7 +230,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Trace message includes details on the calling thread" 
+		description = "Trace message includes details on the calling thread",
+		threadsafe = false
 	)
 	public void tm_0C1E78197( Test.Case tc ) {
 		String s = Thread.currentThread().toString();
@@ -225,7 +240,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Trace message includes details on the source object" 
+		description = "Trace message includes details on the source object",
+		threadsafe = false
 	)
 	public void tm_04995C5E9( Test.Case tc ) {
 		String s = this.toString();
@@ -234,7 +250,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Trace message includes the given message" 
+		description = "Trace message includes the given message",
+		threadsafe = false
 	)
 	public void tm_014A86C54( Test.Case tc ) {
 		String s = "Some random message... 42";
@@ -243,7 +260,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Return is non-empty when disabled" 
+		description = "Return is non-empty when disabled",
+		threadsafe = false
 	)
 	public void tm_01374793C( Test.Case tc ) {
 		Trace.enable( false );
@@ -252,7 +270,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String)", 
-		description = "Return is non-empty when enabled" 
+		description = "Return is non-empty when enabled",
+		threadsafe = false
 	)
 	public void tm_049721D97( Test.Case tc ) {
 		Trace.enable( true );
@@ -261,7 +280,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Message is echoed to the given PrintWriter immediately" 
+		description = "Message is echoed to the given PrintWriter immediately",
+		threadsafe = false
 	)
 	public void tm_066FF07D2( Test.Case tc ) {
 		Trace.write( this, "IMMEDIATE", this.out );
@@ -270,7 +290,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Message is written to file before application exits" 
+		description = "Message is written to file before application exits",
+		threadsafe = false
 	)
 	public void tm_0A3B3B4D3( Test.Case tc ) {
 		tc.addMessage( "Manually verified." ).assertPass();
@@ -278,7 +299,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Multi-thread stress test" 
+		description = "Multi-thread stress test",
+		threadsafe = false
 	)
 	public void tm_0F59A5A68( Test.Case tc ) throws InterruptedException {
 		Set<Agent> agents = IntStream.range( 0, 40 ).boxed()
@@ -290,7 +312,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Throws AssertionError for empty message" 
+		description = "Throws AssertionError for empty message",
+		threadsafe = false
 	)
 	public void tm_0891DBCA0( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -299,7 +322,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Throws AssertionError for null PrintWriter" 
+		description = "Throws AssertionError for null PrintWriter",
+		threadsafe = false
 	)
 	public void tm_0329A0071( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -308,7 +332,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Throws AssertionError for null source" 
+		description = "Throws AssertionError for null source",
+		threadsafe = false
 	)
 	public void tm_0FE8D2D80( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -317,7 +342,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Trace message includes details on the calling class" 
+		description = "Trace message includes details on the calling class",
+		threadsafe = false
 	)
 	public void tm_08D8160B5( Test.Case tc ) {
 		String s = this.getSubjectClass().getName();
@@ -326,7 +352,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Trace message includes details on the calling method" 
+		description = "Trace message includes details on the calling method",
+		threadsafe = false
 	)
 	public void tm_0DEFB089A( Test.Case tc ) {
 		String s = "tm_0DEFB089A";
@@ -335,7 +362,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Trace message includes details on the calling thread" 
+		description = "Trace message includes details on the calling thread",
+		threadsafe = false
 	)
 	public void tm_0513B9F83( Test.Case tc ) {
 		String s = Thread.currentThread().toString();
@@ -344,7 +372,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Trace message includes details on the source object" 
+		description = "Trace message includes details on the source object",
+		threadsafe = false
 	)
 	public void tm_0B9903A7D( Test.Case tc ) {
 		String s = this.toString();
@@ -353,7 +382,8 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Trace message includes the given message" 
+		description = "Trace message includes the given message",
+		threadsafe = false
 	)
 	public void tm_0A2290C40( Test.Case tc ) {
 		String s = "Some bogus and random message";
@@ -362,7 +392,8 @@ public class TraceTest extends Test.Container {
 	
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Return is non-empty when disabled" 
+		description = "Return is non-empty when disabled",
+		threadsafe = false
 	)
 	public void tm_04EE87C36( Test.Case tc ) {
 		Trace.enable( false );
@@ -371,7 +402,8 @@ public class TraceTest extends Test.Container {
 			
 	@Test.Impl( 
 		member = "method: String Trace.write(Object, String, PrintWriter)", 
-		description = "Return is non-empty when enabled" 
+		description = "Return is non-empty when enabled",
+		threadsafe = false
 	)
 	public void tm_02A54D35D( Test.Case tc ) {
 		Trace.enable( true );
@@ -381,6 +413,20 @@ public class TraceTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Trace.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Trace.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Trace.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

@@ -1508,6 +1508,20 @@ public class AssertTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Assert.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Assert.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Assert.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

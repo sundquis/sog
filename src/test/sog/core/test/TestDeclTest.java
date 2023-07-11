@@ -200,6 +200,6 @@ public class TestDeclTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( TestDecl.class ).showDetails( true ).print();
 	}
+	
 }

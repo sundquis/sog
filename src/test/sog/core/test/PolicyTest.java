@@ -35,11 +35,17 @@ import sog.core.test.Policy;
 public class PolicyTest extends Test.Container {
 
 
-	private final Policy ORIGINAL;
+	private Policy ORIGINAL;
 	
 	public PolicyTest() {
 		super( Policy.class );
-		this.ORIGINAL = Policy.get();
+	}
+
+	@Override
+	public Procedure beforeAll() {
+		return () -> {
+			this.ORIGINAL = Policy.get();
+		};
 	}
 	
 	
@@ -48,6 +54,11 @@ public class PolicyTest extends Test.Container {
 		return () -> {
 			Policy.set( this.ORIGINAL );
 		};
+	}
+	
+	@Override
+	public Procedure afterEach() {
+		return this.afterAll();
 	}
 
 	
@@ -658,11 +669,21 @@ public class PolicyTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		//Test.eval( Policy.class ).showDetails( true ).print();
-		Test.evalPackage( Policy.class ).showDetails( false ).print();
-//		sog.core.test.TestSet ts = new sog.core.test.TestSet( "TEST" );
-//		ts.addClass( Policy.class ).addClass( sog.core.test.TestDecl.class );
-//		ts.showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Policy.class )
+			.concurrentSubjects( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		// Some tests can fail with multiple threads due to exceeding specified resource limits.
+		Test.evalPackage( Policy.class )
+			.concurrentSets( false )
+			.concurrentSubjects( false )
+			.showDetails( true )
+			.print();
+		//*/
 	}
 
 }

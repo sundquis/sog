@@ -940,6 +940,20 @@ public class StringsTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Strings.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Strings.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Strings.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

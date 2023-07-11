@@ -66,6 +66,9 @@ public class CacheTest extends Test.Container {
 		return new CacheTest.Value( Strings.rightJustify( n.toString(), 20, '_' ) );
 	};
 	
+	// A single shared Cache which is reset after every case, so these tests were
+	// written in a way the disallows concurrent processing
+	
 	private Cache<Integer, Value> cache;
 	
 	@Override public Procedure beforeEach() {
@@ -97,7 +100,8 @@ public class CacheTest extends Test.Container {
 	
 	@Test.Impl( 
 		member = "constructor: Cache(Cache.Builder)", 
-		description = "Throws AssertionError for null builder" 
+		description = "Throws AssertionError for null builder",
+		threadsafe = false
 	)
 	public void tm_06B011624( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -106,7 +110,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "After clear() produces equivalent object" 
+		description = "After clear() produces equivalent object",
+		threadsafe = false 
 	)
 	public void tm_043EC5F55( Test.Case tc ) {
 		Value value = this.cache.get( 42 );
@@ -116,7 +121,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "After clear() produces non-identical object" 
+		description = "After clear() produces non-identical object",
+		threadsafe = false
 	)
 	public void tm_0C28C7D80( Test.Case tc ) {
 		Value value = this.cache.get( 42 );
@@ -126,7 +132,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "After garbage collection produces valid object" 
+		description = "After garbage collection produces valid object",
+		threadsafe = false
 	)
 	public void tm_0E649AFB4( Test.Case tc ) {
 		int n = 0;
@@ -138,7 +145,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "From empty cache returns valid object" 
+		description = "From empty cache returns valid object",
+		threadsafe = false
 	)
 	public void tm_0465B6646( Test.Case tc ) {
 		tc.assertEqual( this.cache.get( 42 ), this.cache.get( 42 ) );
@@ -146,7 +154,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Produces identical values for identical keys after collection" 
+		description = "Produces identical values for identical keys after collection",
+		threadsafe = false
 	)
 	public void tm_05CCE4EE5( Test.Case tc ) {
 		int n = 0;
@@ -158,7 +167,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Produces identical values for identical keys before collection" 
+		description = "Produces identical values for identical keys before collection",
+		threadsafe = false
 	)
 	public void tm_0F01D5012( Test.Case tc ) {
 		int n = 55;
@@ -167,7 +177,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Stored uncolllectable object returns identical object" 
+		description = "Stored uncolllectable object returns identical object",
+		threadsafe = false
 	)
 	public void tm_030EFD0AD( Test.Case tc ) {
 		Value value = this.cache.get( 0 );
@@ -180,7 +191,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Throws AppException if Builder throws exception" 
+		description = "Throws AppException if Builder throws exception",
+		threadsafe = false
 	)
 	public void tm_0E55DE864( Test.Case tc ) {
 		Cache.Builder<Integer, String> builder = (n) -> {
@@ -193,7 +205,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Throws AssertionError for null key" 
+		description = "Throws AssertionError for null key",
+		threadsafe = false
 	)
 	public void tm_09F53E05B( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
@@ -202,7 +215,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Throws AssertionError if Builder produces null" 
+		description = "Throws AssertionError if Builder produces null",
+		threadsafe = false
 	)
 	public void tm_0783D71AA( Test.Case tc ) {
 		Cache.Builder<Integer, String> builder = (n) -> {
@@ -215,7 +229,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Values before and after collection are equivalent" 
+		description = "Values before and after collection are equivalent",
+		threadsafe = false
 	)
 	public void tm_045F979A7( Test.Case tc ) {
 		String label = this.cache.get( 0 ).label;
@@ -228,7 +243,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Values before and after collection are not identical" 
+		description = "Values before and after collection are not identical",
+		threadsafe = false
 	)
 	public void tm_05C060DA1( Test.Case tc ) {
 		String label = this.cache.get( 0 ).toString();
@@ -241,7 +257,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Cache.toString()", 
-		description = "Result is not empty" 
+		description = "Result is not empty",
+		threadsafe = false
 	)
 	public void tm_0D1FB8F40( Test.Case tc ) {
 		tc.assertNotEmpty( this.cache.toString() );
@@ -253,7 +270,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.collected()", 
-		description = "Greater than zero when the size of the map decreases" 
+		description = "Greater than zero when the size of the map decreases",
+		threadsafe = false
 	)
 	public void tm_0BAF8A0A0( Test.Case tc ) {
 		int n = 0;
@@ -267,7 +285,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.collected()", 
-		description = "Unchanged after clear()" 
+		description = "Unchanged after clear()",
+		threadsafe = false
 	)
 	public void tm_02FCB933D( Test.Case tc ) {
 		int n = 0;
@@ -281,7 +300,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.collected()", 
-		description = "Zero at creation" 
+		description = "Zero at creation",
+		threadsafe = false
 	)
 	public void tm_0B3F7DD32( Test.Case tc ) {
 		tc.assertEqual( 0, this.cache.collected() );
@@ -289,7 +309,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.collected()", 
-		description = "collected() + size() is invariant across collections" 
+		description = "collected() + size() is invariant across collections",
+		threadsafe = false
 	)
 	public void tm_0B29392B5( Test.Case tc ) {
 		int n = 0;
@@ -309,7 +330,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.size()", 
-		description = "Created empty" 
+		description = "Created empty",
+		threadsafe = false
 	)
 	public void tm_0ACE6B283( Test.Case tc ) {
 		tc.assertTrue( this.cache.size() == 0 );
@@ -317,7 +339,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.size()", 
-		description = "Not empty after get" 
+		description = "Not empty after get",
+		threadsafe = false
 	)
 	public void tm_0C706A3A0( Test.Case tc ) {
 		this.cache.get( 0 );
@@ -326,7 +349,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int Cache.size()", 
-		description = "Zero after clear()" 
+		description = "Zero after clear()",
+		threadsafe = false
 	)
 	public void tm_0C70038FA( Test.Case tc ) {
 		Stream.of( 0, 1, 2, 3 ).forEach( this.cache::get );
@@ -337,7 +361,8 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Cache.clear()", 
-		description = "Idempotent" 
+		description = "Idempotent",
+		threadsafe = false
 	)
 	public void tm_0A7ED3A2A( Test.Case tc ) {
 		int n = 0;
@@ -359,6 +384,20 @@ public class CacheTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Cache.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Cache.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Cache.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

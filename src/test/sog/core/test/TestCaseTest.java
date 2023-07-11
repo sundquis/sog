@@ -56,8 +56,8 @@ public class TestCaseTest extends Test.Container {
 	
 	
 	
-	public final MyContainer container;
-	public final Map<String, TestImpl> TEST_IMPLS;
+	public MyContainer container;
+	public Map<String, TestImpl> TEST_IMPLS;
 	
 	public TestCase noop = null;
 	public TestImpl impl = null;
@@ -66,11 +66,16 @@ public class TestCaseTest extends Test.Container {
 	
 	public TestCaseTest() {
 		super( TestCase.class );
-		
-		this.container = new MyContainer();
+	}
+	
+	@Override
+	public Procedure beforeAll() {
+		return () -> {
+			this.container = new MyContainer();
 
-		this.TEST_IMPLS = Arrays.stream( MyContainer.class.getDeclaredMethods() )
-			.collect( Collectors.toMap( Method::getName, TestImpl::forMethod ) );
+			this.TEST_IMPLS = Arrays.stream( MyContainer.class.getDeclaredMethods() )
+				.collect( Collectors.toMap( Method::getName, TestImpl::forMethod ) );
+		};
 	}
 	
 	@Override
@@ -410,8 +415,6 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_06AED5866( Test.Case tc ) {
     	TestCase fail = this.getCase( "failMethod" );
-    	tc.assertFalse( fail.toString().startsWith( "FAIL" ) );
-    	fail.toString();
     	tc.assertTrue( fail.toString().startsWith( "FAIL" ) );
     }
         
@@ -421,8 +424,6 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0B31DEC4C( Test.Case tc ) {
     	TestCase pass = this.getCase( "passMethod" );
-    	tc.assertFalse( pass.toString().startsWith( "PASS" ) );
-    	pass.toString();
     	tc.assertTrue( pass.toString().startsWith( "PASS" ) );
     }
         
@@ -1803,6 +1804,6 @@ public class TestCaseTest extends Test.Container {
     
         
     public static void main( String[] args ) {
-		Test.eval( TestCase.class ).showDetails( true ).print();
 	}
+    
 }

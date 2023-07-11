@@ -107,5 +107,10 @@ public class TestImpl extends TestIdentifier {
 	public long getTimeout() {
 		return this.impl.timeout();
 	}
+	
+	@Test.Decl( "Value is consistent with configured value" )
+	public boolean threadsafe() {
+		return this.impl.threadsafe();
+	}
 
 }

@@ -40,35 +40,30 @@ public class ByteFileTest extends Test.Container {
 	
 	private static final long LIMIT = 10_000;
 
-	private final long ORIG_MAX_LENGTH;
-	private final long ORIG_WARN_LIMIT;
-	private final long ORIG_FAIL_LIMIT;
+	private long ORIG_MAX_LENGTH;
+	private long ORIG_WARN_LIMIT;
+	private long ORIG_FAIL_LIMIT;
 	
-	private final long MAX_LENGTH = LIMIT;
-	private final long WARN_LIMIT = LIMIT * 2;
-	private final long FAIL_LIMIT = LIMIT * 5;
+	private final long NEW_MAX_LENGTH = LIMIT;
+	private final long NEW_WARN_LIMIT = LIMIT * 2;
+	private final long NEW_FAIL_LIMIT = LIMIT * 5;
 	
 	public ByteFileTest() {
 		super( ByteFile.class );
-		
-		this.ORIG_MAX_LENGTH = this.getSubjectField( null, "MAX_LENGTH", null );
-		this.ORIG_WARN_LIMIT = this.getSubjectField( null, "WARN_LIMIT", null );
-		this.ORIG_FAIL_LIMIT = this.getSubjectField( null, "FAIL_LIMIT", null );
+	}
+	
+	public Procedure beforeAll() {
+		return () -> {
+			this.ORIG_MAX_LENGTH = this.getSubjectField( null, "MAX_LENGTH", null );
+			this.ORIG_WARN_LIMIT = this.getSubjectField( null, "WARN_LIMIT", null );
+			this.ORIG_FAIL_LIMIT = this.getSubjectField( null, "FAIL_LIMIT", null );
 
-		// Reduce limits to make it easier to trigger exceptional cases
-		this.setLimits();
+			// Reduce limits to make it easier to trigger exceptional cases
+			this.setSubjectField( null, "MAX_LENGTH", this.NEW_MAX_LENGTH );
+			this.setSubjectField( null, "WARN_LIMIT", this.NEW_WARN_LIMIT );
+			this.setSubjectField( null, "FAIL_LIMIT", this.NEW_FAIL_LIMIT );
+		};
 	}
-	
-	public long getMaxLength() {
-		return this.getSubjectField( null, "MAX_LENGTH", null );
-	}
-	
-	public void setLimits() {
-		this.setSubjectField( null, "MAX_LENGTH", this.MAX_LENGTH );
-		this.setSubjectField( null, "WARN_LIMIT", this.WARN_LIMIT );
-		this.setSubjectField( null, "FAIL_LIMIT", this.FAIL_LIMIT );
-	};
-	
 	
 	@Override
 	public Procedure afterAll() {
@@ -79,6 +74,14 @@ public class ByteFileTest extends Test.Container {
 		};
 	}
 	
+	public long getMaxLength() {
+		return this.getSubjectField( null, "MAX_LENGTH", null );
+	}
+	
+	public long getTotalBytes() {
+		return this.getSubjectField( null, "TOTAL_BYTES", null );
+	}
+
 	public File getFile( ByteFile bf ) {
 		return this.getSubjectField( bf, "file", null );
 	}
@@ -92,14 +95,10 @@ public class ByteFileTest extends Test.Container {
 		"In a hole in, in the ground, there lived a Hobbit.",
 		"The answer to the ultimate question of life, the universe, and everything."
 	};
-	
+
 	/* Reusable byte array to read and append. */
 	public final byte[] DATA = ARGS[ARGS.length - 1].getBytes();
 	
-	public long getTotalBytes() {
-		return this.getSubjectField( null, "TOTAL_BYTES", null );
-	}
-
 	
 	
 	
@@ -153,7 +152,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0F7F0AA8B( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canAppend( (int) this.MAX_LENGTH + 1 ) );
+			tc.assertFalse( bf.canAppend( (int) this.NEW_MAX_LENGTH + 1 ) );
 		}
 	}
 		
@@ -176,7 +175,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0B52185CE( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertTrue( bf.canAppend( (int) this.MAX_LENGTH ) );
+			tc.assertTrue( bf.canAppend( (int) this.NEW_MAX_LENGTH ) );
 		}
 	}
 		
@@ -186,9 +185,9 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_033B5AF97( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertTrue( bf.canWrite( 0, 0 ) );
+			tc.assertTrue( bf.canRead( 0, 0 ) );
 			bf.dispose();
-			tc.assertFalse( bf.canWrite( 0, 0 ) );
+			tc.assertFalse( bf.canRead( 0, 0 ) );
 		}
 	}
 		
@@ -243,7 +242,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_0451D0457( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canWrite( 1, (int) this.MAX_LENGTH ) );
+			tc.assertFalse( bf.canWrite( 1, (int) this.NEW_MAX_LENGTH ) );
 		}
 	}
 		
@@ -253,7 +252,7 @@ public class ByteFileTest extends Test.Container {
 	)
 	public void tm_05F2799B7( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			tc.assertFalse( bf.canWrite( (int) this.MAX_LENGTH, 1 ) );
+			tc.assertFalse( bf.canWrite( (int) this.NEW_MAX_LENGTH, 1 ) );
 		}
 	}
 		
@@ -308,9 +307,11 @@ public class ByteFileTest extends Test.Container {
 	public void tm_09853AA15( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
 			List<Integer> positions = Stream.of( this.ARGS )
-				.map( String::getBytes ).map( bf::append ).collect( Collectors.toList() );
+				.map( String::getBytes )
+				.map( bf::append )
+				.collect( Collectors.toList() );
 			for ( int i = 0; i < this.ARGS.length; i++ ) {
-				tc.assertEqual( this.ARGS[i].substring( 0, 10 ), new String( bf.read( positions.get( i ), 10 ) ) );
+				tc.assertEqual( this.ARGS[i], new String( bf.read( positions.get( i ), ARGS[i].length() ) ) );
 			}
 		}
 	}
@@ -365,7 +366,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[])", 
-		description = "At fail limit throws AppException" 
+		description = "At fail limit throws AppException",
+		threadsafe = false
 	)
 	public void tm_06694C1DC( Test.Case tc ) {
 		// Fail limit is 5 * max length
@@ -377,7 +379,7 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf5 = new ByteFile(); 
 			ByteFile bf6 = new ByteFile(); 
 		) {
-			int position = (int) this.MAX_LENGTH - this.DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - this.DATA.length;
 			bf1.write( position, this.DATA );
 			bf2.write( position, this.DATA );
 			bf3.write( position, this.DATA );
@@ -390,7 +392,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[])", 
-		description = "At warn limit issues warning" 
+		description = "At warn limit issues warning",
+		threadsafe = false
 	)
 	public void tm_084F9DB69( Test.Case tc ) {
 		// Warn limit is 2 * max length
@@ -401,7 +404,7 @@ public class ByteFileTest extends Test.Container {
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
 			tc.afterThis( () -> Fault.removeListener( listener ) );
-			int position = (int) this.MAX_LENGTH - DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
 			Fault.addListener( listener );
@@ -424,7 +427,7 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[])", 
-		description = "Increases length by source.length" 
+		description = "Increases length by source.length"
 	)
 	public void tm_0392704D0( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -438,7 +441,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[])", 
-		description = "Increases total bytes by source.length" 
+		description = "Increases total bytes by source.length",
+		threadsafe = false
 	)
 	public void tm_0A0B685D1( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -456,19 +460,20 @@ public class ByteFileTest extends Test.Container {
 	public void tm_07F406F24( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
 			bf.append( this.DATA );
-			tc.expectError( AssertionError.class );
 			bf.dispose();
+			tc.expectError( AssertionError.class );
 			bf.append( this.DATA );
 		}
 	}
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[])", 
-		description = "Throws AssertionError for length + source.length > MAX_LENGTH" 
+		description = "Throws AssertionError for length + source.length > MAX_LENGTH",
+		threadsafe = false
 	)
 	public void tm_09BF6C210( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			bf.write( (int) this.MAX_LENGTH - this.DATA.length, this.DATA );
+			bf.write( (int) this.NEW_MAX_LENGTH - this.DATA.length, this.DATA );
 			tc.expectError( AssertionError.class );
 			bf.append( this.DATA );
 		}
@@ -487,7 +492,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[], int, int)", 
-		description = "At fail limit throws AppException" 
+		description = "At fail limit throws AppException",
+		threadsafe = false
 	)
 	public void tm_0C770D63C( Test.Case tc ) {
 		// Fail limit is 5 * max length
@@ -499,7 +505,7 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf5 = new ByteFile(); 
 			ByteFile bf6 = new ByteFile(); 
 		) {
-			int position = (int) this.MAX_LENGTH - this.DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - this.DATA.length;
 			bf1.write( position, this.DATA );
 			bf2.write( position, this.DATA );
 			bf3.write( position, this.DATA );
@@ -512,7 +518,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[], int, int)", 
-		description = "At warn limit issues warning" 
+		description = "At warn limit issues warning",
+		threadsafe = false
 	)
 	public void tm_0FD3A8B09( Test.Case tc ) {
 		// Warn limit is 2 * max length
@@ -523,7 +530,7 @@ public class ByteFileTest extends Test.Container {
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
 			tc.afterThis( () -> Fault.removeListener( listener ) );
-			int position = (int) this.MAX_LENGTH - DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
 			Fault.addListener( listener );
@@ -557,7 +564,7 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[], int, int)", 
-		description = "Increases length by count" 
+		description = "Increases length by count"
 	)
 	public void tm_0E16E6CA6( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -570,15 +577,16 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[], int, int)", 
-		description = "Increases total bytes by count" 
+		description = "Increases total bytes by count",
+		threadsafe = false
 	)
 	public void tm_011D851E7( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
 			bf.write( 43, this.DATA );
 			int count = 9;
-			long TOTAL_BYTES = this.getSubjectField( null, "TOTAL_BYTES", null );
+			long TOTAL_BYTES = this.getTotalBytes();
 			bf.append( this.DATA, 2, count );
-			tc.assertEqual( TOTAL_BYTES + count, this.getSubjectField( null, "TOTAL_BYTES", null ) );
+			tc.assertEqual( TOTAL_BYTES + count, this.getTotalBytes() );
 		}
 	}
 		
@@ -597,12 +605,13 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.append(byte[], int, int)", 
-		description = "Throws AssertionError for length + count > MAX_LENGTH" 
+		description = "Throws AssertionError for length + count > MAX_LENGTH",
+		threadsafe = false
 	)
 	public void tm_05A8EB9BA( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
 			int count = 8;
-			bf.write( (int) this.MAX_LENGTH - count, this.DATA, 0, 1 );
+			bf.write( (int) this.NEW_MAX_LENGTH - count, this.DATA, 0, 1 );
 			tc.expectError( AssertionError.class );
 			bf.append( this.DATA, 1, count );
 		}
@@ -682,7 +691,7 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.length()", 
-		description = "Length increases with write" 
+		description = "Length increases with write"
 	)
 	public void tm_0F4C54CF9( final Test.Case tc ) {
 		try ( final ByteFile bf = new ByteFile() ) {
@@ -701,32 +710,31 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.length()", 
-		description = "Length is at most MAX_LENGTH" 
+		description = "Length is at most MAX_LENGTH",
+		threadsafe = false
 	)
 	public void tm_07C049F58( Test.Case tc ) {
-		tc.afterThis( this::setLimits );
-		this.setSubjectField( null, "MAX_LENGTH", 100L );
-		
 		try ( final ByteFile bf = new ByteFile() ) {
 			Consumer<Integer> process = new Consumer<Integer>() {
 				@Override
 				public void accept( Integer p ) {
 					try { bf.write( p, DATA ); } catch ( AssertionError e ) {}
-					tc.assertTrue( bf.getLength() <= 100 );
+					tc.assertTrue( bf.getLength() <= ByteFileTest.this.NEW_MAX_LENGTH );
 				}
 			};
-			Stream.of( 27, 11, 92, 78, 76, 98, 105, 130, 100, 100 - DATA.length ).forEach( process );
-			tc.assertEqual( 100, bf.getLength() );
+			Stream.of( 27, 11, 92, 98, 105, 130, 100, (int) this.NEW_MAX_LENGTH - DATA.length ).forEach( process );
+			tc.assertEqual( (int) this.NEW_MAX_LENGTH, bf.getLength() );
 		}
 	}
 		
 	@Test.Impl( 
 		member = "method: int ByteFile.length()", 
-		description = "Length is non-negative" 
+		description = "Length is non-negative",
+		threadsafe = false
 	)
 	public void tm_0D0A12D7C( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			Stream.of( 0, 27, 11, 92, 78, 76, 98, (int) MAX_LENGTH - DATA.length )
+			Stream.of( 0, 27, 11, 92, 78, 76, 98, (int) NEW_MAX_LENGTH - DATA.length )
 				.map( p -> { bf.write( p, DATA ); return bf.getLength(); } )
 				.forEach( l -> tc.assertTrue( l >= 0 ) );
 		}
@@ -924,7 +932,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[])", 
-		description = "At fail limit throws AppException" 
+		description = "At fail limit throws AppException",
+		threadsafe = false
 	)
 	public void tm_0C420EAF9( Test.Case tc ) {
 		// Fail limit is 5 * max length
@@ -936,7 +945,7 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf5 = new ByteFile(); 
 			ByteFile bf6 = new ByteFile(); 
 		) {
-			int position = (int) this.MAX_LENGTH - this.DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - this.DATA.length;
 			bf1.write( position, this.DATA );
 			bf2.write( position, this.DATA );
 			bf3.write( position, this.DATA );
@@ -949,7 +958,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[])", 
-		description = "At warn limit issues warning" 
+		description = "At warn limit issues warning",
+		threadsafe = false
 	)
 	public void tm_01BD5B42C( Test.Case tc ) {
 		// Warn limit is 2 * max length
@@ -960,7 +970,7 @@ public class ByteFileTest extends Test.Container {
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
 			tc.afterThis( () -> Fault.removeListener( listener ) );
-			int position = (int) this.MAX_LENGTH - DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
 			Fault.addListener( listener );
@@ -1031,7 +1041,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[])", 
-		description = "Increases total bytes if position + source.length > length" 
+		description = "Increases total bytes if position + source.length > length",
+		threadsafe = false
 	)
 	public void tm_040BD17DC( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -1079,19 +1090,21 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[])", 
-		description = "Throws AssertionError for position + source.length > MAX_LENGTH" 
+		description = "Throws AssertionError for position + source.length > MAX_LENGTH",
+		threadsafe = false
 	)
 	public void tm_042C274CA( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			bf.write( (int) MAX_LENGTH, DATA, 0, 0 );
+			bf.write( (int) NEW_MAX_LENGTH, DATA, 0, 0 );
 			tc.expectError( AssertionError.class );
-			bf.write( (int) MAX_LENGTH, DATA, 0, 1 );
+			bf.write( (int) NEW_MAX_LENGTH, DATA, 0, 1 );
 		}
 	}
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "At fail limit throws AppException" 
+		description = "At fail limit throws AppException",
+		threadsafe = false
 	)
 	public void tm_02485FF19( Test.Case tc ) {
 		// Fail limit is 5 * max length
@@ -1103,7 +1116,7 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf5 = new ByteFile(); 
 			ByteFile bf6 = new ByteFile(); 
 		) {
-			int position = (int) this.MAX_LENGTH - this.DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - this.DATA.length;
 			bf1.write( position, this.DATA );
 			bf2.write( position, this.DATA );
 			bf3.write( position, this.DATA );
@@ -1116,7 +1129,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "At warn limit issues warning" 
+		description = "At warn limit issues warning",
+		threadsafe = false
 	)
 	public void tm_05F5C8C0C( Test.Case tc ) {
 		// Warn limit is 2 * max length
@@ -1127,7 +1141,7 @@ public class ByteFileTest extends Test.Container {
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
 			tc.afterThis( () -> Fault.removeListener( listener ) );
-			int position = (int) this.MAX_LENGTH - DATA.length;
+			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
 			Fault.addListener( listener );
@@ -1183,7 +1197,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "Does not increase total bytes if position + count <= length" 
+		description = "Does not increase total bytes if position + count <= length",
+		threadsafe = false
 	)
 	public void tm_0723A2AC2( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -1196,7 +1211,7 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "Increases length if position + count > length" 
+		description = "Increases length if position + count > length"
 	)
 	public void tm_0EEDE24DF( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -1209,7 +1224,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "Increases total bytes if position + count > length" 
+		description = "Increases total bytes if position + count > length",
+		threadsafe = false
 	)
 	public void tm_05E542706( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -1229,7 +1245,7 @@ public class ByteFileTest extends Test.Container {
 			bf.write( 145, DATA, 4, 11 );
 			bf.dispose();
 			tc.expectError( AssertionError.class );
-			bf.write( 167, DATA, 4, 11 );
+			bf.write( 145, DATA, 4, 11 );
 		}
 	}
 		
@@ -1301,13 +1317,14 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[], int, int)", 
-		description = "Throws AssertionError for position + count > MAX_LENGTH" 
+		description = "Throws AssertionError for position + count > MAX_LENGTH",
+		threadsafe = false
 	)
 	public void tm_056D8DE34( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
-			bf.write( (int) MAX_LENGTH, DATA, 0, 0 );
+			bf.write( (int) NEW_MAX_LENGTH, DATA, 0, 0 );
 			tc.expectError( AssertionError.class );
-			bf.write( (int) MAX_LENGTH, DATA, 0, 1 );
+			bf.write( (int) NEW_MAX_LENGTH, DATA, 0, 1 );
 		}
 	}
 	
@@ -1315,12 +1332,20 @@ public class ByteFileTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-//		new sog.core.test.TestSet( "Concurrency" )
-//			.addClass( ByteFile.class )
-//			.addClass( sog.core.SoftString.class )
-//			.concurrentSetThreads( 1 )
-//			.showDetails( true )
-//			.print();
-		Test.eval( ByteFile.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( ByteFile.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( ByteFile.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

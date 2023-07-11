@@ -105,10 +105,13 @@ public class IndentWriter {
 	@Test.Decl( "Return this IndentWriter to allow chaining" )
 	@Test.Decl( "Throws Assertion Error for null error" )
 	@Test.Decl( "Details of the error are included" )
-	public IndentWriter printErr( Throwable error ) {
+	@Test.Decl( "Elements have classes matching the given class name prefix" )
+	@Test.Decl( "Throws AssertionError for null prefix" )
+	@Test.Decl( "Prefix can be empty" )
+	public IndentWriter printErr( Throwable error, String prefix ) {
 		this.println( "Error: " + error );
 		this.increaseIndent();
-		App.get().getLocation( error ).forEach( this::println );
+		App.get().getLocation( error, prefix ).forEach( this::println );
 		this.decreaseIndent();
 		
 		Throwable cause = error.getCause();
@@ -121,6 +124,14 @@ public class IndentWriter {
 		}
 		
 		return this;
+	}
+
+	@Test.Decl( "Default shows all locations" )
+	@Test.Decl( "Throws AssertionError for null error" )
+	@Test.Decl( "Details of the error are included" )
+	@Test.Decl( "Default shows elements from all classes" )
+	public IndentWriter printErr( Throwable error ) {
+		return this.printErr( error, "" );
 	}
 
 	@Test.Decl( "Null object is allowed" )
@@ -144,6 +155,22 @@ public class IndentWriter {
 			this.out.close();
 		}
 		return this;
+	}
+	
+	
+	/**
+	 * Returns a IndentWriter using a StringOutputStream. The toString method closes the OutputStream
+	 * and returns the concatenation of written strings.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "After toString write calls are ignored" )
+	public static IndentWriter stringIndentWriter() {
+		final StringOutputStream sos = new StringOutputStream();
+		IndentWriter result = new IndentWriter( sos ) {
+			@Override public String toString() { return sos.toString(); }
+		};
+		return result;
 	}
 	
 	

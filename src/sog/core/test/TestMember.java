@@ -175,7 +175,7 @@ public class TestMember {
 		this.decls = field.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = Policy.get().required( field );
 		this.isSynthetic = field.isSynthetic();
-		this.isMain= false;
+		this.isMain = false;
 		this.isAbstract = false;
 		this.isEnumSpecial = false;
 	}
@@ -187,7 +187,7 @@ public class TestMember {
 		this.decls = method.getDeclaredAnnotationsByType( Test.Decl.class );
 		this.isRequired = Policy.get().required( method );
 		this.isSynthetic = method.isSynthetic();
-		this.isMain= "main".equals( method.getName() );
+		this.isMain= "main".equals( method.getName() );		// WARNING: All methods named "main" are ignored
 		this.isAbstract = Modifier.isAbstract( method.getModifiers() );
 		this.isEnumSpecial = this.isEnumValues( method ) || this.isEnumValueOf( method );
 	}

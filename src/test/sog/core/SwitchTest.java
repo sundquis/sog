@@ -21,7 +21,6 @@ package test.sog.core;
 
 
 import sog.core.AppException;
-import sog.core.Procedure;
 import sog.core.Switch;
 import sog.core.Test;
 
@@ -40,22 +39,9 @@ public class SwitchTest extends Test.Container {
 		A, B, C
 	}
 	
-	private Switch<Type, Integer, String> sw;
-	
-	@Override
-	public Procedure beforeEach() {
-		return () -> {
-			this.sw = new Switch<>();
-		};
+	private Switch<Type, Integer, String> getSwitch() {
+		return new Switch<>();
 	}
-	
-	@Override
-	public Procedure afterEach() {
-		return () -> {
-			this.sw = null;
-		};
-	}
-	
 	
 	
 	// TEST CASES
@@ -65,9 +51,10 @@ public class SwitchTest extends Test.Container {
 		description = "Default handler returns null" 
 	)
 	public void tm_065ACB3A8( Test.Case tc ) {
-		tc.assertIsNull( this.sw.apply( Type.A, 1 ) );
-		tc.assertIsNull( this.sw.apply( Type.B, 2 ) );
-		tc.assertIsNull( this.sw.apply( Type.C, 3 ) );
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		tc.assertIsNull( sw.apply( Type.A, 1 ) );
+		tc.assertIsNull( sw.apply( Type.B, 2 ) );
+		tc.assertIsNull( sw.apply( Type.C, 3 ) );
 	}
 		
 	@Test.Impl( 
@@ -75,12 +62,13 @@ public class SwitchTest extends Test.Container {
 		description = "Throws AppException when handler raises exception" 
 	)
 	public void tm_00BEB3662( Test.Case tc ) {
-		this.sw.addCase( Type.A, n -> { return "A"; } )
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		sw.addCase( Type.A, n -> { return "A"; } )
 			.addCase( Type.B, n -> { return "B" + 1/n; } );
 
-		this.sw.apply( Type.A, 0 );
+		sw.apply( Type.A, 0 );
 		tc.expectError( AppException.class );
-		this.sw.apply( Type.B, 0 );
+		sw.apply( Type.B, 0 );
 	}
 		
 	@Test.Impl( 
@@ -88,8 +76,9 @@ public class SwitchTest extends Test.Container {
 		description = "Throws AssertionError for null key" 
 	)
 	public void tm_060AEDB6B( Test.Case tc ) {
+		Switch<Type, Integer, String> sw = this.getSwitch();
 		tc.expectError( AssertionError.class );
-		this.sw.apply( null, 1 );
+		sw.apply( null, 1 );
 	}
 		
 	@Test.Impl( 
@@ -97,10 +86,11 @@ public class SwitchTest extends Test.Container {
 		description = "Replaces previously added case" 
 	)
 	public void tm_03EDF885D( Test.Case tc ) {
-		this.sw.addCase( Type.A, n -> { return "orig"; } );
-		tc.assertEqual( "orig", this.sw.apply( Type.A, 0 ) );
-		this.sw.addCase( Type.A, n -> { return "replace"; } );
-		tc.assertEqual( "replace", this.sw.apply( Type.A, 0 ) );
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		sw.addCase( Type.A, n -> { return "orig"; } );
+		tc.assertEqual( "orig", sw.apply( Type.A, 0 ) );
+		sw.addCase( Type.A, n -> { return "replace"; } );
+		tc.assertEqual( "replace", sw.apply( Type.A, 0 ) );
 	}
 		
 	@Test.Impl( 
@@ -108,7 +98,8 @@ public class SwitchTest extends Test.Container {
 		description = "Returns this Switch instance" 
 	)
 	public void tm_066A336EE( Test.Case tc ) {
-		tc.assertEqual( this.sw, this.sw.addCase( Type.A, n -> { return null; } ) );
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		tc.assertEqual( sw, sw.addCase( Type.A, n -> { return null; } ) );
 	}
 		
 	@Test.Impl( 
@@ -116,8 +107,9 @@ public class SwitchTest extends Test.Container {
 		description = "Throws AssertionError for null handler" 
 	)
 	public void tm_065C4CEC1( Test.Case tc ) {
+		Switch<Type, Integer, String> sw = this.getSwitch();
 		tc.expectError( AssertionError.class );
-		this.sw.addCase( Type.A, null );
+		sw.addCase( Type.A, null );
 	}
 		
 	@Test.Impl( 
@@ -125,8 +117,9 @@ public class SwitchTest extends Test.Container {
 		description = "Throws AssertionError for null key" 
 	)
 	public void tm_01BC7C296( Test.Case tc ) {
+		Switch<Type, Integer, String> sw = this.getSwitch();
 		tc.expectError( AssertionError.class );
-		this.sw.addCase( null, n -> { return "fi"; } );
+		sw.addCase( null, n -> { return "fi"; } );
 	}
 		
 	@Test.Impl( 
@@ -134,10 +127,11 @@ public class SwitchTest extends Test.Container {
 		description = "Replaces previously set default" 
 	)
 	public void tm_0CDE0172E( Test.Case tc ) {
-		this.sw.addDefault( n -> { return "orig"; } );
-		tc.assertEqual( "orig", this.sw.apply( Type.A, 0 ) );
-		this.sw.addDefault( n -> { return "replace"; } );
-		tc.assertEqual( "replace", this.sw.apply( Type.A, 0 ) );
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		sw.addDefault( n -> { return "orig"; } );
+		tc.assertEqual( "orig", sw.apply( Type.A, 0 ) );
+		sw.addDefault( n -> { return "replace"; } );
+		tc.assertEqual( "replace", sw.apply( Type.A, 0 ) );
 	}
 		
 	@Test.Impl( 
@@ -145,7 +139,8 @@ public class SwitchTest extends Test.Container {
 		description = "Returns this Switch instance" 
 	)
 	public void tm_0469437EC( Test.Case tc ) {
-		tc.assertEqual( this.sw, this.sw.addDefault( n -> { return null; } ) );
+		Switch<Type, Integer, String> sw = this.getSwitch();
+		tc.assertEqual( sw, sw.addDefault( n -> { return null; } ) );
 	}
 		
 	@Test.Impl( 
@@ -153,14 +148,29 @@ public class SwitchTest extends Test.Container {
 		description = "Throws AssertionError for null handler" 
 	)
 	public void tm_0875F2A3F( Test.Case tc ) {
+		Switch<Type, Integer, String> sw = this.getSwitch();
 		tc.expectError( AssertionError.class );
-		this.sw.addDefault( null );
+		sw.addDefault( null );
 	}
 	
 	
 	
 
 	public static void main( String[] args ) {
-		Test.eval( Switch.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( Switch.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Switch.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

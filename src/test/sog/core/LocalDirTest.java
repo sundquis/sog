@@ -297,6 +297,20 @@ public class LocalDirTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( LocalDir.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( LocalDir.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( LocalDir.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

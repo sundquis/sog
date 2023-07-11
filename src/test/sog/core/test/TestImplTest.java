@@ -168,6 +168,5 @@ public class TestImplTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		Test.eval( TestImpl.class ).showDetails( true ).print();
 	}
 }

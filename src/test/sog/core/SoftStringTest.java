@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 import sog.core.App;
+import sog.core.Procedure;
 import sog.core.SoftString;
 import sog.core.Strings;
 import sog.core.Test;
@@ -42,25 +43,30 @@ import test.sog.core.test.TestCaseTest;
 @Test.Skip( "Container" )
 public class SoftStringTest extends Test.Container {
 	
-	private final int THRESHOLD;
-	private final String LONG_STRING;
-	private final String SHORT_STRING;
-	private final String[] ARGS;
+	private int THRESHOLD;
+	private String LONG_STRING;
+	private String SHORT_STRING;
+	private String[] ARGS;
 	
 	public SoftStringTest() {
 		super( SoftString.class );
-		
-		this.THRESHOLD = this.getSubjectField( null, "THRESHOLD", null );
-		this.LONG_STRING = Strings.leftJustify( "Hello", THRESHOLD, '_' )
-			+ Strings.rightJustify( "world.", THRESHOLD, '_' );
-		this.SHORT_STRING = Strings.leftJustify( "FOO", THRESHOLD/2, '_' );
-		
-		this.ARGS = new String[] {
-			this.LONG_STRING,
-			this.SHORT_STRING,
-			Strings.leftJustify( "Some random string", this.THRESHOLD, '#' ),
-			"abcdefghijklmnopqrstuvwxyz!@#$%^&*()0123456789,<.>/?;:'\\|ABCDEFGHIJKLMNOPQRSTUVWXYZ\"",
-			""
+	}
+	
+	@Override
+	public Procedure beforeAll() {
+		return () -> {
+			this.THRESHOLD = this.getSubjectField( null, "THRESHOLD", null );
+			this.LONG_STRING = Strings.leftJustify( "Hello", THRESHOLD, '_' )
+				+ Strings.rightJustify( "world.", THRESHOLD, '_' );
+			this.SHORT_STRING = Strings.leftJustify( "FOO", THRESHOLD/2, '_' );
+			
+			this.ARGS = new String[] {
+				this.LONG_STRING,
+				this.SHORT_STRING,
+				Strings.leftJustify( "Some random string", this.THRESHOLD, '#' ),
+				"abcdefghijklmnopqrstuvwxyz!@#$%^&*()0123456789,<.>/?;:'\\|ABCDEFGHIJKLMNOPQRSTUVWXYZ\"",
+				""
+			};
 		};
 	}
 	
@@ -96,7 +102,7 @@ public class SoftStringTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "constructor: SoftString(String)", 
-		description = "Strings longer than threshold are soft" 
+		description = "Strings longer or equal to threshold are soft" 
 	)
 	public void tm_0D154678A( Test.Case tc ) {
 		SoftString ss = new SoftString( this.LONG_STRING );
@@ -135,7 +141,7 @@ public class SoftStringTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String SoftString.toString()", 
-		description = "Correct value after collection" 
+		description = "Correct value after collection"
 	)
 	public void tm_08A459B1D( Test.Case tc ) {
 		List<SoftString> strings = new ArrayList<SoftString>();
@@ -153,7 +159,16 @@ public class SoftStringTest extends Test.Container {
 
 		// GC has run. No guarantee about what was collected. SHOULD be one of our bogus soft refs
 		// If a bogus soft ref was collected, the SoftString will retrieve the correct value from the Location
-		tc.assertTrue( strings.stream().map( Object::toString ).anyMatch( this.LONG_STRING::equals ) );
+		//
+		// We look for all SoftString s such that s.soft.get() == null (verifying that this string was collected),
+		// then verify s.location.toString() is LONG_STRING
+		SoftReference<String> soft = null;
+		for ( SoftString ss : strings ) {
+			soft = this.getSubjectField( ss, "soft", null );
+			if ( soft.get() == null ) {
+				tc.assertEqual( this.LONG_STRING, this.getSubjectField( ss, "location", null ).toString() );
+			}
+		}
 	}
 		
 	@Test.Impl( 
@@ -346,6 +361,20 @@ public class SoftStringTest extends Test.Container {
 
 
 	public static void main( String[] args ) {
-		Test.eval( SoftString.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( SoftString.class )
+			.concurrent( true )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( SoftString.class )
+			.concurrent( false )
+			.showDetails( true )
+			.print();
+		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 }

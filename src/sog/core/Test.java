@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 import sog.core.test.TestSubject;
-import sog.core.test.Result;
 import sog.core.test.TestSet;
 
 /**
@@ -347,6 +346,19 @@ public class Test {
 			return this.subjectClass;
 		}
 		
+		/** 
+		 * The procedure to be called before any method invocations.
+		 * 
+		 * Note: Formerly initialization code was placed in the Container constructor, but this
+		 * constructor is called while tests are being assembled (before tests are run) and
+		 * was interfering with the Test framework. Any remaining code in constructors should
+		 * be moved to the beforeAll Procedure.
+		 */
+		@Test.Decl( "Default is NOOP" )
+		public Procedure beforeAll() {
+			return Procedure.NOOP;
+		}
+		
 		/** The procedure to be called before each method invocation. */
 		@Test.Decl( "Default is NOOP" )
 		public Procedure beforeEach() {
@@ -530,6 +542,9 @@ public class Test {
 		
 		/** Used to scale the relative importance of the test case */
 		int weight() default 1;
+
+		/** Used to determine if cases should be run concurrently */
+		boolean threadsafe() default true;
 		
 	}
 	
@@ -684,13 +699,13 @@ public class Test {
 	
 	/** Convenience method to evaluate and print results for one subject class. */
 	@Test.Decl( "Throws AssertionError for null subject" )
-	public static Result eval( Class<?> subject ) {
+	public static TestSubject eval( Class<?> subject ) {
 		return TestSubject.forSubject( Assert.nonNull( subject ) );
 	}
 	
 	/** Convenience method to evaluate and print results for the package containing the given subject class. */
 	@Test.Decl( "Throws AssertionError for null subject" )
-	public static Result evalPackage( Class<?> subject ) {
+	public static TestSet evalPackage( Class<?> subject ) {
 		return TestSet.forPackage( Assert.nonNull( subject ) );
 	}
 	

@@ -36,14 +36,6 @@ Multiline comment
 		<property name="safeMode" value="true" />
 	</class>
  
- 	<!-- Properties that alter printing behavior -->
-	<class fullname="sog.core.test.Result">
-		<property name="showDetails" value="true" />
-		<property name="concurrentSubjects" value="false"/>
-		<property name="concurrentSets" value="false"/>
-	</class>
-
-
     <!-- Properties for App -->
     <class fullname="sog.core.App">
         <property name="description" value="Developmental version of application framework" />

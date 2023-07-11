@@ -242,8 +242,8 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestSubject TestSubject.forSubject(Class)", 
-		description = "If a test container was constructed afterAll is called after all cases have run" 
+		member = "method: void TestSubject.run()", 
+		description = "If there are no errors afterAll is called after all cases have run" 
 	)
 	public void tm_0C883E562( Test.Case tc ) {
 		TestSubject.forSubject( AfterAllCalled.class );
@@ -296,7 +296,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestSubject TestSubject.forSubject(Class)", 
+		member = "method: void TestSubject.run()", 
 		description = "If there are any errors all test cases are counted as failures" 
 	)
 	public void tm_0CE25B846( Test.Case tc ) {
@@ -305,7 +305,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestSubject TestSubject.forSubject(Class)", 
+		member = "method: void TestSubject.run()", 
 		description = "If there are any errors no test cases are run" 
 	)
 	public void tm_0CADCECD0( Test.Case tc ) {
@@ -314,7 +314,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestSubject TestSubject.forSubject(Class)", 
+		member = "method: void TestSubject.run()", 
 		description = "If there are no errors all test cases are run" 
 	)
 	public void tm_08A2F76A7( Test.Case tc ) {
@@ -407,7 +407,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: TestSubject TestSubject.forSubject(Class)", 
+		member = "method: void TestSubject.run()", 
 		description = "Unimplemented test declarations count as test failures" 
 	)
 	public void tm_05E38A64D( Test.Case tc ) {
@@ -588,23 +588,59 @@ public class TestSubjectTest extends Test.Container {
 		tr.print( null );
 	}
 	
-	@Test.Impl( 
-		member = "method: void TestSubject.print()", 
-		description = "Prints all relevant information" 
-	)
-	public void tm_0EA51065F( Test.Case tc ) {
-		tc.addMessage( "Manually verified" );
-		tc.assertPass();
-	}
-
-
-		
-		
+    @Test.Impl( 
+    	member = "method: void TestSubject.run()", 
+    	description = "If there are no errors beforeAll is called before any cases have run" 
+    )
+    public void tm_0ACCB12F5( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: boolean TestSubject.equals(Object)", 
+    	description = "If compareTo not zero then not equal" 
+    )
+    public void tm_01554D9E6( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: boolean TestSubject.equals(Object)", 
+    	description = "If compareTo zero then equal" 
+    )
+    public void tm_0CCE3E640( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: boolean TestSubject.noErorrs()", 
+    	description = "False after error" 
+    )
+    public void tm_0328F7955( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: int TestSubject.compareTo(TestSubject)", 
+    	description = "Alphabetic by subject classname" 
+    )
+    public void tm_0114C74A4( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: int TestSubject.hashCode()", 
+    	description = "If equal then same hashCode" 
+    )
+    public void tm_0E7104431( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
 		
 
 	public static void main( String[] args ) {
-		Test.eval( TestSubject.class ).showDetails( true ).print();
 	}
+	
+	
 }
 
 @Test.Subject( ".TEST" )

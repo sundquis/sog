@@ -46,6 +46,10 @@ public class A {
 		return Secondary.getLocationSecondary( prefix );
 	}
 	
+	public static Stream<String> getLocationException( String prefix ) {
+		return Secondary.getLocationExceptionSecondary( prefix );
+	}
+	
 	public static Stream<String> getLocationException() {
 		return Secondary.getLocationExceptionSecondary();
 	}
@@ -71,6 +75,10 @@ class Secondary {
 
 	static Stream<String> getLocationExceptionSecondary() {
 		return App.get().getLocation( new Exception() );
+	}
+	
+	static Stream<String> getLocationExceptionSecondary( String prefix ) {
+		return App.get().getLocation( new Exception(), prefix );
 	}
 	
 	@Override public String toString() {
