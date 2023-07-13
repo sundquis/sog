@@ -1225,7 +1225,7 @@ public class TestCaseTest extends Test.Container {
     )
     public void tm_0144F6DBF( Test.Case tc ) {
     	StringOutputStream sos = new StringOutputStream();
-    	this.noop.assertEqual( "foo", "bar" ); String location = App.get().getLocation( "test.sog.core.test.TestCaseTest" ).findFirst().get();
+    	this.noop.assertEqual( "foo", "bar" ); String location = App.get().getLocationStarting( "test.sog.core.test.TestCaseTest" ).findFirst().get();
     	this.noop.print( new IndentWriter( sos ) ); 
     	tc.assertTrue( sos.toString().contains( location ) );
     }

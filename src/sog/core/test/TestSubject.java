@@ -234,9 +234,15 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 			out.increaseIndent();
 			Arrays.stream( this.details ).forEach( out::println );
 			if ( this.error != null ) {
-				out.printErr( this.error, "sog" );
+				out.printErr( this.error, "^sog.*|^test.*" );
 			}
 			out.decreaseIndent();
+		}
+		
+		@Override
+		@Test.Decl( "Includes error description" )
+		public String toString( ) {
+			return this.description;
 		}
 		
 	}
@@ -443,12 +449,14 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 			this.container.beforeAll().exec();
 			this.runTests();
 			this.container.afterAll().exec();
+		} else {
+			this.failCount += this.testCases.size();
 		}
 		
 		this.hasRun = true;
 		return this;
 	}
-
+	
 	private void runTests() {
 		
 		Function<TestCase, TestCase> mapper = (tc) -> { tc.run(); return tc; };
@@ -622,6 +630,5 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	public int hashCode() {
 		return this.getLabel().hashCode();
 	}
-
 
 }

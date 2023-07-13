@@ -76,7 +76,7 @@ public class Concurrent implements App.OnShutdown {
 					"WARNING: Potential deadlock identified.",
 					"In Concurrent, calling thread is a Worker thread:"
 				).map( s -> ">>> " + s ).forEach( System.err::println );
-				App.get().getLocation( "sog" ).limit( 15L ).map( s -> "\t" + s ).forEach( System.err::println );
+				App.get().getLocationStarting( "sog" ).limit( 15L ).map( s -> "\t" + s ).forEach( System.err::println );
 			}
 		}
 		

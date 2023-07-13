@@ -18,6 +18,7 @@
  */
 package test.sog.core.test.foo;
 
+import sog.core.Procedure;
 import sog.core.Test;
 
 /**
@@ -33,13 +34,27 @@ public class C1 {
 	@Test.Skip( "container" )
 	public static class TEST extends Test.Container implements Sleep {
 		
+		private static String ranFirst = null;
+		
+		public static String getRanFirst() { return TEST.ranFirst; }
+		
+		private static synchronized void setRanFirst( String me ) {
+			if ( TEST.ranFirst == null ) {
+				TEST.ranFirst = me;
+			}
+		}
+		
 		TEST() { super( C1.class ); }
+		
+		public Procedure beforeAll() {
+			return () -> { TEST.setRanFirst( "beforeAll" ); };
+		}
 
 		@Test.Impl( member = "constructor: C1()", description = "fail w = 2", weight = 2 )
-		public void tm_0A4759247( Test.Case tc ) { this.sleep( 2L ); tc.assertTrue( false ); }
+		public void tm_0A4759247( Test.Case tc ) { TEST.setRanFirst( "one" ); this.sleep( 2L ); tc.assertTrue( false ); }
 		
 		@Test.Impl( member = "method: void C1.m()", description = "pass w = 3", weight = 3 )
-		public void tm_0374FA689( Test.Case tc ) { this.sleep( 3L ); tc.assertTrue( true ); }
+		public void tm_0374FA689( Test.Case tc ) { TEST.setRanFirst( "two" ); this.sleep( 3L ); tc.assertTrue( true ); }
 	}
 	
 }

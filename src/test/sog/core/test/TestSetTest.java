@@ -478,7 +478,7 @@ public class TestSetTest extends Test.Container {
     
     @Test.Impl( 
     	member = "method: TestSet TestSet.concurrent(boolean)", 
-    	description = "Returns this TestSubject instance to allow chaining" 
+    	description = "Returns this TestSubject instance to allow chaining"
     )
     public void tm_02807334C( Test.Case tc ) {
     	TestSet set = new TestSet( "testing" );
@@ -487,7 +487,8 @@ public class TestSetTest extends Test.Container {
     
     @Test.Impl( 
     	member = "method: TestSet TestSet.concurrent(boolean)", 
-    	description = "When concurrent is true TestSubject instances use worker threads to run tests" 
+    	description = "When concurrent is true TestSubject instances use worker threads to run tests",
+    	threadsafe = false 
     )
     public void tm_064B69EAF( Test.Case tc ) {
     	TestSet set = TestSet.forPackage( test.sog.core.test.bar.ConcurrentTests.class ).concurrent( true );
@@ -498,8 +499,9 @@ public class TestSetTest extends Test.Container {
     	// but if we are also running concurrently our thread and these threads will
     	// all be Worker threads. NOTE: In safeMode, this will result in error messages warning
     	// about potential deadlock printed to std.err.
-    	tc.assertTrue( ConcurrentTests.TEST.getThreads().size() > 1 );
-    	ConcurrentTests.TEST.getThreads().stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
+    	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
+    	tc.assertTrue( threads.size() > 1 );
+    	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
     
     @Test.Impl( 

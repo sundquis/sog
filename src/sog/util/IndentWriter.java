@@ -105,13 +105,13 @@ public class IndentWriter {
 	@Test.Decl( "Return this IndentWriter to allow chaining" )
 	@Test.Decl( "Throws Assertion Error for null error" )
 	@Test.Decl( "Details of the error are included" )
-	@Test.Decl( "Elements have classes matching the given class name prefix" )
-	@Test.Decl( "Throws AssertionError for null prefix" )
-	@Test.Decl( "Prefix can be empty" )
-	public IndentWriter printErr( Throwable error, String prefix ) {
+	@Test.Decl( "Elements have classes matching the given regexp" )
+	@Test.Decl( "Throws AssertionError for null regexp" )
+	@Test.Decl( "regexp can be empty" )
+	public IndentWriter printErr( Throwable error, String regexp ) {
 		this.println( "Error: " + error );
 		this.increaseIndent();
-		App.get().getLocation( error, prefix ).forEach( this::println );
+		App.get().getLocationMatching( error, regexp ).forEach( this::println );
 		this.decreaseIndent();
 		
 		Throwable cause = error.getCause();

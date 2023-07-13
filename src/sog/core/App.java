@@ -402,15 +402,15 @@ public class App implements Runnable {
 	 * Return a stream of file locations corresponding to the portion of the stack of an executing 
 	 * program that corresponds to classes with the given prefix.
 	 */
-	@Test.Decl( "Throws AssertionError for null prefix" )
-	@Test.Decl( "Throws AssertionError for empty prefix" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Throws AssertionError for null prefix" )
+	@Test.Decl( "Throws AssertionError for empty prefix" )
 	@Test.Decl( "Elements are file links" )
 	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the calling stack" )
 	@Test.Decl( "Elements have classes matching the given class name prefix" )
-	public Stream<String> getLocation( String prefix ) {
+	public Stream<String> getLocationStarting( String prefix ) {
 		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
 			.filter( sf -> sf.getClassName().startsWith( Assert.nonEmpty( prefix ) ) )
 			.map( Location::new )
@@ -420,28 +420,27 @@ public class App implements Runnable {
 	}
 	
 	
-
 	/**
-	 * Return a stream of file locations corresponding to the stack trace elements of the
-	 * given Throwable object.
+	 * Return a stream of file locations corresponding to the portion of the stack of an executing 
+	 * program that corresponds to classes that match the given regexp.
 	 */
-	@Test.Decl( "Throws AssertionError for null Throwable" )
+	@Test.Decl( "Throws AssertionError for null regexp" )
+	@Test.Decl( "Throws AssertionError for empty regexp" )
 	@Test.Decl( "Return is non-null" )
 	@Test.Decl( "Return is not terminated" )
-	@Test.Decl( "Return can be empty" )
 	@Test.Decl( "Elements are file links" )
 	@Test.Decl( "Links work for secondary classes" )
-	@Test.Decl( "Elements correspond to the stack trace" )
-	@Test.Decl( "Elements have classes matching the given class name prefix" )
-	@Test.Decl( "Throws AssertionError for null prefix" )
-	@Test.Decl( "Prefix can be empty" )
-	public Stream<String> getLocation( Throwable th, String prefix ) {
-		Assert.nonNull( prefix );
-		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
-			.filter( (ste) -> ste.getClassName().startsWith( prefix ) )
+	@Test.Decl( "Elements correspond to the calling stack" )
+	@Test.Decl( "Elements have classes matching the given regexp" )
+	public Stream<String> getLocationMatching( String regexp ) {
+		return StackWalker.getInstance( Option.RETAIN_CLASS_REFERENCE ).walk( s -> s
+			.filter( sf -> sf.getClassName().matches( Assert.nonEmpty( regexp ) ) )
 			.map( Location::new )
-			.map( Location::toString );
+			.map( Location::toString )
+			.collect( Collectors.toList() )
+		).stream();
 	}
+
 	
 
 	/**
@@ -455,7 +454,52 @@ public class App implements Runnable {
 	@Test.Decl( "Links work for secondary classes" )
 	@Test.Decl( "Elements correspond to the stack trace" )
 	public Stream<String> getLocation( Throwable th ) {
-		return this.getLocation( th, "" );
+		return this.getLocationStarting( th, "" );
+	}
+	
+
+	/**
+	 * Return a stream of file locations corresponding to the portion of the stack of an executing 
+	 * program that corresponds to classes with the given prefix.
+	 */
+	@Test.Decl( "Throws AssertionError for null Throwable" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Throws AssertionError for null prefix" )
+	@Test.Decl( "Prefix can be empty" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links work for secondary classes" )
+	@Test.Decl( "Elements correspond to the calling stack" )
+	@Test.Decl( "Elements have classes matching the given class name prefix" )
+	public Stream<String> getLocationStarting( Throwable th, String prefix ) {
+		Assert.nonNull( prefix );
+		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
+			.filter( (ste) -> ste.getClassName().startsWith( prefix ) )
+			.map( Location::new )
+			.map( Location::toString );
+	}
+	
+
+	/**
+	 * Return a stream of file locations corresponding to the portion of the stack of an executing 
+	 * program that corresponds to classes that match the given regexp.
+	 */
+	@Test.Decl( "Throws AssertionError for null Throwable" )
+	@Test.Decl( "Throws AssertionError for null regexp" )
+	@Test.Decl( "Prefix can be empty" )
+	@Test.Decl( "Return is non-null" )
+	@Test.Decl( "Return can be empty" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Elements are file links" )
+	@Test.Decl( "Links work for secondary classes" )
+	@Test.Decl( "Elements correspond to the calling stack" )
+	@Test.Decl( "Elements have classes matching the given regexp" )
+	public Stream<String> getLocationMatching( Throwable th, String regexp ) {
+		Assert.nonNull( regexp );
+		return Arrays.stream( Assert.nonNull( th ).getStackTrace() )
+			.filter( (ste) -> ste.getClassName().matches( regexp ) )
+			.map( Location::new )
+			.map( Location::toString );
 	}
 	
 

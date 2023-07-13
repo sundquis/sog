@@ -678,7 +678,7 @@ public class AppTest extends Test.Container{
 		description = "Elements are file links" 
 	)
 	public void tm_01CB2DCE7( Test.Case tc ) {
-		App.get().getLocation( "sog.core" ).forEach( tc::addMessage );
+		App.get().getLocationStarting( "sog.core" ).forEach( tc::addMessage );
 		tc.addMessage( "  " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Inspect and test previous links that all start with 'sog.core'" ); /*
@@ -697,7 +697,7 @@ public class AppTest extends Test.Container{
 		tc.addMessage( sos.toString() );
 		tc.addMessage( " " );
 		tc.addMessage( "LOCATIONS starting with sog.core:" );
-		App.get().getLocation( "sog.core" ).forEach( tc::addMessage );
+		App.get().getLocationStarting( "sog.core" ).forEach( tc::addMessage );
 		tc.addMessage( "  " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
@@ -712,7 +712,7 @@ public class AppTest extends Test.Container{
 	public void tm_0F8318AAC( Test.Case tc ) {
 		final String prefix = "sog";
 		Consumer<String> process = s -> tc.assertTrue( s.startsWith( prefix ) );
-		App.get().getLocation( prefix ).forEach( process );
+		App.get().getLocationStarting( prefix ).forEach( process );
 	}
 		
 	@Test.Impl( 
@@ -734,7 +734,7 @@ public class AppTest extends Test.Container{
 		description = "Return is non-null" 
 	)
 	public void tm_024320886( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocation( "sog" ) );
+		tc.assertNonNull( App.get().getLocationStarting( "sog" ) );
 	}
 		
 	@Test.Impl( 
@@ -742,7 +742,7 @@ public class AppTest extends Test.Container{
 		description = "Return is not terminated" 
 	)
 	public void tm_0F44BBC4F( Test.Case tc ) {
-		App.get().getLocation( "sog" ).map( Function.identity() );
+		App.get().getLocationStarting( "sog" ).map( Function.identity() );
 		tc.assertPass();
 	}
 		
@@ -752,7 +752,7 @@ public class AppTest extends Test.Container{
 	)
 	public void tm_0E83961BC( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		App.get().getLocation( "" );
+		App.get().getLocationStarting( "" );
 	}
 		
 	@Test.Impl( 
@@ -762,7 +762,7 @@ public class AppTest extends Test.Container{
 	public void tm_0CF000FCA( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		String prefix = null;
-		App.get().getLocation( prefix );
+		App.get().getLocationStarting( prefix );
 	}
 		
 	@Test.Impl( 
@@ -771,7 +771,7 @@ public class AppTest extends Test.Container{
 	)
 	public void tm_0901581E8( Test.Case tc ) {
 		Exception e = new Exception();
-		App.get().getLocation( e, "sog" ).forEach( tc::addMessage );
+		App.get().getLocationStarting( e, "sog" ).forEach( tc::addMessage );
 		tc.addMessage( "  " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
@@ -791,7 +791,7 @@ public class AppTest extends Test.Container{
 		tc.addMessage( sos.toString() );
 		tc.addMessage( " " );
 		tc.addMessage( "LOCATION:" );
-		App.get().getLocation( e, "sog" ).forEach( tc::addMessage );
+		App.get().getLocationStarting( e, "sog" ).forEach( tc::addMessage );
 		tc.addMessage( "  " );
 		// TOGGLE:
 		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
@@ -817,7 +817,7 @@ public class AppTest extends Test.Container{
 		description = "Return is non-null" 
 	)
 	public void tm_0CC8A86E5( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocation( new Throwable(), "test" ) );
+		tc.assertNonNull( App.get().getLocationStarting( new Throwable(), "test" ) );
 	}
 		
 	@Test.Impl( 
@@ -825,7 +825,7 @@ public class AppTest extends Test.Container{
 		description = "Return is not terminated" 
 	)
 	public void tm_0ED3DB76E( Test.Case tc ) {
-		App.get().getLocation( new Throwable(), "test" ).map( Function.identity() );
+		App.get().getLocationStarting( new Throwable(), "test" ).map( Function.identity() );
 		tc.assertPass();
 	}
 		
@@ -836,7 +836,7 @@ public class AppTest extends Test.Container{
 	public void tm_03BC3785D( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Throwable t = null;
-		App.get().getLocation( t, "test" );
+		App.get().getLocationStarting( t, "test" );
 	}
 	
     @Test.Impl( 
@@ -869,7 +869,7 @@ public class AppTest extends Test.Container{
     )
     public void tm_0A9184DA9( Test.Case tc ) {
 		Exception e = new Exception();
-		tc.assertEqual( 0, App.get().getLocation( e, "bogus" ).collect( Collectors.toList() ).size() );
+		tc.assertEqual( 0, App.get().getLocationStarting( e, "bogus" ).collect( Collectors.toList() ).size() );
     }
 
     @Test.Impl( 
@@ -928,7 +928,7 @@ public class AppTest extends Test.Container{
     )
     public void tm_0144A68B0( Test.Case tc ) {
     	String prefix = "test";
-    	List<String> elements = App.get().getLocation( new Exception(), prefix ).collect( Collectors.toList() );
+    	List<String> elements = App.get().getLocationStarting( new Exception(), prefix ).collect( Collectors.toList() );
     	tc.assertFalse( elements.isEmpty() );
     	elements.forEach( s -> tc.assertTrue( s.startsWith( prefix ) ) );
     }
@@ -938,7 +938,7 @@ public class AppTest extends Test.Container{
     	description = "Prefix can be empty" 
     )
     public void tm_0BB502807( Test.Case tc ) {
-    	App.get().getLocation( new Exception(), "" );
+    	App.get().getLocationStarting( new Exception(), "" );
     	tc.assertPass();
     }
     
@@ -948,7 +948,7 @@ public class AppTest extends Test.Container{
     )
     public void tm_0CCF3F746( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
-    	App.get().getLocation( new Exception(), null );
+    	App.get().getLocationStarting( new Exception(), null );
     }
 		
 	@Test.Impl( 

@@ -70,7 +70,7 @@ class Secondary {
 	}
 
 	static Stream<String> getLocationSecondary( String prefix ) {
-		return App.get().getLocation( prefix );
+		return App.get().getLocationStarting( prefix );
 	}
 
 	static Stream<String> getLocationExceptionSecondary() {
@@ -78,7 +78,7 @@ class Secondary {
 	}
 	
 	static Stream<String> getLocationExceptionSecondary( String prefix ) {
-		return App.get().getLocation( new Exception(), prefix );
+		return App.get().getLocationStarting( new Exception(), prefix );
 	}
 	
 	@Override public String toString() {

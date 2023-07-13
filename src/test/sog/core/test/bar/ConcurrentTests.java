@@ -56,6 +56,7 @@ public class ConcurrentTests {
 	@Test.Decl( "Test 7" )
 	@Test.Decl( "Test 8" )
 	@Test.Decl( "Test 9" )
+	@Test.Decl( "Not Thread Safe" )
 	public void method2() {}
 
 	@Test.Skip( "Container" )
@@ -68,8 +69,14 @@ public class ConcurrentTests {
 		private static Set<Thread> implThreads = Collections.synchronizedSet( new HashSet<>() );
 		
 		public static Set<Thread> getThreads() {
-			return ConcurrentTests.TEST.implThreads;
+			Set<Thread> result = new HashSet<Thread>( ConcurrentTests.TEST.implThreads );
+			ConcurrentTests.TEST.implThreads.clear();  // Reset some multiple tests can use this.
+			return result;
 		}
+		
+		private static Thread threadsafeFalseThread = null;
+		
+		public static Thread getThreadsafeFalseThread() { return TEST.threadsafeFalseThread; }
 		
 		
         @Test.Impl( member = "method: void ConcurrentTests.method1()", description = "Test 0" )
@@ -132,16 +139,12 @@ public class ConcurrentTests {
         @Test.Impl( member = "method: void ConcurrentTests.method2()", description = "Test 9" )
         public void tm_02A88D2D0( Test.Case tc ) { implThreads.add( Thread.currentThread() ); tc.assertPass(); }
 
+        @Test.Impl( 
+        	member = "method: void ConcurrentTests.method2()", 
+        	description = "Not Thread Safe",
+        	threadsafe = false
+        )
+        public void tm( Test.Case tc ) { threadsafeFalseThread = Thread.currentThread(); tc.assertPass(); }
 	}
 	
-	
-	public static void main( String[] args ) {
-		Test.evalPackage( ConcurrentTests.class )
-			.concurrent( true )
-			.showDetails( true )
-			.showDetails( true )
-			.print();
-		
-		ConcurrentTests.TEST.getThreads().forEach( System.out::println );
-	}
 }

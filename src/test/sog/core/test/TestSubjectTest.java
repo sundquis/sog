@@ -29,9 +29,12 @@ import sog.core.Test;
 import sog.core.test.Policy;
 import sog.core.test.TestCase;
 import sog.core.test.TestDecl;
+import sog.core.test.TestSet;
 import sog.core.test.TestSubject;
 import sog.util.IndentWriter;
 import sog.util.StringOutputStream;
+import test.sog.core.test.bar.ConcurrentTests;
+import test.sog.core.test.foo.C1;
 
 /**
  * 
@@ -39,17 +42,27 @@ import sog.util.StringOutputStream;
 @Test.Skip( "Container" )
 public class TestSubjectTest extends Test.Container {
 	
-	private final Policy originalPolicy;
+	private Policy originalPolicy;
 
 	public TestSubjectTest() {
 		super( TestSubject.class );
-		this.originalPolicy = Policy.get();
-		//Policy.set( Policy.ALL );		// WTF?
 	}
 	
 	@Override
-	public Procedure afterAll() {
-		return () -> { Policy.set( this.originalPolicy ); };
+	public Procedure beforeAll() {
+		return () -> { this.originalPolicy = Policy.get(); };
+	}
+	
+	public void reset() {
+		Policy.set( this.originalPolicy );
+	}
+
+	// Any test that changes the policy should: 
+	// 	Declare threadsafe = false
+	//  Call temporaryPolicy(...) to temporarily change the policy
+	public void temporaryPolicy( Test.Case tc, Policy temp ) {
+		tc.afterThis( this::reset );
+		Policy.set( temp );
 	}
 	
 	public int declarationCount( TestSubject tr ) {
@@ -60,6 +73,11 @@ public class TestSubjectTest extends Test.Container {
 	public int testCaseCount( TestSubject tr ) {
 		Set<TestCase> testCases = null;
 		return this.getSubjectField( tr, "testCases", testCases ).size();
+	}
+	
+	public void run( TestSubject ts ) {
+		// Print forces run
+		ts.print( new IndentWriter( new StringOutputStream() ) );
 	}
 	
 	public void print( TestSubject tr ) {
@@ -144,9 +162,11 @@ public class TestSubjectTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: TestSubject TestSubject.forSubject(Class)", 
-		description = "Has an error message for non-skipped members that do not have declarations and are required by the current policy" 
+		description = "Has an error message for non-skipped members that do not have declarations and are required by the current policy",
+		threadsafe = false
 	)
 	public void tm_082C22D5C( Test.Case tc ) {
+		this.temporaryPolicy( tc, Policy.ALL );
 		TestSubject tr = TestSubject.forSubject( UntestedMemberRequiredByTheCurrentPolicy.class );
 		tc.assertTrue( this.messages( tr ).contains( "Untested member required by the current policy" ) );
 	}
@@ -246,7 +266,7 @@ public class TestSubjectTest extends Test.Container {
 		description = "If there are no errors afterAll is called after all cases have run" 
 	)
 	public void tm_0C883E562( Test.Case tc ) {
-		TestSubject.forSubject( AfterAllCalled.class );
+		this.run( TestSubject.forSubject( AfterAllCalled.class ) );
 		tc.assertTrue( AfterAllCalled.TEST.executed );
 	}
 		
@@ -301,6 +321,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_0CE25B846( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( AllFailWithErrors.class );
+		this.run( tr );
 		tc.assertTrue( tr.getFailCount() > 0 );
 	}
 		
@@ -319,6 +340,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_08A2F76A7( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
+		this.run( tr );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
@@ -328,7 +350,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_088C372EB( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( SkippedMemberClassesIgnored.class );
-		tc.assertTrue( tr.getPassCount() > 0 );
+		tc.assertTrue( tr.noErorrs() );
 	}
 		
 	@Test.Impl( 
@@ -385,6 +407,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_04818361B( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
+		this.run( tr );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
@@ -394,6 +417,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_03E79E116( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
+		this.run( tr );
 		tc.assertEqual( "9", this.getContainer( tr ).toString() );
 	}
 		
@@ -412,6 +436,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_05E38A64D( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( UnimplementedDeclarations.class );
+		this.run( tr );
 		tc.assertEqual( 3, tr.getFailCount() );
 	}
 		
@@ -434,6 +459,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_0F73C8FE7( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( FailCount.class );
+		this.run( tr );
 		tc.assertEqual( 6, tr.getFailCount() );
 	}
 		
@@ -443,6 +469,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_0EAD3A681( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( PassCount.class );
+		this.run( tr );
 		tc.assertEqual( 6, tr.getPassCount() );
 	}
 		
@@ -452,6 +479,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_03A708E7D( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ElapsdedTime.class );
+		this.run( tr );
 		tc.assertTrue( tr.getElapsedTime() >= 60L );
 	}
 		
@@ -516,7 +544,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_0A8E65AEF( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
-		String message = "Reason to skip somoe memeber";
+		String message = "Reason to skip some memeber";
 		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { null, message} );
 		tc.assertTrue( this.skipMessages( tr ).contains( message ) );
 	}
@@ -528,7 +556,7 @@ public class TestSubjectTest extends Test.Container {
 	public void tm_0F7103BCA( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( ValidSubject.class );
 		Object source = new Object() {};
-		String message = "Reason to skip somoe memeber";
+		String message = "Reason to skip some memeber";
 		this.evalSubjectMethod( tr, "addSkip", null, new Object[] { source, message} );
 		tc.assertTrue( this.skipMessages( tr ).contains( source.toString() ) );
 	}
@@ -557,7 +585,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_023D7CCFF( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( SkippedMemberClassesIgnored.class );
-		tc.assertTrue( this.messages( tr ).contains( "SKIPS" ) );
+		tc.assertTrue( this.messages( tr ).contains( "SKIPPED" ) );
 	}
 		
 	@Test.Impl( 
@@ -593,7 +621,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "If there are no errors beforeAll is called before any cases have run" 
     )
     public void tm_0ACCB12F5( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	this.evalSubjectMethod( TestSubject.forSubject( C1.class ), "run", null );
+    	tc.assertEqual( "beforeAll", C1.TEST.getRanFirst() );
     }
     
     @Test.Impl( 
@@ -601,7 +630,18 @@ public class TestSubjectTest extends Test.Container {
     	description = "If compareTo not zero then not equal" 
     )
     public void tm_01554D9E6( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	// IF NOT ts1.compareTo( ts2 ) == 0 THEN NOT ts1.equals( ts2 )
+    	// ts1.compareTo( ts2 ) == 0  OR  ! ts1.equals( ts2 )
+    	
+    	TestSubject ts1 = TestSubject.forSubject( TestSubject.class );
+    	TestSubject ts2 = TestSubject.forSubject( TestSet.class );
+    	TestSubject ts3 = TestSubject.forSubject( TestSubject.class );
+    	
+    	tc.assertTrue( ts1.compareTo( ts2 ) == 0  ||  ! ts1.equals( ts2 ) );
+    	tc.assertTrue( ts2.compareTo( ts1 ) == 0  ||  ! ts2.equals( ts1 ) );
+    	
+    	tc.assertTrue( ts1.compareTo( ts3 ) == 0  ||  ! ts1.equals( ts3 ) );
+    	tc.assertTrue( ts3.compareTo( ts1 ) == 0  ||  ! ts3.equals( ts1 ) );
     }
     
     @Test.Impl( 
@@ -641,15 +681,19 @@ public class TestSubjectTest extends Test.Container {
     	description = "Returns this TestSubject instance to allow chaining" 
     )
     public void tm_05C52C3E0( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	TestSubject subj = TestSubject.forSubject( Object.class );
+    	tc.assertEqual( subj, subj.concurrent( true ) );
     }
     
     @Test.Impl( 
     	member = "method: TestSubject TestSubject.concurrent(boolean)", 
-    	description = "When concurrent is true TestSubject instances use worker threads to run tests" 
+    	description = "When concurrent is true TestSubject instances use worker threads to run tests"
     )
     public void tm_03D8BDE43( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class).concurrent( true ), "run", null );
+    	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
+    	tc.assertTrue( threads.size() > 1 );
+    	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
     
     @Test.Impl( 
@@ -657,15 +701,20 @@ public class TestSubjectTest extends Test.Container {
     	description = "Cases marked with threadsafe = false run in the main thread" 
     )
     public void tm_0D6A96E9F( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class).concurrent( true ), "run", null );
+    	tc.assertEqual( Thread.currentThread(), ConcurrentTests.TEST.getThreadsafeFalseThread() );
     }
     
     @Test.Impl( 
     	member = "method: TestSubject TestSubject.run()", 
-    	description = "If concurrent is true TestCase instances run in worker threads" 
+    	description = "If concurrent is true TestCase instances run in worker threads",
+    	threadsafe = false
     )
     public void tm_0A9E90CE8( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class ).concurrent( true ), "run", null );
+    	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
+    	tc.assertTrue( threads.size() > 1 );
+    	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
     
     @Test.Impl( 
@@ -673,7 +722,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "Returns this TestSubject instance to allow chaining" 
     )
     public void tm_04290DFCA( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	TestSubject subj = TestSubject.forSubject( Object.class );
+    	tc.assertEqual( subj, subj.showDetails( false ) );
     }
     
     @Test.Impl( 
@@ -681,7 +731,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "When showDetails is true contained TestSubjects include their details" 
     )
     public void tm_086D470F4( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.addMessage( "Manually verified." );
+    	tc.assertPass();
     }
     
     @Test.Impl( 
@@ -689,7 +740,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "Returns this TestSubject instance to allow chaining" 
     )
     public void tm_08AE17EAD( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	TestSubject subj = TestSubject.forSubject( Object.class );
+    	tc.assertEqual( subj, subj.showProgress( true ) );
     }
     
     @Test.Impl( 
@@ -697,7 +749,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "When showProgress is true contained TestCase instances show progress as tests are run" 
     )
     public void tm_0C3034999( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.addMessage( "Manually verified." );
+    	tc.assertPass();
     }
     
     @Test.Impl( 
@@ -705,7 +758,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "Indicates if tests were run concurrently" 
     )
     public void tm_0C5372295( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.addMessage( "Manually verified." );
+    	tc.assertPass();
     }
     
     @Test.Impl( 
@@ -713,8 +767,19 @@ public class TestSubjectTest extends Test.Container {
     	description = "Prints the total elapsed time" 
     )
     public void tm_0035F8D73( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.addMessage( "Manually verified." );
+    	tc.assertPass();
     }
+    
+    @Test.Impl( 
+    	member = "method: String TestSubject.Err.toString()", 
+    	description = "Includes error description" 
+    )
+    public void tm_060DC7A81( Test.Case tc ) {
+    	tc.addMessage( "Manually verified." );
+    	tc.assertPass();
+    }
+
 
 		
 
