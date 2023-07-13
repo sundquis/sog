@@ -73,9 +73,6 @@ public abstract class Result implements Printable {
 	 * Subclass Obligations
 	 */
 	
-	/** Execute the test(s) associated with this Result */
-	protected abstract void run();
-
 	/** Total execution time for Method and framework monitoring. */
 	public abstract long getElapsedTime();
 
@@ -110,7 +107,7 @@ public abstract class Result implements Printable {
 		int totalCount = this.getPassCount() + this.getFailCount();
 		double success = (double) 100 * this.getPassCount() / (totalCount == 0 ? 1 : totalCount);
 		double seconds = (double) this.getElapsedTime() / 1000.0;
-		return String.format( "%s: Success = %.1f%%, Time = %.2fs, Count = %d (P = %d, F = %d)", 
+		return String.format( "%s: Success = %.1f%%, Time = %.2f s, Count = %d (P = %d, F = %d)", 
 			this.label, success, seconds, totalCount, this.getPassCount(), this.getFailCount() );
 	}
 	

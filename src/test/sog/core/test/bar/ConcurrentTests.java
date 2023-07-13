@@ -136,19 +136,12 @@ public class ConcurrentTests {
 	
 	
 	public static void main( String[] args ) {
-		//* Toggle class results
-		//Test.eval( ConcurrentTests.class ).concurrentSubjects( false ).showDetails( true ).print();
-		//*/
-
-		/* Toggle package results
-		// Some tests can fail with multiple threads due to exceeding specified resource limits.
 		Test.evalPackage( ConcurrentTests.class )
-			.concurrentSets( false )
-			.concurrentSubjects( false )
+			.concurrent( true )
+			.showDetails( true )
 			.showDetails( true )
 			.print();
-		//*/
 		
-		//ConcurrentTests.TEST.getThreads().forEach( System.out::println );
+		ConcurrentTests.TEST.getThreads().forEach( System.out::println );
 	}
 }

@@ -37,6 +37,7 @@ import sog.core.Test;
 import sog.util.Concurrent;
 import sog.util.IndentWriter;
 import sog.util.Printable;
+import sog.util.Timed;
 
 /**
  * 		Responsibilities: 
@@ -200,6 +201,8 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	
 	/* If true, print details of the contained TestCase results. */
 	private boolean showDetails = true;
+	
+	private boolean showProgress = false;
 	
 	/* If true, use evaluator Worker threads for the contained TestCase instances. */
 	private boolean concurrent = false;
@@ -411,7 +414,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 				"Member", impl.getMemberName(), "Description", impl.getDescription() );		
 		} else {
 			if ( decl.setImpl( impl ) ) {
-				this.testCases.add( new TestCase( impl, this.container ) );
+				this.testCases.add( new TestCase( impl, this.container ).showProgress( this.showProgress ) );
 			} else {
 				this.addError( null, "Duplicate test implementation", this.containerLocation,
 					"Member", impl.getMemberName(), "Description", impl.getDescription() );
@@ -421,15 +424,16 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	
 	
 	// Properties from runTests()
-	@Override
 	@Test.Decl( "Unimplemented test declarations count as test failures" )
 	@Test.Decl( "If there are any errors no test cases are run" )
 	@Test.Decl( "If there are any errors all test cases are counted as failures" )
 	@Test.Decl( "If there are no errors all test cases are run" )
 	@Test.Decl( "If there are no errors afterAll is called after all cases have run" )
 	@Test.Decl( "If there are no errors beforeAll is called before any cases have run" )
-	protected void run() {
-		if ( this.hasRun ) { return; }
+	@Test.Decl( "If concurrent is true TestCase instances run in worker threads" )
+	@Test.Decl( "Cases marked with threadsafe = false run in the main thread" )
+	protected TestSubject run() {
+		if ( this.hasRun ) { return this; }
 		
 		this.unimplemented = this.declMap.values().stream().filter( TestDecl::unimplemented )
 			.collect( Collectors.toList() );
@@ -442,6 +446,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		}
 		
 		this.hasRun = true;
+		return this;
 	}
 
 	private void runTests() {
@@ -470,6 +475,17 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		this.failCount += result.getFailCount();
 	}
 	
+	
+	@Override
+	@Test.Decl( "Prints the total elapsed time" )
+	@Test.Decl( "Indicates if tests were run concurrently" )
+	public void print() {
+		System.out.println();
+		Timed.Proc tp = Timed.wrap( () -> super.print() );
+		tp.exec();
+		System.out.println( "\n\n" + (this.concurrent ? "CONCURRENT TIME: " : "SERIAL TIME: ") + tp.format() );
+	}
+
 	
 	@Override
 	@Test.Decl( "Throws AssertionError for null writer" )
@@ -535,17 +551,25 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		}
 	}
 	
+	@Test.Decl( "When concurrent is true TestSubject instances use worker threads to run tests" )
 	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
-	@Test.Decl( "If true threadsafe TestCase instances are run concurrently" )
 	public TestSubject concurrent( boolean concurrent ) {
 		this.concurrent = concurrent;
 		return this;
 	}
 
+	@Test.Decl( "When showDetails is true contained TestSubjects include their details" )
 	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
-	@Test.Decl( "If true TestCase details are printed" )
 	public TestSubject showDetails( boolean showDetails ) {
 		this.showDetails = showDetails;
+		return this;
+	}
+	
+	@Test.Decl( "When showProgress is true contained TestCase instances show progress as tests are run" )
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
+	public TestSubject showProgress( boolean showProgress ) {
+		this.showProgress = showProgress;
+		this.testCases.forEach( (tc) -> tc.showProgress( showProgress ) );
 		return this;
 	}
 

@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.IndentWriter;
+import sog.util.Timed;
 
 /**
  * 	Responsibilities:
@@ -62,6 +62,8 @@ public class TestSet extends Result {
 	private final SortedSet<TestSubject> testSubjects = new TreeSet<TestSubject>();
 	
 	private boolean showDetails = false;
+	
+	private boolean showProgress = false;
 	
 	private boolean concurrent = false;
 	
@@ -101,17 +103,14 @@ public class TestSet extends Result {
 		this.skippedClasses.add( className + ": " + reason );
 	}
 
-	@Override
 	@Test.Decl( "Ignored after first call" )
-	@Test.Decl( "If concurrentSets = false and concurrentSubject = false all tests use same thread" )
-	@Test.Decl( "If concurrentSets = true and concurrentSubject = false all tests use same Worker thread" )
-	protected void run() {
-		if ( this.hasRun ) { return; }
+	protected TestSet run() {
+		if ( this.hasRun ) { return this; }
 		
-		Function<TestSubject, TestSubject> mapper = (ts) -> { ts.run(); return ts; };
-		this.testSubjects.stream().map( mapper ).forEach( this::addResult );
-		
+		this.testSubjects.stream().map( TestSubject::run ).forEach( this::addResult );
 		this.hasRun = true;
+		
+		return this;
 	}
 	
 	private void addResult( Result result ) {
@@ -137,6 +136,7 @@ public class TestSet extends Result {
 			this.testSubjects.add( 
 				TestSubject.forSubject( clazz )
 					.showDetails( this.showDetails )
+					.showProgress( this.showProgress )
 					.concurrent( this.concurrent )
 			);
 		} else {
@@ -260,6 +260,16 @@ public class TestSet extends Result {
 	}
 
 	
+	@Override
+	@Test.Decl( "Prints the total elapsed time" )
+	@Test.Decl( "Indicates if tests were run concurrently" )
+	public void print() {
+		System.out.println();
+		Timed.Proc tp = Timed.wrap( () -> super.print() );
+		tp.exec();
+		System.out.println( "\n\n" + (this.concurrent ? "CONCURRENT TIME: " : "SERIAL TIME: ") + tp.format() );
+	}
+
 	/**
 	 * Used to show detailed results.
 	 */
@@ -301,18 +311,31 @@ public class TestSet extends Result {
 	}
 
 
+	@Test.Decl( "When showDetails is true contained TestSubjects include their details" )
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
 	public TestSet showDetails( boolean showDetails ) {
 		this.showDetails = showDetails;
 		this.testSubjects.forEach( (ts) -> ts.showDetails( showDetails ) );
 		return this;
 	}
+	
+
+	@Test.Decl( "When showProgress is true contained TestCase instances show progress as tests are run" )
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
+	public TestSet showProgress( boolean showProgress ) {
+		this.showProgress = showProgress;
+		this.testSubjects.forEach( (ts) -> ts.showProgress( showProgress) );
+		return this;
+	}
 
 
+	@Test.Decl( "When concurrent is true TestSubject instances use worker threads to run tests" )
+	@Test.Decl( "Returns this TestSubject instance to allow chaining" )
 	public TestSet concurrent( boolean concurrent ) {
 		this.concurrent = concurrent;
 		this.testSubjects.forEach( (ts) -> ts.concurrent( concurrent ) );
 		return this;
 	}
-
+	
 	
 }

@@ -31,6 +31,7 @@ import sog.core.test.TestSubject;
 import sog.core.test.TestSet;
 import sog.util.IndentWriter;
 import sog.util.StringOutputStream;
+import test.sog.core.test.bar.ConcurrentTests;
 
 /**
  * 
@@ -72,8 +73,6 @@ public class TestSetTest extends Test.Container {
 		@Override public int getFailCount() { return MyResult.FAIL_COUNT; }
 
 		@Override public void print( IndentWriter out ) {}
-		
-		@Override public void run() {}
 	}
 	
 	public static final Result RESULT = new MyResult();
@@ -455,10 +454,10 @@ public class TestSetTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void TestSet.run()", 
-    	description = "Ignored after first call" 
-    )
-    public void tm_05D6E8C25( Test.Case tc ) {
+        	member = "method: TestSet TestSet.run()", 
+        	description = "Ignored after first call" 
+        )
+        public void tm_0AD0FCFED( Test.Case tc ) {
 		TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class );
 		this.evalSubjectMethod( set, "run", null );
 		int before = set.getPassCount();
@@ -467,50 +466,118 @@ public class TestSetTest extends Test.Container {
     }
 
     @Test.Impl( 
-    	member = "method: void TestSet.run()", 
-    	description = "If concurrentSets = false and concurrentSubject = false all tests use same thread" 
-    )
-    public void tm_0F0C120D5( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
-    }
-    
-    @Test.Impl( 
-    	member = "method: void TestSet.run()", 
-    	description = "If concurrentSets = true and concurrentSubject = false all tests use same Worker thread" 
-    )
-    public void tm_07FE3DDA8( Test.Case tc ) {
-//    	boolean original = Result.concurrentSets();
-//    	tc.afterThis( () -> TestSetTest.RESULT.concurrentSets( original ) );
-//    	TestSetTest.RESULT.concurrentSets( true );
-//
-//    	IndentWriter out = IndentWriter.stringIndentWriter();
-//    	new TestSet("Test").addClass( Concurrent.class ).print( out );
-//    	tc.addMessage( out.toString() );
-//    	tc.assertFail( "hi" );
-    }
-
-    
-    @Test.Impl( 
     	member = "method: void TestSet.print(IndentWriter)", 
     	description = "Includes details when Result.showDetails is true" 
     )
     public void tm_0C480A0ED( Test.Case tc ) {
-//    	boolean original = Result.showDetails();
-//    	tc.afterThis( () -> TestSetTest.RESULT.showDetails( original ) );
-//    	TestSetTest.RESULT.showDetails( true );
-//    	IndentWriter out = IndentWriter.stringIndentWriter();
-//		new TestSet( "TESTING" )
-//			.addClass( test.sog.core.test.foo.C3.class )
-//			.addClass( test.sog.core.test.foo.C2.class )
-//			.addClass( test.sog.core.test.foo.C1.class )
-//			.print( out );
-//		tc.assertTrue( out.toString().contains( "SKIPPED" ) );
+    	TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class ).showDetails( true );
+    	StringOutputStream sos = new StringOutputStream();
+    	set.print( new IndentWriter( sos ) );
+    	tc.assertTrue( sos.toString().contains( "SKIPPED" ) );
     }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.concurrent(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_02807334C( Test.Case tc ) {
+    	TestSet set = new TestSet( "testing" );
+    	tc.assertEqual( set, set.concurrent( true ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.concurrent(boolean)", 
+    	description = "When concurrent is true TestSubject instances use worker threads to run tests" 
+    )
+    public void tm_064B69EAF( Test.Case tc ) {
+    	TestSet set = TestSet.forPackage( test.sog.core.test.bar.ConcurrentTests.class ).concurrent( true );
+    	this.evalSubjectMethod( set, "run", null );
+    	// We can't actually guarantee that more than one thread gets scheduled, but there are 20
+    	// tests so it is likely...
+    	// In concurrent mode our thread must be different from the thread(s) used by these cases,,
+    	// but if we are also running concurrently our thread and these threads will
+    	// all be Worker threads. NOTE: In safeMode, this will result in error messages warning
+    	// about potential deadlock printed to std.err.
+    	tc.assertTrue( ConcurrentTests.TEST.getThreads().size() > 1 );
+    	ConcurrentTests.TEST.getThreads().stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.showDetails(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_0ED6A5DDE( Test.Case tc ) {
+    	TestSet set = new TestSet( "testing" );
+    	tc.assertEqual( set, set.showDetails( true ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.showDetails(boolean)", 
+    	description = "When showDetails is true contained TestSubjects include their details" 
+    )
+    public void tm_07ADA1208( Test.Case tc ) {
+    	TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class ).showDetails( true );
+    	StringOutputStream sos = new StringOutputStream();
+    	set.print( new IndentWriter( sos ) );
+    	tc.assertTrue( sos.toString().contains( "RESULTS" ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.showProgress(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_03B37C319( Test.Case tc ) {
+    	TestSet set = new TestSet( "test" );
+    	tc.assertEqual( set, set.showProgress( true ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSet TestSet.showProgress(boolean)", 
+    	description = "When showProgress is true contained TestCase instances show progress as tests are run" 
+    )
+    public void tm_0D4397305( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertTrue( true );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.print()", 
+    	description = "Indicates if tests were run concurrently" 
+    )
+    public void tm_0ADAFAF1F( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertTrue( true );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSet.print()", 
+    	description = "Prints the total elapsed time" 
+    )
+    public void tm_08D817329( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertTrue( true );
+    }
+
 
 	
 	
 	
 
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestSet.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestSet.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 }

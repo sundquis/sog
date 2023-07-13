@@ -19,7 +19,6 @@
 
 package test.sog.core.test;
 
-import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.test.TestDecl;
 import sog.core.test.TestImpl;
@@ -36,26 +35,15 @@ public class TestDeclTest extends Test.Container {
 		super( TestDecl.class );
 	}
 	
-	private TestDecl decl;
-	private TestImpl impl;
-	
 	private static final String MEMBER_NAME = "MemebrName";
 	private static final String DESCRIPTION = "Description";
 	
-	@Override 
-	public Procedure beforeEach() {
-		return () -> { 
-			this.decl = new TestDecl( MEMBER_NAME, DESCRIPTION );
-			this.impl = TestImpl.forMethod( SomeContainer.class.getDeclaredMethods()[0] );
-		};
+	private TestDecl getDecl() {
+		return new TestDecl( MEMBER_NAME, DESCRIPTION );
 	}
 	
-	@Override
-	public Procedure afterEach() {
-		return () -> { 
-			this.decl = null; 
-			this.impl = null;
-		};
+	private TestImpl getImpl() {
+		return TestImpl.forMethod( SomeContainer.class.getDeclaredMethods()[0] );
 	}
 	
 	public class SomeContainer {
@@ -106,7 +94,8 @@ public class TestDeclTest extends Test.Container {
 		description = "First call returns true"
 	)
 	public void tm_01E20C91E( Test.Case tc ) {
-		tc.assertTrue( this.decl.setImpl( this.impl ) );
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
+		tc.assertTrue( decl.setImpl( impl ) );
 	}
 
 	@Test.Impl( 
@@ -114,8 +103,9 @@ public class TestDeclTest extends Test.Container {
 		description = "Second call returns false" 
 	)
 	public void tm_00BBFC671( Test.Case tc ) {
-		this.decl.setImpl( this.impl );
-		tc.assertFalse( this.decl.setImpl( this.impl ) );
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
+		decl.setImpl( impl );
+		tc.assertFalse( decl.setImpl( impl ) );
 	}
 
 	@Test.Impl( 
@@ -123,8 +113,9 @@ public class TestDeclTest extends Test.Container {
 		description = "Throws AssertionError for null TestImpl" 
 	)
 	public void tm_0E190932E( Test.Case tc ) {
+		TestDecl decl = this.getDecl();
 		tc.expectError( AssertionError.class );
-		this.decl.setImpl( null );
+		decl.setImpl( null );
 	}
 
 	@Test.Impl( 
@@ -132,8 +123,9 @@ public class TestDeclTest extends Test.Container {
 		description = "After setImpl returns false" 
 	)
 	public void tm_03388949E( Test.Case tc ) {
-		this.decl.setImpl( this.impl );
-		tc.assertFalse( this.decl.unimplemented() );
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
+		decl.setImpl( impl );
+		tc.assertFalse( decl.unimplemented() );
 	}
 
 	@Test.Impl( 
@@ -141,7 +133,8 @@ public class TestDeclTest extends Test.Container {
 		description = "Before setImpl returns true" 
 	)
 	public void tm_07DEBD7E4( Test.Case tc ) {
-		tc.assertTrue( this.decl.unimplemented() );
+		TestDecl decl = this.getDecl();
+		tc.assertTrue( decl.unimplemented() );
 	}
 
 	@Test.Impl( 
@@ -149,9 +142,10 @@ public class TestDeclTest extends Test.Container {
 		description = "Output includes Test.Impl" 
 	)
 	public void tm_0F238E18B( Test.Case tc ) {
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
 		StringOutputStream sos = new StringOutputStream();
-		this.decl.setImpl( this.impl );
-		this.decl.print( new IndentWriter( sos ) );
+		decl.setImpl( impl );
+		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( "@Test.Impl" ) );
 	}
 
@@ -160,9 +154,10 @@ public class TestDeclTest extends Test.Container {
 		description = "Output includes description" 
 	)
 	public void tm_0F3CCC7CB( Test.Case tc ) {
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
 		StringOutputStream sos = new StringOutputStream();
-		this.decl.setImpl( this.impl );
-		this.decl.print( new IndentWriter( sos ) );
+		decl.setImpl( impl );
+		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( DESCRIPTION ) );
 	}
 
@@ -171,9 +166,10 @@ public class TestDeclTest extends Test.Container {
 		description = "Output includes member name" 
 	)
 	public void tm_0A99BB420( Test.Case tc ) {
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
 		StringOutputStream sos = new StringOutputStream();
-		this.decl.setImpl( this.impl );
-		this.decl.print( new IndentWriter( sos ) );
+		decl.setImpl( impl );
+		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( MEMBER_NAME ) );
 	}
 
@@ -182,10 +178,11 @@ public class TestDeclTest extends Test.Container {
 		description = "Output includes method name" 
 	)
 	public void tm_01FDC4239( Test.Case tc ) {
+		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
 		StringOutputStream sos = new StringOutputStream();
-		this.decl.setImpl( this.impl );
-		this.decl.print( new IndentWriter( sos ) );
-		tc.assertTrue( sos.toString().contains( this.decl.getMethodName() ) );
+		decl.setImpl( impl );
+		decl.print( new IndentWriter( sos ) );
+		tc.assertTrue( sos.toString().contains( decl.getMethodName() ) );
 	}
 
 	@Test.Impl( 
@@ -193,13 +190,29 @@ public class TestDeclTest extends Test.Container {
 		description = "Throws AssertionError for null IndentWriter" 
 	)
 	public void tm_071B0803F( Test.Case tc ) {
+		TestDecl decl = this.getDecl();
 		tc.expectError( AssertionError.class );
-		this.decl.print( null );
+		decl.print( null );
 	}
 
 	
 	
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestDecl.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestDecl.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 	
 }

@@ -217,6 +217,21 @@ public class TestIdentifierTest extends Test.Container {
 
 	
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestIdentifier.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestIdentifier.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 	
 }

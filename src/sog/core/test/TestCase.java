@@ -152,6 +152,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Initially zero" )
 	private long elapsedTime;
 	
+	private boolean showProgress = false;
+	
 	
 	@Test.Decl( "Throws AssertionError for null TestImpl" )
 	@Test.Decl( "Throws AssertionError for null Test.Container" )
@@ -248,8 +250,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Error in afterEach: unexpectedError is not null" )
 	@Test.Decl( "Error in afterEach: afterThis called" )
 
-	@Override 
-	protected void run() {
+	protected TestCase run() {
 		long start = System.currentTimeMillis();
 		try {
 			this.container.beforeEach().exec();
@@ -284,11 +285,15 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		}
 
 		// Indicates progress
-		TestCase.numTestCase++;
-		System.err.print( "+" );
-		if ( TestCase.numTestCase % 80 == 0 ) {
-			System.err.println();
+		if ( this.showProgress ) {
+			TestCase.numTestCase++;
+			System.err.print( "+" );
+			if ( TestCase.numTestCase % 80 == 0 ) {
+				System.err.println();
+			}
 		}
+		
+		return this;
 	}
 
 
@@ -678,6 +683,12 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		}
 		
 		out.decreaseIndent();
+	}
+
+	@Test.Decl( "Consistent with configured value" )
+	public TestCase showProgress( boolean showProgress ) {
+		this.showProgress = showProgress;
+		return this;
 	}
 	
 	

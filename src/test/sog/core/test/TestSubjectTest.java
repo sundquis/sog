@@ -242,7 +242,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestSubject.run()", 
+		member = "method: TestSubject TestSubject.run()", 
 		description = "If there are no errors afterAll is called after all cases have run" 
 	)
 	public void tm_0C883E562( Test.Case tc ) {
@@ -296,7 +296,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestSubject.run()", 
+		member = "method: TestSubject TestSubject.run()", 
 		description = "If there are any errors all test cases are counted as failures" 
 	)
 	public void tm_0CE25B846( Test.Case tc ) {
@@ -305,7 +305,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestSubject.run()", 
+		member = "method: TestSubject TestSubject.run()", 
 		description = "If there are any errors no test cases are run" 
 	)
 	public void tm_0CADCECD0( Test.Case tc ) {
@@ -314,7 +314,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestSubject.run()", 
+		member = "method: TestSubject TestSubject.run()", 
 		description = "If there are no errors all test cases are run" 
 	)
 	public void tm_08A2F76A7( Test.Case tc ) {
@@ -407,7 +407,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 		
 	@Test.Impl( 
-		member = "method: void TestSubject.run()", 
+		member = "method: TestSubject TestSubject.run()", 
 		description = "Unimplemented test declarations count as test failures" 
 	)
 	public void tm_05E38A64D( Test.Case tc ) {
@@ -589,7 +589,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 	
     @Test.Impl( 
-    	member = "method: void TestSubject.run()", 
+    	member = "method: TestSubject TestSubject.run()", 
     	description = "If there are no errors beforeAll is called before any cases have run" 
     )
     public void tm_0ACCB12F5( Test.Case tc ) {
@@ -635,9 +635,105 @@ public class TestSubjectTest extends Test.Container {
     public void tm_0E7104431( Test.Case tc ) {
     	tc.addMessage( "GENERATED STUB" );
     }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.concurrent(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_05C52C3E0( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.concurrent(boolean)", 
+    	description = "When concurrent is true TestSubject instances use worker threads to run tests" 
+    )
+    public void tm_03D8BDE43( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.run()", 
+    	description = "Cases marked with threadsafe = false run in the main thread" 
+    )
+    public void tm_0D6A96E9F( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.run()", 
+    	description = "If concurrent is true TestCase instances run in worker threads" 
+    )
+    public void tm_0A9E90CE8( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.showDetails(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_04290DFCA( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.showDetails(boolean)", 
+    	description = "When showDetails is true contained TestSubjects include their details" 
+    )
+    public void tm_086D470F4( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.showProgress(boolean)", 
+    	description = "Returns this TestSubject instance to allow chaining" 
+    )
+    public void tm_08AE17EAD( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.showProgress(boolean)", 
+    	description = "When showProgress is true contained TestCase instances show progress as tests are run" 
+    )
+    public void tm_0C3034999( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSubject.print()", 
+    	description = "Indicates if tests were run concurrently" 
+    )
+    public void tm_0C5372295( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void TestSubject.print()", 
+    	description = "Prints the total elapsed time" 
+    )
+    public void tm_0035F8D73( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+
 		
 
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestSubject.class )
+			.concurrent( false )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestSubject.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 	
 	

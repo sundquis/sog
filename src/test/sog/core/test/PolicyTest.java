@@ -130,7 +130,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.ALL", 
     	description = "Constructors are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_01D124A8D( Test.Case tc ) {
 		Policy.set( Policy.ALL );
@@ -143,7 +144,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.ALL", 
     	description = "Fields are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_0EB1ECB8D( Test.Case tc ) {
 		Policy.set( Policy.ALL );
@@ -156,7 +158,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.ALL", 
     	description = "Methods are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_0196C7634( Test.Case tc ) {
 		Policy.set( Policy.ALL );
@@ -169,7 +172,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.DEFAULT", 
     	description = "Non-private executables are required",
-    	weight = 6
+    	weight = 6,
+    	threadsafe = false
     )
     public void tm_034231D3A( Test.Case tc ) {
 		Policy.set( Policy.DEFAULT );
@@ -184,7 +188,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.DEFAULT", 
     	description = "Non-public fields are exempt",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_0FFA1C9F6( Test.Case tc ) {
 		Policy.set( Policy.DEFAULT );
@@ -196,7 +201,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.DEFAULT", 
     	description = "Private executables are exempt",
-    	weight = 2
+    	weight = 2,
+    	threadsafe = false
     )
     public void tm_09160167A( Test.Case tc ) {
 		Policy.set( Policy.DEFAULT );
@@ -206,7 +212,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "field: Policy Policy.DEFAULT", 
-    	description = "Public fields are required" 
+    	description = "Public fields are required",
+    	threadsafe = false
     )
     public void tm_0570F03B6( Test.Case tc ) {
 		Policy.set( Policy.DEFAULT );
@@ -216,7 +223,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.NONE", 
     	description = "Constructors are not required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_07058AF37( Test.Case tc ) {
 		Policy.set( Policy.NONE );
@@ -229,7 +237,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.NONE", 
     	description = "Fields are not required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_0D44AC1F7( Test.Case tc ) {
 		Policy.set( Policy.NONE );
@@ -242,7 +251,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.NONE", 
     	description = "Methods are not required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_03AB837C4( Test.Case tc ) {
 		Policy.set( Policy.NONE );
@@ -255,7 +265,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.STRICT", 
     	description = "Non-private constructors are required",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_08B95DDBE( Test.Case tc ) {
 		Policy.set( Policy.STRICT );
@@ -267,7 +278,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.STRICT", 
     	description = "Non-private fields are required",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_09BD8D77E( Test.Case tc ) {
 		Policy.set( Policy.STRICT );
@@ -279,7 +291,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.STRICT", 
     	description = "Non-private methods are required",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_07FF3E863( Test.Case tc ) {
 		Policy.set( Policy.STRICT );
@@ -291,7 +304,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.VERY_STRICT", 
     	description = "Constructors are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_0D8F4763E( Test.Case tc ) {
 		Policy.set( Policy.VERY_STRICT );
@@ -304,7 +318,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.VERY_STRICT", 
     	description = "Methods are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_00EF7FFE3( Test.Case tc ) {
 		Policy.set( Policy.VERY_STRICT );
@@ -317,7 +332,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "field: Policy Policy.VERY_STRICT", 
     	description = "Non-private fields are required",
-    	weight = 4
+    	weight = 4,
+    	threadsafe = false
     )
     public void tm_0B6C714A1( Test.Case tc ) {
 		Policy.set( Policy.VERY_STRICT );
@@ -340,7 +356,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "method: Policy Policy.get()", 
     	description = "Return is consistent with previous set(Policy)",
-    	weight = 5
+    	weight = 5,
+    	threadsafe = false
     )
     public void tm_0B57EECFC( Test.Case tc ) {
 		for ( Policy p : Policy.values() ) {
@@ -359,7 +376,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageConstructor()", 
-    	description = "True for Policy CONSTRUCTOR" 
+    	description = "True for Policy CONSTRUCTOR",
+    	threadsafe = false
     )
     public void tm_0E77F521A( Test.Case tc ) {
 		Policy.set( Policy.CONSTRUCTOR );
@@ -368,7 +386,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageConstructor()", 
-    	description = "True for Policy PACKAGE" 
+    	description = "True for Policy PACKAGE",
+    	threadsafe = false
     )
     public void tm_064AAADE6( Test.Case tc ) {
 		Policy.set( Policy.PACKAGE );
@@ -377,7 +396,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageField()", 
-    	description = "True for Policy FIELD" 
+    	description = "True for Policy FIELD",
+    	threadsafe = false
     )
     public void tm_007A9499A( Test.Case tc ) {
 		Policy.set( Policy.FIELD );
@@ -386,7 +406,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageField()", 
-    	description = "True for Policy PACKAGE" 
+    	description = "True for Policy PACKAGE" ,
+    	threadsafe = false
     )
     public void tm_0E28520A6( Test.Case tc ) {
 		Policy.set( Policy.PACKAGE );
@@ -395,7 +416,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageMethod()", 
-    	description = "True for Policy METHOD" 
+    	description = "True for Policy METHOD" ,
+    	threadsafe = false
     )
     public void tm_068086B4A( Test.Case tc ) {
 		Policy.set( Policy.METHOD );
@@ -404,7 +426,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePackageMethod()", 
-    	description = "True for Policy PACKAGE" 
+    	description = "True for Policy PACKAGE" ,
+    	threadsafe = false
     )
     public void tm_0375EC2B3( Test.Case tc ) {
 		Policy.set( Policy.PACKAGE );
@@ -413,7 +436,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateConstructor()", 
-    	description = "True for Policy CONSTRUCTOR" 
+    	description = "True for Policy CONSTRUCTOR" ,
+    	threadsafe = false
     )
     public void tm_0FFD3BFFD( Test.Case tc ) {
 		Policy.set( Policy.CONSTRUCTOR );
@@ -422,7 +446,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateConstructor()", 
-    	description = "True for Policy PRIVATE" 
+    	description = "True for Policy PRIVATE" ,
+    	threadsafe = false
     )
     public void tm_009F41B46( Test.Case tc ) {
 		Policy.set( Policy.PRIVATE );
@@ -431,7 +456,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateField()", 
-    	description = "True for Policy FIELD" 
+    	description = "True for Policy FIELD" ,
+    	threadsafe = false
     )
     public void tm_0B9E133FD( Test.Case tc ) {
 		Policy.set( Policy.FIELD );
@@ -440,7 +466,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateField()", 
-    	description = "True for Policy PRIVATE" 
+    	description = "True for Policy PRIVATE" ,
+    	threadsafe = false
     )
     public void tm_01C909446( Test.Case tc ) {
 		Policy.set( Policy.PRIVATE );
@@ -449,7 +476,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateMethod()", 
-    	description = "True for Policy METHOD" 
+    	description = "True for Policy METHOD" ,
+    	threadsafe = false
     )
     public void tm_06BEF48ED( Test.Case tc ) {
 		Policy.set( Policy.METHOD );
@@ -458,7 +486,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePrivateMethod()", 
-    	description = "True for Policy PRIVATE" 
+    	description = "True for Policy PRIVATE" ,
+    	threadsafe = false
     )
     public void tm_0E6782F6D( Test.Case tc ) {
 		Policy.set( Policy.PRIVATE );
@@ -467,7 +496,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedConstructor()", 
-    	description = "True for Policy CONSTRUCTOR" 
+    	description = "True for Policy CONSTRUCTOR" ,
+    	threadsafe = false
     )
     public void tm_0FF080EF2( Test.Case tc ) {
 		Policy.set( Policy.CONSTRUCTOR );
@@ -476,7 +506,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedConstructor()", 
-    	description = "True for Policy PROTECTED" 
+    	description = "True for Policy PROTECTED" ,
+    	threadsafe = false
     )
     public void tm_08521A4E6( Test.Case tc ) {
 		Policy.set( Policy.PROTECTED );
@@ -485,7 +516,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedField()", 
-    	description = "True for Policy FIELD" 
+    	description = "True for Policy FIELD" ,
+    	threadsafe = false
     )
     public void tm_00F848A72( Test.Case tc ) {
 		Policy.set( Policy.FIELD );
@@ -494,7 +526,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedField()", 
-    	description = "True for Policy PROTECTED" 
+    	description = "True for Policy PROTECTED" ,
+    	threadsafe = false
     )
     public void tm_02A8769A6( Test.Case tc ) {
 		Policy.set( Policy.PROTECTED );
@@ -503,7 +536,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedMethod()", 
-    	description = "True for Policy METHOD" 
+    	description = "True for Policy METHOD" ,
+    	threadsafe = false
     )
     public void tm_0E616D622( Test.Case tc ) {
 		Policy.set( Policy.METHOD );
@@ -512,7 +546,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requireProtectedMethod()", 
-    	description = "True for Policy PROTECTED" 
+    	description = "True for Policy PROTECTED" ,
+    	threadsafe = false
     )
     public void tm_0CB252DC3( Test.Case tc ) {
 		Policy.set( Policy.PROTECTED );
@@ -521,7 +556,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicConstructor()", 
-    	description = "True for Policy CONSTRUCTOR" 
+    	description = "True for Policy CONSTRUCTOR" ,
+    	threadsafe = false
     )
     public void tm_089CB5C71( Test.Case tc ) {
 		Policy.set( Policy.CONSTRUCTOR );
@@ -530,7 +566,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicConstructor()", 
-    	description = "True for Policy PUBLIC" 
+    	description = "True for Policy PUBLIC" ,
+    	threadsafe = false
     )
     public void tm_0007D0888( Test.Case tc ) {
 		Policy.set( Policy.PUBLIC );
@@ -539,7 +576,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicField()", 
-    	description = "True for Policy FIELD" 
+    	description = "True for Policy FIELD" ,
+    	threadsafe = false
     )
     public void tm_020A8DE71( Test.Case tc ) {
 		Policy.set( Policy.FIELD );
@@ -548,7 +586,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicField()", 
-    	description = "True for Policy PUBLIC" 
+    	description = "True for Policy PUBLIC" ,
+    	threadsafe = false
     )
     public void tm_078EDA888( Test.Case tc ) {
 		Policy.set( Policy.PUBLIC );
@@ -557,7 +596,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicMethod()", 
-    	description = "True for Policy METHOD" 
+    	description = "True for Policy METHOD" ,
+    	threadsafe = false
     )
     public void tm_03F762661( Test.Case tc ) {
 		Policy.set( Policy.METHOD );
@@ -566,7 +606,8 @@ public class PolicyTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: boolean Policy.requirePublicMethod()", 
-    	description = "True for Policy PUBLIC" 
+    	description = "True for Policy PUBLIC" ,
+    	threadsafe = false
     )
     public void tm_0A6FBC5E9( Test.Case tc ) {
 		Policy.set( Policy.PUBLIC );
@@ -576,7 +617,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "method: boolean Policy.required(Constructor)", 
     	description = "Results correct for constructors",
-    	weight = 8
+    	weight = 8,
+    	threadsafe = false
     )
     public void tm_01E342FA3( Test.Case tc ) {
 		Policy.set( Policy.CONSTRUCTOR );
@@ -604,7 +646,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "method: boolean Policy.required(Field)", 
     	description = "Results correct for fields",
-    	weight = 8
+    	weight = 8,
+    	threadsafe = false
     )
     public void tm_089AF65A3( Test.Case tc ) {
 		Policy.set( Policy.FIELD );
@@ -632,7 +675,8 @@ public class PolicyTest extends Test.Container {
     @Test.Impl( 
     	member = "method: boolean Policy.required(Method)", 
     	description = "Results correct for methods",
-    	weight = 8
+    	weight = 8,
+    	threadsafe = false
     )
     public void tm_0D8359329( Test.Case tc ) {
 		Policy.set( Policy.METHOD );
@@ -669,21 +713,23 @@ public class PolicyTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		/* Toggle class results
+		//* Toggle class results
 		Test.eval( Policy.class )
-			.concurrentSubjects( false )
+			.concurrent( false )
 			.showDetails( true )
+			.showProgress( true )
 			.print();
 		//*/
 		
 		/* Toggle package results
-		// Some tests can fail with multiple threads due to exceeding specified resource limits.
 		Test.evalPackage( Policy.class )
-			.concurrentSets( false )
-			.concurrentSubjects( false )
-			.showDetails( true )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
 			.print();
 		//*/
+		
+		System.out.println( "\nDone!" );
 	}
 
 }

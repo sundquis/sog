@@ -572,7 +572,8 @@ public class TestMemberTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean TestMember.isRequired()", 
-		description = "Constructors: True iff required by Policy" 
+		description = "Constructors: True iff required by Policy",
+		threadsafe = false
 	)
 	public void tm_0CE2B8A43( Test.Case tc ) {
 		Policy.set(  Policy.PUBLIC );
@@ -583,7 +584,8 @@ public class TestMemberTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean TestMember.isRequired()", 
-		description = "Fields: True iff required by Policy" 
+		description = "Fields: True iff required by Policy",
+		threadsafe = false
 	)
 	public void tm_03C5F4643( Test.Case tc ) {
 		Policy.set( Policy.PROTECTED );
@@ -594,7 +596,8 @@ public class TestMemberTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean TestMember.isRequired()", 
-		description = "Methods: True iff required by Policy" 
+		description = "Methods: True iff required by Policy",
+		threadsafe = false
 	)
 	public void tm_062F94DA2( Test.Case tc ) {
 		Policy.set( Policy.PACKAGE );
@@ -829,5 +832,20 @@ public class TestMemberTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestMember.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestMember.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 }

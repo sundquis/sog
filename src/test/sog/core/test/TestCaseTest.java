@@ -52,6 +52,8 @@ public class TestCaseTest extends Test.Container {
 	 * Test.Case tc test cases.
 	 * 
 	 * MyContainer is the Container for TestCase as a subject class.
+	 * 
+	 * Test cases here generally are not threadsafe. For failing cases, try marking "threadsafe = false"
 	 */
 	
 	
@@ -325,7 +327,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "field: Procedure TestCase.afterThis", 
-    	description = "Initially NOOP" 
+    	description = "Initially NOOP",
+    	threadsafe = false
     )
     public void tm_0C5DBD73A( Test.Case tc ) {
     	Procedure afterThis = null;
@@ -343,7 +346,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "field: Test.Container TestCase.container", 
-    	description = "Not null" 
+    	description = "Not null" ,
+    	threadsafe = false
     )
     public void tm_0FF0D5DB2( Test.Case tc ) {
     	Test.Container container = null;
@@ -385,7 +389,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "field: TestImpl TestCase.impl", 
-    	description = "Not null" 
+    	description = "Not null" ,
+    	threadsafe = false
     )
     public void tm_02C91CBDA( Test.Case tc ) {
     	TestImpl impl = null;
@@ -411,7 +416,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: String TestCase.toString()", 
-    	description = "Starts with FAIL if failed" 
+    	description = "Starts with FAIL if failed" ,
+    	threadsafe = false
     )
     public void tm_06AED5866( Test.Case tc ) {
     	TestCase fail = this.getCase( "failMethod" );
@@ -429,7 +435,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: String TestCase.toString()", 
-    	description = "Statrs with OPEN if pass/fail is unknown" 
+    	description = "Statrs with OPEN if pass/fail is unknown" ,
+    	threadsafe = false
     )
     public void tm_03590B1F1( Test.Case tc ) {
     	TestCase open = this.getCase( "openMethod" );
@@ -441,7 +448,8 @@ public class TestCaseTest extends Test.Container {
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
     	description = "Does not alter State",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_0928753F0( Test.Case tc ) {
     	TestCase tstCase = this.getCase( "openMethod" );
@@ -468,7 +476,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0A4F69A10( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -478,7 +487,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
-    	description = "Message is included in details." 
+    	description = "Message is included in details." ,
+    	threadsafe = false
     )
     public void tm_02A38A2F9( Test.Case tc ) {
     	StringOutputStream sos = new StringOutputStream();
@@ -490,7 +500,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
-    	description = "Return is this" 
+    	description = "Return is this",
+    	threadsafe = false
     )
     public void tm_0F908BBA1( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.addMessage( "hi" ) );
@@ -498,7 +509,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
-    	description = "Throws AssertionError for empty message" 
+    	description = "Throws AssertionError for empty message" ,
+    	threadsafe = false
     )
     public void tm_0D3CF612F( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -507,7 +519,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.addMessage(String)", 
-    	description = "Throws AssertionError for null message" 
+    	description = "Throws AssertionError for null message" ,
+    	threadsafe = false
     )
     public void tm_081D045E9( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -517,7 +530,8 @@ public class TestCaseTest extends Test.Container {
     @Test.Impl( 
     	member = "method: Test.Case TestCase.afterThis(Procedure)", 
     	description = "Does not alter State",
-    	weight = 3
+    	weight = 3,
+    	threadsafe = false
     )
     public void tm_0BD36E122( Test.Case tc ) {
     	Procedure p = () -> {};
@@ -546,7 +560,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.afterThis(Procedure)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0CFA62742( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -556,7 +571,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.afterThis(Procedure)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_08CEE9653( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.afterThis( () -> {} ) );
@@ -564,7 +580,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.afterThis(Procedure)", 
-    	description = "Throws AssertionError for null procedure" 
+    	description = "Throws AssertionError for null procedure" ,
+    	threadsafe = false
     )
     public void tm_027E21827( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -573,7 +590,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertEqual(Object, Object)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_08D3ED115( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -583,7 +601,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertEqual(Object, Object)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_06D73DA66( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertEqual( "A", "B" ) );
@@ -591,7 +610,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertEqual(Object, Object)", 
-    	description = "Test fails for inequivalent" 
+    	description = "Test fails for inequivalent" ,
+    	threadsafe = false
     )
     public void tm_0D8688053( Test.Case tc ) {
     	List<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toList() );
@@ -602,7 +622,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertEqual(Object, Object)", 
-    	description = "Test passes for equivalent objects" 
+    	description = "Test passes for equivalent objects" ,
+    	threadsafe = false
     )
     public void tm_0A32ACECA( Test.Case tc ) {
     	Set<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toSet() );
@@ -613,7 +634,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertFalse(boolean)", 
-    	description = "Case fails for true" 
+    	description = "Case fails for true" ,
+    	threadsafe = false
     )
     public void tm_0C3A7304F( Test.Case tc ) {
     	this.noop.assertFalse( true );
@@ -622,7 +644,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertFalse(boolean)", 
-    	description = "Case passes for false" 
+    	description = "Case passes for false" ,
+    	threadsafe = false
     )
     public void tm_0FB86BC0A( Test.Case tc ) {
     	this.noop.assertFalse( false );
@@ -631,7 +654,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertFalse(boolean)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_086BBAB1A( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -641,7 +665,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertFalse(boolean)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_09409DC2B( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertFalse( false ) );
@@ -649,7 +674,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertIsNull(Object)", 
-    	description = "Case fails for non-null object" 
+    	description = "Case fails for non-null object" ,
+    	threadsafe = false
     )
     public void tm_0C2F7CDE0( Test.Case tc ) {
     	this.noop.assertIsNull( "hi" );
@@ -658,7 +684,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertIsNull(Object)", 
-    	description = "Case passes for null object" 
+    	description = "Case passes for null object" ,
+    	threadsafe = false
     )
     public void tm_022C03D8C( Test.Case tc ) {
     	this.noop.assertIsNull( null );
@@ -667,7 +694,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertIsNull(Object)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_00032EECD( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -677,7 +705,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertIsNull(Object)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_0BA5EA21E( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertIsNull( "" ) );
@@ -685,7 +714,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-    	description = "Case fails for null" 
+    	description = "Case fails for null" ,
+    	threadsafe = false
     )
     public void tm_0FE31D5E0( Test.Case tc ) {
     	this.noop.assertNonNull( null );
@@ -694,7 +724,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-    	description = "Case passes for non-null" 
+    	description = "Case passes for non-null" ,
+    	threadsafe = false
     )
     public void tm_0E1846FBE( Test.Case tc ) {
     	this.noop.assertNonNull( "hi" );
@@ -703,7 +734,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0D6483642( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -713,7 +745,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNonNull(Object)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_07E07E553( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertNonNull( "hi" ) );
@@ -721,7 +754,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-    	description = "Case fails for empty string" 
+    	description = "Case fails for empty string" ,
+    	threadsafe = false
     )
     public void tm_07F303449( Test.Case tc ) {
     	this.noop.assertNotEmpty( "" );
@@ -730,7 +764,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-    	description = "Case fails for null string" 
+    	description = "Case fails for null string" ,
+    	threadsafe = false
     )
     public void tm_0A6C47EFB( Test.Case tc ) {
     	this.noop.assertNotEmpty( null );
@@ -739,7 +774,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-    	description = "Case passes for non-empty string" 
+    	description = "Case passes for non-empty string" ,
+    	threadsafe = false
     )
     public void tm_095428DCF( Test.Case tc ) {
     	this.noop.assertNotEmpty( "hi" );
@@ -748,7 +784,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0742FACD6( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -758,7 +795,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEmpty(String)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_0A220DAE7( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertNotEmpty( "" ) );
@@ -766,7 +804,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-    	description = "Case fails for false" 
+    	description = "Case fails for false" ,
+    	threadsafe = false
     )
     public void tm_0A7538BBB( Test.Case tc ) {
     	this.noop.assertTrue( false );
@@ -775,7 +814,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-    	description = "Case passes for true" 
+    	description = "Case passes for true" ,
+    	threadsafe = false
     )
     public void tm_0D709B1C0( Test.Case tc ) {
     	this.noop.assertTrue( true );
@@ -784,7 +824,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_07EE17EFD( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -794,7 +835,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertTrue(boolean)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_04289164E( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertTrue( true ) );
@@ -802,7 +844,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.expectError(Class)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0F32873BC( Test.Case tc ) {
     	tc.assertIsNull( this.getFileLocation() );
@@ -812,7 +855,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.expectError(Class)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_0E15A464D( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.expectError( Error.class ) );
@@ -820,7 +864,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.expectError(Class)", 
-    	description = "Test.Case fails if expected error already set" 
+    	description = "Test.Case fails if expected error already set" ,
+    	threadsafe = false
     )
     public void tm_06699588B( Test.Case tc ) {
     	this.noop.expectError( Error.class );
@@ -830,7 +875,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.expectError(Class)", 
-    	description = "Throws AssertionError for null error" 
+    	description = "Throws AssertionError for null error" ,
+    	threadsafe = false
     )
     public void tm_0C09C3B16( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -839,7 +885,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: Test.Case TestCase.getTestCase()", 
-    	description = "Physically equal to this" 
+    	description = "Physically equal to this" ,
+    	threadsafe = false
     )
     public void tm_00096BC01( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.getTestCase() );
@@ -939,7 +986,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getFailCount()", 
-    	description = "Return is Test.Impl.weight when State is FAIL" 
+    	description = "Return is Test.Impl.weight when State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_069B1FAD1( Test.Case tc ) {
     	this.noop.assertTrue( false );
@@ -949,7 +997,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getFailCount()", 
-    	description = "Return is Test.Impl.weight when State is OPEN" 
+    	description = "Return is Test.Impl.weight when State is OPEN" ,
+    	threadsafe = false
     )
     public void tm_079DF2EFD( Test.Case tc ) {
     	tc.assertEqual( TestCase.State.OPEN, this.getState() );
@@ -958,7 +1007,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getFailCount()", 
-    	description = "Return is zero when State is PASS" 
+    	description = "Return is zero when State is PASS" ,
+    	threadsafe = false
     )
     public void tm_0EAD20B46( Test.Case tc ) {
     	this.noop.assertTrue( true );
@@ -968,7 +1018,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getPassCount()", 
-    	description = "Return is Test.Impl.weight when State is PASS" 
+    	description = "Return is Test.Impl.weight when State is PASS" ,
+    	threadsafe = false
     )
     public void tm_044F4FD71( Test.Case tc ) {
     	this.noop.assertTrue( true );
@@ -978,7 +1029,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getPassCount()", 
-    	description = "Return is zero when State is FAIL" 
+    	description = "Return is zero when State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_07E275100( Test.Case tc ) {
     	this.noop.assertTrue( false );
@@ -988,7 +1040,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: int TestCase.getPassCount()", 
-    	description = "Return is zero when State is OPEN" 
+    	description = "Return is zero when State is OPEN" ,
+    	threadsafe = false
     )
     public void tm_08E54852C( Test.Case tc ) {
     	tc.assertEqual( TestCase.State.OPEN, this.getState() );
@@ -1028,7 +1081,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: long TestCase.getElapsedTime()", 
-    	description = "Elapsed time is consistent with execution time" 
+    	description = "Elapsed time is consistent with execution time" ,
+    	threadsafe = false
     )
     public void tm_0F6E3A253( Test.Case tc ) {
     	TestCase timed = this.getTimed( "noErrorPASS", 5L );
@@ -1038,7 +1092,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "If old state is FAIL, new state is FAIL"
+    	description = "If old state is FAIL, new state is FAIL",
+    	threadsafe = false
     )
     public void tm_0EBA3BDE5( Test.Case tc ) {
     	this.noop.assertTrue( false );
@@ -1049,7 +1104,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "If old state is OPEN, new state is FAIL" 
+    	description = "If old state is OPEN, new state is FAIL" ,
+    	threadsafe = false
     )
     public void tm_039B2E239( Test.Case tc ) {
     	tc.assertEqual( TestCase.State.OPEN, this.getState() );
@@ -1059,7 +1115,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "If old state is PASS, new state is FAIL" 
+    	description = "If old state is PASS, new state is FAIL" ,
+    	threadsafe = false
     )
     public void tm_0A91ED6D2( Test.Case tc ) {
     	this.noop.assertTrue( true );
@@ -1070,7 +1127,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "The message is retained" 
+    	description = "The message is retained" ,
+    	threadsafe = false
     )
     public void tm_0C8BE02CF( Test.Case tc ) {
     	tc.assertEqual( List.of(), this.getMessages() );
@@ -1080,7 +1138,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "The message must not be empty" 
+    	description = "The message must not be empty" ,
+    	threadsafe = false
     )
     public void tm_0CCE2B4C9( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -1089,7 +1148,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.fail(String)", 
-    	description = "The message must not be null" 
+    	description = "The message must not be null" ,
+    	threadsafe = false
     )
     public void tm_0A2C96DE1( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -1098,7 +1158,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.pass()", 
-    	description = "If old state is FAIL, new state is FAIL" 
+    	description = "If old state is FAIL, new state is FAIL" ,
+    	threadsafe = false
     )
     public void tm_03BA40429( Test.Case tc ) {
     	this.noop.assertTrue( false );
@@ -1109,7 +1170,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.pass()", 
-    	description = "If old state is OPEN, new state is PASS" 
+    	description = "If old state is OPEN, new state is PASS" ,
+    	threadsafe = false
     )
     public void tm_09AC844B0( Test.Case tc ) {
     	tc.assertEqual( TestCase.State.OPEN, this.getState() );
@@ -1119,7 +1181,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.pass()", 
-    	description = "If old state is PASS, new state is PASS" 
+    	description = "If old state is PASS, new state is PASS" ,
+    	threadsafe = false
     )
     public void tm_00A343949( Test.Case tc ) {
     	this.noop.assertTrue( true );
@@ -1130,7 +1193,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.print(IndentWriter)", 
-    	description = "Includes additional messages on failure" 
+    	description = "Includes additional messages on failure" ,
+    	threadsafe = false
     )
     public void tm_06503EAF3( Test.Case tc ) {
     	this.noop.addMessage( "ONE" ).addMessage( "TWO" ).assertTrue( false ).addMessage( "THREE" );
@@ -1143,7 +1207,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.print(IndentWriter)", 
-    	description = "Includes fail messages on failure" 
+    	description = "Includes fail messages on failure" ,
+    	threadsafe = false
     )
     public void tm_0DA55B5AA( Test.Case tc ) {
     	StringOutputStream sos = new StringOutputStream();
@@ -1155,7 +1220,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.print(IndentWriter)", 
-    	description = "Includes file location on failure" 
+    	description = "Includes file location on failure" ,
+    	threadsafe = false
     )
     public void tm_0144F6DBF( Test.Case tc ) {
     	StringOutputStream sos = new StringOutputStream();
@@ -1166,7 +1232,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.print(IndentWriter)", 
-    	description = "Prints summary line" 
+    	description = "Prints summary line" ,
+    	threadsafe = false
     )
     public void tm_0EC920742( Test.Case tc ) {
     	StringOutputStream sos = new StringOutputStream();
@@ -1177,7 +1244,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.print(IndentWriter)", 
-    	description = "Throws AssertionError for null writer" 
+    	description = "Throws AssertionError for null writer" ,
+    	threadsafe = false
     )
     public void tm_0AEE2C608( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
@@ -1200,7 +1268,8 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void TestCase.print(IndentWriter)", 
-		description = "Prints stack trace when excpetion is thrown" 
+		description = "Prints stack trace when excpetion is thrown" ,
+    	threadsafe = false
 	)
 	public void tm_05AA9AAF8( Test.Case tc ) {
 		StringOutputStream sos = new StringOutputStream();
@@ -1217,7 +1286,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterEach: State is FAIL" 
+    	description = "Error in afterEach: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_0DAA1815C( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 0L, new Error() ) );
@@ -1241,7 +1311,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterEach: elapsedTime recorded" 
+    	description = "Error in afterEach: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_02BC82946( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
@@ -1252,7 +1323,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterEach: unexpectedError is not null" 
+    	description = "Error in afterEach: unexpectedError is not null" ,
+    	threadsafe = false
     )
     public void tm_06CA682CB( Test.Case tc ) {
     	this.container.setAfterEach( new TestProcedure( 2L, new Error() ) );
@@ -1263,7 +1335,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterThis: State is FAIL" 
+    	description = "Error in afterThis: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_03147C25F( Test.Case tc ) {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
@@ -1275,7 +1348,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterThis: afterEach called" 
+    	description = "Error in afterThis: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_0B267539C( Test.Case tc ) {
     	TestProcedure verify = new TestProcedure( 0L, null );
@@ -1290,7 +1364,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterThis: elapsedTime recorded" 
+    	description = "Error in afterThis: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_0926A4EE3( Test.Case tc ) {
     	TestCase noError = this.getTimed( "noErrorPASS", 2L );
@@ -1302,7 +1377,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in afterThis: unexpectedError is not null" 
+    	description = "Error in afterThis: unexpectedError is not null" ,
+    	threadsafe = false
     )
     public void tm_0FBDD9C0E( Test.Case tc ) {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
@@ -1314,7 +1390,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in beforeEach: State is FAIL" 
+    	description = "Error in beforeEach: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_0F60D2DFB( Test.Case tc ) {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
@@ -1327,7 +1404,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in beforeEach: afterEach called" 
+    	description = "Error in beforeEach: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_02C6CF280( Test.Case tc ) {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
@@ -1343,7 +1421,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in beforeEach: afterThis called" 
+    	description = "Error in beforeEach: afterThis called" ,
+    	threadsafe = false
     )
     public void tm_05879E683( Test.Case tc ) {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
@@ -1358,7 +1437,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in beforeEach: elapsedTime recorded" 
+    	description = "Error in beforeEach: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_040FDDBC7( Test.Case tc ) {
     	TestProcedure errProc = new TestProcedure( 3L, new Error() );
@@ -1371,7 +1451,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Error in beforeEach: unexpectedError is not null" 
+    	description = "Error in beforeEach: unexpectedError is not null" ,
+    	threadsafe = false
     )
     public void tm_0EFE23A97( Test.Case tc ) {
     	TestProcedure errProc = new TestProcedure( 0L, new Error() );
@@ -1384,7 +1465,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got expected error: State is PASS" 
+    	description = "Got expected error: State is PASS" ,
+    	threadsafe = false
     )
     public void tm_0C16BBBF5( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 0L );
@@ -1394,7 +1476,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got expected error: afterEach called" 
+    	description = "Got expected error: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_0953C5759( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
@@ -1419,7 +1502,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got expected error: elapsedTime recorded" 
+    	description = "Got expected error: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_0376D2C20( Test.Case tc ) {
     	TestCase expectedError = this.getTimed( "gotExpectedError", 3L );
@@ -1439,7 +1523,8 @@ public class TestCaseTest extends Test.Container {
 
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got unexpected error: State is FAIL" 
+    	description = "Got unexpected error: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_035A5C409( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 0L );
@@ -1449,7 +1534,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got unexpected error: afterEach called" 
+    	description = "Got unexpected error: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_0EA0AF9B2( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
@@ -1462,7 +1548,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got unexpected error: afterThis called" 
+    	description = "Got unexpected error: afterThis called" ,
+    	threadsafe = false
     )
     public void tm_01617EDB5( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
@@ -1475,7 +1562,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got unexpected error: elapsedTime recorded" 
+    	description = "Got unexpected error: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_06500F9F9( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
@@ -1485,7 +1573,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got unexpected error: unexpectedError is not null" 
+    	description = "Got unexpected error: unexpectedError is not null" ,
+    	threadsafe = false
     )
     public void tm_07FBC2025( Test.Case tc ) {
     	TestCase unexpectedError = this.getTimed( "gotUnexpectedError", 2L );
@@ -1495,7 +1584,8 @@ public class TestCaseTest extends Test.Container {
 
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got wrong error: State is FAIL" 
+    	description = "Got wrong error: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_0116ED75D( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
@@ -1505,7 +1595,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got wrong error: afterEach called" 
+    	description = "Got wrong error: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_0966B35DE( Test.Case tc ) {
     	TestProcedure verifyProc= new TestProcedure( 0L, null );
@@ -1530,7 +1621,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got wrong error: elapsedTime recorded" 
+    	description = "Got wrong error: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_0314F4025( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 3L );
@@ -1540,7 +1632,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got wrong error: unexpectedError is different from expected" 
+    	description = "Got wrong error: unexpectedError is different from expected" ,
+    	threadsafe = false
     )
     public void tm_046BDB9F8( Test.Case tc ) {
     	TestCase gotWrongError = this.getTimed( "gotWrongError", 0L );
@@ -1553,7 +1646,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "Got wrong error: unexpectedError is not null" 
+    	description = "Got wrong error: unexpectedError is not null" ,
+    	threadsafe = false
     )
     public void tm_04CA6D079( Test.Case tc ) {
        	this.getTimed( "gotWrongError", 0L ).toString();
@@ -1562,7 +1656,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: State is FAIL if assertion fails" 
+    	description = "No error: State is FAIL if assertion fails" ,
+    	threadsafe = false
     )
     public void tm_0BAA5AB1D( Test.Case tc ) {
     	this.getTimed( "noErrorFAIL", 0L ).toString();
@@ -1571,7 +1666,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: State is PASS if assertion succeeds" 
+    	description = "No error: State is PASS if assertion succeeds" ,
+    	threadsafe = false
     )
     public void tm_00A82C0B2( Test.Case tc ) {
     	this.getTimed( "noErrorPASS", 0L ).toString();
@@ -1580,7 +1676,8 @@ public class TestCaseTest extends Test.Container {
 
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: State is OPEN if no assertions" 
+    	description = "No error: State is OPEN if no assertions" ,
+    	threadsafe = false
     )
     public void tm_0914BABEA( Test.Case tc ) {
     	this.getTimed( "noErrorOPEN", 0L ).toString();
@@ -1589,7 +1686,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: afterEach called" 
+    	description = "No error: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_075818E0E( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
@@ -1600,7 +1698,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: afterThis called" 
+    	description = "No error: afterThis called" ,
+    	threadsafe = false
     )
     public void tm_0A18E8211( Test.Case tc ) {
     	TestCase noError = this.getTimed( "noErrorPASS", 0L );
@@ -1612,7 +1711,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No error: elapsedTime recorded" 
+    	description = "No error: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_0701E0055( Test.Case tc ) {
     	this.getTimed( "noErrorPASS", 6L ).toString();
@@ -1630,7 +1730,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No expected error: State is FAIL" 
+    	description = "No expected error: State is FAIL" ,
+    	threadsafe = false
     )
     public void tm_0DD9A5B7F( Test.Case tc ) {
     	this.getTimed( "noExpectedError", 0L ).toString();
@@ -1639,7 +1740,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No expected error: afterEach called" 
+    	description = "No expected error: afterEach called" ,
+    	threadsafe = false
     )
     public void tm_01270A67C( Test.Case tc ) {
     	TestProcedure verifyProc = new TestProcedure( 0L, null );
@@ -1662,7 +1764,8 @@ public class TestCaseTest extends Test.Container {
         
     @Test.Impl( 
     	member = "method: void TestCase.run()", 
-    	description = "No expected error: elapsedTime recorded" 
+    	description = "No expected error: elapsedTime recorded" ,
+    	threadsafe = false
     )
     public void tm_055CF31C3( Test.Case tc ) {
     	this.getTimed( "noExpectedError", 4L ).toString();
@@ -1680,7 +1783,8 @@ public class TestCaseTest extends Test.Container {
 
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "File location is set" 
+    	description = "File location is set" ,
+    	threadsafe = false
     )
     public void tm_0BEAD9B90( Test.Case tc ) {
     	this.noop.assertNotEqual( "one", "two" );
@@ -1689,7 +1793,8 @@ public class TestCaseTest extends Test.Container {
             
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "Return is this" 
+    	description = "Return is this" ,
+    	threadsafe = false
     )
     public void tm_0627EDD21( Test.Case tc ) {
     	tc.assertEqual( this.noop, this.noop.assertNotEqual( 1, 2 ) );
@@ -1697,7 +1802,8 @@ public class TestCaseTest extends Test.Container {
             
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "Test fails for equivalent objects" 
+    	description = "Test fails for equivalent objects" ,
+    	threadsafe = false
     )
     public void tm_01E192747( Test.Case tc ) {
     	Set<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toSet() );
@@ -1708,7 +1814,8 @@ public class TestCaseTest extends Test.Container {
             
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "Test fails when both null" 
+    	description = "Test fails when both null" ,
+    	threadsafe = false
     )
     public void tm_017A9D2D2( Test.Case tc ) {
     	this.noop.assertNotEqual( null, null );
@@ -1717,7 +1824,8 @@ public class TestCaseTest extends Test.Container {
             
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "Test passes for inequivalent" 
+    	description = "Test passes for inequivalent" ,
+    	threadsafe = false
     )
     public void tm_084F36AB6( Test.Case tc ) {
     	List<String> abc = Stream.of( "A", "B", "C" ).collect( Collectors.toList() );
@@ -1728,7 +1836,8 @@ public class TestCaseTest extends Test.Container {
             
     @Test.Impl( 
     	member = "method: Test.Case TestCase.assertNotEqual(Object, Object)", 
-    	description = "Test passes for one null and one not null" 
+    	description = "Test passes for one null and one not null" ,
+    	threadsafe = false
     )
     public void tm_0E7A5D7E5( Test.Case tc ) {
     	this.noop.assertNotEqual( null, "hey" );
@@ -1737,7 +1846,8 @@ public class TestCaseTest extends Test.Container {
 
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertFail(String)", 
-		description = "Case fails" 
+		description = "Case fails" ,
+    	threadsafe = false
 	)
 	public void tm_03E469684( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertFail", 0L );
@@ -1747,7 +1857,8 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertFail(String)", 
-		description = "File location is set" 
+		description = "File location is set" ,
+    	threadsafe = false
 	)
 	public void tm_01784AA72( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertFail", 0L );
@@ -1757,7 +1868,8 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertFail(String)", 
-		description = "Return is this" 
+		description = "Return is this" ,
+    	threadsafe = false
 	)
 	public void tm_0B1FB3D83( Test.Case tc ) {
 		tc.assertEqual( this.noop, this.noop.assertFail( "msg" ) );
@@ -1765,7 +1877,8 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertFail(String)", 
-		description = "Failure message is included" 
+		description = "Failure message is included" ,
+    	threadsafe = false
 	)
 	public void tm_06A65EDDA( Test.Case tc ) {
 		String msg = "Some error message";
@@ -1775,7 +1888,8 @@ public class TestCaseTest extends Test.Container {
 
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertPass()", 
-		description = "Case passes" 
+		description = "Case passes" ,
+    	threadsafe = false
 	)
 	public void tm_03AC7014A( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertPass", 0L );
@@ -1785,7 +1899,8 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertPass()", 
-		description = "File location is set" 
+		description = "File location is set" ,
+    	threadsafe = false
 	)
 	public void tm_0E591072E( Test.Case tc ) {
 		TestCase test = this.getTimed( "assertPass", 0L );
@@ -1795,15 +1910,50 @@ public class TestCaseTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Test.Case TestCase.assertPass()", 
-		description = "Return is this" 
+		description = "Return is this" ,
+    	threadsafe = false
 	)
 	public void tm_0A4CAD73F( Test.Case tc ) {
 		tc.assertEqual( this.noop, this.noop.assertPass() );
 	}
+	
+    @Test.Impl( 
+    	member = "method: boolean TestCase.threadsafe()", 
+    	description = "Consistent with configured value" 
+    )
+    public void tm_0867D007A( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertPass();
+    }
+
+    @Test.Impl( 
+    	member = "method: TestCase TestCase.showProgress(boolean)", 
+    	description = "Consistent with configured value" 
+    )
+    public void tm_0D7C37755( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertPass();
+    }
+
 
     
         
     public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestCase.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestCase.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
     
 }

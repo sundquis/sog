@@ -1308,13 +1308,15 @@ public class AppTest extends Test.Container{
 		Test.eval( App.class )
 			.concurrent( false )
 			.showDetails( true )
+			.showProgress( false )
 			.print();
 		//*/
 		
 		/* Toggle package results
 		Test.evalPackage( App.class )
-			.concurrent( false )
-			.showDetails( true )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
 			.print();
 		//*/
 		

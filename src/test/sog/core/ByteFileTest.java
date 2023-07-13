@@ -1015,7 +1015,8 @@ public class ByteFileTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void ByteFile.write(int, byte[])", 
-		description = "Does not increase total bytes if position + source.length <= length" 
+		description = "Does not increase total bytes if position + source.length <= length",
+		threadsafe = false
 	)
 	public void tm_05DB95FAC( Test.Case tc ) {
 		try ( ByteFile bf = new ByteFile() ) {
@@ -1339,7 +1340,7 @@ public class ByteFileTest extends Test.Container {
 			.print();
 		//*/
 		
-		/* Toggle package results
+		//* Toggle package results
 		Test.evalPackage( ByteFile.class )
 			.concurrent( true )
 			.showDetails( true )

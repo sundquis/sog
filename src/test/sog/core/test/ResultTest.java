@@ -40,7 +40,6 @@ public class ResultTest extends Test.Container {
 		@Override public int getFailCount() { return 2000; }
 		@Override public int getPassCount() { return 3000; }
 		@Override public void print( IndentWriter out ) {}
-		@Override protected void run() {}
 	}
 	
 	
@@ -81,7 +80,8 @@ public class ResultTest extends Test.Container {
     	description = "Includes elapsed time" 
     )
     public void tm_09DDBEA84( Test.Case tc ) {
-    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "1.0s" ) );
+    	tc.assertTrue( new MyResult( "foo" ).toString().contains( "1.00 s" ) );
+    	//tc.assertEqual( new MyResult( "foo" ).toString(), "" );
     }
         
     @Test.Impl( 
@@ -141,6 +141,21 @@ public class ResultTest extends Test.Container {
 
 	
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( Result.class )
+			.concurrent( false )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( Result.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
         
 }

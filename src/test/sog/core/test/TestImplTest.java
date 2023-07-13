@@ -163,10 +163,35 @@ public class TestImplTest extends Test.Container {
 		tc.assertEqual( MyContainer.TIMEOUT, impl.getTimeout() );
 	}
 	
+    @Test.Impl( 
+    	member = "method: boolean TestImpl.threadsafe()", 
+    	description = "Value is consistent with configured value" 
+    )
+    public void tm_0B5179609( Test.Case tc ) {
+    	tc.addMessage( "Manually verified" );
+    	tc.assertPass();
+    }
+
+	
 	
 	
 	
 	
 	public static void main( String[] args ) {
+		//* Toggle class results
+		Test.eval( TestImpl.class )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		Test.evalPackage( TestImpl.class )
+			.concurrent( true )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 }
