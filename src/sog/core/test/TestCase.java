@@ -692,6 +692,12 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	}
 	
 	
+	@Test.Decl( "Consistent with configured value" )
+	public boolean threadsafe() {
+		return this.impl.threadsafe();
+	}
+	
+	
 	@Override
 	@Test.Decl( "Respects Test.Impl.priority" )
 	@Test.Decl( "For equal priority ordered by member" )
@@ -708,12 +714,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	}
 	
 
-	@Test.Decl( "Consistent with configured value" )
-	public boolean threadsafe() {
-		return this.impl.threadsafe();
-	}
-	
-	
 	@Override
 	@Test.Decl( "If compareTo not zero then not equal" )
 	@Test.Decl( "If compareTo zero then equal" )

@@ -18,7 +18,6 @@
  */
 package test.sog.core.test;
 
-import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.test.TestIdentifier;
 
@@ -35,22 +34,11 @@ public class TestIdentifierTest extends Test.Container {
 	private static final String NAME = "The member name";
 	private static final String DESC  ="The description of a test";
 	
-	private TestIdentifier id;
+	//private TestIdentifier id;
 	
-	@Override
-	public Procedure beforeEach() {
-		return () -> {
-			this.id = new TestIdentifier( NAME, DESC ) {};
-		};
+	private TestIdentifier getTestIdentifier() {
+		return new TestIdentifier( NAME, DESC ) {};
 	}
-	
-	@Override
-	public Procedure afterEach() {
-		return () -> {
-			this.id = null;
-		};
-	}
-	
 	
     @Test.Impl( 
     	member = "constructor: TestIdentifier(String, String)", 
@@ -93,7 +81,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is consistent with value supplied to constructor" 
     )
     public void tm_02952996B( Test.Case tc ) {
-    	tc.assertEqual( DESC, this.id.getDescription() );
+    	tc.assertEqual( DESC, this.getTestIdentifier().getDescription() );
     }
         
     @Test.Impl( 
@@ -101,7 +89,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_0ADDB51FC( Test.Case tc ) {
-    	tc.assertNotEmpty( this.id.getDescription() );
+    	tc.assertNotEmpty( this.getTestIdentifier().getDescription() );
     }
         
     @Test.Impl( 
@@ -188,7 +176,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is consistent with value supplied to constructor" 
     )
     public void tm_03656892A( Test.Case tc ) {
-    	tc.assertEqual( NAME, this.id.getMemberName() );
+    	tc.assertEqual( NAME, this.getTestIdentifier().getMemberName() );
     }
         
     @Test.Impl( 
@@ -196,7 +184,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_083C7B53B( Test.Case tc ) {
-    	tc.assertNotEmpty( this.id.getMemberName() );
+    	tc.assertNotEmpty( this.getTestIdentifier().getMemberName() );
     }
         
     @Test.Impl( 
@@ -204,7 +192,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_07EEE5B02( Test.Case tc ) {
-    	tc.assertNotEmpty( this.id.getMethodName() );
+    	tc.assertNotEmpty( this.getTestIdentifier().getMethodName() );
     }
         
     @Test.Impl( 
@@ -212,7 +200,7 @@ public class TestIdentifierTest extends Test.Container {
     	description = "Return is non-empty" 
     )
     public void tm_000A913E2( Test.Case tc ) {
-    	tc.assertNotEmpty( this.id.toString() );
+    	tc.assertNotEmpty( this.getTestIdentifier().toString() );
     }
 
 	

@@ -45,7 +45,17 @@ public class Concurrent implements App.OnShutdown {
 	 * in deadlock. This can happen if the implementation of a concurrent function or procedure
 	 * uses the same Concurrent instance to execute code.
 	 */
-	private static final boolean safeMode = Property.get( "safeMode", false, Parser.BOOLEAN );
+	private static boolean safeMode = Property.get( "safeMode", false, Parser.BOOLEAN );
+	
+	/**
+	 * Allow the testing framework to temporarily suppress this during testing.
+	 * Deprecation warning serves as reminder to remove.
+	 */
+	@Deprecated
+	@Test.Skip( "Deprecated" )
+	public static void safeModeOff() {
+		Concurrent.safeMode = false;
+	}
 
 	
 	private final String label;

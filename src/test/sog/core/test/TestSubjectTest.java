@@ -21,6 +21,8 @@ package test.sog.core.test;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import sog.core.App;
@@ -33,8 +35,6 @@ import sog.core.test.TestSet;
 import sog.core.test.TestSubject;
 import sog.util.IndentWriter;
 import sog.util.StringOutputStream;
-import test.sog.core.test.bar.ConcurrentTests;
-import test.sog.core.test.foo.C1;
 
 /**
  * 
@@ -621,8 +621,8 @@ public class TestSubjectTest extends Test.Container {
     	description = "If there are no errors beforeAll is called before any cases have run" 
     )
     public void tm_0ACCB12F5( Test.Case tc ) {
-    	this.evalSubjectMethod( TestSubject.forSubject( C1.class ), "run", null );
-    	tc.assertEqual( "beforeAll", C1.TEST.getRanFirst() );
+    	this.evalSubjectMethod( TestSubject.forSubject( test.sog.core.test.foo.C1.class ), "run", null );
+    	tc.assertEqual( "beforeAll", test.sog.core.test.foo.C1.TEST.getRanFirst() );
     }
     
     @Test.Impl( 
@@ -631,7 +631,7 @@ public class TestSubjectTest extends Test.Container {
     )
     public void tm_01554D9E6( Test.Case tc ) {
     	// IF NOT ts1.compareTo( ts2 ) == 0 THEN NOT ts1.equals( ts2 )
-    	// ts1.compareTo( ts2 ) == 0  OR  ! ts1.equals( ts2 )
+    	// ts1.compareTo( ts2 ) == 0  ||  ! ts1.equals( ts2 )
     	
     	TestSubject ts1 = TestSubject.forSubject( TestSubject.class );
     	TestSubject ts2 = TestSubject.forSubject( TestSet.class );
@@ -649,7 +649,18 @@ public class TestSubjectTest extends Test.Container {
     	description = "If compareTo zero then equal" 
     )
     public void tm_0CCE3E640( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	// IF ts1.compareTo( ts2 ) == 0 THEN ts1.equals( ts2 )
+    	// ts1.compareTo( ts2 ) != 0  ||  ts1.equals( ts2 )
+
+    	TestSubject ts1 = TestSubject.forSubject( TestSubject.class );
+    	TestSubject ts2 = TestSubject.forSubject( TestSet.class );
+    	TestSubject ts3 = TestSubject.forSubject( TestSubject.class );
+    	
+    	tc.assertTrue( ts1.compareTo( ts2 ) != 0  ||  ts1.equals( ts2 ) );
+    	tc.assertTrue( ts2.compareTo( ts1 ) != 0  ||  ts2.equals( ts1 ) );
+    	
+    	tc.assertTrue( ts1.compareTo( ts3 ) != 0  ||  ts1.equals( ts3 ) );
+    	tc.assertTrue( ts3.compareTo( ts1 ) != 0  ||  ts3.equals( ts1 ) );
     }
     
     @Test.Impl( 
@@ -657,7 +668,7 @@ public class TestSubjectTest extends Test.Container {
     	description = "False after error" 
     )
     public void tm_0328F7955( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.assertFalse( TestSubject.forSubject( AllFailWithErrors.class ).noErorrs() );
     }
     
     @Test.Impl( 
@@ -665,7 +676,19 @@ public class TestSubjectTest extends Test.Container {
     	description = "Alphabetic by subject classname" 
     )
     public void tm_0114C74A4( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	SortedSet<TestSubject> subjects = new TreeSet<>();
+
+    	TestSubject subj1 = TestSubject.forSubject( test.sog.core.test.bar.ConcurrentTests.class );
+    	TestSubject subj2 = TestSubject.forSubject( test.sog.core.test.foo.C1.class );
+    	TestSubject subj3 = TestSubject.forSubject( test.sog.core.test.foo.C2.class );
+    	
+    	subjects.add( subj3 );
+    	subjects.add( subj2 );
+    	subjects.add( subj1 );
+    	
+    	tc.assertEqual( subj1, subjects.first() );
+    	tc.assertEqual( subj3, subjects.last() );
+    	tc.assertTrue( subjects.contains( subj2 ) );
     }
     
     @Test.Impl( 
@@ -673,7 +696,21 @@ public class TestSubjectTest extends Test.Container {
     	description = "If equal then same hashCode" 
     )
     public void tm_0E7104431( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	// IF ts1.equals( ts2 ) THEN ts1.hashCode() == ts2.hashCode()
+    	// ! ts1.equals( ts2 )  ||  ts1.hashCode() == ts2.hashCode()
+
+    	TestSubject ts1 = TestSubject.forSubject( TestSubject.class );
+    	TestSubject ts2 = TestSubject.forSubject( TestSet.class );
+    	TestSubject ts3 = TestSubject.forSubject( TestSubject.class );
+
+    	tc.assertTrue( ! ts1.equals( ts2 )  ||  ts1.hashCode() == ts2.hashCode() );
+    	tc.assertTrue( ! ts2.equals( ts1 )  ||  ts2.hashCode() == ts1.hashCode() );
+    	
+    	tc.assertTrue( ! ts1.equals( ts3 )  ||  ts1.hashCode() == ts3.hashCode() );
+    	tc.assertTrue( ! ts3.equals( ts1 )  ||  ts3.hashCode() == ts1.hashCode() );
+
+    	tc.assertTrue( ! ts2.equals( ts3 )  ||  ts2.hashCode() == ts3.hashCode() );
+    	tc.assertTrue( ! ts3.equals( ts2 )  ||  ts3.hashCode() == ts2.hashCode() );
     }
     
     @Test.Impl( 
@@ -690,8 +727,9 @@ public class TestSubjectTest extends Test.Container {
     	description = "When concurrent is true TestSubject instances use worker threads to run tests"
     )
     public void tm_03D8BDE43( Test.Case tc ) {
-    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class).concurrent( true ), "run", null );
-    	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
+    	this.evalSubjectMethod( TestSubject.forSubject( test.sog.core.test.bar.ConcurrentTests.class)
+    		.concurrent( true ), "run", null );
+    	Set<Thread> threads = test.sog.core.test.bar.ConcurrentTests.TEST.getThreads();
     	tc.assertTrue( threads.size() > 1 );
     	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
@@ -701,8 +739,9 @@ public class TestSubjectTest extends Test.Container {
     	description = "Cases marked with threadsafe = false run in the main thread" 
     )
     public void tm_0D6A96E9F( Test.Case tc ) {
-    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class).concurrent( true ), "run", null );
-    	tc.assertEqual( Thread.currentThread(), ConcurrentTests.TEST.getThreadsafeFalseThread() );
+    	this.evalSubjectMethod( TestSubject.forSubject( test.sog.core.test.bar.ConcurrentTests.class)
+    		.concurrent( true ), "run", null );
+    	tc.assertEqual( Thread.currentThread(), test.sog.core.test.bar.ConcurrentTests.TEST.getThreadsafeFalseThread() );
     }
     
     @Test.Impl( 
@@ -711,8 +750,9 @@ public class TestSubjectTest extends Test.Container {
     	threadsafe = false
     )
     public void tm_0A9E90CE8( Test.Case tc ) {
-    	this.evalSubjectMethod( TestSubject.forSubject( ConcurrentTests.class ).concurrent( true ), "run", null );
-    	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
+    	this.evalSubjectMethod( TestSubject.forSubject( test.sog.core.test.bar.ConcurrentTests.class )
+    		.concurrent( true ), "run", null );
+    	Set<Thread> threads = test.sog.core.test.bar.ConcurrentTests.TEST.getThreads();
     	tc.assertTrue( threads.size() > 1 );
     	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
@@ -784,15 +824,17 @@ public class TestSubjectTest extends Test.Container {
 		
 
 	public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
+		//sog.util.Concurrent.safeModeOff();
 		Test.eval( TestSubject.class )
-			.concurrent( false )
+			.concurrent( true )
 			.showDetails( true )
 			.showProgress( false )
 			.print();
 		//*/
 		
-		/* Toggle package results
+		//* Toggle package results
+		//sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( TestSubject.class )
 			.concurrent( true )
 			.showDetails( false )
