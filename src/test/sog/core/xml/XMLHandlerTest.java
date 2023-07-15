@@ -889,7 +889,21 @@ public class XMLHandlerTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( XMLHandler.class ).showDetails( true ).print();
-		//sog.core.test.TestSet.forPackage( XMLHandler.class, false ).showDetails( false ).print();
+		//* Toggle class results
+		Test.eval( XMLHandler.class )
+			.concurrent( false )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		sog.util.Concurrent.safeModeOff();
+		Test.evalPackage( XMLHandler.class )
+			.concurrent( false )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 }

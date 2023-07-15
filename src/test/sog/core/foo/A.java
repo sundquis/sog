@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021
+ * Copyright (C) 2021, 2023
  * *** *** *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,26 +34,30 @@ public class A {
 		return App.get().classesInPackage( Secondary.class );
 	}
 	
-	public static String classname() {
-		return "test.sog.core.foo.Secondary";
-	}
-	
 	public static Stream<String> getLocation() {
 		return Secondary.getLocationSecondary();
 	}
 	
-	public static Stream<String> getLocation( String prefix ) {
-		return Secondary.getLocationSecondary( prefix );
+	public static Stream<String> getLocation( Throwable th ) {
+		return Secondary.getLocationSecondary( th );
 	}
 	
-	public static Stream<String> getLocationException( String prefix ) {
-		return Secondary.getLocationExceptionSecondary( prefix );
+	public static Stream<String> getLocationMatching( String regexp ) {
+		return Secondary.getLocationMatchingSecondary( regexp );
 	}
 	
-	public static Stream<String> getLocationException() {
-		return Secondary.getLocationExceptionSecondary();
+	public static Stream<String> getLocationMatching( Throwable th, String regexp ) {
+		return Secondary.getLocationMatchingSecondary( th, regexp );
 	}
 	
+	public static Stream<String> getLocationStarting( String prefix ) {
+		return Secondary.getLocationStartingSecondary( prefix );
+	}
+		
+	public static Stream<String> getLocationStarting( Throwable th, String prefix ) {
+		return Secondary.getLocationStartingSecondary( th, prefix );
+	}
+		
 	public A() {}
 	
 	static public Object getSecondary() {
@@ -69,18 +73,26 @@ class Secondary {
 		return App.get().getLocation();
 	}
 
-	static Stream<String> getLocationSecondary( String prefix ) {
+	static Stream<String> getLocationSecondary( Throwable th ) {
+		return App.get().getLocation( new Throwable() );
+	}
+
+	static Stream<String> getLocationMatchingSecondary( String regexp ) {
+		return App.get().getLocationMatching( regexp );
+	}
+
+	static Stream<String> getLocationMatchingSecondary( Throwable th, String regexp ) {
+		return App.get().getLocationMatching( new Throwable(), regexp );
+	}
+
+	static Stream<String> getLocationStartingSecondary( String prefix ) {
 		return App.get().getLocationStarting( prefix );
 	}
 
-	static Stream<String> getLocationExceptionSecondary() {
-		return App.get().getLocation( new Exception() );
+	static Stream<String> getLocationStartingSecondary( Throwable th, String prefix ) {
+		return App.get().getLocationStarting( new Throwable(), prefix );
 	}
-	
-	static Stream<String> getLocationExceptionSecondary( String prefix ) {
-		return App.get().getLocationStarting( new Exception(), prefix );
-	}
-	
+
 	@Override public String toString() {
 		return App.get().getCallingMethod( 1 );
 	}

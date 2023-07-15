@@ -18,7 +18,6 @@
  */
 package test.sog.core;
 
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -31,7 +30,6 @@ import sog.core.App;
 import sog.core.AppException;
 import sog.core.Test;
 import sog.core.test.TestCase;
-import sog.util.StringOutputStream;
 import test.sog.core.foo.A;
 
 /**
@@ -610,286 +608,95 @@ public class AppTest extends Test.Container{
 		tc.expectError( AssertionError.class );
 		App.get().classesUnderDir( null );
 	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation()", 
-		description = "Elements are file links" 
-	)
-	public void tm_0E6EE3978( Test.Case tc ) {
-		App.get().getLocation().forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation()", 
-		description = "Elements correspond to the calling stack" 
-	)
-	public void tm_0D91F7968( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
-		new Exception().printStackTrace( new PrintStream( sos, true ) );
-		tc.addMessage( "STACK TRACE:" );
-		tc.addMessage( sos.toString() );
-		tc.addMessage( " " );
-		tc.addMessage( "LOCATION" );
-		App.get().getLocation().forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation()", 
-		description = "Links work for secondary classes" 
-	)
-	public void tm_021F60730( Test.Case tc ) {
-		A.getLocation().forEach( tc::addMessage );
-		tc.addMessage( " " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
-		tc.assertPass();
-		/* */
-	}
-
-	@Test.Impl( 
-		member = "method: Stream App.getLocation()", 
-		description = "Return is non-null" 
-	)
-	public void tm_000E15555( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocation() );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation()", 
-		description = "Return is not terminated" 
-	)
-	public void tm_0717BF1DE( Test.Case tc ) {
-		App.get().getLocation().map( Function.identity() );
-		tc.assertPass();
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Elements are file links" 
-	)
-	public void tm_01CB2DCE7( Test.Case tc ) {
-		App.get().getLocationStarting( "sog.core" ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Inspect and test previous links that all start with 'sog.core'" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Elements correspond to the calling stack" 
-	)
-	public void tm_0821641D9( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
-		new Exception().printStackTrace( new PrintStream( sos, true ) );
-		tc.addMessage( "STACK TRACE:" );
-		tc.addMessage( sos.toString() );
-		tc.addMessage( " " );
-		tc.addMessage( "LOCATIONS starting with sog.core:" );
-		App.get().getLocationStarting( "sog.core" ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Elements have classes matching the given class name prefix" 
-	)
-	public void tm_0F8318AAC( Test.Case tc ) {
-		final String prefix = "sog";
-		Consumer<String> process = s -> tc.assertTrue( s.startsWith( prefix ) );
-		App.get().getLocationStarting( prefix ).forEach( process );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Links work for secondary classes" 
-	)
-	public void tm_0D790D0A1( Test.Case tc ) {
-		String prefix = "test";
-		A.getLocation( prefix ).forEach( tc::addMessage );
-		tc.addMessage( " " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
-		tc.assertPass();
-		/* */
-	}
-
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Return is non-null" 
-	)
-	public void tm_024320886( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocationStarting( "sog" ) );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Return is not terminated" 
-	)
-	public void tm_0F44BBC4F( Test.Case tc ) {
-		App.get().getLocationStarting( "sog" ).map( Function.identity() );
-		tc.assertPass();
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Throws AssertionError for empty prefix" 
-	)
-	public void tm_0E83961BC( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		App.get().getLocationStarting( "" );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(String)", 
-		description = "Throws AssertionError for null prefix" 
-	)
-	public void tm_0CF000FCA( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		String prefix = null;
-		App.get().getLocationStarting( prefix );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Elements are file links" 
-	)
-	public void tm_0901581E8( Test.Case tc ) {
-		Exception e = new Exception();
-		App.get().getLocationStarting( e, "sog" ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Elements correspond to the stack trace" 
-	)
-	public void tm_0DF0FD879( Test.Case tc ) {
-		Exception e = new Exception();
-		StringOutputStream sos = new StringOutputStream();
-		e.printStackTrace( new PrintStream( sos, true ) );
-		tc.addMessage( "STACK TRACE:" );
-		tc.addMessage( sos.toString() );
-		tc.addMessage( " " );
-		tc.addMessage( "LOCATION:" );
-		App.get().getLocationStarting( e, "sog" ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
-		tc.assertPass();
-		/* */
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Links work for secondary classes" 
-	)
-	public void tm_05CA13CC0( Test.Case tc ) {
-		A.getLocationException( "test" ).forEach( tc::addMessage );
-		tc.addMessage( " " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Test link for method getLocationExceptionSecondary" ); /*
-		tc.assertPass();
-		/* */
-	}
-
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Return is non-null" 
-	)
-	public void tm_0CC8A86E5( Test.Case tc ) {
-		tc.assertNonNull( App.get().getLocationStarting( new Throwable(), "test" ) );
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Return is not terminated" 
-	)
-	public void tm_0ED3DB76E( Test.Case tc ) {
-		App.get().getLocationStarting( new Throwable(), "test" ).map( Function.identity() );
-		tc.assertPass();
-	}
-		
-	@Test.Impl( 
-		member = "method: Stream App.getLocation(Throwable, String)", 
-		description = "Throws AssertionError for null Throwable" 
-	)
-	public void tm_03BC3785D( Test.Case tc ) {
-		tc.expectError( AssertionError.class );
-		Throwable t = null;
-		App.get().getLocationStarting( t, "test" );
-	}
 	
     @Test.Impl( 
-    	member = "method: Stream App.getLocation(Throwable)", 
-    	description = "Throws AssertionError for null Throwable" 
+    	member = "method: Stream App.getLocation()", 
+    	description = "Elements are file links" 
     )
-    public void tm_03BC3785D2( Test.Case tc ) {
-    	tc.expectError( AssertionError.class );
-    	Throwable th = null;
-    	App.get().getLocation( th );
+    public void tm_0E6EE3978( Test.Case tc ) {
+		App.get().getLocation().forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method tm_0E6EE3978" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation()", 
+    	description = "Elements correspond to the calling stack" 
+    )
+    public void tm_0D91F7968( Test.Case tc ) {
+    	App.get().getLocation().forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE:
+    	//* */ tc.assertFail( ">>> Verify: Elements correspond to the calling stack" ); /*
+    	tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation()", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_0CEBA0E23( Test.Case tc ) {
+		test.sog.core.foo.A.getLocation().forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation()", 
+    	description = "Return is non-null" 
+    )
+    public void tm_000E15555( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocation() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocation()", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_0717BF1DE( Test.Case tc ) {
+    	App.get().getLocation().collect( Collectors.toList() );
+    	tc.assertPass();
     }
     
     @Test.Impl( 
     	member = "method: Stream App.getLocation(Throwable)", 
     	description = "Elements are file links" 
     )
-    public void tm_0901581E8dup( Test.Case tc ) {
-		Exception e = new Exception();
-		App.get().getLocation( e ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
+    public void tm_0901581E8( Test.Case tc ) {
+		App.get().getLocation( new Exception() ).forEach( tc::addMessage );
+		tc.addMessage( " " );
 		// TOGGLE:
-		//* */ tc.assertFail( ">>> Inspect and test previous links" ); /*
+		//* */ tc.assertFail( ">>> Test link for method tm_0901581E8" ); /*
 		tc.assertPass();
 		/* */
     }
-
-    @Test.Impl( 
-    	member = "method: Stream App.getLocation(Throwable, String)", 
-    	description = "Return can be empty" 
-    )
-    public void tm_0A9184DA9( Test.Case tc ) {
-		Exception e = new Exception();
-		tc.assertEqual( 0, App.get().getLocationStarting( e, "bogus" ).collect( Collectors.toList() ).size() );
-    }
-
+    
     @Test.Impl( 
     	member = "method: Stream App.getLocation(Throwable)", 
     	description = "Elements correspond to the stack trace" 
     )
-    public void tm_0DF0FD879dup( Test.Case tc ) {
-		Exception e = new Exception();
-		StringOutputStream sos = new StringOutputStream();
-		e.printStackTrace( new PrintStream( sos, true ) );
-		tc.addMessage( "STACK TRACE:" );
-		tc.addMessage( sos.toString() );
-		tc.addMessage( " " );
-		tc.addMessage( "LOCATION:" );
-		App.get().getLocation( e ).forEach( tc::addMessage );
-		tc.addMessage( "  " );
-		// TOGGLE:
-		//* */ tc.assertFail( ">>> Compare STACK and LOCATION" ); /*
-		tc.assertPass();
-		/* */
+    public void tm_0DF0FD879( Test.Case tc ) {
+    	Exception e = new Exception();
+    	List<String> locations = App.get().getLocation( e ).collect( Collectors.toList() );
+    	tc.assertEqual( e.getStackTrace().length, locations.size() );
+    	// TOGGLE
+    	/* */ tc.assertPass(); /*
+    	tc.addMessage( "Verify the following are similar." );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Location stream:" );
+    	locations.stream().forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Exception stack:" );
+    	Stream.of( e.getStackTrace() ).map( Object::toString ).forEach( tc::addMessage );
+    	tc.assertFail( "Compare" );
+    	/* */
     }
     
     @Test.Impl( 
@@ -897,10 +704,10 @@ public class AppTest extends Test.Container{
     	description = "Links work for secondary classes" 
     )
     public void tm_0096543B3( Test.Case tc ) {
-		A.getLocationException().forEach( tc::addMessage );
+		test.sog.core.foo.A.getLocation( new Throwable() ).forEach( tc::addMessage );
 		tc.addMessage( " " );
 		// TOGGLE:
-		//* */ tc.assertFail( ">>> Test link for method getLocationExceptionSecondary" ); /*
+		//* */ tc.assertFail( ">>> Test link for method getLocationSecondary" ); /*
 		tc.assertPass();
 		/* */
     }
@@ -909,47 +716,426 @@ public class AppTest extends Test.Container{
     	member = "method: Stream App.getLocation(Throwable)", 
     	description = "Return is non-null" 
     )
-    public void tm_0CC8A86E5dup( Test.Case tc ) {
-    	tc.assertNonNull( App.get().getLocation( new Exception() ) );
+    public void tm_0CC8A86E5( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocation( new Throwable() ) );
     }
     
     @Test.Impl( 
     	member = "method: Stream App.getLocation(Throwable)", 
     	description = "Return is not terminated" 
     )
-    public void tm_0ED3DB76Edup( Test.Case tc ) {
-    	App.get().getLocation( new Exception() ).map( Function.identity() );
+    public void tm_0ED3DB76E( Test.Case tc ) {
+    	App.get().getLocation( new Throwable() ).collect( Collectors.toList() );
     	tc.assertPass();
     }
     
     @Test.Impl( 
-    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	member = "method: Stream App.getLocation(Throwable)", 
+    	description = "Throws AssertionError for null Throwable" 
+    )
+    public void tm_03BC3785D( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocation( null );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Elements are file links" 
+    )
+    public void tm_0CFD50284( Test.Case tc ) {
+    	App.get().getLocationMatching( "^test.*|^sog.*" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method tm_0CFD50284" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Elements correspond to the calling stack" 
+    )
+    public void tm_0DA5A69DC( Test.Case tc ) {
+    	App.get().getLocationMatching( "^test.*|^sog.*" ).forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE
+    	//* */ tc.assertFail( ">>> Verify: Elements correspond to the calling stack" ); /*
+		tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Elements have classes matching the given regexp" 
+    )
+    public void tm_07E4DBA4F( Test.Case tc ) {
+    	final String regexp = "^test.*";
+    	App.get().getLocationMatching( regexp ).forEach( s -> tc.assertTrue( s.matches( regexp ) ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_0A5D6B297( Test.Case tc ) {
+		test.sog.core.foo.A.getLocationMatching( "^test.*" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationMatchingSecondary" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Return can be empty" 
+    )
+    public void tm_087ABBB4A( Test.Case tc ) {
+    	tc.assertEqual( 0L, App.get().getLocationMatching( "bogus" ).count() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Return is non-null" 
+    )
+    public void tm_04DCC14C9( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocationMatching( "sog.*" ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_0A56E4A52( Test.Case tc ) {
+    	App.get().getLocationMatching( "sog.*" ).collect( Collectors.toList() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Throws AssertionError for empty regexp" 
+    )
+    public void tm_0DBD15336( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationMatching( "" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(String)", 
+    	description = "Throws AssertionError for null regexp" 
+    )
+    public void tm_05401435E( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationMatching( null );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Elements are file links" 
+    )
+    public void tm_0325A73A6( Test.Case tc ) {
+    	App.get().getLocationMatching( new Throwable(), "^test.*" ).forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE:
+    	//* */ tc.assertFail( ">>> Verify link for tm_0325A73A6" ); /*
+    	tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Elements correspond to the stack trace" 
+    )
+    public void tm_0B2A520FA( Test.Case tc ) {
+    	Exception e = new Exception();
+    	List<String> locations = App.get().getLocationMatching( e, "^test.*|^sog.*" ).collect( Collectors.toList() );
+    	tc.assertTrue( locations.size() > 0 );
+    	// TOGGLE
+    	/* */ tc.assertPass(); /*
+    	tc.addMessage( "Verify the following are similar." );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Location stream:" );
+    	locations.stream().forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Exception stack:" );
+    	Stream.of( e.getStackTrace() ).map( Object::toString ).forEach( tc::addMessage );
+    	tc.assertFail( "Compare" );
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Elements have classes matching the given regexp" 
+    )
+    public void tm_0C23A6571( Test.Case tc ) {
+    	String regexp = "^test.*|^sog.*";
+    	App.get().getLocationMatching( new Throwable(), regexp ).forEach( s -> tc.assertTrue( s.matches( regexp ) ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_025A167B5( Test.Case tc ) {
+		test.sog.core.foo.A.getLocationMatching( new Throwable(), "^test.*" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationMatchingSecondary" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Return can be empty" 
+    )
+    public void tm_0CC4B0D6C( Test.Case tc ) {
+    	tc.assertEqual( 0L, App.get().getLocationMatching( new Throwable(), "bogus" ).count() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Return is non-null" 
+    )
+    public void tm_068C8F667( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocationMatching( new Throwable(), " " ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_09396FD70( Test.Case tc ) {
+    	App.get().getLocationMatching( new Throwable(),  " " ).collect( Collectors.toList() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Throws AssertionError for empty regexp" 
+    )
+    public void tm_0D6FB39D4( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationMatching( new Throwable(), "" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Throws AssertionError for null Throwable" 
+    )
+    public void tm_024247A5F( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationMatching( null, "hi" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationMatching(Throwable, String)", 
+    	description = "Throws AssertionError for null regexp" 
+    )
+    public void tm_032D11100( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationMatching( new Throwable(), null );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Elements are file links" 
+    )
+    public void tm_02B819147( Test.Case tc ) {
+    	App.get().getLocationStarting( "^test.*" ).forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE:
+    	//* */ tc.assertFail( ">>> Verify link for tm_02B819147" ); /*
+    	tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Elements correspond to the calling stack" 
+    )
+    public void tm_072BAD979( Test.Case tc ) {
+    	App.get().getLocationStarting( "sog" ).forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE
+    	//* */ tc.assertFail( ">>> Verify: Elements correspond to the calling stack" ); /*
+		tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
     	description = "Elements have classes matching the given class name prefix" 
     )
-    public void tm_0144A68B0( Test.Case tc ) {
-    	String prefix = "test";
-    	List<String> elements = App.get().getLocationStarting( new Exception(), prefix ).collect( Collectors.toList() );
-    	tc.assertFalse( elements.isEmpty() );
-    	elements.forEach( s -> tc.assertTrue( s.startsWith( prefix ) ) );
+    public void tm_091FB7A4C( Test.Case tc ) {
+    	String regexp = "test";
+    	App.get().getLocationStarting( regexp ).forEach( s -> tc.assertTrue( s.startsWith( regexp ) ) );
     }
     
     @Test.Impl( 
-    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_07C5B0F34( Test.Case tc ) {
+		test.sog.core.foo.A.getLocationStarting( "test" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationStartingSecondary" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
     	description = "Prefix can be empty" 
     )
-    public void tm_0BB502807( Test.Case tc ) {
-    	App.get().getLocationStarting( new Exception(), "" );
+    public void tm_0F053FDEB( Test.Case tc ) {
+    	App.get().getLocationStarting( "" ).collect( Collectors.toList() );
     	tc.assertPass();
     }
     
     @Test.Impl( 
-    	member = "method: Stream App.getLocation(Throwable, String)", 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Return can be empty" 
+    )
+    public void tm_0DE1C238D( Test.Case tc ) {
+    	tc.assertEqual( 0L, App.get().getLocationStarting( "bogus" ).count() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Return is non-null" 
+    )
+    public void tm_0695C1826( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocationStarting( "sog" ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_0BF5393EF( Test.Case tc ) {
+    	App.get().getLocationMatching( "empty" ).collect( Collectors.toList() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(String)", 
     	description = "Throws AssertionError for null prefix" 
     )
-    public void tm_0CCF3F746( Test.Case tc ) {
+    public void tm_0D64B9C2A( Test.Case tc ) {
     	tc.expectError( AssertionError.class );
-    	App.get().getLocationStarting( new Exception(), null );
+    	App.get().getLocationStarting( null );
     }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Elements are file links" 
+    )
+    public void tm_0793A1D03( Test.Case tc ) {
+    	tc.addMessage( " " );
+    	App.get().getLocationStarting( new Throwable(), "test" ).forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	// TOGGLE
+    	//* */ tc.assertFail( ">>> Verify link for method tm_0793A1D03" ); /*
+    	tc.assertPass();
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Elements correspond to the stack trace" 
+    )
+    public void tm_0DCEBBD3D( Test.Case tc ) {
+    	Exception e = new Exception();
+    	List<String> locations = App.get().getLocationStarting( e, "test" ).collect( Collectors.toList() );
+    	tc.assertTrue( locations.size() > 0 );
+    	// TOGGLE
+    	/* */ tc.assertPass(); /*
+    	tc.addMessage( "Verify the following are similar." );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Location stream:" );
+    	locations.stream().forEach( tc::addMessage );
+    	tc.addMessage( " " );
+    	tc.addMessage( "Exception stack:" );
+    	Stream.of( e.getStackTrace() ).map( Object::toString ).forEach( tc::addMessage );
+    	tc.assertFail( "Compare" );
+    	/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Elements have classes matching the given class name prefix" 
+    )
+    public void tm_05B4C7510( Test.Case tc ) {
+    	String prefix = "java";
+    	App.get().getLocationStarting( new Throwable(), prefix ).forEach( s -> tc.assertTrue( s.startsWith( prefix ) ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Links work for secondary classes" 
+    )
+    public void tm_063FDF6F8( Test.Case tc ) {
+		test.sog.core.foo.A.getLocationStarting( new Throwable(), "test" ).forEach( tc::addMessage );
+		tc.addMessage( " " );
+		// TOGGLE:
+		//* */ tc.assertFail( ">>> Test link for method getLocationStartingSecondary" ); /*
+		tc.assertPass();
+		/* */
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Prefix can be empty" 
+    )
+    public void tm_050BFC7A7( Test.Case tc ) {
+    	App.get().getLocationStarting( new Throwable(), "" ).collect( Collectors.toList() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Return can be empty" 
+    )
+    public void tm_03E87ED49( Test.Case tc ) {
+    	tc.assertEqual( 0L, App.get().getLocationStarting( new Throwable(), "bogus" ).count() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Return is non-null" 
+    )
+    public void tm_053B226EA( Test.Case tc ) {
+    	tc.assertNonNull( App.get().getLocationStarting( new Throwable(), " " ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Return is not terminated" 
+    )
+    public void tm_028AC7FB3( Test.Case tc ) {
+    	App.get().getLocationStarting( new Throwable(), "" ).collect( Collectors.toList() );
+    	tc.assertPass();
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Throws AssertionError for null Throwable" 
+    )
+    public void tm_04E6B16A2( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationStarting( null, "" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Stream App.getLocationStarting(Throwable, String)", 
+    	description = "Throws AssertionError for null prefix" 
+    )
+    public void tm_0E1D6EEE6( Test.Case tc ) {
+    	tc.expectError( AssertionError.class );
+    	App.get().getLocationStarting( new Throwable(), null );
+    }	
 		
 	@Test.Impl( 
 		member = "method: String App.Location.toString()", 
@@ -1313,8 +1499,9 @@ public class AppTest extends Test.Container{
 		//*/
 		
 		/* Toggle package results
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( App.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( false )
 			.showProgress( true )
 			.print();

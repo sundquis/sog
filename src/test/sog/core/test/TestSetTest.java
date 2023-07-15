@@ -566,7 +566,7 @@ public class TestSetTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
 		Test.eval( TestSet.class )
 			.concurrent( true )
 			.showDetails( true )
@@ -575,6 +575,7 @@ public class TestSetTest extends Test.Container {
 		//*/
 		
 		/* Toggle package results
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( TestSet.class )
 			.concurrent( true )
 			.showDetails( false )

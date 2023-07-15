@@ -305,8 +305,8 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	 * @return
 	 * 		this Test.Case
 	 */
-	@Test.Decl( "The message must not be empty" )
-	@Test.Decl( "The message must not be null" )
+	@Test.Decl( "Throws AssertionError for empty message" )
+	@Test.Decl( "Throws AssertionError for null message" )
 	@Test.Decl( "The message is retained" )
 	@Test.Decl( "If old state is OPEN, new state is FAIL" )
 	@Test.Decl( "If old state is PASS, new state is FAIL" )
@@ -685,7 +685,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		out.decreaseIndent();
 	}
 
-	@Test.Decl( "Consistent with configured value" )
+	@Test.Decl( "Returns this TestCase instance to allow chaining" )
 	public TestCase showProgress( boolean showProgress ) {
 		this.showProgress = showProgress;
 		return this;
@@ -699,7 +699,6 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	
 	
 	@Override
-	@Test.Decl( "Respects Test.Impl.priority" )
 	@Test.Decl( "For equal priority ordered by member" )
 	@Test.Decl( "For equal priority and member ordered by description" )
 	public int compareTo( TestCase other ) {

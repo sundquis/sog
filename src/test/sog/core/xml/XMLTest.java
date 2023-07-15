@@ -79,6 +79,21 @@ public class XMLTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		Test.eval( XML.class ).showDetails( true ).print();
+		/* Toggle class results
+		Test.eval( XML.class )
+			.concurrent( false )
+			.showDetails( true )
+			.showProgress( false )
+			.print();
+		//*/
+		
+		/* Toggle package results
+		//sog.util.Concurrent.safeModeOff();
+		Test.evalPackage( XML.class )
+			.concurrent( false )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
 	}
 }
