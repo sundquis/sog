@@ -21,7 +21,7 @@ package test.sog.core;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Cache;
 import sog.core.Procedure;
 import sog.core.Strings;
@@ -191,7 +191,7 @@ public class CacheTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Cache.get(Comparable)", 
-		description = "Throws AppException if Builder throws exception",
+		description = "Throws AppRuntime if Builder throws exception",
 		threadsafe = false
 	)
 	public void tm_0E55DE864( Test.Case tc ) {
@@ -199,7 +199,7 @@ public class CacheTest extends Test.Container {
 			throw new AssertionError();
 		};
 		Cache<Integer, String> cache = new Cache<>( builder );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		cache.get( 0 );
 	}
 		
@@ -388,13 +388,15 @@ public class CacheTest extends Test.Container {
 		Test.eval( Cache.class )
 			.concurrent( true )
 			.showDetails( true )
+			.showProgress( true )
 			.print();
 		//*/
 		
 		/* Toggle package results
 		Test.evalPackage( Cache.class )
 			.concurrent( false )
-			.showDetails( true )
+			.showDetails( false )
+			.showProgress( true )
 			.print();
 		//*/
 		

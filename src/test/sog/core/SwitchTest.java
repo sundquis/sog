@@ -20,7 +20,7 @@
 package test.sog.core;
 
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Switch;
 import sog.core.Test;
 
@@ -59,7 +59,7 @@ public class SwitchTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: Object Switch.apply(Object, Object)", 
-		description = "Throws AppException when handler raises exception" 
+		description = "Throws AppRuntime when handler raises exception" 
 	)
 	public void tm_00BEB3662( Test.Case tc ) {
 		Switch<Type, Integer, String> sw = this.getSwitch();
@@ -67,7 +67,7 @@ public class SwitchTest extends Test.Container {
 			.addCase( Type.B, n -> { return "B" + 1/n; } );
 
 		sw.apply( Type.A, 0 );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		sw.apply( Type.B, 0 );
 	}
 		

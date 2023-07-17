@@ -131,7 +131,7 @@ public class Switch<T, A, R> implements BiFunction<T, A, R> {
 	 */
 	@Override
 	@Test.Decl( "Throws AssertionError for null key" )
-	@Test.Decl( "Throws AppException when handler raises exception" )
+	@Test.Decl( "Throws AppRuntime when handler raises exception" )
 	public R apply( T key, A arg ) {
 		Assert.nonNull( key );
 		
@@ -144,7 +144,7 @@ public class Switch<T, A, R> implements BiFunction<T, A, R> {
 		try {
 			result = handler.apply( arg );
 		} catch ( Throwable e ) {
-			throw new AppException( "Exception in case handler for Switch on " + key.getClass(), e );
+			throw new AppRuntime( "Exception in case handler for Switch on " + key.getClass(), e );
 		}
 
 		return result;

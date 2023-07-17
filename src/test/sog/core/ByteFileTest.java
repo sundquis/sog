@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.ByteFile;
 import sog.core.Procedure;
 import sog.core.Test;
@@ -385,7 +385,7 @@ public class ByteFileTest extends Test.Container {
 			bf3.write( position, this.DATA );
 			bf4.write( position, this.DATA );
 			bf5.write( position, this.DATA );
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			bf6.append( this.DATA );
 		}
 	}
@@ -511,7 +511,7 @@ public class ByteFileTest extends Test.Container {
 			bf3.write( position, this.DATA );
 			bf4.write( position, this.DATA );
 			bf5.write( position, this.DATA );
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			bf6.append( this.DATA, 0, 1 );
 		}
 	}
@@ -685,7 +685,7 @@ public class ByteFileTest extends Test.Container {
 			Stream.of( 27, 11, 92, 78, 76, 100 ).forEach( n -> bf.write( n, this.DATA ) );
 			tc.assertEqual( bf.getLength(), (int) raf.length() );
 		} catch ( Exception e ) {
-			throw new AppException(e);
+			throw new AppRuntime(e);
 		} 
 	}
 		
@@ -951,7 +951,7 @@ public class ByteFileTest extends Test.Container {
 			bf3.write( position, this.DATA );
 			bf4.write( position, this.DATA );
 			bf5.write( position, this.DATA );
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			bf6.write( 0, this.DATA );
 		}
 	}
@@ -1123,7 +1123,7 @@ public class ByteFileTest extends Test.Container {
 			bf3.write( position, this.DATA );
 			bf4.write( position, this.DATA );
 			bf5.write( position, this.DATA );
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			bf6.write( 0, DATA, 0, 1 );
 		}
 	}

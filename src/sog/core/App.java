@@ -131,8 +131,8 @@ public class App implements Runnable {
 	 * @return	The non-null Path to the source directory.
 	 */
 	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws AppException for missing source dir" )
-	@Test.Decl( "Throws AppException for secondary class" )
+	@Test.Decl( "Throws AppRuntime for missing source dir" )
+	@Test.Decl( "Throws AppRuntime for secondary class" )
 	@Test.Decl( "Returns non null" )
 	@Test.Decl( "Returns readable" )
 	@Test.Decl( "Returns writeable" )
@@ -167,8 +167,8 @@ public class App implements Runnable {
 	 * @return	The non-null Path to the source file.
 	 */
 	@Test.Decl( "Throws assertion error for null class" )
-	@Test.Decl( "Throws AppException for missing source file" )
-	@Test.Decl( "Throws AppException for secondary class" )
+	@Test.Decl( "Throws AppRuntime for missing source file" )
+	@Test.Decl( "Throws AppRuntime for secondary class" )
 	@Test.Decl( "Returns non null" )
 	@Test.Decl( "Returns readable" )
 	@Test.Decl( "Returns container for nested class" )
@@ -253,7 +253,7 @@ public class App implements Runnable {
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
-			throw new AppException( e );
+			throw new AppRuntime( e );
 		}
 	}
 	
@@ -280,7 +280,7 @@ public class App implements Runnable {
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
-			throw new AppException( e );
+			throw new AppRuntime( e );
 		}
 	}
 	
@@ -307,7 +307,7 @@ public class App implements Runnable {
 				.map( sourceDir::relativize )
 				.map( this::relativePathToClassname );
 		} catch ( IOException e ) {
-			throw new AppException( e );
+			throw new AppRuntime( e );
 		}
 	}
 
@@ -533,7 +533,7 @@ public class App implements Runnable {
 			.map( StackWalker.StackFrame::getDeclaringClass )
 			.skip( offset )
 			.findFirst()
-			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
+			.orElseThrow( () -> new AppRuntime( "Offset (" + offset + ") larger than depth of stack." ) )
 		);
 	}
 
@@ -562,7 +562,7 @@ public class App implements Runnable {
 			.map(  StackWalker.StackFrame::getMethodName )
 			.skip( offset )
 			.findFirst()
-			.orElseThrow( () -> new AppException( "Offset (" + offset + ") larger than depth of stack." ) )
+			.orElseThrow( () -> new AppRuntime( "Offset (" + offset + ") larger than depth of stack." ) )
 		);
 	}
 	

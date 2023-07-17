@@ -178,7 +178,7 @@ public class ByteFile implements AutoCloseable {
 		} catch ( FileNotFoundException e ) {
 			Fatal.impossible( "Framework should ensure tmp files exist." );
 		} catch ( IOException e ) {
-			throw new AppException( e );
+			throw new AppRuntime( e );
 		}
 	}
 
@@ -328,7 +328,7 @@ public class ByteFile implements AutoCloseable {
 		} catch ( FileNotFoundException e ) {
 			Fatal.impossible( "Framework should ensure tmp files exist." );
 		} catch ( IOException e ) {
-			throw new AppException( e );
+			throw new AppRuntime( e );
 		}
 	}
 	

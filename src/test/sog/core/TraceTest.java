@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Trace;
@@ -152,12 +152,12 @@ public class TraceTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: void Trace.run()", 
-		description = "Throws AppException when called from an external thread",
+		description = "Throws AppRuntime when called from an external thread",
 		threadsafe = false
 	)
 	public void tm_0DBED2B2C( Test.Case tc ) {
 		Trace INSTANCE = this.getSubjectField( null, "INSTANCE", null );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		INSTANCE.run();
 	}
 		
@@ -417,13 +417,15 @@ public class TraceTest extends Test.Container {
 		Test.eval( Trace.class )
 			.concurrent( true )
 			.showDetails( true )
+			.showProgress( true )
 			.print();
 		//*/
 		
 		/* Toggle package results
 		Test.evalPackage( Trace.class )
 			.concurrent( false )
-			.showDetails( true )
+			.showDetails( false )
+			.showProgress( true )
 			.print();
 		//*/
 		

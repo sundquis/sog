@@ -13,10 +13,13 @@ import java.io.Reader;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -24,7 +27,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
+import sog.core.LocalDir;
 import sog.core.Strings;
 import sog.core.Test;
 import sog.core.xml.XMLHandler;
@@ -46,7 +50,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 			try {
 				return new StreamReader( Adapter.comment.getCommentedLines( label ) );
 			} catch ( IOException e ) {
-				throw new AppException( e );
+				throw new AppRuntime( e );
 			}
 		}
 		
@@ -68,7 +72,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 		// Controls diagnostic feedback
 		private static final boolean FEEDBACK = true;
 		
-		private void out( Object ... msg ) {
+		protected void out( Object ... msg ) {
 			if ( !FEEDBACK ) { return; }
 			
 			// REMOVE
@@ -103,6 +107,78 @@ public class XMLHandlerTestOLD extends Test.Container {
 
 	
 	// Test implementations
+	
+    // EXT-XML	<?xml version = "1.0" encoding = "UTF-8" ?>
+    // EXT-XML	<!DOCTYPE root SYSTEM "TEST.dtd" >
+    // EXT-XML	
+    // EXT-XML	<root>
+    // EXT-XML		<a/>
+    // EXT-XML		<b name = "tom">
+    // EXT-XML			Some content.
+    // EXT-XML		</b>
+    // EXT-XML	</root>
+    // EXT-XML	
+    
+    // EXT-DTD		<!ELEMENT	root	(a,b)>
+    // EXT-DTD		<!ELEMENT	a		EMPTY>
+    // EXT-DTD		<!ELEMENT	b		(#PCDATA)>
+    // EXT-DTD		<!ATTLIST	b
+    // EXT-DTD			name	CDATA	#REQUIRED
+    // EXT-DTD			age		CDATA	#FIXED		"42"
+    // EXT-DTD		>
+    
+    @Test.Impl( 
+    	member = "constructor: XMLHandler(Path)", 
+    	description = "External DTD is read" 
+    )
+    public void tm_00380BA00( Test.Case tc ) {
+//    	Path xmlPath = new LocalDir().sub( "tmp" ).getFile( "TEST", LocalDir.Type.XML );
+//    	Path dtdPath = new LocalDir().sub( "tmp" ).getFile( "TEST", LocalDir.Type.DTD );
+//    	Adapter.writeLines( xmlPath, "EXT-XML" );
+//    	Adapter.writeLines( dtdPath, "EXT-DTD" );
+//    	tc.assertTrue( new Adapter<Boolean>( xmlPath ) {
+//    		@Override public void endDTD() throws SAXException { this.accept( true ); }
+//    	}.parseAndGet());
+    }
+
+    // attributesToMap	<?xml version = "1.0" encoding = "UTF-8" standalone = "yes" ?>
+    // attributesToMap	<!DOCTYPE root [
+    // attributesToMap		<!ELEMENT	root	(child1) >
+    // attributesToMap		<!ELEMENT	child1	EMPTY>
+    // attributesToMap		<!ATTLIST	child1
+    // attributesToMap			attr1	CDATA	#IMPLIED
+    // attributesToMap			attr2	CDATA	#IMPLIED
+    // attributesToMap			attr3	CDATA	#IMPLIED
+    // attributesToMap		>
+    // attributesToMap		<!ELEMENT	child2	EMPTY>
+    // attributesToMap	]>
+    // attributesToMap	<root>
+    // attributesToMap		<child1 attr1 = "one" attr2 = "two" attr3 = "three" />
+    // attributesToMap		<child2 />
+    // attributesToMap	</root>
+    // attributesToMap	
+    
+    @Test.Impl( 
+    	member = "method: Map XMLHandler.attributesToMap(Attributes)", 
+    	description = "All keys are present" 
+    )
+    public void tm_0CEFD09EC( Test.Case tc ) {
+//    	Attributes attrs = new Adapter<Attributes>( "attributesToMap" ) {
+//    		@Override public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
+//    			this.out( true, "qName", qName, "length before", (this.get() == null ? 0 : this.get().getLength()) );
+//    			if ( qName.equals( "child1" ) ) { 
+//    				this.accept( atts );
+//        			this.out( true, "qName", qName, "in equals", (this.get() == null ? 0 : this.get().getLength()) );
+//    			}
+//    		}
+//    	}.parseAndGet();
+//
+//    	tc.assertEqual( 
+//    		List.of( "attr1", "attr2", "attr3" ),
+//    		IntStream.range( 0, attrs.getLength() ).mapToObj( attrs::getQName ).collect( Collectors.toList() )
+//    	);
+    }
+
 	
 	
 	// ATTRIBUTE	<?xml version="1.0" encoding="UTF-8"?>
@@ -745,7 +821,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 		try {
 			adapter.parse();
 			//tc.fail( "Expected SAXParseException" );
-		} catch ( AppException e ) {
+		} catch ( AppRuntime e ) {
 			tc.assertEqual( "Got error", adapter.get() );
 			tc.assertEqual( SAXParseException.class, e.getCause().getClass() );
 		}
@@ -761,7 +837,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 		try {
 			adapter.parse();
 			//tc.fail( "Expected SAXParseException" );
-		} catch ( AppException e ) {
+		} catch ( AppRuntime e ) {
 			tc.assertEqual( "(1, 3)",  adapter.get() );
 		}
 	}
@@ -778,7 +854,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 		try {
 			adapter.parse();
 			//tc.fail( "Expected SAXParseException" );
-		} catch ( AppException e ) {
+		} catch ( AppRuntime e ) {
 			tc.assertEqual( "Got error",  adapter.get() );
 		}
 	}
@@ -795,7 +871,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 		try {
 			adapter.parse();
 			//tc.fail( "Expected SAXParseException" );
-		} catch ( AppException e ) {
+		} catch ( AppRuntime e ) {
 			tc.assertEqual( "Got error",  adapter.get() );
 		}
 	}

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Test;
 import sog.util.Macro;
 
@@ -162,7 +162,7 @@ public class MacroTest extends Test.Container {
 		}
 		macro.expand( "x" + iterations,  "Done" );
 		tc.assertEqual( "Done", macro.apply( "${x1}" ).findFirst().orElse("FAIL") );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		macro.apply( "${x0}" );
 	}
 
@@ -172,10 +172,10 @@ public class MacroTest extends Test.Container {
 		tc.assertEqual( (long) lines.size(),  new Macro().expand( "x",  "text" ).apply( lines ).count() );
 	}
 
-	@Test.Impl( member = "public Stream Macro.apply(List)", description = "Throws AppException for excessive recursion" )
+	@Test.Impl( member = "public Stream Macro.apply(List)", description = "Throws AppRuntime for excessive recursion" )
 	public void apply_ThrowsAppexceptionForExcessiveRecursion( Test.Case tc ) {
 		Macro macro = new Macro().expand( "X",  "${Y}" ).expand( "Y",  "${X}" );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		macro.apply( Arrays.asList( "{X}", "Good", "${X}", "Good" ) ).count();
 	}
 
@@ -255,16 +255,16 @@ public class MacroTest extends Test.Container {
 		tc.assertEqual( "Done", macro.apply( "${simple replacement}" ).findFirst().orElse( "FAIL" ) );
 	}
 
-	@Test.Impl( member = "public Stream Macro.apply(String)", description = "Throws AppException for excessive recursion" )
+	@Test.Impl( member = "public Stream Macro.apply(String)", description = "Throws AppRuntime for excessive recursion" )
 	public void apply_ThrowsAppexceptionForExcessiveRecursion_( Test.Case tc ) {
 		Macro macro = new Macro().expand( "X",  "${Y}" ).expand( "Y",  "${X}" );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		macro.apply( "Start: ${X}" );
 	}
 
 	@Test.Impl( member = "public Stream Macro.apply(String)", description = "Throws AppExcpetion for missing key" )
 	public void apply_ThrowsAppexcpetionForMissingKey( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		new Macro().apply( "${missing}" );
 	}
 
@@ -301,9 +301,9 @@ public class MacroTest extends Test.Container {
 		tc.assertEqual( 3L,  new Macro().apply( "1", "2", "3" ).count() );
 	}
 
-	@Test.Impl( member = "public Stream Macro.apply(String[])", description = "Throws AppException for excessive recursion" )
+	@Test.Impl( member = "public Stream Macro.apply(String[])", description = "Throws AppRuntime for excessive recursion" )
 	public void apply_ThrowsAppexceptionForExcessiveRecursion__( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		new Macro().expand( "x",  "${x}" ).apply( "v", "w", "${x}" ).count();
 	}
 

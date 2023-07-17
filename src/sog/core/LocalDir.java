@@ -131,7 +131,7 @@ public class LocalDir {
 	 */
 	@Test.Decl( "Throws AssertionError for null subdir name" )
 	@Test.Decl( "Throws AssertionError for empty subdir name" )
-	@Test.Decl( "Throws AppException if missing directory cannot be created" )
+	@Test.Decl( "Throws AppRuntime if missing directory cannot be created" )
 	@Test.Decl( "Throws AssertionError if resulting directory does not exist" )
 	@Test.Decl( "Throws AssertionError if resulting directory is not readable" )
 	@Test.Decl( "Return is this LocalDir instance" )
@@ -141,7 +141,7 @@ public class LocalDir {
 			try {
 				Files.createDirectory( this.path );
 			} catch ( IOException e ) {
-				throw new AppException( e );
+				throw new AppRuntime( e );
 			}
 		}
 

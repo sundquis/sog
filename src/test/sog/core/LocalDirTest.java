@@ -21,7 +21,7 @@ package test.sog.core;
 
 import java.nio.file.Files;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.LocalDir;
 import sog.core.Test;
 
@@ -183,11 +183,11 @@ public class LocalDirTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: LocalDir LocalDir.sub(String)", 
-		description = "Throws AppException if missing directory cannot be created" 
+		description = "Throws AppRuntime if missing directory cannot be created" 
 	)
 	public void tm_0ECFA8620( Test.Case tc ) {
 		LocalDir dir = new LocalDir( true ).sub( "tmp" ).sub( "assert" ).sub( "unwriteable_dir" );
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		dir.sub( "foo" );
 	}
 		

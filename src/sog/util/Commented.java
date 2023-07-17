@@ -9,6 +9,9 @@ package sog.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import sog.core.App;
@@ -27,7 +30,7 @@ public interface Commented {
 	/**
 	 * Returns a non-terminated stream containing labeled comments from the source file for this class
 	 * Labeled comments have:
-	 * 		<optional white space>//<optional white space><label><optional tab or space>Content
+	 * 		<optional white space>//<optional white space><label><one optional tab or space>Content
 	 * 
 	 * @param label
 	 * @return
@@ -49,5 +52,35 @@ public interface Commented {
 			.filter( s -> s.matches( getRegExp( label + ".*" ) ) )
 			.map( s -> s.replaceFirst( getRegExp( label ),  "" ) ); 
 	}
+
+	/**
+	 * A filtering operation that:
+	 * 		1. Extracts the commented lines in this Commented source file.
+	 * 		2. Applies the mapping (usually a Macro).
+	 * 		3. Writes the mapped lines to a destination file.
+	 * If the file exists, the contents are replaced with the new lines.
+	 * If the file does not exist it is created.
+	 * 
+	 * @param label
+	 * @param file
+	 * @param mapper
+	 * @param options
+	 * @throws IOException
+	 */
+	default void writeLines( String label, Path file, Function<String, Stream<String>> mapper ) throws IOException {
+		// WARNING: Forming an Iterable that will only only work once
+		Stream<String> lines = this.getCommentedLines( label );
+		Iterable<CharSequence> iter = () -> lines.flatMap( mapper ).map( CharSequence.class::cast ).iterator();
+
+		Files.write( file, iter, 
+			StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE );
+	}
+
+	default void writeLines( String label, Path file ) throws IOException {
+		this.writeLines( label, file, (String s) -> Stream.of( s ) );
+	}
+
+
+
 
 }

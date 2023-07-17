@@ -45,7 +45,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	 */
 	@FunctionalInterface
 	public interface Builder<K, V> {
-		public V make( K key ) throws AppException;
+		public V make( K key ) throws AppRuntime;
 	}
 
 	/** A SoftReference that also holds the key */
@@ -87,12 +87,12 @@ public final class Cache<K extends Comparable<K>, V> {
 	 * 
 	 * @param key
 	 * @return
-	 * @throws AppException		If the builder is unable to construct the value.
+	 * @throws AppRuntime		If the builder is unable to construct the value.
 	 */
 	@SuppressWarnings( "unchecked" )
 	@Test.Decl( "Throws AssertionError for null key" )
 	@Test.Decl( "Throws AssertionError if Builder produces null" )
-	@Test.Decl( "Throws AppException if Builder throws exception" )
+	@Test.Decl( "Throws AppRuntime if Builder throws exception" )
 	@Test.Decl( "From empty cache returns valid object" )
 	@Test.Decl( "After clear() produces equivalent object" )
 	@Test.Decl( "After clear() produces non-identical object" )
@@ -102,7 +102,7 @@ public final class Cache<K extends Comparable<K>, V> {
 	@Test.Decl( "Produces identical values for identical keys after collection" )
 	@Test.Decl( "Values before and after collection are equivalent" )
 	@Test.Decl( "Values before and after collection are not identical" )
-	public V get( K key ) throws AppException {
+	public V get( K key ) throws AppRuntime {
 		Assert.nonNull( key );
 		V value = null;
 
@@ -130,7 +130,7 @@ public final class Cache<K extends Comparable<K>, V> {
 				try {
 					value = this.builder.make( key );
 				} catch ( Throwable t ) {
-					throw new AppException( t );
+					throw new AppRuntime( t );
 				}
 				this.map.put( key, new SoftRef<K, V>( key, Assert.nonNull( value ), this.rq ) );
 			}

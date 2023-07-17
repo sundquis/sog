@@ -25,26 +25,26 @@ package sog.core;
  * 		NONE
  */
 @Test.Subject( "test." )
-public class AppException extends RuntimeException {
+public class AppRuntime extends RuntimeException {
 
 	private static final long serialVersionUID = -2314875945481995828L;
 
 	/** Constructs an exception with empty detail message. */
 	@Test.Skip( "No testing required" )
-	public AppException() {
+	public AppRuntime() {
 		super();
 	}
 
 	/** Constructs an exception with specified detail message. */
 	@Test.Decl( "Throws AsserionError for null message" )
 	@Test.Decl( "Throws AsserionError for empty message" )
-	public AppException( String msg ) {
+	public AppRuntime( String msg ) {
 		super( Assert.nonEmpty( msg ) );
 	}
 
 	/** Constructs an exception with specified cause. */
 	@Test.Decl( "Throws AsserionError for null cause" )
-	public AppException( Throwable cause ) {
+	public AppRuntime( Throwable cause ) {
 		super( Assert.nonNull( cause ) );
 	}
 
@@ -52,7 +52,7 @@ public class AppException extends RuntimeException {
 	@Test.Decl( "Throws AsserionError for null message" )
 	@Test.Decl( "Throws AsserionError for empty message" )
 	@Test.Decl( "Throws AsserionError for null cause" )
-	public AppException( String msg, Throwable cause ) {
+	public AppRuntime( String msg, Throwable cause ) {
 		super( Assert.nonEmpty( msg ), Assert.nonNull( cause ) );
 	}
 	

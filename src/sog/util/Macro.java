@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Parser;
 import sog.core.Property;
@@ -182,7 +182,7 @@ public class Macro implements Function<String, Stream<String>> {
 	@Override 
 	@Test.Decl( "Throws AssertionError for null line" )
 	@Test.Decl( "Input line without keys is unchanged" )
-	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "Throws AppRuntime for excessive recursion" )
 	@Test.Decl( "An empty expansion rule produces an empty stream" )
 	@Test.Decl( "Throws AppExcpetion for missing key" )
 	@Test.Decl( "Simple replacement works" )
@@ -204,7 +204,7 @@ public class Macro implements Function<String, Stream<String>> {
 			String current;
 			while ( (current = pending.get()) != null ) {
 				if ( iterations++ > Macro.MAX_ITERATIONS ) {
-					throw new AppException( "Infinite recurrsion detected: " + line );
+					throw new AppRuntime( "Infinite recurrsion detected: " + line );
 				}
 				if ( this.matcher.reset( current ).find() ) {
 					String head = current.substring( 0,  this.matcher.start() );
@@ -224,7 +224,7 @@ public class Macro implements Function<String, Stream<String>> {
 	private List<String> getExpansions( String key ) {
 		List<String> result = this.expansions.get( key );
 		if ( result == null ) {
-			throw new AppException( "Missing key: " + key );
+			throw new AppRuntime( "Missing key: " + key );
 		}
 		return result;
 	}
@@ -242,7 +242,7 @@ public class Macro implements Function<String, Stream<String>> {
 	 * @return A {@code Stream} containing the results of applying expansion rules for each macro key.
 	 */
 	@Test.Decl( "An empty sequence of lines produces an empty stream" )
-	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "Throws AppRuntime for excessive recursion" )
 	@Test.Decl( "An empty expansion rule removes line from output stream" )
 	@Test.Decl( "Multiple lines in output for multiple input lines" )
 	public Stream<String> apply( String ... lines ) {
@@ -263,7 +263,7 @@ public class Macro implements Function<String, Stream<String>> {
 	 */
 	@Test.Decl( "An empty collection produces an empty stream" )
 	@Test.Decl( "Throws Assertion Error for null lines" )
-	@Test.Decl( "Throws AppException for excessive recursion" )
+	@Test.Decl( "Throws AppRuntime for excessive recursion" )
 	@Test.Decl( "An empty expansion rule removes line from output stream" )
 	@Test.Decl( "Multiple lines in output for multiple input lines" )
 	public Stream<String> apply( List<String> lines ) {

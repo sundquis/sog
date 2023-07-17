@@ -20,7 +20,7 @@ package sog.core.test;
 
 import java.io.IOException;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.Commented;
@@ -87,7 +87,7 @@ public class TestDecl extends TestIdentifier implements Commented, Printable {
 		try {
 			this.getCommentedLines( "STUB" ).flatMap( macro ).forEach( out::println );
 		} catch ( IOException ex ) {
-			throw new AppException( ex );
+			throw new AppRuntime( ex );
 		}
 	}
 

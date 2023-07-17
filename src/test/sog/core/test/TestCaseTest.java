@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Procedure;
 import sog.core.Test;
@@ -89,9 +89,9 @@ public class TestCaseTest extends Test.Container {
 		
 		@Test.Impl( member = "member", description = "description" )
 		public void tm_ExpectedError( Test.Case tc ) { 
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			this.sleep();
-			throw new AppException();
+			throw new AppRuntime();
 		}
 		
 		@Test.Impl( member = "member", description = "description" )
@@ -102,7 +102,7 @@ public class TestCaseTest extends Test.Container {
 		
 		@Test.Impl( member = "member", description = "description" )
 		public void tm_WrongError( Test.Case tc ) { 
-			tc.expectError( AppException.class );
+			tc.expectError( AppRuntime.class );
 			this.sleep();
 			throw new AssertionError();
 		}

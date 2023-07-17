@@ -24,7 +24,7 @@ import sog.util.Fault;
 /**
  * A class used to signal fatal runtime conditions.
  * 
- * These (with the exception of warning) throw AppException.
+ * These (with the exception of warning) throw AppRuntime.
  * Contract violations (illegal arguments, etc.) use the Assert class and throw AssertionError
  */
 @Test.Subject( "test." )
@@ -117,11 +117,11 @@ public final class Fatal {
 
 	
 	private static void fail( String msg ) {
-		throw new AppException( msg );
+		throw new AppRuntime( msg );
 	}
 	
 	private static void fail( String msg, Throwable cause ) {
-		throw new AppException( msg, cause );
+		throw new AppRuntime( msg, cause );
 	}
 
 }

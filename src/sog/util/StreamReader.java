@@ -35,7 +35,7 @@ public class StreamReader extends Reader implements AutoCloseable {
 	 * 
 	 * @param stream
 	 */
-	@Test.Decl( "Throws Assertion Error for null stream" )
+	@Test.Decl( "Throws AssertionError for null stream" )
 	public StreamReader( Stream<String> stream ) {
 		this.stream = Assert.nonNull( stream );
 		this.lines = stream.iterator();
@@ -69,8 +69,8 @@ public class StreamReader extends Reader implements AutoCloseable {
 		}
 		
 		int capacity = this.currentLine.length - this.position;
-		int actual = Math.min( count,  capacity );
-		System.arraycopy( this.currentLine,  this.position,  buffer,  offset,  actual );
+		int actual = Math.min( count, capacity );
+		System.arraycopy( this.currentLine, this.position, buffer, offset, actual );
 		this.position += actual;
 		return actual;
 	}

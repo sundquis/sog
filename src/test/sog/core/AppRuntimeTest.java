@@ -18,17 +18,17 @@
  */
 package test.sog.core;
 
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Test;
 
 /**
  * 
  */
 @Test.Skip( "Container" )
-public class AppExceptionTest extends Test.Container {
+public class AppRuntimeTest extends Test.Container {
 	
-	public AppExceptionTest() {
-		super( AppException.class );
+	public AppRuntimeTest() {
+		super( AppRuntime.class );
 	}
 	
 	
@@ -36,65 +36,65 @@ public class AppExceptionTest extends Test.Container {
 	// TEST CASES
 	
 	@Test.Impl( 
-		member = "constructor: AppException(String)", 
+		member = "constructor: AppRuntime(String)", 
 		description = "Throws AsserionError for empty message" 
 	)
 	public void tm_0CE4F475E( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		new AppException( "" );
+		new AppRuntime( "" );
 	}
 	
 	@Test.Impl( 
-		member = "constructor: AppException(String)", 
+		member = "constructor: AppRuntime(String)", 
 		description = "Throws AsserionError for null message" 
 	)
 	public void tm_0C3B35DDA( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		String msg = null;
-		new AppException( msg );
+		new AppRuntime( msg );
 	}
 	
 	@Test.Impl( 
-		member = "constructor: AppException(String, Throwable)", 
+		member = "constructor: AppRuntime(String, Throwable)", 
 		description = "Throws AsserionError for empty message" 
 	)
 	public void tm_0D1CD07BE( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		String msg = "";
 		Throwable th = new Throwable();
-		new AppException( msg, th );
+		new AppRuntime( msg, th );
 	}
 	
 	@Test.Impl( 
-		member = "constructor: AppException(String, Throwable)", 
+		member = "constructor: AppRuntime(String, Throwable)", 
 		description = "Throws AsserionError for null cause" 
 	)
 	public void tm_05CE3C35C( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		String msg = "hi";
 		Throwable th = null;
-		new AppException( msg, th );
+		new AppRuntime( msg, th );
 	}
 	
 	@Test.Impl( 
-		member = "constructor: AppException(String, Throwable)", 
+		member = "constructor: AppRuntime(String, Throwable)", 
 		description = "Throws AsserionError for null message" 
 	)
 	public void tm_0B34C117A( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		String msg = null;
 		Throwable th = new Throwable();
-		new AppException( msg, th );
+		new AppRuntime( msg, th );
 	}
 	
 	@Test.Impl( 
-		member = "constructor: AppException(Throwable)", 
+		member = "constructor: AppRuntime(Throwable)", 
 		description = "Throws AsserionError for null cause" 
 	)
 	public void tm_066DF6237( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
 		Throwable th = null;
-		new AppException( th );
+		new AppRuntime( th );
 	}
 	
 	
@@ -102,14 +102,14 @@ public class AppExceptionTest extends Test.Container {
 
 	public static void main( String[] args ) {
 		/* Toggle class results
-		Test.eval( AppException.class )
+		Test.eval( AppRuntime.class )
 			.concurrent( false )
 			.showDetails( true )
 			.print();
 		//*/
 		
 		/* Toggle package results
-		Test.evalPackage( AppException.class )
+		Test.evalPackage( AppRuntime.class )
 			.concurrent( false )
 			.showDetails( true )
 			.print();

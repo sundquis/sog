@@ -209,10 +209,10 @@ public class Trace implements Runnable, OnShutdown {
 	
 	
 	@Override
-	@Test.Decl( "Throws AppException when called from an external thread" )
+	@Test.Decl( "Throws AppRuntime when called from an external thread" )
 	public void run() {
 		if ( Thread.currentThread() != this.worker ) {
-			throw new AppException( "Cannot start externally." );
+			throw new AppRuntime( "Cannot start externally." );
 		}
 
 		String msg = null;

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
-import sog.core.AppException;
+import sog.core.AppRuntime;
 import sog.core.Test;
 import sog.core.test.TestCase;
 import test.sog.core.foo.A;
@@ -178,7 +178,7 @@ public class AppTest extends Test.Container{
 		description = "Throws AppExcpetion for offset larger than stack depth" 
 	)
 	public void tm_01A20702E( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().getCallingClass( 42 );
 	}
 		
@@ -318,19 +318,19 @@ public class AppTest extends Test.Container{
 		
 	@Test.Impl( 
 		member = "method: Path App.sourceDir(Class)", 
-		description = "Throws AppException for missing source dir" 
+		description = "Throws AppRuntime for missing source dir" 
 	)
 	public void tm_095D6573A( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().sourceDir( Object.class );
 	}
 		
 	@Test.Impl( 
 		member = "method: Path App.sourceDir(Class)", 
-		description = "Throws AppException for secondary class" 
+		description = "Throws AppRuntime for secondary class" 
 	)
 	public void tm_0221E47B0( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().sourceDir( SecondClass.class );
 	}
 
@@ -414,19 +414,19 @@ public class AppTest extends Test.Container{
 		
 	@Test.Impl( 
 		member = "method: Path App.sourceFile(Class)", 
-		description = "Throws AppException for missing source file" 
+		description = "Throws AppRuntime for missing source file" 
 	)
 	public void tm_0A2FD6054( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().sourceFile( Object.class );
 	}
 		
 	@Test.Impl( 
 		member = "method: Path App.sourceFile(Class)", 
-		description = "Throws AppException for secondary class" 
+		description = "Throws AppRuntime for secondary class" 
 	)
 	public void tm_0874DCBBF( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().sourceFile( SecondClass.class );
 	}
 
@@ -479,7 +479,7 @@ public class AppTest extends Test.Container{
 		description = "Secondary classes are not included" 
 	)
 	public void tm_085492351( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		A.classesInPackage().forEach( System.out::println );
 	}
 
@@ -1246,7 +1246,7 @@ public class AppTest extends Test.Container{
 		description = "Throws AppExcpetion for offset larger than stack depth" 
 	)
 	public void tm_0F4DB4BC4( Test.Case tc ) {
-		tc.expectError( AppException.class );
+		tc.expectError( AppRuntime.class );
 		App.get().getCallingMethod( 42 );
 	}
 		
@@ -1501,7 +1501,7 @@ public class AppTest extends Test.Container{
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( App.class )
-			.concurrent( false )
+			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )
 			.print();
