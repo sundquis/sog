@@ -127,28 +127,28 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	
 
 	@Test.Decl( "Enables feedback for content events" )
-	@Test.Decl( "Returns this XMLHadler instance to allow chaining" )
+	@Test.Decl( "Returns this XMLHandler instance to allow chaining" )
 	public XMLHandler showContentEvents() {
 		this.showContentEvents = true;
 		return this;
 	}
 
 	@Test.Decl( "Enables feedback for error events" )
-	@Test.Decl( "Returns this XMLHadler instance to allow chaining" )
+	@Test.Decl( "Returns this XMLHandler instance to allow chaining" )
 	public XMLHandler showErrorEvents() {
 		this.showErrorEvents = true;
 		return this;
 	}
 
 	@Test.Decl( "Enables feedback for lexical (DTD) events" )
-	@Test.Decl( "Returns this XMLHadler instance to allow chaining" )
+	@Test.Decl( "Returns this XMLHandler instance to allow chaining" )
 	public XMLHandler showLexicalEvents() {
 		this.showLexicalEvents = true;
 		return this;
 	}
 
 	@Test.Decl( "Enables feedback for declaration events" )
-	@Test.Decl( "Returns this XMLHadler instance to allow chaining" )
+	@Test.Decl( "Returns this XMLHandler instance to allow chaining" )
 	public XMLHandler showDeclarationEvents() {
 		this.showDeclarationEvents = true;
 		return this;
@@ -215,12 +215,12 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 			this.col = locator == null ? -1 : locator.getColumnNumber();
 		}
 		
-		@Test.Decl( "Must be set if using public resources" )
+		@Test.Decl( "Agrees with value supplied to the InputSource" )
 		public String getPublicId() {
 			return this.publicId;
 		}
 		
-		@Test.Decl( "Can be set when using a file" )
+		@Test.Decl( "Agrees with value supplied to the InputSource" )
 		public String getSystemId() {
 			return this.systemId;
 		}
@@ -234,11 +234,10 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		public int getColumnNumber() { return this.col; }
 		
 		@Override 
-		@Test.Decl( "Not empty" )
 		@Test.Decl( "Indicates row and column while parsing" )
 		public String toString() { return "(" + this.line + ", " + this.col + ")"; }
 
-		@Test.Decl( "True when line or column unknown" )
+		@Test.Decl( "False while parsing" )
 		public boolean unknown() {
 			return (this.line == -1) || (this.col == -1);
 		}
@@ -519,7 +518,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Feedback provided if showErrorEvents() has been called" )
 	public void fatalError( SAXParseException exception ) throws SAXException {
 		if ( this.showErrorEvents ) {
-			this.out( "SAX Fata Error", exception );
+			this.out( "SAX Fatal Error", exception );
 		}
 	}
 

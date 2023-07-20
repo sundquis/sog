@@ -44,7 +44,7 @@ public class XMLHandlerTestOLD extends Test.Container {
 	// Override event handler of interest, using accept() to assign the result
 	private static abstract class Adapter<T> extends XMLHandler implements Supplier<T>, Consumer<T> {
 
-		private static final Commented comment = new Commented() {};
+		private static final Commented comment = new Commented( XMLHandlerTestOLD.class );
 		
 		private static Reader getReader( String label ) {
 			try {

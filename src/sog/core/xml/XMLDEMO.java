@@ -472,7 +472,7 @@ public class XMLDEMO implements ContentHandler, DTDHandler, ErrorHandler, DeclHa
 		// XML	</root>
 		// XML	
 		
-		XMLDEMO demo = new XMLDEMO(	new Commented() {}.getCommentedLines( "XML" ) );
+		XMLDEMO demo = new XMLDEMO(	new Commented( XMLDEMO.class ).getCommentedLines( "XML" ) );
 
 		demo.out( "PARSING:" );
 		demo.parse();

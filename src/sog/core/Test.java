@@ -693,6 +693,13 @@ public class Test {
 		 */
 		public <T> Test.Case assertNotEqual( T expected, T actual );
 		
+		/**
+		 * Mark the test case as failed and insert a comment and file link to the current location.
+		 * 
+		 * @return
+		 */
+		public Test.Case here();
+		
 	}
 	
 	

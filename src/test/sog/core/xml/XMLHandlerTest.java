@@ -22,30 +22,26 @@ package test.sog.core.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
 import sog.core.AppRuntime;
 import sog.core.LocalDir;
-import sog.core.Strings;
 import sog.core.Test;
 import sog.core.xml.XMLHandler;
 import sog.util.Commented;
-import sog.util.Macro;
-import sog.util.StreamReader;
 
 /**
  * Test cases reveal the behavior of the SAX parsing framework.
@@ -54,7 +50,10 @@ import sog.util.StreamReader;
  * Cases illustrating a useful technique are marked with a "PROOF-OF-CONCEPT" comment.
  */
 @Test.Skip( "Container" )
-public class XMLHandlerTest extends Test.Container implements Commented {
+public class XMLHandlerTest extends Test.Container {
+
+	
+	private final Commented source = new Commented( XMLHandlerTest.class );
 	
 	public XMLHandlerTest() {
 		super( XMLHandler.class );
@@ -76,9 +75,9 @@ public class XMLHandlerTest extends Test.Container implements Commented {
 	}
 	
 	
-	private Stream<String> getLines( String label ) {
+	private Stream<String> getLines( String tag ) {
 		try {
-			return this.getCommentedLines( label );
+			return this.source.getTaggedBlock( tag );
 		} catch ( IOException e ) {
 			throw new AppRuntime( e );
 		}
@@ -108,12 +107,18 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	new XMLHandler( stream );
     }
     
-    // EXT-XML	<?xml version = "1.0" encoding = "UTF-8" ?>
-    // EXT-XML	<!DOCTYPE	root	SYSTEM	"TEST.dtd" >
-    // EXT-XML	<root/>
     
-    // EXT-DTD	<!ELEMENT	root	EMPTY>
     
+    
+    /* <EXT-XML>
+     * <?xml version = "1.0" encoding = "UTF-8" ?>
+     * <!DOCTYPE	root	SYSTEM	"TEST.dtd" >
+     * <root/>
+     */
+    
+    /* <EXT-DTD>
+     * <!ELEMENT	root	EMPTY>
+     */
     @Test.Impl( 
     	member = "constructor: XMLHandler(Path)", 
     	description = "External DTD is read" 
@@ -121,9 +126,9 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     public void tm_00380BA00( Test.Case tc ) throws IOException {
     	Path xmlPath = new LocalDir().sub( "tmp" ).sub( "system" ).getFile( "TEST", LocalDir.Type.XML );
     	Path dtdPath = new LocalDir().sub( "tmp" ).sub( "system" ).getFile( "TEST", LocalDir.Type.DTD );
-    	
-		this.writeLines( "EXT-XML", xmlPath );
-		this.writeLines( "EXT-DTD", dtdPath );
+
+		this.source.writeTaggedBlock( "EXT-XML", xmlPath );
+		this.source.writeTaggedBlock( "EXT-DTD", dtdPath );
 		
 		final CS<Boolean> docComplete = new CS<>( false );
 		final CS<Boolean> dtdComplete = new CS<>( false );
@@ -132,11 +137,26 @@ public class XMLHandlerTest extends Test.Container implements Commented {
 		final CS<Boolean> noFatal = new CS<>( true );
 		
     	new XMLHandler( xmlPath ) {
-    		@Override public void endDocument() throws SAXException { docComplete.accept( true ); }
-    		@Override public void endDTD() throws SAXException { dtdComplete.accept( true ); }
-    		@Override public void warning( SAXParseException exception ) throws SAXException { noWarn.accept( false ); }
-    		@Override public void error( SAXParseException exception ) throws SAXException { noError.accept( false ); }
-    		@Override public void fatalError( SAXParseException exception ) throws SAXException { noFatal.accept( false ); }
+    		@Override public void endDocument() throws SAXException { 
+    			super.endDocument();
+    			docComplete.accept( true ); 
+    		}
+    		@Override public void endDTD() throws SAXException { 
+    			super.endDTD();
+    			dtdComplete.accept( true ); 
+    		}
+    		@Override public void warning( SAXParseException exception ) throws SAXException { 
+    			super.warning( exception );
+    			noWarn.accept( false ); 
+    		}
+    		@Override public void error( SAXParseException exception ) throws SAXException { 
+    			super.error( exception );
+    			noError.accept( false ); 
+    		}
+    		@Override public void fatalError( SAXParseException exception ) throws SAXException { 
+    			super.fatalError( exception );
+    			noFatal.accept( false ); 
+    		}
     	}.parse();
     	
     	tc.assertTrue( docComplete.get() );
@@ -185,27 +205,24 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	new XMLHandler( stream );
     }
     
-    // attributesToMap	<?xml version = "1.0" encoding = "UTF-8" ?>
-    // attributesToMap	<!DOCTYPE root [
-    // attributesToMap		<!ELEMENT	root	(A,B) >
-    // attributesToMap		<!ELEMENT	A		EMPTY >
-    // attributesToMap		<!ATTLIST	A
-    // attributesToMap			attr1	CDATA	#IMPLIED
-    // attributesToMap			attr2	CDATA	#IMPLIED
-    // attributesToMap			attr3	CDATA	#IMPLIED
-    // attributesToMap		>
-    // attributesToMap		<!ELEMENT	B		EMPTY >
-    // attributesToMap	]>
-    // attributesToMap	<root>
-    // attributesToMap		<A attr1 = "1" attr2 = "2" attr3 = "3" />
-    // attributesToMap		<B />
-    // attributesToMap	</root>
-    // attributesToMap	
-    // attributesToMap	
-    // attributesToMap	
-    // attributesToMap	
-    // attributesToMap	
     
+    
+    /* <attributesToMap>
+     * <?xml version = "1.0" encoding = "UTF-8" ?>
+     * <!DOCTYPE	root [
+     * 	<!ELEMENT	root	(A, B) >
+     * 	<!ELEMENT	A		EMPTY>
+     * 	<!ATTLIST	A		attr1		CDATA	#IMPLIED
+     * 						attr2		CDATA	#IMPLIED
+     * 						attr3		CDATA	#IMPLIED
+     * 	>
+     * 	<!ELEMENT	B		EMPTY>
+     * ]>
+     * <root>
+     * 	<A  attr1 = "1"  attr2 = "2"  attr3 = "3" />
+     * 	<B/>
+     * </root>
+     */
     @Test.Impl( 
     	member = "method: Map XMLHandler.attributesToMap(Attributes)", 
     	description = "All keys are present" 
@@ -220,6 +237,7 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	// make the test assertion. Decided to simply convert to a Map
     	new XMLHandler( this.getLines( "attributesToMap" ) ) {
     		@Override public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
+    			super.startElement( uri, localName, qName, atts );
     			if ( qName.equals( "A" ) ) { keyToVal.accept( XMLHandler.attributesToMap( atts ) ); }
     		}
     	}.parse();
@@ -236,6 +254,7 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	
     	new XMLHandler( this.getLines( "attributesToMap" ) ) {
     		@Override public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
+    			super.startElement( uri, localName, qName, atts );
     			if ( qName.equals( "A" ) ) { keyToVal.accept( XMLHandler.attributesToMap( atts ) ); }
     		}
     	}.parse();
@@ -255,6 +274,7 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	
     	new XMLHandler( this.getLines( "attributesToMap" ) ) {
     		@Override public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
+    			super.startElement( uri, localName, qName, atts );
     			if ( qName.equals( "B" ) ) { keyToVal.accept( XMLHandler.attributesToMap( atts ) ); }
     		}
     	}.parse();
@@ -262,20 +282,61 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	tc.assertTrue( keyToVal.get().size() == 0 );
     }
     
+
+    /* <Location>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE root [
+     *		<!ELEMENT root EMPTY>
+     *	]>
+     *	<root/>
+     */
     @Test.Impl( 
     	member = "method: String XMLHandler.Location.getPublicId()", 
-    	description = "Must be set if using public resources" 
+    	description = "Agrees with value supplied to the InputSource" 
     )
     public void tm_090C629A6( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> thePublicId = new CS<>();
+    	
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void setDocumentLocator( Locator locator ) {
+    			super.setDocumentLocator( locator );
+    			thePublicId.accept( locator.getPublicId() );
+    		}
+    	};
+
+    	String publicId = "my-pub-id";		// For publicId, string can be anything
+    	InputSource source = this.getSubjectField( handler, "source", null );
+    	source.setPublicId( publicId );
+
+    	handler.parse();
+    	tc.assertEqual( publicId, thePublicId.get() );
     }
     
     @Test.Impl( 
     	member = "method: String XMLHandler.Location.getSystemId()", 
-    	description = "Can be set when using a file" 
+    	description = "Agrees with value supplied to the InputSource" 
     )
     public void tm_07B51C1E5( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theSystemId = new CS<>();
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void setDocumentLocator( Locator locator ) {
+    			super.setDocumentLocator( locator );
+    			theSystemId.accept( locator.getSystemId() );
+    		}
+    	};
+
+    	// LESSON LEARNED
+    	// If the systemId has not been previously set (for example, reading a stream) and
+    	// and then set to a non-fully resolved URL, it is interpreted as a relative
+    	// URL and gets resolved against a value determined by some environment variable.
+    	// For example, setSystemId( "my-sis-id" ) results in
+    	// 		file:///home/sundquis/book/Dropbox/java/projects/SOG/my-sys-id
+    	String systemId = "file:///home";
+    	InputSource source = this.getSubjectField( handler, "source", null );
+    	source.setSystemId( systemId );
+
+    	handler.parse();
+    	tc.assertEqual( systemId, theSystemId.get() );
     }
     
     @Test.Impl( 
@@ -283,31 +344,45 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Indicates row and column while parsing" 
     )
     public void tm_03405A7FD( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> thePosition = new CS<>();
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override 	public void startDocument() throws SAXException {
+    			super.startDocument();
+    			thePosition.accept( this.getLocation().toString() );
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( "(1, 1)", thePosition.get() );
     }
     
-    @Test.Impl( 
-    	member = "method: String XMLHandler.Location.toString()", 
-    	description = "Not empty" 
-    )
-    public void tm_0B48C6125( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
-    }
+    
     
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showContentEvents()", 
     	description = "Enables feedback for content events" 
     )
     public void tm_09A29E715( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see parsing events, including:" );
+    	tc.addMessage( "Parser set Locator" );
+    	tc.addMessage( "Document started" );
+    	tc.addMessage( "Element started" );
+    	tc.addMessage( "Element complete" );
+    	tc.addMessage( "Document complete" );
+    	handler.showContentEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showContentEvents()", 
-    	description = "Returns this XMLHadler instance to allow chaining" 
+    	description = "Returns this XMLHandler instance to allow chaining" 
     )
     public void tm_0CFC338A5( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	tc.assertEqual( handler, handler.showContentEvents() );
     }
     
     @Test.Impl( 
@@ -315,31 +390,63 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Enables feedback for declaration events" 
     )
     public void tm_027E14B35( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see declaration events, including:" );
+    	tc.addMessage( "Element declaration" );
+    	tc.addMessage( "Name: root" );
+    	tc.addMessage( "Model: EMPTY" );
+    	handler.showDeclarationEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showDeclarationEvents()", 
-    	description = "Returns this XMLHadler instance to allow chaining" 
+    	description = "Returns this XMLHandler instance to allow chaining" 
     )
     public void tm_0795C4C66( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	tc.assertEqual( handler, handler.showDeclarationEvents() );
     }
     
+    // showErrorEvents	<?xml version = "1.0" encoding = "UTF-8" ?>
+    // showErrorEvents	<!DOCTYPE root [ <!ELEMENT root (A) > ]>
+    // showErrorEvents	<root>
+    // showErrorEvents		<A/>
+    // showErrorEvents	</groot>
+    
+    /* <showErrorEvents>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE root [ <!ELEMENT root (A) > ]>
+     *	<root>
+     *		<A/>
+     *	</groot>
+     */
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showErrorEvents()", 
     	description = "Enables feedback for error events" 
     )
     public void tm_023C1CCF5( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "showErrorEvents" ) );
+    	// TOGGLE
+    	/* */ tc.expectError( AppRuntime.class ); handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see error events, including:" );
+    	tc.addMessage( "SAX Error: org.xml.sax.SAXParseException; ... Element type \"A\" must be declared." );
+    	tc.addMessage( "SAX Fatal Error: org.xml.sax.SAXParseException; ... The element type \"root\" must be terminated by the matching end-tag \"</root>\"." );
+    	handler.showErrorEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showErrorEvents()", 
-    	description = "Returns this XMLHadler instance to allow chaining" 
+    	description = "Returns this XMLHandler instance to allow chaining" 
     )
     public void tm_0983A36B4( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	tc.assertEqual( handler, handler.showErrorEvents() );
     }
     
     @Test.Impl( 
@@ -347,15 +454,24 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Enables feedback for lexical (DTD) events" 
     )
     public void tm_0C9173858( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see parsing events, including:" );
+    	tc.addMessage( "DTD started: root" );
+    	tc.addMessage( "DTD complete" );
+    	handler.showLexicalEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
     	member = "method: XMLHandler XMLHandler.showLexicalEvents()", 
-    	description = "Returns this XMLHadler instance to allow chaining" 
+    	description = "Returns this XMLHandler instance to allow chaining" 
     )
     public void tm_091F12050( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	tc.assertEqual( handler, handler.showDeclarationEvents() );
     }
     
     @Test.Impl( 
@@ -363,7 +479,7 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Is not null" 
     )
     public void tm_0132A429A( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.assertNonNull( new XMLHandler( this.getLines( "Location" ) ).getLocation() );
     }
     
     @Test.Impl( 
@@ -371,7 +487,9 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Location is unknown after parsing" 
     )
     public void tm_0E72E765B( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	handler.parse();
+    	tc.assertTrue( handler.getLocation().unknown() );
     }
     
     @Test.Impl( 
@@ -379,15 +497,23 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Location is unknown before parsing" 
     )
     public void tm_0EDFB4DD6( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "Location" ) );
+    	tc.assertTrue( handler.getLocation().unknown() );
     }
     
     @Test.Impl( 
     	member = "method: boolean XMLHandler.Location.unknown()", 
-    	description = "True when line or column unknown" 
+    	description = "False while parsing" 
     )
     public void tm_0C41A489B( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Boolean> theUnknown = new CS<>();
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void startDocument() throws SAXException {
+    			super.startDocument();
+    			theUnknown.accept( this.getLocation().unknown() );
+    		}
+    	}.parse();
+    	tc.assertEqual( false, theUnknown.get() );
     }
     
     @Test.Impl( 
@@ -395,7 +521,28 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Greater or equal to zero while parsing" 
     )
     public void tm_09D21EF6F( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Integer> theStartDocumentColumn = new CS<>();
+    	CS<Integer> theStartElementColumn = new CS<>();
+    	CS<Integer> theEndElementColumn = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void startDocument() throws SAXException { 
+    			super.startDocument();
+    			theStartDocumentColumn.accept( this.getLocation().getColumnNumber() );
+    		}
+    		@Override public void startElement( String name, Map<String, String> attributes ) {
+    			super.startElement( name, attributes );
+    			theStartElementColumn.accept( this.getLocation().getColumnNumber() );
+    		}
+    		@Override public void endElement( String uri, String localName, String qName ) throws SAXException {
+    			super.endElement( uri, localName, qName );
+    			theEndElementColumn.accept( this.getLocation().getColumnNumber() );
+    		}
+    	}.parse();
+    	
+    	tc.assertTrue( theStartDocumentColumn.get() > 0 );
+    	tc.assertTrue( theStartElementColumn.get() > 0 );
+    	tc.assertTrue( theEndElementColumn.get() > 0 );
     }
     
     @Test.Impl( 
@@ -403,7 +550,16 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Return is -1 when unknown" 
     )
     public void tm_0B830214C( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Integer> theColumn = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void endDocument() throws SAXException { 
+    			super.endDocument();
+    			theColumn.accept( this.getLocation().getColumnNumber() );
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( -1, theColumn.get() );
     }
     
     @Test.Impl( 
@@ -411,7 +567,28 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Greater or equal to zero while parsing" 
     )
     public void tm_0604FC4D1( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Integer> theStartDocumentLine = new CS<>();
+    	CS<Integer> theStartElementLine = new CS<>();
+    	CS<Integer> theEndElementLine = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void startDocument() throws SAXException { 
+    			super.startDocument();
+    			theStartDocumentLine.accept( this.getLocation().getLineNumber() );
+    		}
+    		@Override public void startElement( String name, Map<String, String> attributes ) {
+    			super.startElement( name, attributes );
+    			theStartElementLine.accept( this.getLocation().getLineNumber() );
+    		}
+    		@Override public void endElement( String uri, String localName, String qName ) throws SAXException {
+    			super.endElement( uri, localName, qName );
+    			theEndElementLine.accept( this.getLocation().getLineNumber() );
+    		}
+    	}.parse();
+    	
+    	tc.assertTrue( theStartDocumentLine.get() > 0 );
+    	tc.assertTrue( theStartElementLine.get() > 0 );
+    	tc.assertTrue( theEndElementLine.get() > 0 );
     }
     
     @Test.Impl( 
@@ -419,15 +596,41 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Return is -1 when unknown" 
     )
     public void tm_0830934AA( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Integer> theLine = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "Location" ) ) {
+    		@Override public void endDocument() throws SAXException { 
+    			super.endDocument();
+    			theLine.accept( this.getLocation().getLineNumber() );
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( -1, theLine.get() );
     }
     
+    /* <attributeDecl: Basic>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE	root	[
+     *		<!ELEMENT	root	EMPTY>
+     *		<!ATTLIST	root	attr	CDATA	#IMPLIED>
+     *	]>
+     *	<root  attr = "42"/>
+     */
     @Test.Impl( 
     	member = "method: void XMLHandler.attributeDecl(String, String, String, String, String)", 
     	description = "Attribute name is not empty" 
     )
     public void tm_0D9B6E779( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theAttributeName = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "attributeDecl: Basic" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+				theAttributeName.accept( aName );
+    		}
+    	}.parse();
+
+    	tc.assertNotEmpty( theAttributeName.get() );
     }
     
     @Test.Impl( 
@@ -435,7 +638,16 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Element name is not empty" 
     )
     public void tm_0879EB099( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theElementName = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "attributeDecl: Basic" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+				theElementName.accept( eName );
+    		}
+    	}.parse();
+
+    	tc.assertNotEmpty( theElementName.get() );
     }
     
     @Test.Impl( 
@@ -443,7 +655,15 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Feedback provided if showDeclarationEvents() has been called" 
     )
     public void tm_087E189D9( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "attributeDecl: Basic" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see parsing events including:" );
+    	tc.addMessage( "Element declaration" );
+    	tc.addMessage( "Attribute declaration" );
+    	handler.showDeclarationEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
@@ -451,23 +671,90 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Location is identified" 
     )
     public void tm_009A360BE( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theLocation = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "attributeDecl: Basic" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+    			if ( "attr".equals( aName ) ) {
+    				theLocation.accept( this.getLocation().toString() );    				
+    			}
+    		}
+    	}.parse();
+
+    	tc.assertEqual( "(4, 36)", theLocation.get() );
     }
+
     
+    
+    /* <attributeDecl: Mode>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE root [
+     *		<!ELEMENT	root	EMPTY>
+     *		<!ATTLIST	root	implied		CDATA		#IMPLIED
+     *							required	CDATA		#REQUIRED
+     *							fixed		CDATA		#FIXED		"42"
+     *							default		CDATA		"42"
+     *		>
+     *	]>
+     *	<root required = "val"/>
+     */
     @Test.Impl( 
     	member = "method: void XMLHandler.attributeDecl(String, String, String, String, String)", 
     	description = "Mode is correct" 
     )
     public void tm_0FAF7DB4F( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	final Map<String, String> aNameToMode = new HashMap<>();
+
+    	new XMLHandler( this.getLines( "attributeDecl: Mode" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+				aNameToMode.put( aName, mode );
+    		}
+    	}.parse();
+
+    	tc.assertEqual( 
+    		List.of( "#IMPLIED", "#REQUIRED", "#FIXED" ),
+    		Stream.of( "implied", "required", "fixed" ).map( aNameToMode::get ).collect( Collectors.toList() )
+    	);
+    	tc.assertIsNull( aNameToMode.get( "default" ) );
     }
-    
+
+    /* <attributeDecl: Type>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE root [
+     *		<!ELEMENT	root	EMPTY>
+     *		<!ATTLIST	root	cdata		CDATA		#IMPLIED
+     *							nmtoken		NMTOKEN		#IMPLIED
+     *							nmtokens	NMTOKENS	#IMPLIED
+     *							id			ID			#IMPLIED
+     *							idref		IDREF		#IMPLIED
+     *							idrefs		IDREFS		#IMPLIED
+     *							entity		ENTITY		#IMPLIED
+     *							entities	ENTITIES	#IMPLIED
+     *							enum		(1|2|3)		#IMPLIED
+     *		>
+     *	]>
+     *	<root/>
+     */
     @Test.Impl( 
     	member = "method: void XMLHandler.attributeDecl(String, String, String, String, String)", 
     	description = "Type is correct" 
     )
     public void tm_035989318( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	final Map<String, String> aNameToType = new HashMap<>();
+
+    	new XMLHandler( this.getLines( "attributeDecl: Type" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+				aNameToType.put( aName, type );
+    		}
+    	}.parse();
+
+    	// TODO: Investigate Notations to see if they should be added.
+		Stream.of( "cdata", "nmtoken", "nmtokens", "id", "idref", "idrefs", "entity", "entities" )
+			.forEach( (String s) -> tc.assertEqual( s.toUpperCase(), aNameToType.get( s ) ) );
+		tc.assertEqual( "(1|2|3)", aNameToType.get( "enum" ) );
     }
     
     @Test.Impl( 
@@ -475,15 +762,52 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Value is correct when supplied in DTD" 
     )
     public void tm_080BE7B30( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theValue = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "attributeDecl: Mode" ) ) {
+    		@Override public void attributeDecl( String eName, String aName, String type, String mode, String value ) throws SAXException {
+    			super.attributeDecl( eName, aName, type, mode, value );
+    			if ( "fixed".equals( aName ) ) {
+    				theValue.accept( value );
+    			}
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( "42", theValue.get() );
     }
     
+    
+    
+    /* <characters>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE	root	[
+     *		<!ELEMENT	root	(#PCDATA)>
+     *	]>
+     *	<root>
+     *		Some character data.
+     *		Another line of data.
+     *	</root>
+     */
     @Test.Impl( 
     	member = "method: void XMLHandler.characters(char[], int, int)", 
     	description = "All content registered before endElement" 
     )
     public void tm_0CD2DE44F( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	StringBuilder buffer = new StringBuilder();
+    	CS<String> theResult = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "characters" ) ) {
+    		@Override public void characters( char[] ch, int start, int length ) throws SAXException {
+    			super.characters( ch, start, length );
+    			buffer.append( ch, start, length );
+    		}
+    		@Override public void endElement( String name ) {
+    			super.endElement( name );
+    			theResult.accept( buffer.toString() );
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( "\n\tSome character data.\n\tAnother line of data.\n", theResult.get() );
     }
     
     @Test.Impl( 
@@ -491,7 +815,15 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Feedback provided if showContentEvents() has been called" 
     )
     public void tm_0AE2AC765( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "characters" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+    	tc.addMessage( "Should see parsing events including:" );
+    	tc.addMessage( "Character data found" );
+    	tc.addMessage( "Element complete" );
+    	handler.showContentEvents().parse();
+    	tc.assertFail( "Verify messages" );
+    	/* */
     }
     
     @Test.Impl( 
@@ -499,7 +831,16 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Location is identified" 
     )
     public void tm_07AD6ABCB( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theLocation = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "characters" ) ) {
+    		@Override public void characters( char[] ch, int start, int length ) throws SAXException {
+    			super.characters( ch, start, length );
+    			theLocation.accept( this.getLocation().toString() );
+    		}
+    	}.parse();
+
+    	tc.assertNotEmpty( theLocation.get() );
     }
     
     @Test.Impl( 
@@ -507,15 +848,32 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Parser uses to signal content" 
     )
     public void tm_0292924E4( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	tc.addMessage( "Remove this case?" );
+    	tc.assertPass();
     }
     
+    
+    
+    /* <comment>
+     *	<?xml version = "1.0" encoding = "UTF-8" ?>
+     *	<!DOCTYPE	root [ <!ELEMENT root EMPTY> ]>
+     *	<!--Comment before-->
+     *	<root/>
+     *	<!--Comment after-->
+     */
     @Test.Impl( 
     	member = "method: void XMLHandler.comment(char[], int, int)", 
     	description = "Feedback provided if showLexicalEvents() has been called" 
     )
     public void tm_027A703BD( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	XMLHandler handler = new XMLHandler( this.getLines( "comment" ) );
+    	// TOGGLE
+    	/* */ handler.parse(); tc.assertPass(); /*
+		tc.addMessage( "Should see parsing events including:" );
+		tc.addMessage( "Comment:  Comment before" );
+		tc.addMessage( "Comment:  Comment after" );
+		handler.showLexicalEvents().parse();
+    	/* */
     }
     
     @Test.Impl( 
@@ -523,7 +881,16 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Location is identified" 
     )
     public void tm_04E7CE238( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<String> theLocation = new CS<>();
+    	
+    	new XMLHandler( this.getLines( "comment"  ) ) {
+    		@Override public void comment( char[] ch, int start, int length ) throws SAXException {
+    			super.comment( ch, start, length );
+    			theLocation.accept( this.getLocation().toString() );
+    		}
+    	}.parse();
+    	
+    	tc.assertNotEmpty( theLocation.get() );
     }
     
     @Test.Impl( 
@@ -531,14 +898,30 @@ public class XMLHandlerTest extends Test.Container implements Commented {
     	description = "Parser signals comments" 
     )
     public void tm_0F8C0BB4E( Test.Case tc ) {
-    	tc.addMessage( "GENERATED STUB" );
+    	CS<Boolean> needComment = new CS<>( true );
+    	StringBuilder theComment = new StringBuilder();
+    	
+    	new XMLHandler( this.getLines( "comment" ) ) {
+    		@Override public void comment( char[] ch, int start, int length ) throws SAXException {
+    			super.comment( ch, start, length );
+    			if ( needComment.get() ) {
+    				theComment.append( ch, start, length );
+    				needComment.accept( false );
+    			}
+    		}
+    	}.parse();
+    	
+    	tc.assertEqual( "Comment before", theComment.toString() );
     }
+    
+    
     
     @Test.Impl( 
     	member = "method: void XMLHandler.elementDecl(String, String)", 
     	description = "Feedback provided if showDeclarationEvents() has been called" 
     )
     public void tm_001DFE38A( Test.Case tc ) {
+    	tc.here();
     	tc.addMessage( "GENERATED STUB" );
     }
     

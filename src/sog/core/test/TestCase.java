@@ -433,7 +433,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Return is this" )
 	@Test.Decl( "File location is set" )
 	@Test.Decl( "Failure message is included" )
-	public Test.Case assertFail( String message ) {
+	public Case assertFail( String message ) {
 		this.setFileLocation();
 		this.fail( message );
 		return this;
@@ -449,7 +449,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Case passes" )
 	@Test.Decl( "Return is this" )
 	@Test.Decl( "File location is set" )
-	public Test.Case assertPass() {
+	public Case assertPass() {
 		this.setFileLocation();
 		this.pass();
 		return this;
@@ -607,13 +607,21 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Test fails when both null" )
 	@Test.Decl( "Return is this" )
 	@Test.Decl( "File location is set" )
-	public <T> Test.Case assertNotEqual( T first, T second ) {
+	public <T> Case assertNotEqual( T first, T second ) {
 		this.setFileLocation();
 		if ( Objects.shallowEquals( first, second ) ) {
 			this.fail( "First: " + Strings.toString( first ) + ", Second: " + Strings.toString( second ) );
 		} else {
 			this.pass();
 		}
+		return this;
+	}
+	
+	@Override
+	@Test.Decl( "Marks case ase failed" )
+	@Test.Decl( "Returns this Test.Case instance to allow chaining" )
+	public Case here() {
+		this.assertFail( "YOU ARE HERE" );
 		return this;
 	}
 	

@@ -34,10 +34,12 @@ import sog.util.Printable;
  * Knows when the TestDecl has been matched with a corresponding TestImpl. 
  */
 @Test.Subject( "test." )
-public class TestDecl extends TestIdentifier implements Commented, Printable {
+public class TestDecl extends TestIdentifier implements Printable {
 
 	
 	private TestImpl impl = null;
+	
+	private final Commented source = new Commented( TestDecl.class );
 
 	@Test.Decl( "Throws AssertionError for null member name" )
 	@Test.Decl( "Throws AssertionError for emtpy member name" )
@@ -85,7 +87,7 @@ public class TestDecl extends TestIdentifier implements Commented, Printable {
 			.expand( "description", this.getDescription() )
 			.expand( "methodName", this.getMethodName() );
 		try {
-			this.getCommentedLines( "STUB" ).flatMap( macro ).forEach( out::println );
+			this.source.getCommentedLines( "STUB" ).flatMap( macro ).forEach( out::println );
 		} catch ( IOException ex ) {
 			throw new AppRuntime( ex );
 		}
