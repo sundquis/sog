@@ -687,7 +687,7 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 		}
 		
 		if ( this.unexpectedError != null ) {
-			out.printErr( this.unexpectedError, "sog" );
+			out.printErr( this.unexpectedError, "^sog.*|^test.*" );
 		}
 		
 		out.decreaseIndent();
@@ -703,6 +703,17 @@ public class TestCase extends Result implements Test.Case, Comparable<TestCase> 
 	@Test.Decl( "Consistent with configured value" )
 	public boolean threadsafe() {
 		return this.impl.threadsafe();
+	}
+	
+	/**
+	 * True if this TestCase corresponds to the TestImpl for the given method.
+	 * 
+	 * @param methodName
+	 * @return
+	 */
+	@Test.Decl( "Throws AssertionError for empty method name" )
+	public boolean matches( String methodName ) {
+		return Assert.nonEmpty( methodName ).equals( this.impl.getMethod().getName() );
 	}
 	
 	

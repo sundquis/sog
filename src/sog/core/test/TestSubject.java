@@ -429,6 +429,15 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	}
 	
 	
+	@Test.Decl( "Runs only the named test method" )
+	@Test.Decl( "Throws AssertionError for empty methodName" )
+	@Test.Decl( "Returns this TestCase instance to allow chaining" )
+	public TestSubject limit( String methodName ) {
+		this.testCases.removeIf( tc -> !tc.matches( methodName ) );
+		return this;
+	}
+	
+	
 	// Properties from runTests()
 	@Test.Decl( "Unimplemented test declarations count as test failures" )
 	@Test.Decl( "If there are any errors no test cases are run" )

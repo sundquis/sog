@@ -44,6 +44,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 
+import sog.core.App;
 import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Fatal;
@@ -177,7 +178,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 		} catch ( ParserConfigurationException e ) {
 			Fatal.error( "Failed to configure parser", e );
 		} catch ( SAXException e ) {
-			Fatal.error( "Failed to configure parser", e );
+			Fatal.error( "Unknown SAXException", e );
 		} catch ( IOException e ) { // parse
 			Fatal.error( "Error while parsing source", e );
 		}
@@ -253,7 +254,9 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Throws AssertionError for odd number of details" )
 	@Test.Decl( "Detail objects may be null" )
 	@Test.Decl( "Details treated as (label, detail) pairs" )
-	protected void out( Object... details ) {
+	public void out( Object... details ) {
+		Assert.nonNull( details );
+		Assert.isTrue( 2 * (details.length/2) == details.length, "Odd number of details provided" );
 		System.err.println( ">>> " + this.getLocation() );
 		for ( int i = 0; i < details.length; ) {
 			System.err.println( "\t" + Strings.toString( details[i++] ) + ": " + Strings.toString( details[i++] ) );
@@ -270,7 +273,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	public void setDocumentLocator( Locator locator ) {
 		this.locator = locator;
 		if ( this.showContentEvents ) {
-			this.out( "Parser set Locator", this.locator.getSystemId() );
+			this.out( "Parser set Locator", this.getLocation().getSystemId() );
 		}
 	}
 
@@ -283,7 +286,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Feedback provided if showContentEvents() has been called" )
 	public void startDocument() throws SAXException {
 		if ( this.showContentEvents ) {
-			this.out( "Document started", this.locator.getSystemId() );
+			this.out( "Document started", this.getLocation().getSystemId() );
 		}
 	}
 
@@ -293,11 +296,11 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Override
 	@Test.Decl( "Called after startDocument()" )
-	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Location is unknown" )
 	@Test.Decl( "Feedback provided if showContentEvents() has been called" )
 	public void endDocument() throws SAXException {
 		if ( this.showContentEvents ) {
-			this.out( "Document complete", this.locator.getSystemId() );
+			this.out( "Document complete", this.getLocation().getSystemId() );
 		}
 	}
 
@@ -349,9 +352,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 	 */
 	@Override
-	@Test.Decl( "Parser signals start of element processing" )
-	@Test.Decl( "uri is not empty" )
-	@Test.Decl( "localName is not empty" )
 	@Test.Decl( "qName is not empty" )
 	@Test.Decl( "Attributes is not null" )
 	@Test.Decl( "Feedback provided if showContentEvents() has been called" )
@@ -391,8 +391,8 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@Test.Decl( "uri is not empty" )
-	@Test.Decl( "localName is not empty" )
+	@Test.Decl( "uri can be empty" )
+	@Test.Decl( "localName can be empty" )
 	@Test.Decl( "qName is not empty" )
 	@Test.Decl( "Feedback provided if showContentEvents() has been called" )
 	public void endElement( String uri, String localName, String qName ) throws SAXException {
@@ -443,7 +443,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Feedback provided if showContentEvents() has been called" )
 	public void ignorableWhitespace( char[] ch, int start, int length ) throws SAXException {
 		if ( this.showContentEvents ) {
-			this.out( "Whitespace found", length );
+			this.out( "Ignorable whitespace found", length );
 		}
 	}
 
@@ -480,10 +480,10 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Override
 	@Test.Decl( "Unable to trigger..." )
-	@Test.Decl( "Feedback provided if showErrorEvents() has been called" )
-	public void warning( SAXParseException exception ) throws SAXException {
+	public void warning( SAXParseException exception ) {
 		if ( this.showErrorEvents ) {
 			this.out( "SAX Warning", exception );
+			App.get().getLocationMatching( exception, "^sog.*|^test.*" ).map( s -> "\t" + s ).forEach( System.err::println );
 		}
 	}
 
@@ -492,7 +492,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
 	 */
 	@Override
-	@Test.Decl( "Trigered for missing DTD" )
+	@Test.Decl( "Trigered for missing doctype" )
 	@Test.Decl( "Trigered when element does not match declared type" )
 	@Test.Decl( "Trigered for undeclared elements" )
 	@Test.Decl( "Trigered for undeclared attributes" )
@@ -500,9 +500,11 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Trigered for changing #FIXED attribute" )
 	@Test.Decl( "Location is identified" )
 	@Test.Decl( "Feedback provided if showErrorEvents() has been called" )
-	public void error( SAXParseException exception ) throws SAXException {
+	@Test.Decl( "Prints error message and stack trace" )
+	public void error( SAXParseException exception ) {
 		if ( this.showErrorEvents ) {
 			this.out( "SAX Error", exception );
+			App.get().getLocationMatching( exception, "^sog.*|^test.*" ).map( s -> "\t" + s ).forEach( System.err::println );
 		}
 	}
 
@@ -513,13 +515,16 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Override
 	@Test.Decl( "Trigered for illegal DTD structure" )
 	@Test.Decl( "Trigered for undeclared entity" )
-	@Test.Decl( "Excpetion is thrown after signaling" )
+	@Test.Decl( "AppRuntime is thrown after signaling" )
 	@Test.Decl( "Location is identified" )
+	@Test.Decl( "Prints fatal message and stack trace" )
 	@Test.Decl( "Feedback provided if showErrorEvents() has been called" )
-	public void fatalError( SAXParseException exception ) throws SAXException {
+	public void fatalError( SAXParseException exception ) throws AppRuntime {
 		if ( this.showErrorEvents ) {
 			this.out( "SAX Fatal Error", exception );
+			App.get().getLocationMatching( exception, "^sog.*|^test.*" ).map( s -> "\t" + s ).forEach( System.err::println );
 		}
+		throw new AppRuntime( exception );
 	}
 
 
@@ -529,6 +534,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Override
 	@Test.Decl( "Location is identified" )
 	@Test.Decl( "Name is not empty" )
+	@Test.Decl( "Model is correct" )
 	@Test.Decl( "Feedback provided if showDeclarationEvents() has been called" )
 	public void elementDecl( String name, String model ) throws SAXException {
 		if ( this.showDeclarationEvents ) {
@@ -614,7 +620,6 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
 	 */
 	@Override
-	@Test.Decl( "Parser signals use of entity" )
 	@Test.Decl( "Location is identified" )
 	@Test.Decl( "Name is correct" )
 	@Test.Decl( "Feedback provided if showLexicalEvents() has been called" )
@@ -644,7 +649,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 * @see org.xml.sax.ext.LexicalHandler#startCDATA()
 	 */
 	@Override
-	@Test.Decl( "Parser signals start of CDATA before characters" )
+	@Test.Decl( "Parser signals start of CDATA AFTER characters" )
 	@Test.Decl( "Location is identified" )
 	@Test.Decl( "Feedback provided if showLexicalEvents() has been called" )
 	public void startCDATA() throws SAXException {
@@ -659,7 +664,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Override
 	@Test.Decl( "Called after startCDATA()" )
-	@Test.Decl( "Parser signals end of CDATA after characters" )
+	@Test.Decl( "Parser signals end of CDATA BEFORE last characters call" )
 	@Test.Decl( "Location is identified" )
 	@Test.Decl( "Feedback provided if showLexicalEvents() has been called" )
 	public void endCDATA() throws SAXException {

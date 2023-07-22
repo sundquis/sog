@@ -148,6 +148,7 @@ public class Commented {
 				// If searching is still true we ran out of lines
 				if ( searching ) {
 					this.close();
+					throw new AppRuntime( "Comment block for tag <" + tag + "> not found" );
 				}
 				
 				// If searching is false there must be at least one more line in the stream,
@@ -314,7 +315,8 @@ public class Commented {
 		new Commented(Commented.class ).writeTaggedBlock( "EXT-XML", destXml );
 		new Commented(Commented.class ).writeTaggedBlock( "EXT-DTD", destDtd );
 		try {
-			new Commented( Commented.class ).getTaggedBlock( "foo" ).map( s -> ">>> " + s ).forEach( System.out::println );
+			//new Commented( Commented.class ).getTaggedBlock( "foox" ).map( s -> ">>> " + s ).forEach( System.out::println );
+			//new Commented( Commented.class ).getTaggedBlock( "foo" ).map( s -> ">>> " + s ).forEach( System.out::println );
 		} catch ( Throwable t ) {
 			t.printStackTrace();
 		}
