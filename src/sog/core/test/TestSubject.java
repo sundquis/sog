@@ -207,6 +207,8 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	/* If true, use evaluator Worker threads for the contained TestCase instances. */
 	private boolean concurrent = false;
 	
+	/* This flag, from Test.Subject.threadsafe(), overrides the request to run concurrent tests. */
+	private boolean threadsafe = false;
 	
 	/* Instances are obtained using the public static builder. */
 	private TestSubject( String label ) {
@@ -295,6 +297,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 					this.addError( null, "Subject annotation has empty container location", this.subjectClass );
 				} else {
 					this.containerLocation = subj.value();
+					this.threadsafe = subj.threadsafe();
 				}
 			} else {
 				this.addError( null, "Subject class is not annotated", this.subjectClass );
@@ -433,6 +436,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	@Test.Decl( "Throws AssertionError for empty methodName" )
 	@Test.Decl( "Returns this TestCase instance to allow chaining" )
 	public TestSubject limit( String methodName ) {
+		Assert.nonEmpty( methodName );
 		this.testCases.removeIf( tc -> !tc.matches( methodName ) );
 		return this;
 	}
@@ -446,6 +450,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	@Test.Decl( "If there are no errors afterAll is called after all cases have run" )
 	@Test.Decl( "If there are no errors beforeAll is called before any cases have run" )
 	@Test.Decl( "If concurrent is true TestCase instances run in worker threads" )
+	@Test.Decl( "Subjects marked with threadsafe = false run all tests in the main thread" )
 	@Test.Decl( "Cases marked with threadsafe = false run in the main thread" )
 	protected TestSubject run() {
 		if ( this.hasRun ) { return this; }
@@ -470,11 +475,11 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		
 		Function<TestCase, TestCase> mapper = (tc) -> { tc.run(); return tc; };
 		
-		if ( this.concurrent ) {
+		if ( this.concurrent && this.threadsafe ) {
 			this.testCases.stream()
 				.filter( TestCase::threadsafe )
 				.map( TestSubject.getConcurrent().wrapGetLater( mapper ) )
-				.collect( Collectors.toList() ).stream()
+				.collect( Collectors.toList() ).stream()	// Forces the concurrent tests to run concurrently.
 				.map( Supplier::get )
 				.forEach( this::addResult );
 			this.testCases.stream()

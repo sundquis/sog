@@ -6,7 +6,6 @@
 
 package sog.util;
 
-
 /**
  * Abstraction of the queue operations.
  *
@@ -56,8 +55,10 @@ public interface Queue<E> extends AutoCloseable {
 	 * Implementations:
 	 * 	1. Determine behavior for put( E elt ) when the queue is open and full
 	 * 	2. Determine behavior for E get() when the queue is open and empty
-	 * 	3. Determine the order retrieval policy
+	 * 	3. Determine the retrieval order policy
 	 * 	4. Test the contract
+	 * 
+	 * The OPEN/CLOSED/TERMINATED semantics are enforced by the AbstractQueue.
 	 * 
 	 */
 

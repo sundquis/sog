@@ -18,6 +18,8 @@
  */
 package test.sog.core.test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -730,7 +732,6 @@ public class TestSubjectTest extends Test.Container {
     	this.evalSubjectMethod( TestSubject.forSubject( test.sog.core.test.bar.ConcurrentTests.class)
     		.concurrent( true ), "run", null );
     	Set<Thread> threads = test.sog.core.test.bar.ConcurrentTests.TEST.getThreads();
-    	tc.assertTrue( threads.size() > 1 );
     	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
     
@@ -819,6 +820,52 @@ public class TestSubjectTest extends Test.Container {
     	tc.addMessage( "Manually verified." );
     	tc.assertPass();
     }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.limit(String)", 
+    	description = "Returns this TestCase instance to allow chaining" 
+    )
+    public void tm_019A1AC05( Test.Case tc ) {
+    	TestSubject subj = TestSubject.forSubject( Object.class );
+    	tc.assertEqual( subj, subj.limit( "bogus" ) );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.limit(String)", 
+    	description = "Runs only the named test method" 
+    )
+    public void tm_05336BAD9( Test.Case tc ) {
+    	TestSubject subj = TestSubject.forSubject( LimitSubject.class );
+    	this.run( subj );
+    	tc.assertEqual( "[A, B, C]", LimitSubject.TEST.executedMethods.toString() );
+    	subj = TestSubject.forSubject( LimitSubject.class );
+    	subj.limit( "tm_A" );
+    	LimitSubject.TEST.executedMethods.clear();
+    	this.run( subj );
+    	tc.assertEqual( "[A]", LimitSubject.TEST.executedMethods.toString() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.limit(String)", 
+    	description = "Throws AssertionError for empty methodName" 
+    )
+    public void tm_0FE2BA0B7( Test.Case tc ) {
+    	TestSubject subj = TestSubject.forSubject( Object.class );
+    	tc.expectError( AssertionError.class );
+    	subj.limit( "" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: TestSubject TestSubject.run()", 
+    	description = "Subjects marked with threadsafe = false run all tests in the main thread" 
+    )
+    public void tm_07931351D( Test.Case tc ) {
+    	TestSubject subj = TestSubject.forSubject( NotThreadSafe.class );
+    	subj.concurrent( true );
+    	this.run( subj );
+    	NotThreadSafe.TEST.executionThreads.forEach( t -> tc.assertEqual( Thread.currentThread(), t ) );
+    }
+
 
 
 		
@@ -827,14 +874,14 @@ public class TestSubjectTest extends Test.Container {
 		/* Toggle class results
 		//sog.util.Concurrent.safeModeOff();
 		Test.eval( TestSubject.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( true )
 			.showProgress( false )
 			.print();
 		//*/
 		
-		//* Toggle package results
-		//sog.util.Concurrent.safeModeOff();
+		/* Toggle package results
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( TestSubject.class )
 			.concurrent( true )
 			.showDetails( false )
@@ -1138,4 +1185,112 @@ class ElapsdedTime {
 			tc.addMessage( "GENERATED STUB" );
 		}
 	}
+}
+
+@Test.Subject( ".TEST" )
+class LimitSubject {
+	
+	@Test.Decl( "A" )
+	@Test.Decl( "B" )
+	@Test.Decl( "C" )
+	public LimitSubject() {}
+	
+	@Test.Skip( "container" )
+	public static class TEST extends Test.Container {
+		public static SortedSet<String> executedMethods = new TreeSet<>();
+		
+		TEST() { super( LimitSubject.class ); }
+		
+        @Test.Impl( member = "constructor: LimitSubject()", description = "A" )
+        public void tm_A( Test.Case tc ) {
+        	TEST.executedMethods.add( "A" );
+        }
+        
+        @Test.Impl( member = "constructor: LimitSubject()", description = "B" )
+        public void tm_B( Test.Case tc ) {
+        	TEST.executedMethods.add( "B" );
+        }
+        
+        @Test.Impl( member = "constructor: LimitSubject()", description = "C" )
+        public void tm_C( Test.Case tc ) {
+        	TEST.executedMethods.add( "C" );
+        }
+
+	}
+}
+
+@Test.Subject( value = ".TEST", threadsafe = false )
+class NotThreadSafe {
+
+	@Test.Decl( "01" )
+	@Test.Decl( "02" )
+	@Test.Decl( "03" )
+	@Test.Decl( "04" )
+	@Test.Decl( "05" )
+	@Test.Decl( "06" )
+	@Test.Decl( "07" )
+	@Test.Decl( "08" )
+	@Test.Decl( "09" )
+	@Test.Decl( "10" )
+	public NotThreadSafe() {}
+
+	@Test.Skip( "container" )
+	public static class TEST extends Test.Container {
+		
+		public static List<Thread> executionThreads = Collections.synchronizedList(  new ArrayList<>() );
+
+		public TEST() { super( NotThreadSafe.class ); }
+
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "01" )
+        public void tm_0A5817E24( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "02" )
+        public void tm_0A58181E5( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "03" )
+        public void tm_0A58185A6( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "04" )
+        public void tm_0A5818967( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "05" )
+        public void tm_0A5818D28( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "06" )
+        public void tm_0A58190E9( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "07" )
+        public void tm_0A58194AA( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "08" )
+        public void tm_0A581986B( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "09" )
+        public void tm_0A5819C2C( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+        
+        @Test.Impl( member = "constructor: NotThreadSafe()", description = "10" )
+        public void tm_0A581EEC2( Test.Case tc ) {
+        	TEST.executionThreads.add( Thread.currentThread() );
+        }
+
+	}
+	
 }

@@ -1,9 +1,21 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021, 2023
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.util;
 
 import sog.core.Assert;
@@ -21,6 +33,7 @@ import sog.core.Test;
  * @see MultiQueue
  * @see PriorityQueue
  */
+@Test.Subject( "test." )
 public abstract class AbstractQueue<E> implements Queue<E> {
 
 	/**
@@ -29,6 +42,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	private enum State {
 
 		/** Accepting input and providing output */
+		@Test.Skip( "Enumerated" )
 		OPEN {
 			@Override
 			<E> boolean put( AbstractQueue<E> q, E elt ) {
@@ -42,6 +56,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 		},
 
 		/** Providing output but not accepting input */
+		@Test.Skip( "Enumerated" )
 		CLOSED {
 			@Override
 			<E> boolean put( AbstractQueue<E> q, E elt ) {
@@ -55,6 +70,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 		},
 
 		/** Not accepting input and not providing output */
+		@Test.Skip( "Enumerated" )
 		TERMINATED {
 			@Override
 			<E> boolean put( AbstractQueue<E> q, E elt ) {
@@ -102,6 +118,9 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 * 		false if the queue is closed or terminated and the call has been ignored,
 	 * 		true if the element has been accepted
 	 */
+	@Test.Decl( "Returns true when OPEN" )
+	@Test.Decl( "Returns false when CLOSED" )
+	@Test.Decl( "Returns false when TERMINATED" )
 	public boolean put( E elt ) {
 		Assert.nonNull( elt );  // Queue cannot accept null elements.
 		
@@ -134,6 +153,9 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 * @return
 	 *       The next element of the queue or null if the queue is done producing elements.
 	 */
+	@Test.Decl( "Consistent with getImpl when OPEN and non-empty" )
+	@Test.Decl( "Consistent with getImpl when CLOSED" )
+	@Test.Decl( "Returns null when TERMINATED" )
 	public E get() {
 		return this.state.get( this );
 	}
@@ -160,6 +182,9 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 * @return
 	 *      <tt>true</tt> if the queue is open and accepting input.
 	 */
+	@Test.Decl( "True when constructed" )
+	@Test.Decl( "False after close()" )
+	@Test.Decl( "False after terminate()" )
 	public boolean isOpen() {
 		return this.state == State.OPEN;
 	}
@@ -170,6 +195,9 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 * @return
 	 *      <tt>true</tt> if the queue is closed and not accepting inputs.
 	 */
+	@Test.Decl( "False when constructed" )
+	@Test.Decl( "True after close()" )
+	@Test.Decl( "False after terminate()" )
 	public boolean isClosed() {
 		return this.state == State.CLOSED;
 	}
@@ -181,6 +209,9 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	 *      <tt>true</tt> if the queue is no longer accepting inputs or
 	 *      producing outputs.
 	 */
+	@Test.Decl( "False when constructed" )
+	@Test.Decl( "False after close()" )
+	@Test.Decl( "True after terminate()" )
 	public boolean isTerminated() {
 		return this.state == State.TERMINATED;
 	}

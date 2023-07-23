@@ -1851,12 +1851,43 @@ public class TestCaseTest extends Test.Container {
     	tcd.getTestCase().print( null );
     }
 	
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.here()", 
+    	description = "Marks case ase failed" 
+    )
+    public void tm_0B262BEB4( Test.Case tc ) {
+    	TestCaseData tcd = TestCaseData.forMethod( "NOOP" );
+    	tc.assertEqual( TestCase.State.OPEN, tcd.getState() );
+    	tcd.getTestCase().here();
+    	tc.assertEqual( TestCase.State.FAIL, tcd.getState() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: Test.Case TestCase.here()", 
+    	description = "Returns this Test.Case instance to allow chaining" 
+    )
+    public void tm_06B95F0FF( Test.Case tc ) {
+    	TestCaseData tcd = TestCaseData.forMethod( "NOOP" );
+    	TestCase me = tcd.getTestCase();
+    	tc.assertEqual( me, me.here() );
+    }
+    
+    @Test.Impl( 
+    	member = "method: boolean TestCase.matches(String)", 
+    	description = "Throws AssertionError for empty method name" 
+    )
+    public void tm_0D3B2A217( Test.Case tc ) {
+    	TestCaseData tcd = TestCaseData.forMethod( "NOOP" );
+    	tc.expectError( AssertionError.class );
+    	tcd.getTestCase().matches( "" );
+    }
+
 
 
     
         
     public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
 		Test.eval( TestCase.class )
 			.concurrent( false )
 			.showDetails( true )
@@ -1871,12 +1902,6 @@ public class TestCaseTest extends Test.Container {
 			.showProgress( true )
 			.print();
 		//*/
-
-    	//Stream.of( "NOOP" ).map( TestCaseData::forMethod ).forEach( System.out::println );
-    	//System.out.println( TestCaseData.forMethod( "NOOP" ) );
-    	//System.out.println( TestCaseData.forMethod( "bogus" ) );
-    	
-    	System.out.println("\nDone!");
 	}
     
 }

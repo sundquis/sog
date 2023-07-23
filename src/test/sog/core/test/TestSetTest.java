@@ -568,7 +568,7 @@ public class TestSetTest extends Test.Container {
 	public static void main( String[] args ) {
 		/* Toggle class results
 		Test.eval( TestSet.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( true )
 			.showProgress( false )
 			.print();

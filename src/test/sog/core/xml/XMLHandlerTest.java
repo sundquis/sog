@@ -2454,15 +2454,15 @@ public class XMLHandlerTest extends Test.Container {
 
 
 	public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
 		Test.eval( XMLHandler.class )
-			.concurrent( false )
+			.concurrent( true )
 			.showDetails( true )
 			.showProgress( false )
 			.print();
 		//*/
 		
-		/* Toggle package results
+		//* Toggle package results
 		//sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( XMLHandler.class )
 			.concurrent( true )

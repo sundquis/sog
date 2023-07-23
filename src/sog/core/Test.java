@@ -292,6 +292,14 @@ public class Test {
 		 *   4. Otherwise, the string is treated as the fully qualified name of a Test.Container class
 		 */
 		String value(); 
+		
+		/**
+		 * Set this value to false when the tests for a given subject should not be run concurrently 
+		 * by worker threads. The default assumes that tests generally can be run concurrently.
+		 * It is also possible to specifiy concurrency for individual test 
+		 * implementations: see Test.Impl.threasafe()
+		 */
+		boolean threadsafe() default true;
 	}
 
 	/**
@@ -543,7 +551,7 @@ public class Test {
 		/** Used to scale the relative importance of the test case */
 		int weight() default 1;
 
-		/** Used to determine if cases should be run concurrently */
+		/** Used to determine if cases are allowed to be run concurrently */
 		boolean threadsafe() default true;
 		
 	}

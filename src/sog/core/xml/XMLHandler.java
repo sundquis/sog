@@ -56,7 +56,7 @@ import sog.util.StreamReader;
  * Provides default no-op implementations of the SAX xml parsing call-backs, and minimizes
  * application contact with the SAX api.
  */
-@Test.Subject( "test." )
+@Test.Subject( value = "test.", threadsafe = false )
 public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, LexicalHandler {
 
 	

@@ -1506,6 +1506,16 @@ public class AppTest extends Test.Container{
 			.showProgress( true )
 			.print();
 		//*/
+
+		/* Global results
+		sog.util.Concurrent.safeModeOff();
+		sog.core.test.TestSet.forAllSourceDirs()
+			.concurrent( false )
+			.showDetails( false )
+			.showProgress( true )
+			.print();
+		//*/
+		
 		
 		System.out.println( "\nDone!" );
 	}
