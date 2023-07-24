@@ -120,13 +120,13 @@ public class XMLHandlerTest extends Test.Container {
     
     
     
-    /* <EXT-XML>
+    /* <EXT_XML>
      * <?xml version = "1.0" encoding = "UTF-8" ?>
      * <!DOCTYPE	root	SYSTEM	"TEST.dtd" >
      * <root/>
      */
     
-    /* <EXT-DTD>
+    /* <EXT_DTD>
      * <!ELEMENT	root	EMPTY>
      */
     @Test.Impl( 
@@ -137,8 +137,8 @@ public class XMLHandlerTest extends Test.Container {
     	Path xmlPath = new LocalDir().sub( "tmp" ).sub( "system" ).getFile( "TEST", LocalDir.Type.XML );
     	Path dtdPath = new LocalDir().sub( "tmp" ).sub( "system" ).getFile( "TEST", LocalDir.Type.DTD );
 
-		this.source.writeTaggedBlock( "EXT-XML", xmlPath );
-		this.source.writeTaggedBlock( "EXT-DTD", dtdPath );
+		this.source.writeTaggedBlock( "EXT_XML", xmlPath );
+		this.source.writeTaggedBlock( "EXT_DTD", dtdPath );
 		
 		final VAR<Boolean> docComplete = new VAR<>( false );
 		final VAR<Boolean> dtdComplete = new VAR<>( false );
@@ -2454,15 +2454,15 @@ public class XMLHandlerTest extends Test.Container {
 
 
 	public static void main( String[] args ) {
-		/* Toggle class results
+		//* Toggle class results
 		Test.eval( XMLHandler.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( true )
 			.showProgress( false )
 			.print();
 		//*/
 		
-		//* Toggle package results
+		/* Toggle package results
 		//sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( XMLHandler.class )
 			.concurrent( true )

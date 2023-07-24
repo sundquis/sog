@@ -276,7 +276,7 @@ public class AbstractQueueTest extends Test.Container {
 
     
 	public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
 		Test.eval( AbstractQueue.class )
 			.concurrent( false )
 			.showDetails( true )
@@ -285,7 +285,7 @@ public class AbstractQueueTest extends Test.Container {
 		//*/
 		
 		/* Toggle package results
-		sog.util.Concurrent.safeModeOff();
+		//sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( AbstractQueue.class )
 			.concurrent( true )
 			.showDetails( false )

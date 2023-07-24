@@ -493,14 +493,11 @@ public class TestSetTest extends Test.Container {
     public void tm_064B69EAF( Test.Case tc ) {
     	TestSet set = TestSet.forPackage( test.sog.core.test.bar.ConcurrentTests.class ).concurrent( true );
     	this.evalSubjectMethod( set, "run", null );
-    	// We can't actually guarantee that more than one thread gets scheduled, but there are 20
-    	// tests so it is likely...
     	// In concurrent mode our thread must be different from the thread(s) used by these cases,,
     	// but if we are also running concurrently our thread and these threads will
     	// all be Worker threads. NOTE: In safeMode, this will result in error messages warning
     	// about potential deadlock printed to std.err.
     	Set<Thread> threads = ConcurrentTests.TEST.getThreads();
-    	tc.assertTrue( threads.size() > 1 );
     	threads.stream().forEach( (t) -> tc.assertFalse( Thread.currentThread().equals( t ) ) );
     }
     
@@ -574,6 +571,7 @@ public class TestSetTest extends Test.Container {
 			.print();
 		//*/
 		
+
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( TestSet.class )

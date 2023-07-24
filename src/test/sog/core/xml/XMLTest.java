@@ -88,9 +88,9 @@ public class XMLTest extends Test.Container {
 		//*/
 		
 		/* Toggle package results
-		//sog.util.Concurrent.safeModeOff();
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( XML.class )
-			.concurrent( false )
+			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )
 			.print();
