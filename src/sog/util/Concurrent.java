@@ -33,11 +33,12 @@ import sog.core.Property;
 import sog.core.Test;
 
 /**
- * 
+ * Provides services for executing functions concurrently by a pool of Wroker threads.
  */
 @Test.Subject( "test." )
 public class Concurrent implements App.OnShutdown {
 
+	
 	/*
 	 * When true, framework checks for potential deadlock.
 	 * 
@@ -45,10 +46,10 @@ public class Concurrent implements App.OnShutdown {
 	 * in deadlock. This can happen if the implementation of a concurrent function or procedure
 	 * uses the same Concurrent instance to execute code.
 	 */
-	private static boolean safeMode = Property.get( "safeMode", false, Parser.BOOLEAN );
+	private static boolean safeMode = Property.get( "safeMode", true, Parser.BOOLEAN );
 	
 	/**
-	 * Allow the testing framework to temporarily suppress this during testing.
+	 * Safe mode is on by default. This allows the testing framework to temporarily suppress during testing.
 	 * Deprecation warning serves as reminder to remove.
 	 */
 	@Deprecated
@@ -56,6 +57,7 @@ public class Concurrent implements App.OnShutdown {
 	public static void safeModeOff() {
 		Concurrent.safeMode = false;
 	}
+
 
 	
 	private final String label;
@@ -66,10 +68,10 @@ public class Concurrent implements App.OnShutdown {
 
 	@Test.Decl( "Throws AssertionError for null or empty label" )
 	@Test.Decl( "Throws AssertionError for non-positive thread count" )
-	@Test.Decl( "Evaluation procedures are accepted" )
-	@Test.Decl( "Starts correct number of agent threads" )
 	@Test.Decl( "Terminates workers on shutdown" )
 	public Concurrent( String label, int threadCount ) {
+		Assert.positive( threadCount );
+		
 		this.label = Assert.nonEmpty( label );
 		this.procedures = new MultiQueue<>( new FifoQueue<>() );
 		this.workers = Stream.generate( Worker::new ).limit( threadCount ).map( Worker::init ).collect( Collectors.toList() );
@@ -82,139 +84,18 @@ public class Concurrent implements App.OnShutdown {
 			Thread caller = this.workers.stream()
 				.filter( Thread.currentThread()::equals ).findFirst().orElse( null );
 			if ( caller != null ) {
-				Stream.of(
-					"WARNING: Potential deadlock identified.",
-					"In Concurrent, calling thread is a Worker thread:"
-				).map( s -> ">>> " + s ).forEach( System.err::println );
-				App.get().getLocationStarting( "sog" ).limit( 15L ).map( s -> "\t" + s ).forEach( System.err::println );
+				System.err.println( "WARNING: Potential deadlock identified. In Concurrent, calling thread is a Worker thread: " + caller );
+				App.get().getLocationMatching( "^sog.*|^test.*" ).map( s -> "\t" + s ).forEach( System.err::println );
 			}
 		}
 		
 		this.procedures.put( p );
 	}
 
-	/**
-	 * Returns a blocking Supplier that can be used to get the result.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @param concurrent
-	 * @return
-	 */
-	public <T, R> Supplier<R> applyGetLater( Function<T, R> function, T t ) {
-		return new FunctionProcedure<T, R>( function, t ).add();
-	}
-	
-	/**
-	 * This call blocks until a Worker thread completes the evaluation.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @param t
-	 * @return
-	 */
-	public <T, R> R apply( Function<T, R> function, T t ) {
-		return this.applyGetLater( function, t ).get();
-	}
 
 	/**
-	 * Returns a function that will be evaluated by a Worker thread by providing a blocking supplier.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @return
+	 * Closes the request queue and waits for Worker threads to complete their evaluations.
 	 */
-	public <T, R> Function<T, Supplier<R>> wrapGetLater( Function<T, R> function ) {
-		return (t) -> { return this.applyGetLater( function, t ); };
-	}
-
-	/**
-	 * Returns a blocking function that is evaluated by a Worker thread
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @return
-	 */
-	public <T, R> Function<T, R> wrap( Function<T, R> function ) {
-		return (t) -> { return this.apply( function, t ); };
-	}
-
-	/**
-	 * This blocks until all values in the input stream have been processed be a Worker thread.
-	 * The evaluations may occur in any order, but the results in the output stream are presented 
-	 * in the same order as the inputs.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @param stream
-	 * @return
-	 */
-	public <T, R> Stream<R> map( Function<T, R> function, Stream<T> stream ) {
-		return stream
-			.map( this.wrapGetLater( function ) )
-			.collect( Collectors.toList() ).stream()	// Forces all concurrent procedures to be enqueued
-			.map( Supplier::get );						// Block until all procedures are complete
-	}
-
-	/**
-	 * Returns a blocking Supplier that can be used to get the result.
-	 * If the evaluation of the function raises an exception the Supplier.get() call will throw it
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @param concurrent
-	 * @return
-	 */
-	public <T, R, E extends Exception> SupplierWithException<R, E> applyGetLater( FunctionWithException<T, R, E> function, T t ) {
-		return new FunctionWithExceptionProcedure<T, R, E>( function, t ).add();
-	}
-	
-	/**
-	 * This call blocks until a Worker thread completes the evaluation.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @param t
-	 * @return
-	 */
-	public <T, R, E extends Exception> R apply( FunctionWithException<T, R, E> function, T t ) throws E {
-		return this.applyGetLater( function, t ).get();
-	}
-
-	/**
-	 * Returns a function that will be evaluated by a Worker thread by providing a blocking supplier.
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @return
-	 */
-	public <T, R, E extends Exception> Function<T, SupplierWithException<R, E>> wrapGetLater( FunctionWithException<T, R, E> function ) {
-		return (t) -> { return this.applyGetLater( function, t ); };
-	}
-
-	/**
-	 * Returns a blocking function that is evaluated by a Worker thread
-	 * 
-	 * @param <T>
-	 * @param <R>
-	 * @param function
-	 * @return
-	 */
-	public <T, R, E extends Exception> FunctionWithException<T, R, E> wrap( FunctionWithException<T, R, E> function ) {
-		return (t) -> { return this.apply( function, t ); };
-	}
-
-
-	
-	
 	@Override
 	@Test.Decl( "No effect if Concurrent already terminated" )
 	@Test.Decl( "Requests are not acceppted after terminate()" )
@@ -226,6 +107,185 @@ public class Concurrent implements App.OnShutdown {
 		this.procedures.close();
 		this.workers.forEach( Worker::quietJoin );
 	}
+	
+	
+	
+	
+	/**
+	 * Returns a blocking Supplier that can be used to get the result.
+	 * 
+	 * This enqueues a request to evaluate the given function with the given argument.
+	 * The call returns immediately with a Supplier that can be used the retrieve the result.
+	 * The Supplier.get() call blocks until a Worker thread completes the evaluation
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param function		The function to evaluate
+	 * @param t				The argument
+	 * @return				Blocking Supplier with the retrievable result
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	public <T, R> Supplier<R> applyGetLater( Function<T, R> function, T t ) {
+		Assert.nonNull( function );
+		return new FunctionProcedure<T, R>( function, t ).add();
+	}
+	
+	/**
+	 * Evaluate the given function with the given argument using a Worker thread.
+	 * This call blocks until a Worker thread completes the evaluation.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param function		The function to evaluate
+	 * @param t				The argument
+	 * @return				The result of the function application
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	public <T, R> R apply( Function<T, R> function, T t ) {
+		Assert.nonNull( function );
+		return this.applyGetLater( function, t ).get();
+	}
+
+	/**
+	 * Returns a function that will be evaluated by a Worker thread by providing a blocking supplier.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param function		The function to evaluate
+	 * @return				A function that evaluates concurrently
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	public <T, R> Function<T, Supplier<R>> wrapGetLater( Function<T, R> function ) {
+		Assert.nonNull( function );
+		return (t) -> { return this.applyGetLater( function, t ); };
+	}
+
+	/**
+	 * Returns a blocking function that is evaluated by a Worker thread
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param function		The function to evaluate
+	 * @return				A function that evaluates concurrently
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	public <T, R> Function<T, R> wrap( Function<T, R> function ) {
+		Assert.nonNull( function );
+		return (t) -> { return this.apply( function, t ); };
+	}
+	
+	/**
+	 * This blocks until all values in the input stream have been processed be a Worker thread.
+	 * The evaluations may occur in any order, but the results in the output stream are presented 
+	 * in the same order as the inputs.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param function		The function to evaluate
+	 * @param stream		The sequence of inputs for function applications
+	 * @return				The stream of results
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Throws AssertionError for null stream" )
+	@Test.Decl( "Return is not terminated" )
+	@Test.Decl( "Call blocks until all results are ready" )
+	@Test.Decl( "Results are presented in the order of the original steram of inputs" )
+	@Test.Decl( "Results are consistent with the given function and arguments" )
+	public <T, R> Stream<R> map( Function<T, R> function, Stream<T> stream ) {
+		Assert.nonNull( function );
+		Assert.nonNull( stream );
+		return stream
+			.map( this.wrapGetLater( function ) )
+			.collect( Collectors.toList() ).stream()	// Forces all concurrent procedures to be enqueued
+			.map( Supplier::get );						// Block until all procedures are complete
+	}
+
+	
+	
+	/**
+	 * Returns a blocking Supplier that can be used to get the result.
+	 * If the evaluation of the function raises an exception the Supplier.get() call will throw it.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param <E>			The type of the exception thrown by the function
+	 * @param function		The function to evaluate
+	 * @param t				The argument for the function application
+	 * @return				A blocking supplier with the result or exception
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	@Test.Decl( "If the function application throws an exception it is thrown by the Supplier" )
+	public <T, R, E extends Exception> SupplierWithException<R, E> applyGetLater( FunctionWithException<T, R, E> function, T t ) {
+		Assert.nonNull( function );
+		return new FunctionWithExceptionProcedure<T, R, E>( function, t ).add();
+	}
+	
+	/**
+	 * This call blocks until a Worker thread completes the evaluation.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param <E>			The type of the exception thrown by the function
+	 * @param function		The function to evaluate
+	 * @param t				The argument for the function application
+	 * @return				The result of the function application
+	 * @throws E			If the function application raises an exception
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	@Test.Decl( "If the function application throws an exception it is thrown" )
+	public <T, R, E extends Exception> R apply( FunctionWithException<T, R, E> function, T t ) throws E {
+		Assert.nonNull( function );
+		return this.applyGetLater( function, t ).get();
+	}
+
+	/**
+	 * Returns a function that will be evaluated by a Worker thread by providing a blocking supplier.
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param <E>			The type of the exception thrown by the function
+	 * @param function		The function to evaluate
+	 * @return				A function that evaluates concurrently
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	@Test.Decl( "If the function application throws an exception it is thrown by the Supplier" )
+	public <T, R, E extends Exception> Function<T, SupplierWithException<R, E>> wrapGetLater( FunctionWithException<T, R, E> function ) {
+		Assert.nonNull( function );
+		return (t) -> { return this.applyGetLater( function, t ); };
+	}
+
+	/**
+	 * Returns a blocking function that is evaluated by a Worker thread
+	 * 
+	 * @param <T>			The argument type of the function
+	 * @param <R>			The return type of the function
+	 * @param <E>			The type of the exception thrown by the function
+	 * @param function		The function to evaluate
+	 * @return				A function that evaluates concurrently
+	 */
+	@Test.Decl( "Throws AssertionError for null function" )
+	@Test.Decl( "Function is evaluated by a Worker thread" )
+	@Test.Decl( "Result is consistent with given function and argument" )
+	@Test.Decl( "If the function application throws an exception it is thrown" )
+	public <T, R, E extends Exception> FunctionWithException<T, R, E> wrap( FunctionWithException<T, R, E> function ) {
+		Assert.nonNull( function );
+		return (t) -> { return this.apply( function, t ); };
+	}
+
 	
 	
 	@Override 
@@ -243,7 +303,6 @@ public class Concurrent implements App.OnShutdown {
 	private class Worker extends Thread {
 		
 		@Override
-		@Test.Decl( "Worker accepts procedures" )
 		@Test.Decl( "Worker evaluates procedures" )
 		public  void run() {
 			Procedure proc;
@@ -268,7 +327,7 @@ public class Concurrent implements App.OnShutdown {
 	}
 	
 	
-	
+	@Test.Skip( "Abstract base class" )
 	private abstract class BaseProcedure<S extends BaseProcedure<S>> implements Procedure {
 		
 		private boolean completed = false;
@@ -276,7 +335,7 @@ public class Concurrent implements App.OnShutdown {
 		protected abstract S getThis();
 		
 		protected abstract void execImpl();
-		
+
 		protected S add() {
 			Concurrent.this.addProcedure( this );
 			return this.getThis();
@@ -300,7 +359,7 @@ public class Concurrent implements App.OnShutdown {
 		 * 
 		 * 		protected synchronized Result get() {
 		 * 			while ( true ) {
-		 * 				if ( this.isComplete() ) {
+		 * 				if ( this.isCompleted() ) {
 		 * 					return this.result;
 		 * 				} else {
 		 * 					try { this.wait(); } catch ( InterruptedException ex ) {}
@@ -318,6 +377,7 @@ public class Concurrent implements App.OnShutdown {
 	 * Holds the function and argument to be evaluated by a Worker thread.
 	 * The Supplier.get() method blocks until the result has been calculated.
 	 */
+	@Test.Skip( "Covered by cases in Concurrent" )
 	private class FunctionProcedure<T, R> extends BaseProcedure<FunctionProcedure<T, R>> implements Supplier<R> {
 		
 		private final Function<T, R> function;
@@ -344,7 +404,7 @@ public class Concurrent implements App.OnShutdown {
 
 		@Override
 		@Test.Decl( "Blocks until evaluation is complete" )
-		@Test.Decl( "Result is agrees with value of the function" )
+		@Test.Decl( "Result agrees with value of the function" )
 		public synchronized R get() {
 			while  ( true ) {
 				if ( this.isCompleted() ) { 
@@ -359,6 +419,7 @@ public class Concurrent implements App.OnShutdown {
 
 	}
 
+	@Test.Skip( "Covered by cases in Concurrent" )
 	private class FunctionWithExceptionProcedure<T, R, E extends Exception> 
 		extends BaseProcedure<FunctionWithExceptionProcedure<T, R, E>> 
 		implements SupplierWithException<R, E> {
