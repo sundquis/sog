@@ -37,7 +37,7 @@ import sog.util.Commented;
  * @author sundquis
  *
  */
-@Test.Subject( "test." )
+@Test.Skip( "Container" )
 public class CommentedTest extends Test.Container {
 	
 	private final Commented commented = new Commented( CommentedTest.class );

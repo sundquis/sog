@@ -1,10 +1,21 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021, 2023
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.util;
 
 
@@ -34,15 +45,9 @@ import sog.core.Test;
  * detail messages, and also holds a String encoding of the stack trace where the Fault was generated. 
  * The implementation of Printable presents the diagnostic information.
  */
+@Test.Subject( "test." )
 public class Fault implements Printable {
 	
-	
-	/* 
-	 * An object to serve as the source for global application faults. We could use the App singleton
-	 * but this might introduce an unwanted circular dependency Fault -> App -> Fatal -> Fault
-	 * that could lead to class initialization issues.
-	 * */
-	private static final Object APP = new Object() {};
 	
 	/*
 	 * The key is the associated source object, or APP if none was given. The value is
@@ -73,18 +78,6 @@ public class Fault implements Printable {
 	}
 	
 	/**
-	 * Register the given listener to receive notification of GLOBAL application faults.
-	 * 
-	 * @param listener
-	 */
-	@Test.Decl( "Throws AssertionError for null listener" )
-	@Test.Decl( "Subsequent faults for GLOBAL application are deleivered to listener" )
-	@Test.Decl( "Subsequent faults for other sources are ignored" )
-	public static void addListener( Consumer<Fault> listener ) {
-		Fault.addListener( Fault.APP, Assert.nonNull( listener ) );
-	}
-	
-	/**
 	 * Unsubscribe the given listener waiting on faults associated with the given source.
 	 * 
 	 * @param listener
@@ -100,17 +93,6 @@ public class Fault implements Printable {
 		if ( listenerSet != null ) {
 			listenerSet.remove( listener );
 		}
-	}
-
-	/**
-	 * Unsubscribe the given listener waiting on faults associated with the GLOBAL application.
-	 * 
-	 * @param listener
-	 */
-	@Test.Decl( "Throws AssertionError for null listener" )
-	@Test.Decl( "Subsequent faults for GLOBAL application are not deleivered to listener" )
-	public static void removeListener( Consumer<Fault> listener ) {
-		Fault.removeListener( Fault.APP, Assert.nonNull( listener ) );
 	}
 
 
@@ -140,30 +122,12 @@ public class Fault implements Printable {
 	 */
 	@Test.Decl( "Throws AssertionError for null source" )
 	@Test.Decl( "Throws AssertionError for enpty description" )
-	@Test.Decl( "Given details are included in print" )
-	@Test.Decl( "Fault location is included in print" )
 	public Fault( Object source, String description, Object ... details ) {
 		this.source = Assert.nonNull( source );
 		this.description = Assert.nonEmpty( description );
 		this.details = Arrays.stream( details ).map( Strings::toString )
 			.collect( Collectors.toCollection( ArrayList<String>::new ) );
-		this.faultLocation = App.get().getLocation().collect( Collectors.toList() );
-	}
-
-	/**
-	 * Construct a {@code Fault} representing an application defect associated with the GLOBAL application.
-	 * 
-	 * The required non-empty description explains the nature of the fault. The optional
-	 * detail objects provide additional context.
-	 * 
-	 * @param description
-	 * @param details
-	 */
-	@Test.Decl( "Throws AssertionError for empty description" )
-	@Test.Decl( "Given details are included in print" )
-	@Test.Decl( "Fault location is included in print" )
-	public Fault( String description, Object ... details ) {
-		this( Fault.APP, description, details );
+		this.faultLocation = App.get().getLocationMatching( "^sog.*|^test.*" ).collect( Collectors.toList() );
 	}
 
 	
@@ -206,7 +170,7 @@ public class Fault implements Printable {
 	@Test.Decl( "Detail converted using Strings.toString()" )
 	@Test.Decl( "Detail is appended to previous details" )
 	@Test.Decl( "Return is this Fault instance" )
-	public Fault addSource( Object detail ) {			
+	public Fault addDetail( Object detail ) {
 		this.details.add( Strings.toString( detail ) );
 		return this;
 	}
@@ -230,24 +194,27 @@ public class Fault implements Printable {
 	@Override
 	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Description printed" )
+	@Test.Decl( "Source is printed" )
 	@Test.Decl( "Fault location printed" )
-	@Test.Decl( "All provided details printed" )
+	@Test.Decl( "All details printed" )
 	public void print( IndentWriter out ) {
 		out.println( this.toString() );
 		out.increaseIndent();
+		
+		out.println( "SOURCE: " + Strings.toString( this.source ) );
 
 		out.println( "LOCATION:" );
 		out.increaseIndent();
 		this.faultLocation.forEach( out::println );
 		out.decreaseIndent();
 
-		out.println( "SOURCE(S):" );
+		out.println( "DETAILS:" );
 		out.increaseIndent();
 		this.details.forEach( out::println );
 		out.decreaseIndent();
 
 		out.decreaseIndent();
-		out.println("");
+		out.println();
 	}
 
 	

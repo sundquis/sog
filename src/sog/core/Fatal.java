@@ -78,14 +78,14 @@ public final class Fatal {
 	/**
 	 * Toss a fault indicating a serious condition.
 	 * To receive notifications register a listener:
-	 * 		Fault.addListener( Consumer<Fault> listener )
+	 * 		Fault.addListener( App.class, Consumer<Fault> listener )
 	 * 
 	 * @param detail
 	 *      A string detail message to include in the exception message.
 	 */
 	@Test.Decl( "Throws AssertionError for empty detail message" )
 	public static void warning( String detail ) {
-		new Fault( "WARNING: " + Assert.nonEmpty( detail ) ).toss();
+		new Fault( App.class, "WARNING: " + Assert.nonEmpty( detail ) ).toss();
 	}
 
 	/**

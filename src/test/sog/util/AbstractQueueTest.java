@@ -29,6 +29,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
+@Test.Skip( "Container" )
 public class AbstractQueueTest extends Test.Container {
 
 	

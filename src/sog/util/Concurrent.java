@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import sog.core.App;
+import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Parser;
 import sog.core.Procedure;
@@ -80,6 +81,10 @@ public class Concurrent implements App.OnShutdown {
 	}
 	
 	private void addProcedure( Procedure p ) {
+		if ( !this.procedures.isOpen() ) {
+			throw new AppRuntime( "This Concurrent instance has been terminated and is not accpeting rquests" );
+		}
+		
 		if ( Concurrent.safeMode ) {
 			Thread caller = this.workers.stream()
 				.filter( Thread.currentThread()::equals ).findFirst().orElse( null );
@@ -98,7 +103,7 @@ public class Concurrent implements App.OnShutdown {
 	 */
 	@Override
 	@Test.Decl( "No effect if Concurrent already terminated" )
-	@Test.Decl( "Requests are not acceppted after terminate()" )
+	@Test.Decl( "Throws AppRuntime for requests after terminated" )
 	@Test.Decl( "Worker threads are stopped after terminate()" )
 	public void terminate() {
 		if ( this.procedures == null || this.procedures.isClosed() ) {
@@ -224,7 +229,8 @@ public class Concurrent implements App.OnShutdown {
 	@Test.Decl( "Throws AssertionError for null function" )
 	@Test.Decl( "Function is evaluated by a Worker thread" )
 	@Test.Decl( "Result is consistent with given function and argument" )
-	@Test.Decl( "If the function application throws an exception it is thrown by the Supplier" )
+	@Test.Decl( "If the function application throws a checked exception it is thrown by the Supplier" )
+	@Test.Decl( "If the function application throws an unchecked excpetion it is thrown by the Supplier" )
 	public <T, R, E extends Exception> SupplierWithException<R, E> applyGetLater( FunctionWithException<T, R, E> function, T t ) {
 		Assert.nonNull( function );
 		return new FunctionWithExceptionProcedure<T, R, E>( function, t ).add();
@@ -244,7 +250,8 @@ public class Concurrent implements App.OnShutdown {
 	@Test.Decl( "Throws AssertionError for null function" )
 	@Test.Decl( "Function is evaluated by a Worker thread" )
 	@Test.Decl( "Result is consistent with given function and argument" )
-	@Test.Decl( "If the function application throws an exception it is thrown" )
+	@Test.Decl( "If the function application throws a checked exception it is thrown" )
+	@Test.Decl( "If the function application throws an unchecked excpetion it is thrown" )
 	public <T, R, E extends Exception> R apply( FunctionWithException<T, R, E> function, T t ) throws E {
 		Assert.nonNull( function );
 		return this.applyGetLater( function, t ).get();
@@ -262,7 +269,8 @@ public class Concurrent implements App.OnShutdown {
 	@Test.Decl( "Throws AssertionError for null function" )
 	@Test.Decl( "Function is evaluated by a Worker thread" )
 	@Test.Decl( "Result is consistent with given function and argument" )
-	@Test.Decl( "If the function application throws an exception it is thrown by the Supplier" )
+	@Test.Decl( "If the function application throws a checked exception it is thrown by the Supplier" )
+	@Test.Decl( "If the function application throws an unchecked excpetion it is thrown by the Supplier" )
 	public <T, R, E extends Exception> Function<T, SupplierWithException<R, E>> wrapGetLater( FunctionWithException<T, R, E> function ) {
 		Assert.nonNull( function );
 		return (t) -> { return this.applyGetLater( function, t ); };
@@ -280,7 +288,8 @@ public class Concurrent implements App.OnShutdown {
 	@Test.Decl( "Throws AssertionError for null function" )
 	@Test.Decl( "Function is evaluated by a Worker thread" )
 	@Test.Decl( "Result is consistent with given function and argument" )
-	@Test.Decl( "If the function application throws an exception it is thrown" )
+	@Test.Decl( "If the function application throws a checked exception it is thrown" )
+	@Test.Decl( "If the function application throws an unchecked excpetion it is thrown" )
 	public <T, R, E extends Exception> FunctionWithException<T, R, E> wrap( FunctionWithException<T, R, E> function ) {
 		Assert.nonNull( function );
 		return (t) -> { return this.apply( function, t ); };
@@ -289,7 +298,7 @@ public class Concurrent implements App.OnShutdown {
 	
 	
 	@Override 
-	@Test.Decl( "Includes constructed label" )
+	@Test.Decl( "Includes label" )
 	@Test.Decl( "Reports when procedures are pending" )
 	@Test.Decl( "Reports number of Worker threads" )
 	public String toString() {
@@ -430,13 +439,18 @@ public class Concurrent implements App.OnShutdown {
 		
 		private R result;
 		
-		private E exception;
+		private E checked;
 		
+		private RuntimeException runtime;
+		
+		private Error error;		
 		private FunctionWithExceptionProcedure( FunctionWithException<T, R, E> function, T arg ) {
 			this.function = function;
 			this.arg = arg;
 			this.result = null;
-			this.exception = null;
+			this.checked = null;
+			this.runtime = null;
+			this.error = null;
 		}
 		
 		@Override
@@ -449,10 +463,12 @@ public class Concurrent implements App.OnShutdown {
 		protected void execImpl() {
 			try {
 				this.result = this.function.apply( this.arg );
-			} catch ( RuntimeException | Error ex ) {
-				throw ex;
+			} catch ( RuntimeException ex ) {
+				this.runtime = ex;
+			} catch( Error ex ) {
+				this.error = ex;
 			} catch ( Exception ex ) {
-				this.exception = (E) ex;
+				this.checked = (E) ex;
 			}
 		}
 
@@ -462,8 +478,14 @@ public class Concurrent implements App.OnShutdown {
 		public synchronized R get() throws E {
 			while  ( true ) {
 				if ( this.isCompleted() ) { 
-					if ( this.exception != null ) {
-						throw this.exception;
+					if ( this.checked != null ) {
+						throw this.checked;
+					}
+					if ( this.runtime != null ) {
+						throw this.runtime;
+					}
+					if ( this.error != null ) {
+						throw this.error;
 					}
 					return this.result; 
 				}

@@ -403,11 +403,11 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf3 = new ByteFile() 
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
-			tc.afterThis( () -> Fault.removeListener( listener ) );
+			tc.afterThis( () -> Fault.removeListener( ByteFileTest.class, listener ) );
 			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
-			Fault.addListener( listener );
+			Fault.addListener( ByteFileTest.class, listener );
 			bf3.write( 0, DATA );
 		}
 	}
@@ -529,11 +529,11 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf3 = new ByteFile() 
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
-			tc.afterThis( () -> Fault.removeListener( listener ) );
+			tc.afterThis( () -> Fault.removeListener( ByteFileTest.class, listener ) );
 			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
-			Fault.addListener( listener );
+			Fault.addListener( ByteFileTest.class, listener );
 			bf3.append( DATA, 0, 1 );
 		}
 	}
@@ -969,11 +969,11 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf3 = new ByteFile() 
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
-			tc.afterThis( () -> Fault.removeListener( listener ) );
+			tc.afterThis( () -> Fault.removeListener( ByteFileTest.class, listener ) );
 			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
-			Fault.addListener( listener );
+			Fault.addListener( ByteFileTest.class, listener );
 			bf3.write( 0, DATA );
 		}
 	}
@@ -1141,11 +1141,11 @@ public class ByteFileTest extends Test.Container {
 			ByteFile bf3 = new ByteFile() 
 		) {
 			Consumer<Fault> listener = f -> tc.assertPass();
-			tc.afterThis( () -> Fault.removeListener( listener ) );
+			tc.afterThis( () -> Fault.removeListener( ByteFileTest.class, listener ) );
 			int position = (int) this.NEW_MAX_LENGTH - DATA.length;
 			bf1.write( position, DATA );
 			bf2.write( position, DATA );
-			Fault.addListener( listener );
+			Fault.addListener( ByteFileTest.class, listener );
 			bf3.write( 0, DATA, 0, 1 );
 		}
 	}
@@ -1335,18 +1335,23 @@ public class ByteFileTest extends Test.Container {
 	public static void main( String[] args ) {
 		/* Toggle class results
 		Test.eval( ByteFile.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( true )
+			.showProgress( false )
 			.print();
 		//*/
 		
-		//* Toggle package results
+		/* Toggle package results
+		//sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( ByteFile.class )
 			.concurrent( true )
-			.showDetails( true )
+			.showDetails( false )
+			.showProgress( true )
 			.print();
 		//*/
 		
 		System.out.println( "\nDone!" );
 	}
+	
+	
 }
