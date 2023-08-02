@@ -171,7 +171,7 @@ public class Fault implements Printable {
 	@Test.Decl( "Detail is appended to previous details" )
 	@Test.Decl( "Return is this Fault instance" )
 	public Fault addDetail( Object detail ) {
-		this.details.add( Strings.toString( detail ) );
+		this.details.add( Strings.toString( Assert.nonNull( detail ) ) );
 		return this;
 	}
 	
@@ -198,6 +198,8 @@ public class Fault implements Printable {
 	@Test.Decl( "Fault location printed" )
 	@Test.Decl( "All details printed" )
 	public void print( IndentWriter out ) {
+		Assert.nonNull( out );
+		
 		out.println( this.toString() );
 		out.increaseIndent();
 		
