@@ -17,26 +17,31 @@
  * Sundquist
  */
 
-package sog.util.persistent;
+package sog.core.xml.data;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 
 import sog.core.Test;
+import sog.core.xml.XML;
 
 /**
  * 
  */
-@Test.Skip( "Container" )
 @Test.Subject( "test." )
-@Documented
-@Retention( RUNTIME )
-@Target( { FIELD } )
-public @interface Data {
-
+public class XMLField {
 	
+	private final Field field;
+	
+	XMLField( Field field ) {
+		this.field = field;
+	}
+
+	boolean persistent() {
+		return this.field.getAnnotation( XML.Data.class ) != null;
+	}
+	
+	String getName() {
+		return this.field.getName();
+	}
+
 }

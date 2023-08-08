@@ -6,6 +6,9 @@
 /html
 /trace
 
+# May need to include this at some point
+/data
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

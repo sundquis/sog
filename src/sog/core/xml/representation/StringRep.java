@@ -17,40 +17,46 @@
  * Sundquist
  */
 
-package test.sog.util.persistent;
+package sog.core.xml.representation;
+
 
 import sog.core.Test;
-import sog.util.persistent.Representation;
+import sog.core.xml.XMLRepresentation;
 
 /**
  * 
  */
-@Test.Skip( "Container" )
-public class RepresentationTest extends Test.Container {
-
-	public RepresentationTest() {
-		super( Representation.class );
+@Test.Subject( "test." )
+public class StringRep extends XMLRepresentation<String> {
+	
+	@Override
+	public String fromString( String rep ) {
+		return this.unwrapEntities( rep );
 	}
 
-	public static void main( String[] args ) {
-		//* Toggle class results
-		Test.eval( Representation.class )
-			.concurrent( false )
-			.showDetails( true )
-			.showProgress( false )
-			.print();
-		//*/
-		
-		/* Toggle package results
-		//sog.util.Concurrent.safeModeOff();
-		Test.evalPackage( Representation.class )
-			.concurrent( true )
-			.showDetails( false )
-			.showProgress( true )
-			.print();
-		//*/
-		
-		System.out.println( "\nDone!" );
+	
+	@Override
+	public String toString( String t ) {
+		return this.wrapEntities( t );
 	}
+
+	
+//	@Override
+//	public String toXML( String t ) {
+//		return "<string>" + this.wrapEntities( t ) + "</string>";
+//	}
+	
+//	public static void main( String[] args ) {
+//		final StringRep rep = new StringRep();
+//		
+//		Stream.of( 
+//			"Hello world!",
+//			"With ampersand & <tag></tag>",
+//			"A \"quoted\" string",
+//			"Single 'quotes'"
+//		).forEach( rep::testMappings );
+//	}
+
+	
 
 }

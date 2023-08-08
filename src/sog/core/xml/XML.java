@@ -20,9 +20,17 @@
 package sog.core.xml;
 
 
+import java.io.IOException;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import sog.core.Assert;
 import sog.core.Property;
 import sog.core.Test;
+import sog.core.xml.data.XMLSimpleDataManager;
 
 /**
  * Static help with xml
@@ -59,6 +67,62 @@ public class XML {
 	public String getDeclaration() {
 		return this.declaration;
 	}
+	
 
+	@Documented
+	@Retention( RetentionPolicy.RUNTIME )
+	@Target( { ElementType.FIELD, ElementType.TYPE } )
+	/**
+	 * A marker annotation indicating that the target class or field can be represented
+	 * as XML data and stored.
+	 */
+	public @interface Data {}
+	
+	/**
+	 * Operations pertaining to persistent data stored as xml.
+	 */
+	public interface DataManager {
+		
+		/**
+		 * Retrieve stored persistent values for the given non-null object.
+		 * 
+		 * The given object becomes the manager...
+		 * Read xml...
+		 * 
+		 * @param obj
+		 */
+		public void load( Object obj ) throws IOException;
+		
+		/**
+		 * Store an xml representation of the persistent data for the given non-null object.
+		 * 
+		 * Fields marked XML.Data
+		 * Only if obj called load
+		 * 
+		 * @param obj
+		 */
+		public void store( Object obj ) throws IOException;
+		
+		/**
+		 * Same as load without store capability
+		 * @param obj
+		 */
+		public void copy( Object obj ) throws IOException;
+		
+	}
+	
+	public DataManager dataManager() {
+		return XMLSimpleDataManager.get();
+	}
+	
+	
+	public static void main( String[] args ) {
+		String orig = "&lt;class&gt;";
+		String replaced = orig.replaceAll( "", "" );
+		System.out.println( ">>> ORIGINAL: " + orig );
+		System.out.println( ">>> REPLACED: " + replaced );
+		
+		System.out.println( "\nDone!" );
+	}
 	
 }
