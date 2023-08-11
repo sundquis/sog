@@ -19,10 +19,13 @@
 
 package sog.core.xml.representation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sog.core.Test;
+import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
+import sog.core.xml.XMLWriter;
 
 /**
  * 
@@ -30,41 +33,41 @@ import sog.core.xml.XMLRepresentation;
 @Test.Subject( "test." )
 public class ListRep<E> extends XMLRepresentation<List<E>> {
 
-	private XMLRepresentation<E> elementRep;
+	//FIXME
+	// Need a more general XMLReader 
+	// Deal with whitespace and elements over multiple lines?
 	
-	public ListRep( XMLRepresentation<E> elementRep ) {
-		this.elementRep = elementRep;
+	public static <T> XMLRepresentation<List<T>> getRep( XMLRepresentation<T> comp ) {
+		return new ListRep<>( comp );
+	}
+	
+	
+	private XMLRepresentation<E> componentRep;
+	
+	public ListRep( XMLRepresentation<E> comp ) {
+		this.componentRep = comp;
+	}
+	
+	@Override
+	public List<E> fromXML( XMLReader in ) {
+		List<E> result = new ArrayList<>();
+		in.readTagOpen( "List" );
+
+		E elt = null;
+		while ( (elt = this.componentRep.fromXML( in )) != null ) {
+			result.add( elt );
+		}
+		
+		in.readTagClose( "List" );
+		return result;
 	}
 
 	@Override
-	public String toString( List<E> t ) {
-		return null;
+	public void toXML( List<E> t, XMLWriter out ) {
+		out.writeTagOpen( "List" );
+		t.forEach( e -> this.componentRep.toXML( e, out ) );
+		out.writeTagClose( "List" );
 	}
 
-	
-	@Override
-	public List<E> fromString( String rep ) {
-		return null;
-	}
 
-//	@Override
-//	public String toXML( List<E> t ) {
-//		final StringBuilder buf = new StringBuilder();
-//		buf.append( "<list><size>" )
-//			.append( t.size() )
-//			.append( "</size>\n" );
-//		t.stream().forEach( (e) -> buf.append( this.elementRep.toXML( e ) + "\n" ) );
-//		buf.append(  "</list>" );
-//		return buf.toString();
-//	}
-
-	
-	public static void main( String[] args ) {
-		IntegerRep eRep = new IntegerRep();
-		ListRep<Integer> rep = new ListRep<>( eRep );
-		List<Integer> list = List.of( 0, 0, -245763, Integer.MAX_VALUE, Integer.MIN_VALUE, +42 );
-		//rep.testMappings( list );
-	}
-
-	
 }

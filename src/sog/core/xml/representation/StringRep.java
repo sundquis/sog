@@ -21,7 +21,9 @@ package sog.core.xml.representation;
 
 
 import sog.core.Test;
+import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
+import sog.core.xml.XMLWriter;
 
 /**
  * 
@@ -30,33 +32,15 @@ import sog.core.xml.XMLRepresentation;
 public class StringRep extends XMLRepresentation<String> {
 	
 	@Override
-	public String fromString( String rep ) {
-		return this.unwrapEntities( rep );
+	public String fromXML( XMLReader in ) {
+		return in.readTag( "String" );
 	}
 
-	
 	@Override
-	public String toString( String t ) {
-		return this.wrapEntities( t );
+	public void toXML( String t, XMLWriter out ) {
+		out.writeTag( "String", t );
 	}
+	
 
-	
-//	@Override
-//	public String toXML( String t ) {
-//		return "<string>" + this.wrapEntities( t ) + "</string>";
-//	}
-	
-//	public static void main( String[] args ) {
-//		final StringRep rep = new StringRep();
-//		
-//		Stream.of( 
-//			"Hello world!",
-//			"With ampersand & <tag></tag>",
-//			"A \"quoted\" string",
-//			"Single 'quotes'"
-//		).forEach( rep::testMappings );
-//	}
-
-	
 
 }

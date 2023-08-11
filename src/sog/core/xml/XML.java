@@ -20,17 +20,9 @@
 package sog.core.xml;
 
 
-import java.io.IOException;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import sog.core.Assert;
 import sog.core.Property;
 import sog.core.Test;
-import sog.core.xml.data.XMLSimpleDataManager;
 
 /**
  * Static help with xml
@@ -68,61 +60,64 @@ public class XML {
 		return this.declaration;
 	}
 	
+	
+	public enum Entity {
+		AMP( "&", "&amp;"),
+		LT( "<", "&lt;" ),
+		GT( ">", "&gt;" ),
+		QUOT( "\"", "&quot;" ),
+		APOS( "'", "&apos;" );
+		
+		private final String entity;
+		private final String replacement;
+		private Entity( String entity, String replacement ) {
+			this.entity = entity;
+			this.replacement = replacement;
+		}
+		
+		public static String encode( String s ) {
+			String result = s;
+			
+			for ( Entity e : Entity.values() ) {
+				result = result.replace( e.entity, e.replacement );
+			}
+			
+			return result;
+		}
+		
+		public static String decode( String s ) {
+			String result = s;
+			
+			for ( Entity e : Entity.values() ) {
+				result = result.replace( e.replacement, e.entity );
+			}
+			
+			return result;
+		}
+	}
 
-	@Documented
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.FIELD, ElementType.TYPE } )
-	/**
-	 * A marker annotation indicating that the target class or field can be represented
-	 * as XML data and stored.
-	 */
-	public @interface Data {}
+
 	
-	/**
-	 * Operations pertaining to persistent data stored as xml.
-	 */
-	public interface DataManager {
+	
+	public interface Helpers {
 		
-		/**
-		 * Retrieve stored persistent values for the given non-null object.
-		 * 
-		 * The given object becomes the manager...
-		 * Read xml...
-		 * 
-		 * @param obj
-		 */
-		public void load( Object obj ) throws IOException;
+		default public String tagStart( String tag ) {
+			return "<" + tag + ">";
+		}
 		
-		/**
-		 * Store an xml representation of the persistent data for the given non-null object.
-		 * 
-		 * Fields marked XML.Data
-		 * Only if obj called load
-		 * 
-		 * @param obj
-		 */
-		public void store( Object obj ) throws IOException;
+		default public String tagEnd( String tag ) {
+			return "</" + tag + ">";
+		}
 		
-		/**
-		 * Same as load without store capability
-		 * @param obj
-		 */
-		public void copy( Object obj ) throws IOException;
+		default public String encodeEntities( String s ) {
+			return Entity.encode( s );
+		}
+		
+		default public String decodeEntities( String s ) {
+			return Entity.decode( s );
+		}
 		
 	}
-	
-	public DataManager dataManager() {
-		return XMLSimpleDataManager.get();
-	}
-	
-	
-	public static void main( String[] args ) {
-		String orig = "&lt;class&gt;";
-		String replaced = orig.replaceAll( "", "" );
-		System.out.println( ">>> ORIGINAL: " + orig );
-		System.out.println( ">>> REPLACED: " + replaced );
-		
-		System.out.println( "\nDone!" );
-	}
+
 	
 }

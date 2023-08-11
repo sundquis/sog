@@ -17,7 +17,7 @@
  * Sundquist
  */
 
-package sog.core.xml.data;
+package sog.core.xml;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,71 +26,43 @@ import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import sog.core.AppRuntime;
 import sog.core.Test;
-import sog.core.xml.XML;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class XMLWriter implements AutoCloseable {
+public class XMLWriter implements AutoCloseable, XML.Helpers {
 	
 	final private PrintWriter out;
 	
 	final private Deque<String> indent;
 	
-	XMLWriter( Path dataFile ) throws IOException {
+	public XMLWriter( Path dataFile ) throws IOException {
 		this.out = new PrintWriter( Files.newBufferedWriter( dataFile ) );
 		this.indent = new ArrayDeque<>();
 		this.indent.push( "" );
 	}
 	
-	private void increaseIndent() {
-		this.indent.push( this.indent.peek() + "    " );
+	public void writeTag( String tag, String content ) {
+		this.out.append( this.tagStart( tag ) )
+			.append( this.encodeEntities( content ) )
+			.append( this.tagEnd( tag ) );
+		this.newline();
 	}
 	
-	private void decreaseIndent() {
-		if ( this.indent.size() == 1 ) {
-			throw new AppRuntime( "Already at minimum indent" );
-		}
-		this.indent.pop();
+	public void newline() {
+		out.println();
 	}
 	
-	private void indent() {
-		this.out.append( this.indent.peek() );
+	public void writeTagOpen( String tag ) {
+		this.out.append( this.tagStart( tag ) );
+		this.newline();
 	}
 	
-	XMLWriter declaration() {
-		this.indent();
-		this.out.println( XML.get().getDeclaration() );
-		return this;
-	}
-	
-	XMLWriter startClass( Class<?> clazz ) {
-		this.indent();
-		this.out.append( "<class name = \"" )
-			.append( clazz.getName() )
-			.println( "\">" );
-		this.increaseIndent();
-		return this;
-	}
-	
-	XMLWriter endClass() {
-		this.decreaseIndent();
-		this.indent();
-		this.out.println( "</class>" );
-		return this;
-	}
-	
-	XMLWriter startField( XMLField field ) {
-		this.indent();
-		this.out.append( "<field name = \"" )
-			.append( field.getName() )
-			.append( "\" representation = \"REP\">" )
-			.append( "STUFF" )
-			.println( "</field>" );
-		return this;
+	public void writeTagClose( String tag ) {
+		this.out.append( this.tagEnd( tag ) );
+		this.newline();
 	}
 
 	@Override

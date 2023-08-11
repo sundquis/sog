@@ -19,11 +19,10 @@
 
 package sog.core.xml.representation;
 
-import java.io.PrintWriter;
-import java.util.stream.Stream;
-
 import sog.core.Test;
+import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
+import sog.core.xml.XMLWriter;
 
 /**
  * 
@@ -32,21 +31,15 @@ import sog.core.xml.XMLRepresentation;
 public class IntegerRep extends XMLRepresentation<Integer> {
 	
 	@Override
-	public Integer fromString( String rep ) {
-		return Integer.parseInt( rep );
+	public Integer fromXML( XMLReader in ) {
+		String content = in.readTag( "Integer" );
+		return content == null ? null : Integer.valueOf( content );
 	}
 
 	@Override
-	public String toString( Integer t ) {
-		return String.valueOf( t );
+	public void toXML( Integer t, XMLWriter out ) {
+		out.writeTag( "Integer", String.valueOf( t ) );
 	}
 
 	
-//	@Override
-//	public String toXML( Integer t ) {
-//		return "<integer>" + String.valueOf( t ) + "</integer>";
-//	}
-
-
-
 }

@@ -331,7 +331,7 @@ public class App implements Runnable {
 			try {
 				os.terminate();
 			} catch ( Throwable th ) {
-				System.out.println( "Exception during shutdown: " + th.getMessage() );
+				System.err.println( "Exception during shutdown: " + th.getMessage() );
 				th.printStackTrace();
 			}
 		}
