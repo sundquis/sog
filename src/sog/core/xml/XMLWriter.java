@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 import sog.core.Test;
 
@@ -36,12 +34,8 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 	
 	final private PrintWriter out;
 	
-	final private Deque<String> indent;
-	
 	public XMLWriter( Path dataFile ) throws IOException {
 		this.out = new PrintWriter( Files.newBufferedWriter( dataFile ) );
-		this.indent = new ArrayDeque<>();
-		this.indent.push( "" );
 	}
 	
 	public void writeTag( String tag, String content ) {

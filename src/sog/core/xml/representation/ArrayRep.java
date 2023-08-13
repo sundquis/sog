@@ -19,8 +19,9 @@
 
 package sog.core.xml.representation;
 
-
-import java.lang.reflect.Type;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import sog.core.Test;
 import sog.core.xml.XMLReader;
@@ -31,21 +32,23 @@ import sog.core.xml.XMLWriter;
  * 
  */
 @Test.Subject( "test." )
-public class StringRep extends XMLRepresentation<String> {
+public class ArrayRep<E> extends XMLRepresentation<E[]> {
 	
-	/**
-	 * Represent a list of elements of type E.
-	 * 
-	 * @param comps		
-	 */
-	@Test.Decl( "Array of component types is ignored" )
-	public StringRep( Type... comps ) {}
+	private XMLRepresentation<E> componentRep;
 	
+	private Class<E> componentType;
+	
+	@Test.Decl( "Throws AssertionError for null component types" )
+	public ArrayRep( Class<E> componentType ) {
+		this.componentType = componentType;
+		this.componentRep = XMLRepresentation.forType( componentType );
+	}
+
 	@Override
 	@Test.Decl( "Result is not empty" )
 	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
-		return "String";
+		return "Array[" + this.componentRep.getName() + "]";
 	}
 
 	@Override
@@ -55,18 +58,41 @@ public class StringRep extends XMLRepresentation<String> {
 	@Test.Decl( "Returns null if element is not present" )
 	@Test.Decl( "If element not present then the reader has not advanced" )
 	@Test.Decl( "Write followed by read produces the original instance" )
-	public String fromXML( XMLReader in ) {
-		return in.readTag( this.getName() );
+	public E[] fromXML( XMLReader in ) {
+		List<E> list = new ArrayList<>();
+		if ( ! in.readTagOpen( this.getName() ) ) {
+			return null;
+		}
+
+		E elt = null;
+		while ( (elt = this.componentRep.fromXML( in )) != null ) {
+			list.add( elt );
+		}
+		
+		in.readTagClose( this.getName() );
+		
+		@SuppressWarnings( "unchecked" )
+		E[] result = (E[]) Array.newInstance( this.componentType, list.size() );
+		int index = 0;
+		for ( E e : list ) {
+			result[index++] = e;
+		}
+		
+		return result;
 	}
 
 	@Override
+	@Test.Decl( "Throws AssertionError for null array" )
 	@Test.Decl( "Throws AssertionError for null element" )
 	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
-	public void toXML( String t, XMLWriter out ) {
-		out.writeTag( this.getName(), t );
+	public void toXML( E[] t, XMLWriter out ) {
+		out.writeTagOpen( this.getName() );
+		for ( E e : t ) {
+			this.componentRep.toXML( e, out );
+		}
+		out.writeTagClose( this.getName() );
 	}
-
-
+	
 }

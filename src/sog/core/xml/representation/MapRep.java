@@ -19,8 +19,9 @@
 
 package sog.core.xml.representation;
 
-
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import sog.core.Test;
 import sog.core.xml.XMLReader;
@@ -31,21 +32,25 @@ import sog.core.xml.XMLWriter;
  * 
  */
 @Test.Subject( "test." )
-public class StringRep extends XMLRepresentation<String> {
+public class MapRep<K, V> extends XMLRepresentation<Map<K, V>> {
 	
-	/**
-	 * Represent a list of elements of type E.
-	 * 
-	 * @param comps		
-	 */
-	@Test.Decl( "Array of component types is ignored" )
-	public StringRep( Type... comps ) {}
+	private XMLRepresentation<K> keyRep;
 	
+	private XMLRepresentation<V> valueRep;
+
+	
+	@Test.Decl( "Throws AssertionError for null array of component types" )
+	@Test.Decl( "Throws AssertionError if not exactly two components" )
+	public MapRep( Type... components ) {
+		this.keyRep = XMLRepresentation.forType( components[0] );
+		this.valueRep = XMLRepresentation.forType( components[1] );
+	}
+
 	@Override
 	@Test.Decl( "Result is not empty" )
 	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
-		return "String";
+		return "Map[" + this.keyRep.getName() + ", " + this.valueRep.getName() + "]";
 	}
 
 	@Override
@@ -55,18 +60,40 @@ public class StringRep extends XMLRepresentation<String> {
 	@Test.Decl( "Returns null if element is not present" )
 	@Test.Decl( "If element not present then the reader has not advanced" )
 	@Test.Decl( "Write followed by read produces the original instance" )
-	public String fromXML( XMLReader in ) {
-		return in.readTag( this.getName() );
+	public Map<K, V> fromXML( XMLReader in ) {
+		Map<K, V> result = new HashMap<>();
+		
+		if ( ! in.readTagOpen( this.getName() ) ) {
+			return null;
+		}
+
+		K key = null;
+		V value = null;
+		while ( (key = this.keyRep.fromXML( in )) != null ) {
+			value = this.valueRep.fromXML( in );
+			result.put( key, value );
+		}
+		
+		in.readTagClose( this.getName() );
+		return result;
 	}
 
 	@Override
-	@Test.Decl( "Throws AssertionError for null element" )
+	@Test.Decl( "Throws AssertionError for null map" )
+	@Test.Decl( "Throws AssertionError for null key" )
+	@Test.Decl( "Throws AssertionError for null value" )
 	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
-	public void toXML( String t, XMLWriter out ) {
-		out.writeTag( this.getName(), t );
+	public void toXML( Map<K, V> t, XMLWriter out ) {
+		out.writeTagOpen( this.getName() );
+		
+		t.entrySet().forEach( (entry) -> {
+			MapRep.this.keyRep.toXML( entry.getKey(), out );
+			MapRep.this.valueRep.toXML( entry.getValue(), out );
+		});
+		
+		out.writeTagClose( this.getName() );
 	}
-
-
+	
 }

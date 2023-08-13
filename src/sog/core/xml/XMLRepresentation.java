@@ -21,198 +21,134 @@ package sog.core.xml;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import sog.core.AppRuntime;
-import sog.core.Stored;
-import sog.core.Strings;
+import sog.core.Assert;
 import sog.core.Test;
+import sog.core.xml.representation.ArrayRep;
 import sog.core.xml.representation.IntegerRep;
 import sog.core.xml.representation.ListRep;
+import sog.core.xml.representation.MapRep;
 import sog.core.xml.representation.StringRep;
 
+/**
+ * To define a new representation:
+ * 		+ Extend XMLRepresentation<>. Suggested location is in or under sog.core.xml.representation
+ * 		+ Define the required constructor accepting an array of Type instances. See ListRep
+ * 		+ Implement the three abstract methods.
+ * 		+ Add an entry to the TARGET_TO_CONS Map below.
+ * 			The map key is the target type modeled by the representation.
+ * 			The value is a static reference to the constructor.
+ */
 @Test.Subject( "test." )
 public abstract class XMLRepresentation<T> {
-	
-	public static enum Registered {
-		STRING( String.class ) {
-			@Override protected XMLRepresentation<?> toRep( XMLRepresentation<?>... comps ) {
-				return new StringRep();
-			}
-		},
-		
-		INTEGER( Integer.class ) {
-			@Override protected XMLRepresentation<?> toRep( XMLRepresentation<?>... comps ) {
-				return new IntegerRep();
-			}
-		},
-		
-		LIST( List.class ) {
-			@Override protected XMLRepresentation<?> toRep( XMLRepresentation<?>... comps ) {
-				return ListRep.getRep( comps[0] );
-			}
+
+	/**
+	 * A simple description of the target type that can be used as a tag name in xml
+	 * Concrete implementations should use the following test cases:
+	 * 		"Result is not empty"
+	 * 		"Result does not contain entity characters"
+	 * 
+	 * @return
+	 */
+	public abstract String getName();
+
+	/**
+	 * Consume lines from the given XMLReader to produce an instance of the target type.
+	 * Concrete implementations should use the following test cases:
+	 * 		"Throws AssertionError for null reader"
+	 * 		"Throws AppRuntime for malformed content"
+	 * 		"Throws AppRuntime if an IOException occurs"
+	 * 		"Returns null if element is not present"
+	 * 		"If element not present then the reader has not advanced"
+	 * 		"Write followed by read produces the original instance"
+	 * 
+	 * @param in
+	 * @return
+	 */
+	public abstract T fromXML( XMLReader in );
+
+	/**
+	 * Convert the given instance to an xml representation and writ on the given writer.
+	 * Concrete implementations should use the following test cases:
+	 * 		"Throws AssertionError for null element"
+	 * 		"Throws AssertionError for null writer"
+	 * 		"Throws AppRuntime if an IOException occurs"
+	 * 		"Read followed by write produces an equivalent representation"
+	 * 
+	 * @param t
+	 * @param out
+	 */
+	public abstract void toXML( T t, XMLWriter out );
+
+
+	@FunctionalInterface
+	private static interface RepConstructor extends Function<Type[], XMLRepresentation<?>> {}
+
+	/*
+	 * The mapping registering all known representations.
+	 * The key entry is the class instance for the target type of a representation.
+	 * The value entry is the constructor for the representation.
+	 * 
+	 * NOTE: Arrays are handled differently. See forType(...)
+	 */
+	private static final Map<Class<?>, RepConstructor> TARGET_TO_CONS = Map.of(
+		String.class, StringRep::new,
+		Integer.class, IntegerRep::new,
+		List.class, ListRep::new,
+		Map.class, MapRep::new
+	);
+
+	/*
+	 * Use the table of registered representations to find a constructor corresponding
+	 * to the given type, then construct an instance of the representation.
+	 * Compound representations (for example representations with type parameters or
+	 * representations for arrays) will use the Type[] of component types.
+	 */
+	@Test.Decl( "Throws AssertionError for null target type" )
+	@Test.Decl( "Throws AppRuntime when no representation for the target type has been registered" )
+	private static XMLRepresentation<?> forClass( Class<?> targetType, Type... comps ) {
+		RepConstructor rc = TARGET_TO_CONS.get( Assert.nonNull( targetType ) );
+		if ( rc == null ) {
+			throw new AppRuntime( "No representation for " + targetType );
 		}
-		;
-		
-		private Class<?> targetType;
-		
-		private Registered( Class<?> targetType ) {
-			this.targetType = targetType;
-		}
-		
-		public Class<?> getRawType() {
-			return this.targetType;
-		}
-		
-		protected abstract XMLRepresentation<?> toRep( XMLRepresentation<?>... comps );
+		return rc.apply( comps );
 	}
 	
-	public static final Map<Class<?>, Registered> REGISTERED = 
-		Arrays.stream( Registered.values() ).collect( Collectors.toMap( Registered::getRawType, Function.identity() ) );
 
 
-	// The cast in the return statement is unchecked. Class design should ensure it succeeds.
-	@SuppressWarnings( "unchecked" )
+	/**
+	 * Return a representation for the given target type. The given Type instance must correspond
+	 * to the type parameter S.
+	 * 
+	 * @param <S>
+	 * @param type
+	 * @return
+	 */
+	@SuppressWarnings( "unchecked" ) // Class design should ensure that the cast in the return statement succeeds.
+	@Test.Decl( "Throws AssertionError for null type" )
+	@Test.Decl( "Throws ClassCastException for improper type" )
+	@Test.Decl( "Throws AppRuntime for a type without registered representation" )
 	public static <S> XMLRepresentation<S> forType( Type type ) {
-
 		XMLRepresentation<?> result = null;
 		
 		if ( type instanceof ParameterizedType ) {
-			ParameterizedType pt = (ParameterizedType) type;
-			Registered reg = getRegistered( pt.getRawType() );
-			Type[] args = pt.getActualTypeArguments();
-			XMLRepresentation<?>[] comps = new XMLRepresentation[ args.length ];
-			for ( int  i = 0; i < args.length; i++ ) {
-				comps[i] = XMLRepresentation.forType( args[i] );
-			}
-			result = reg.toRep( comps );
-		} else if ( type instanceof Class && ((Class) type).isArray() ) {
-			System.out.println( ">>> ARRAY" );
+			ParameterizedType pt = ParameterizedType.class.cast( type );
+			result = forClass( Class.class.cast( pt.getRawType() ), pt.getActualTypeArguments() );
+		} else if ( type instanceof Class && Class.class.cast( type ).isArray() ) {
+			// Arrays get special treatment:
+			result = new ArrayRep<>( Class.class.cast( type ).getComponentType() );
 		} else if ( type instanceof Class ) {
-			result = getRegistered( type ).toRep();
+			result = forClass( Class.class.cast( type ) ); 
 		} else {
 			throw new AppRuntime( "Unsupported field type: " + type );
 		}
-		
 
 		return (XMLRepresentation<S>) result;
 	}
 
-	private static Registered getRegistered( Type type ) {
-		Registered result = REGISTERED.get( type );
 
-		if ( result == null ) {
-			throw new AppRuntime( "Unsupported field type: " + type );
-		}
-
-		return result;
-	}
-	
-	
-	public abstract T fromXML( XMLReader in );
-	
-	public abstract void toXML( T t, XMLWriter out );
-	
-	public static class Foo<X> {
-		
-		
-		public void bar( Object obj ) {
-			java.lang.reflect.Type type = obj.getClass().getGenericSuperclass();
-			System.out.println( "TYPE: " + type );
-			ParameterizedType pt = (ParameterizedType) type;
-			System.out.println( "getTypeName: " + pt.getTypeName() );
-			System.out.println( "getRawType: " + pt.getRawType() );
-			System.out.println( "getActualTypeArguments: " + pt.getActualTypeArguments()[0] );
-		}
-		@Override public String toString() {
-			return this.getClass().toGenericString();
-		}
-		public void accept( X myX ) {
-			System.out.println( myX );
-		}
-	}
-	
-	public static <T> Foo<T> getFoo() {
-		return new Foo<>();
-	}
-	
-	public static Stored<List<String>> myStringList;
-	
-	public static Stored<String> myString;
-	
-	public static Stored<Integer> myInteger;
-	
-	public static Stored<String[]> myStringArray;
-	
-	public static String someString;
-	
-	public static List<String> someList;
-	
-	public static Stored<List<List<Integer>>> myIntegerListList;
-	public static void main( String[] args ) {
-		try {
-//			Field field = XMLRepresentation.class.getDeclaredField( "someString" );
-//			System.out.println( "getGenericType: " + field.getGenericType().getClass() );
-//			field = XMLRepresentation.class.getDeclaredField( "myString" );
-//			System.out.println( "getGenericType: " + field.getGenericType().getClass() );
-
-			myString = Stored.get( "myString", "<open>&hi</open>" );
-			System.out.println( myString.get() );
-			
-			myInteger = Stored.get( "myInteger", 0 );
-			System.out.println( myInteger.get() );
-			myInteger.set( myInteger.get() + 1 );
-			System.out.println( myInteger.get() );
-			
-			myStringList = Stored.get( "myStringList", new ArrayList<>() );
-			System.out.println( Strings.toString( myStringList.get() ) );
-			myStringList.get().add( "'<>'" );
-			System.out.println( Strings.toString( myStringList.get() ) );
-			
-			List<Integer> list = new ArrayList<>();
-			list.add( 1 );
-			List<List<Integer>> llist = new ArrayList<>();
-			llist.add( list );
-			list.add( 2 );
-			llist.add( list );
-			myIntegerListList = Stored.get( "myIntegerListList", llist );
-			System.out.println( Strings.toString( myIntegerListList.get() ) );
-			list.add( 3 );
-			myIntegerListList.get().add( list );
-			System.out.println( Strings.toString( myIntegerListList.get() ) );
-			
-			//myStringArray = Stored.get( "myStringArray", new String[] {"hi"} );
-			
-//			myStringList = Stored.get( "myStringList", new ArrayList<>() );
-//			System.out.println( "Value is " + Strings.toString( myStringList.get() ) );
-//			myStringList.get().add( "Another string" );
-//			myStringList.get().add( "And another string" );
-			
-//			Stored<String> local = Stored.get( "myString", "init" );
-//			System.out.println( "Local value is " + local.get() );
-//			local.set( "Set from local" );
-//			System.out.println( "Value is " + Strings.toString( myStringList.get() ) );
-//			Supplier<Foo<?>> p = Foo::new;
-//			System.out.println( p.get().toString() );
-//			Object arg = "hi";
-//			getFoo().accept( "hi" );
-		} catch ( Throwable e ) {
-			e.printStackTrace();
-		}
-//		Object[] objs = new Object[] {
-//			"A",
-//			new Object(),
-//			new ListRep(),
-//			new ArrayList<String>(),
-//			new Integer[] {1, 2}
-//		};
-//		Arrays.stream( objs ).forEach( obj -> System.out.println( "OBJ: " + obj + ", TYPE: " + obj.getClass().getTypeName() ) );
-		System.out.println( "\nDone!" );
-	}
-	
 }

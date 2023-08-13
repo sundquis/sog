@@ -58,10 +58,13 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 		
 		return result;
 	}
-	
-	public void readTagOpen( String tag ) {
+
+	public boolean readTagOpen( String tag ) {
 		if ( this.currentLine != null && this.currentLine.startsWith( this.tagStart( tag ) ) ) {
 			this.advance();
+			return true;
+		} else {
+			return false;
 		}
 	}
 	

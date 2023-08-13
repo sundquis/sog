@@ -19,6 +19,8 @@
 
 package sog.core.xml.representation;
 
+import java.lang.reflect.Type;
+
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
@@ -30,16 +32,35 @@ import sog.core.xml.XMLWriter;
 @Test.Subject( "test." )
 public class IntegerRep extends XMLRepresentation<Integer> {
 	
+	@Test.Decl( "Array of component types is ignored" )
+	public IntegerRep( Type... comps ) {}
+	
 	@Override
+	@Test.Decl( "Result is not empty" )
+	@Test.Decl( "Result does not contain entity characters" )
+	public String getName() {
+		return "Integer";
+	}
+
+	@Override
+	@Test.Decl( "Throws AssertionError for null reader" )
+	@Test.Decl( "Throws AppRuntime for malformed content" )
+	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
+	@Test.Decl( "Returns null if element is not present" )
+	@Test.Decl( "If element not present then the reader has not advanced" )
+	@Test.Decl( "Write followed by read produces the original instance" )
 	public Integer fromXML( XMLReader in ) {
-		String content = in.readTag( "Integer" );
+		String content = in.readTag( this.getName() );
 		return content == null ? null : Integer.valueOf( content );
 	}
 
 	@Override
+	@Test.Decl( "Throws AssertionError for null element" )
+	@Test.Decl( "Throws AssertionError for null writer" )
+	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
+	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( Integer t, XMLWriter out ) {
-		out.writeTag( "Integer", String.valueOf( t ) );
+		out.writeTag( this.getName(), String.valueOf( t ) );
 	}
 
-	
 }

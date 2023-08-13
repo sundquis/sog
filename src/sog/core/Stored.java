@@ -34,20 +34,50 @@ import sog.core.xml.XMLRepresentation;
 import sog.core.xml.XMLWriter;
 
 /**
- * USAGE: Declare a field of the form
- * 		Stored<String> myString = Stored.get( "myString", "init" );
+ * USAGE:
+ * 		+ Declare a field of the form:
+ * 			public static Stored<String> myString;
+ * 		  The field is not required to be static, but the value is shared by all instances.
+ * 		+ Initialize the value:
+ * 			myString = Stored.get( "myString", "Some initial value" );
+ * 		+ Use accessors to manipulate the stored value.
  * 
- * All instances of the containing class share the same instance of Stored<> so the field
- * may as well be static.
+ * The value is automatically stored when the JVM shuts down.
  */
 @Test.Subject( "test." )
-public class Stored<T> {
+final public class Stored<T> {
 	
+	/*
+	 * A Map of previously loaded stored values.
+	 * The key is the path to the xml file holding the persistent data.
+	 * The value is the previously constructed Stored instance.
+	 */
 	private static final Map<Path, Stored<?>> LOADED = new HashMap<>();
 	
+	/* Used to control access to the Map */
 	private static final Object LOCK = new Object() {};
 
-	
+
+	/**
+	 * Retrieve the unique Stored<T> instance defined by the calling class. This single instance is
+	 * shared by all calling instances, and so corresponds to a persistent static field, even if
+	 * it is declared as an instance field.
+	 * 
+	 * @param <S>		The target type of the Stored value.
+	 * @param name		The name of a Stored<T> field in the calling class.
+	 * @param initial	The value used the very first time the Stored instance is loaded via get(...)
+	 * @return			The non-null Stored instance
+	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
+	@Test.Decl( "Throws AssertionError for null initial value" )
+	@Test.Decl( "Result is not null" )
+	@Test.Decl( "Result agrees with the given initial value the first time the Sorted instance is retrieved" )
+	@Test.Decl( "Throws AssertionError if calling class is anonymous" )
+	@Test.Decl( "Result is the same instance if previously retrieved" )
+	@Test.Decl( "Throws AssertionError if named field is not a Stored instance" )
+	@Test.Decl( "Throws AssertionError if filed is not defined in the calling class" )
+	@Test.Decl( "Value is stored in an xml data file when JVM shuts down" )
+	@Test.Decl( "Initial vlue is consistent with final value of previous JVM execution" )
 	public static <S> Stored<S> get( String name, S initial ) {
 		Assert.nonEmpty( name );
 		
@@ -117,10 +147,22 @@ public class Stored<T> {
 		this.value = value;
 	}
 
+	/**
+	 * Get the stored value. Null values are not allowed.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Result is not null" )
 	public T get() {
 		return this.value;
 	}
-	
+
+	/**
+	 * Set the value. When the JVM shuts down, the last value set will be stored as xml data.
+	 * 
+	 * @param t
+	 */
+	@Test.Decl( "Throws AssertionError for null value" )
 	public void set( T t ) {
 		this.value = t;
 	}
