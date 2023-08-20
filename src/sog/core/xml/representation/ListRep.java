@@ -26,6 +26,7 @@ import java.util.List;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
+import sog.core.xml.XMLTag;
 import sog.core.xml.XMLWriter;
 
 /**
@@ -53,29 +54,24 @@ public class ListRep<E> extends XMLRepresentation<List<E>> {
 	@Test.Decl( "Result is not empty" )
 	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
-		return "List(" + this.componentRep.getName() + ")";
+		return "list";
 	}
 
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null reader" )
-	@Test.Decl( "Throws AppRuntime for malformed content" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
-	@Test.Decl( "Returns null if element is not present" )
-	@Test.Decl( "If element not present then the reader has not advanced" )
+	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public List<E> fromXML( XMLReader in ) {
+		XMLTag open = in.expectOpenTag( this.getName() );
+
+		int size = Integer.valueOf( open.getAttribute( "size" ) );
 		List<E> result = new ArrayList<>();
-		if ( ! in.readTagOpen( this.getName() ) ) {
-			return null;
+		for ( int i = 0; i < size; i++ ) {
+			result.add( this.componentRep.fromXML( in.skipWhiteSpace() ) );
 		}
 
-		E elt = null;
-		while ( (elt = this.componentRep.fromXML( in )) != null ) {
-			result.add( elt );
-		}
-		
-		in.readTagClose( this.getName() );
+		in.expectCloseTag( this.getName() );
 		return result;
 	}
 
@@ -85,9 +81,10 @@ public class ListRep<E> extends XMLRepresentation<List<E>> {
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( List<E> t, XMLWriter out ) {
-		out.writeTagOpen( this.getName() );
+		// FIXME
+		out.writeTagOpenXXX( this.getName() );
 		t.forEach( e -> this.componentRep.toXML( e, out ) );
-		out.writeTagClose( this.getName() );
+		out.writeTagCloseXXX( this.getName() );
 	}
 
 }

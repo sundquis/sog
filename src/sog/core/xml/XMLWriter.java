@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import sog.core.Test;
 
@@ -32,31 +34,57 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class XMLWriter implements AutoCloseable, XML.Helpers {
 	
-	final private PrintWriter out;
+	private static final String INDENT = "    ";
+	
+	private final PrintWriter out;
+	
+	private final Deque<String> prefix;
 	
 	public XMLWriter( Path dataFile ) throws IOException {
 		this.out = new PrintWriter( Files.newBufferedWriter( dataFile ) );
+		this.prefix = new ArrayDeque<>();
+		this.prefix.push( "" );
 	}
 	
-	public void writeTag( String tag, String content ) {
+	
+	public XMLWriter increaseIndent() {
+		this.prefix.push( this.prefix.peek() + INDENT );
+		return this;
+	}
+	
+	
+	public XMLWriter decreaseIndent() {
+		if ( this.prefix.size() == 1 ) {
+			throw new IllegalStateException( "Indent already at minimum" );
+		}
+		this.prefix.pop();
+		return this;
+	}
+	
+	
+	@Deprecated
+	public void writeTagXXX( String tag, String content ) {
 		this.out.append( this.tagStart( tag ) )
 			.append( this.encodeEntities( content ) )
 			.append( this.tagEnd( tag ) );
-		this.newline();
+		this.newlineXXX();
 	}
 	
-	public void newline() {
+	@Deprecated
+	public void newlineXXX() {
 		out.println();
 	}
 	
-	public void writeTagOpen( String tag ) {
+	@Deprecated
+	public void writeTagOpenXXX( String tag ) {
 		this.out.append( this.tagStart( tag ) );
-		this.newline();
+		this.newlineXXX();
 	}
 	
-	public void writeTagClose( String tag ) {
+	@Deprecated
+	public void writeTagCloseXXX( String tag ) {
 		this.out.append( this.tagEnd( tag ) );
-		this.newline();
+		this.newlineXXX();
 	}
 
 	@Override

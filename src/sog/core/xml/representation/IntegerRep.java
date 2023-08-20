@@ -39,19 +39,18 @@ public class IntegerRep extends XMLRepresentation<Integer> {
 	@Test.Decl( "Result is not empty" )
 	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
-		return "Integer";
+		return "integer";
 	}
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null reader" )
-	@Test.Decl( "Throws AppRuntime for malformed content" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
-	@Test.Decl( "Returns null if element is not present" )
-	@Test.Decl( "If element not present then the reader has not advanced" )
+	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public Integer fromXML( XMLReader in ) {
-		String content = in.readTag( this.getName() );
-		return content == null ? null : Integer.valueOf( content );
+		in.expectOpenTag( this.getName() );
+		String content = in.readContent();
+		in.expectCloseTag( this.getName() );
+		return Integer.valueOf( content );
 	}
 
 	@Override
@@ -60,7 +59,8 @@ public class IntegerRep extends XMLRepresentation<Integer> {
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( Integer t, XMLWriter out ) {
-		out.writeTag( this.getName(), String.valueOf( t ) );
+		// FIXME
+		out.writeTagXXX( this.getName(), String.valueOf( t ) );
 	}
 
 }

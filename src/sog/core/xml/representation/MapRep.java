@@ -26,6 +26,7 @@ import java.util.Map;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
+import sog.core.xml.XMLTag;
 import sog.core.xml.XMLWriter;
 
 /**
@@ -50,31 +51,26 @@ public class MapRep<K, V> extends XMLRepresentation<Map<K, V>> {
 	@Test.Decl( "Result is not empty" )
 	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
-		return "Map[" + this.keyRep.getName() + ", " + this.valueRep.getName() + "]";
+		return "map";
 	}
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null reader" )
-	@Test.Decl( "Throws AppRuntime for malformed content" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
-	@Test.Decl( "Returns null if element is not present" )
-	@Test.Decl( "If element not present then the reader has not advanced" )
+	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public Map<K, V> fromXML( XMLReader in ) {
+		XMLTag open = in.expectOpenTag( this.getName() );
+		int size = Integer.valueOf( open.getAttribute( "size" ) );
+		
 		Map<K, V> result = new HashMap<>();
-		
-		if ( ! in.readTagOpen( this.getName() ) ) {
-			return null;
-		}
-
-		K key = null;
-		V value = null;
-		while ( (key = this.keyRep.fromXML( in )) != null ) {
-			value = this.valueRep.fromXML( in );
-			result.put( key, value );
+		for ( int i = 0; i < size; i++ ) {
+			result.put( 
+				this.keyRep.fromXML( in.skipWhiteSpace() ), 
+				this.valueRep.fromXML( in.skipWhiteSpace() ) 
+			);
 		}
 		
-		in.readTagClose( this.getName() );
+		in.expectCloseTag( this.getName() );
 		return result;
 	}
 
@@ -86,14 +82,15 @@ public class MapRep<K, V> extends XMLRepresentation<Map<K, V>> {
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( Map<K, V> t, XMLWriter out ) {
-		out.writeTagOpen( this.getName() );
+		// FIXME 
+		out.writeTagOpenXXX( this.getName() );
 		
 		t.entrySet().forEach( (entry) -> {
 			MapRep.this.keyRep.toXML( entry.getKey(), out );
 			MapRep.this.valueRep.toXML( entry.getValue(), out );
-		});
+		});  
 		
-		out.writeTagClose( this.getName() );
+		out.writeTagCloseXXX( this.getName() );
 	}
 	
 }
