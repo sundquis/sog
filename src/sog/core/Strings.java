@@ -23,6 +23,7 @@ package sog.core;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Test.Subject(  "test." )
@@ -191,7 +192,27 @@ public final class Strings {
 			return Strings.collectionToString( (Collection<Object>) obj );
 		}
 		
+		if ( Map.class.isAssignableFrom( obj.getClass() ) ) {
+			return Strings.collectionToString( ((Map<Object, Object>) obj).entrySet() );
+		}
+		
+		if ( Map.Entry.class.isAssignableFrom( obj.getClass() ) ) {
+			return Strings.entryToString( (Map.Entry<Object, Object>) obj );
+		}
+		
 		return obj.toString();
+	}
+	
+	public static String entryToString( Map.Entry<?, ?> entry ) {
+		Assert.nonNull( entry );
+		
+		StringBuilder sb = new StringBuilder();
+		return sb
+			.append( "<" )
+			.append( Strings.toString( entry.getKey() ) )
+			.append( " -> " )
+			.append( Strings.toString( entry.getValue() ) )
+			.append( ">" ).toString();
 	}
 	
 	@Test.Decl( "Throws AssertionError on null collections" )

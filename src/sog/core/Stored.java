@@ -79,6 +79,7 @@ final public class Stored<T> {
 	@Test.Decl( "Value is stored in an xml data file when JVM shuts down" )
 	@Test.Decl( "Initial vlue is consistent with final value of previous JVM execution" )
 	public static <S> Stored<S> get( String name, S initial ) {
+		// FIXME: Too complex. Refactor.
 		Assert.nonEmpty( name );
 		
 		final Class<?> caller = App.get().getCallingClass( 2 );
@@ -93,7 +94,7 @@ final public class Stored<T> {
 		LocalDir dir = new LocalDir().sub( "data" );
 		Arrays.stream( caller.getPackageName().split( "\\." ) ).forEach( dir::sub );
 		final Path path = dir.getFile( fileName, LocalDir.Type.XML );
-
+		
 		synchronized ( Stored.LOCK ) {
 			@SuppressWarnings( "unchecked" )
 			Stored<S> result = (Stored<S>) Stored.LOADED.get( path );

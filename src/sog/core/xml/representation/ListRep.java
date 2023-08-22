@@ -26,7 +26,6 @@ import java.util.List;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
-import sog.core.xml.XMLTag;
 import sog.core.xml.XMLWriter;
 
 /**
@@ -63,15 +62,19 @@ public class ListRep<E> extends XMLRepresentation<List<E>> {
 	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public List<E> fromXML( XMLReader in ) {
-		XMLTag open = in.expectOpenTag( this.getName() );
+		in.readOpenTag( this.getName() );
 
-		int size = Integer.valueOf( open.getAttribute( "size" ) );
+		in.readOpenTag( "size" );
+		int size = Integer.valueOf( in.readContent() );
+		in.readCloseTag( "size" );
+		
 		List<E> result = new ArrayList<>();
 		for ( int i = 0; i < size; i++ ) {
-			result.add( this.componentRep.fromXML( in.skipWhiteSpace() ) );
+			result.add( this.componentRep.fromXML( in ) );
 		}
 
-		in.expectCloseTag( this.getName() );
+		in.readCloseTag( this.getName() );
+		
 		return result;
 	}
 
@@ -81,10 +84,12 @@ public class ListRep<E> extends XMLRepresentation<List<E>> {
 	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( List<E> t, XMLWriter out ) {
-		// FIXME
-		out.writeTagOpenXXX( this.getName() );
+		out.writeOpenTag( this.getName() );
+		
+		out.writeTag( "size", String.valueOf( t.size() ) );
 		t.forEach( e -> this.componentRep.toXML( e, out ) );
-		out.writeTagCloseXXX( this.getName() );
+
+		out.writeCloseTag( this.getName() );
 	}
 
 }

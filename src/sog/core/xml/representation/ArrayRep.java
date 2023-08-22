@@ -24,7 +24,6 @@ import java.lang.reflect.Array;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
-import sog.core.xml.XMLTag;
 import sog.core.xml.XMLWriter;
 
 /**
@@ -55,15 +54,19 @@ public class ArrayRep<E> extends XMLRepresentation<E[]> {
 	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public E[] fromXML( XMLReader in ) {
-		XMLTag open = in.expectOpenTag( this.getName() );
+		in.readOpenTag( this.getName() );
+		
+		in.readOpenTag( "length" );
+		int length = Integer.parseInt( in.readContent() );
+		in.readCloseTag( "length" );
 
-		int length = Integer.valueOf( open.getAttribute( "length" ) );
 		@SuppressWarnings( "unchecked" ) E[] result = (E[]) Array.newInstance( this.componentType, length );
 		for ( int i = 0; i < length; i++ ) {
-			result[i] = this.componentRep.fromXML( in.skipWhiteSpace() );
+			result[i] = this.componentRep.fromXML( in );
 		}
 
-		in.expectCloseTag( this.getName() );
+		in.readCloseTag( this.getName() );
+		
 		return result;
 	}
 
@@ -73,12 +76,14 @@ public class ArrayRep<E> extends XMLRepresentation<E[]> {
 	@Test.Decl( "Throws AssertionError for null writer" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( E[] t, XMLWriter out ) {
-		// FIXME
-		out.writeTagOpenXXX( this.getName() );
+		out.writeOpenTag( this.getName() );
+		
+		out.writeTag( "length", String.valueOf( t.length ) );
 		for ( E e : t ) {
 			this.componentRep.toXML( e, out );
 		}
-		out.writeTagCloseXXX( this.getName() );
+		
+		out.writeCloseTag( this.getName() );
 	}
 	
 }

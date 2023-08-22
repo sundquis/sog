@@ -47,46 +47,50 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 	}
 	
 	
-	public XMLWriter increaseIndent() {
+	public void writeTag( String name, String content ) {
+		this.indent();
+		this.out.append( this.tagStart( name ) );
+		this.out.append( this.encodeEntities( content ) );
+		this.out.append( this.tagEnd( name ) );
+		this.out.println();
+	}
+
+	
+	
+	public void writeOpenTag( String name ) {
+		this.indent();
+		this.out.println( this.tagStart( name ) );
+		this.increaseIndent();
+	}
+
+	
+	
+	public void writeCloseTag( String name ) {
+		this.decreaseIndent();
+		this.indent();
+		this.out.println( this.tagEnd( name ) );
+	}
+
+	
+
+	private void increaseIndent() {
 		this.prefix.push( this.prefix.peek() + INDENT );
-		return this;
 	}
 	
 	
-	public XMLWriter decreaseIndent() {
+	private void decreaseIndent() {
 		if ( this.prefix.size() == 1 ) {
 			throw new IllegalStateException( "Indent already at minimum" );
 		}
 		this.prefix.pop();
-		return this;
 	}
 	
 	
-	@Deprecated
-	public void writeTagXXX( String tag, String content ) {
-		this.out.append( this.tagStart( tag ) )
-			.append( this.encodeEntities( content ) )
-			.append( this.tagEnd( tag ) );
-		this.newlineXXX();
+	private void indent() {
+		this.out.append( this.prefix.peek() );
 	}
 	
-	@Deprecated
-	public void newlineXXX() {
-		out.println();
-	}
 	
-	@Deprecated
-	public void writeTagOpenXXX( String tag ) {
-		this.out.append( this.tagStart( tag ) );
-		this.newlineXXX();
-	}
-	
-	@Deprecated
-	public void writeTagCloseXXX( String tag ) {
-		this.out.append( this.tagEnd( tag ) );
-		this.newlineXXX();
-	}
-
 	@Override
 	public void close() {
 		this.out.close();

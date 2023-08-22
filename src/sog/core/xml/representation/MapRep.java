@@ -26,7 +26,6 @@ import java.util.Map;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
 import sog.core.xml.XMLRepresentation;
-import sog.core.xml.XMLTag;
 import sog.core.xml.XMLWriter;
 
 /**
@@ -59,18 +58,19 @@ public class MapRep<K, V> extends XMLRepresentation<Map<K, V>> {
 	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public Map<K, V> fromXML( XMLReader in ) {
-		XMLTag open = in.expectOpenTag( this.getName() );
-		int size = Integer.valueOf( open.getAttribute( "size" ) );
+		in.readOpenTag( this.getName() );
+		
+		in.readOpenTag( "size" );
+		int size = Integer.valueOf( in.readContent() );
+		in.readCloseTag( "size" );
 		
 		Map<K, V> result = new HashMap<>();
 		for ( int i = 0; i < size; i++ ) {
-			result.put( 
-				this.keyRep.fromXML( in.skipWhiteSpace() ), 
-				this.valueRep.fromXML( in.skipWhiteSpace() ) 
-			);
+			result.put( this.keyRep.fromXML( in ), this.valueRep.fromXML( in ) );
 		}
 		
-		in.expectCloseTag( this.getName() );
+		in.readCloseTag( this.getName() );
+		
 		return result;
 	}
 
@@ -79,18 +79,17 @@ public class MapRep<K, V> extends XMLRepresentation<Map<K, V>> {
 	@Test.Decl( "Throws AssertionError for null key" )
 	@Test.Decl( "Throws AssertionError for null value" )
 	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( Map<K, V> t, XMLWriter out ) {
-		// FIXME 
-		out.writeTagOpenXXX( this.getName() );
-		
+		out.writeOpenTag( this.getName() );
+
+		out.writeTag( "size", String.valueOf( t.size() ) );
 		t.entrySet().forEach( (entry) -> {
 			MapRep.this.keyRep.toXML( entry.getKey(), out );
 			MapRep.this.valueRep.toXML( entry.getValue(), out );
 		});  
 		
-		out.writeTagCloseXXX( this.getName() );
+		out.writeCloseTag( this.getName() );
 	}
 	
 }

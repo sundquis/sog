@@ -47,20 +47,19 @@ public class IntegerRep extends XMLRepresentation<Integer> {
 	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public Integer fromXML( XMLReader in ) {
-		in.expectOpenTag( this.getName() );
+		in.readOpenTag( this.getName() );
 		String content = in.readContent();
-		in.expectCloseTag( this.getName() );
+		in.readCloseTag( this.getName() );
+		
 		return Integer.valueOf( content );
 	}
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null element" )
 	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( Integer t, XMLWriter out ) {
-		// FIXME
-		out.writeTagXXX( this.getName(), String.valueOf( t ) );
+		out.writeTag( this.getName(), String.valueOf( t ) );
 	}
 
 }

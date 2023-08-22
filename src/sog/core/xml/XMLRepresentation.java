@@ -27,11 +27,14 @@ import java.util.function.Function;
 
 import sog.core.AppRuntime;
 import sog.core.Assert;
+import sog.core.Storable;
+import sog.core.Stored;
 import sog.core.Test;
 import sog.core.xml.representation.ArrayRep;
 import sog.core.xml.representation.IntegerRep;
 import sog.core.xml.representation.ListRep;
 import sog.core.xml.representation.MapRep;
+import sog.core.xml.representation.StorableRep;
 import sog.core.xml.representation.StringRep;
 
 /**
@@ -134,8 +137,10 @@ public abstract class XMLRepresentation<T> {
 	@Test.Decl( "Throws AppRuntime for a type without registered representation" )
 	public static <S> XMLRepresentation<S> forType( Type type ) {
 		XMLRepresentation<?> result = null;
-		
-		if ( type instanceof ParameterizedType ) {
+
+		if ( type instanceof Class && Storable.class.isAssignableFrom( Class.class.cast( type ) ) ) {
+			result = new StorableRep<>( Class.class.cast( type ) );
+		} else if ( type instanceof ParameterizedType ) {
 			ParameterizedType pt = ParameterizedType.class.cast( type );
 			result = forClass( Class.class.cast( pt.getRawType() ), pt.getActualTypeArguments() );
 		} else if ( type instanceof Class && Class.class.cast( type ).isArray() ) {
@@ -150,5 +155,83 @@ public abstract class XMLRepresentation<T> {
 		return (XMLRepresentation<S>) result;
 	}
 
+	
+	
+	// Following should be moved to test cases:
+	
+	public static Stored<String> aString;
+	
+	public static Stored<Integer> anInt;
+	
+	public static Stored<Integer[]> anIntArray;
+	
+	public static Stored<List<Integer>> anIntList;
+	
+	public static Stored<Map<String, Integer>> aMap;
+	
+	public static Stored<Map<Integer[], List<String>>> complex;
+	
+	public static class MyStorable implements Storable {
+		@Data private Integer myInt = 42;
+		@Data private String myString = "Hello world";
+		public MyStorable() {}
+		
+		@Override public String toString() {
+			return "MS(" + this.myInt + ", " + this.myString + ")";
+		}
+	}
+	
+	public static Stored<MyStorable> storable;
+	
+	public static void main( String[] args ) {
+		try {
+//			aString = Stored.get( "aString", "first value" );
+//			System.out.println( aString.get() );
+//			aString.set( "Next value" );
+//			System.out.println( aString.get() );
+
+//			anInt = Stored.get( "anInt", 0 );
+//			System.out.println( anInt.get() );
+//			anInt.set( anInt.get() + 1 );
+//			System.out.println( anInt.get() );
+			
+//			anIntArray = Stored.get( "anIntArray", new Integer[] {} );
+//			System.out.println( Strings.toString( anIntArray.get() ) );
+//			anIntArray.set( new Integer[] { 1, 2, 3} );
+//			System.out.println( Strings.toString( anIntArray.get() ) );
+			
+//			anIntList = Stored.get( "anIntList", new ArrayList<>() );
+//			System.out.println( Strings.toString( anIntList.get() ) );
+//			anIntList.get().add( 42 );
+//			anIntList.get().add( anIntList.get().get( 0 ) + 1 );
+//			System.out.println( Strings.toString( anIntList.get() ) );
+			
+//			aMap = Stored.get( "aMap", new HashMap<>() );
+//			System.out.println( Strings.toString( aMap.get() ) );
+//			aMap.get().put( "fourty-two", 42 );
+//			System.out.println( Strings.toString( aMap.get() ) );
+//			aMap.get().put( "One", aMap.get().get( "One" ) + 1 );
+//			aMap.get().put( "<a&b>", 0 );
+//			System.out.println( Strings.toString( aMap.get() ) );
+			
+//			complex = Stored.get( "complex", new HashMap<>() );
+//			System.out.println( Strings.toString( complex.get() ) );
+//			complex.get().put( new Integer[] {1}, List.of( "One" ) );
+//			System.out.println( Strings.toString( complex.get() ) );
+//			complex.get().put( new Integer[] {1, 2}, List.of("A", "B") );
+//			System.out.println( Strings.toString( complex.get() ) );
+//			complex.get().put( new Integer[] {1, 2, 3}, List.of("<hello>", "&world!" ) );
+//			System.out.println( Strings.toString( complex.get() ) );
+			
+			storable = Stored.get( "storable", new MyStorable() );
+			System.out.println( storable.get().toString() );
+			storable.get().myString = "Foo!";
+			System.out.println( storable.get().toString() );
+		} catch ( Exception ex ) {
+			ex.printStackTrace();
+		}
+		
+		System.out.println( "\nDone!" );
+	}
 
 }

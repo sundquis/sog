@@ -53,20 +53,19 @@ public class StringRep extends XMLRepresentation<String> {
 	@Test.Decl( "Throws XMLRuntime for malformed content" )
 	@Test.Decl( "Write followed by read produces the original instance" )
 	public String fromXML( XMLReader in ) {
-		in.expectOpenTag( this.getName() );
+		in.readOpenTag( this.getName() );
 		String content = in.readContent();
-		in.expectCloseTag( this.getName() );
+		in.readCloseTag( this.getName() );
+		
 		return content;
 	}
 
 	@Override
 	@Test.Decl( "Throws AssertionError for null element" )
 	@Test.Decl( "Throws AssertionError for null writer" )
-	@Test.Decl( "Throws AppRuntime if an IOException occurs" )
 	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( String t, XMLWriter out ) {
-		// FIXME
-		out.writeTagXXX( this.getName(), t );
+		out.writeTag( this.getName(), t );
 	}
 
 
