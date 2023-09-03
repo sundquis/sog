@@ -39,14 +39,28 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 	private final PrintWriter out;
 	
 	private final Deque<String> prefix;
+
 	
+	@Test.Decl( "Throws AssertionError for null path" )
+	@Test.Decl( "Throws IOExcpetion for error openening file" )
 	public XMLWriter( Path dataFile ) throws IOException {
 		this.out = new PrintWriter( Files.newBufferedWriter( dataFile ) );
 		this.prefix = new ArrayDeque<>();
 		this.prefix.push( "" );
 	}
 	
-	
+
+	/**
+	 * Write a tag with the given name and given string content.
+	 * 
+	 * @param name
+	 * @param content
+	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
+	@Test.Decl( "Throws AssertionError for null content" )
+	@Test.Decl( "Content can be empty" )
+	@Test.Decl( "Entities in content are encoded" )
+	@Test.Decl( "Content can contain whitespace" )
 	public void writeTag( String name, String content ) {
 		this.indent();
 		this.out.append( this.tagStart( name ) );
@@ -56,7 +70,13 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 	}
 
 	
-	
+
+	/**
+	 * Write the open tag for an element with mixed content.
+	 * 
+	 * @param name
+	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
 	public void writeOpenTag( String name ) {
 		this.indent();
 		this.out.println( this.tagStart( name ) );
@@ -65,6 +85,12 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 
 	
 	
+	/**
+	 * Write the close tag for an element with mixed content.
+	 * 
+	 * @param name
+	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
 	public void writeCloseTag( String name ) {
 		this.decreaseIndent();
 		this.indent();
@@ -92,6 +118,7 @@ public class XMLWriter implements AutoCloseable, XML.Helpers {
 	
 	
 	@Override
+	@Test.Decl( "Idempotent" )
 	public void close() {
 		this.out.close();
 	}

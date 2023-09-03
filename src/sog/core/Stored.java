@@ -71,11 +71,11 @@ final public class Stored<T> {
 	@Test.Decl( "Throws AssertionError for empty name" )
 	@Test.Decl( "Throws AssertionError for null initial value" )
 	@Test.Decl( "Result is not null" )
-	@Test.Decl( "Result agrees with the given initial value the first time the Sorted instance is retrieved" )
+	@Test.Decl( "Result agrees with the given initial value the first time the Stored instance is retrieved" )
 	@Test.Decl( "Throws AssertionError if calling class is anonymous" )
 	@Test.Decl( "Result is the same instance if previously retrieved" )
 	@Test.Decl( "Throws AssertionError if named field is not a Stored instance" )
-	@Test.Decl( "Throws AssertionError if filed is not defined in the calling class" )
+	@Test.Decl( "Throws AssertionError if field is not defined in the calling class" )
 	@Test.Decl( "Value is stored in an xml data file when JVM shuts down" )
 	@Test.Decl( "Initial vlue is consistent with final value of previous JVM execution" )
 	public static <S> Stored<S> get( String name, S initial ) {
@@ -165,7 +165,13 @@ final public class Stored<T> {
 	 */
 	@Test.Decl( "Throws AssertionError for null value" )
 	public void set( T t ) {
-		this.value = t;
+		this.value = Assert.nonNull( t );
+	}
+	
+	@Override
+	@Test.Decl( "Uses natural string representation of the stored value" )
+	public String toString() {
+		return Strings.toString( this.value );
 	}
 
 }

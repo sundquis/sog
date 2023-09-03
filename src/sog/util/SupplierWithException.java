@@ -24,6 +24,7 @@ import sog.core.Test;
 /**
  * 
  */
+@FunctionalInterface
 @Test.Skip( "Functional interface" )
 public interface SupplierWithException<R, E extends Exception>  {
 

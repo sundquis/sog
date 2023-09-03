@@ -28,7 +28,6 @@ import java.util.function.Function;
 import sog.core.AppRuntime;
 import sog.core.Assert;
 import sog.core.Storable;
-import sog.core.Stored;
 import sog.core.Test;
 import sog.core.xml.representation.ArrayRep;
 import sog.core.xml.representation.IntegerRep;
@@ -49,6 +48,9 @@ import sog.core.xml.representation.StringRep;
 @Test.Subject( "test." )
 public abstract class XMLRepresentation<T> {
 
+	@Test.Skip( "Abstract" )
+	protected XMLRepresentation( Type... comps ) {}
+	
 	/**
 	 * A simple description of the target type that can be used as a tag name in xml
 	 * Concrete implementations should use the following test cases:
@@ -64,9 +66,6 @@ public abstract class XMLRepresentation<T> {
 	 * Concrete implementations should use the following test cases:
 	 * 		"Throws AssertionError for null reader"
 	 * 		"Throws AppRuntime for malformed content"
-	 * 		"Throws AppRuntime if an IOException occurs"
-	 * 		"Returns null if element is not present"
-	 * 		"If element not present then the reader has not advanced"
 	 * 		"Write followed by read produces the original instance"
 	 * 
 	 * @param in
@@ -75,11 +74,10 @@ public abstract class XMLRepresentation<T> {
 	public abstract T fromXML( XMLReader in );
 
 	/**
-	 * Convert the given instance to an xml representation and writ on the given writer.
+	 * Convert the given instance to an xml representation and write on the given writer.
 	 * Concrete implementations should use the following test cases:
 	 * 		"Throws AssertionError for null element"
 	 * 		"Throws AssertionError for null writer"
-	 * 		"Throws AppRuntime if an IOException occurs"
 	 * 		"Read followed by write produces an equivalent representation"
 	 * 
 	 * @param t
@@ -135,6 +133,11 @@ public abstract class XMLRepresentation<T> {
 	@Test.Decl( "Throws AssertionError for null type" )
 	@Test.Decl( "Throws ClassCastException for improper type" )
 	@Test.Decl( "Throws AppRuntime for a type without registered representation" )
+	@Test.Decl( "Returns representation for primitive types" )
+	@Test.Decl( "Returns representation for Storable instances" )
+	@Test.Decl( "Returns representation for arrays" )
+	@Test.Decl( "Returns representation for lists" )
+	@Test.Decl( "Returns representation for maps" )
 	public static <S> XMLRepresentation<S> forType( Type type ) {
 		XMLRepresentation<?> result = null;
 
@@ -155,83 +158,5 @@ public abstract class XMLRepresentation<T> {
 		return (XMLRepresentation<S>) result;
 	}
 
-	
-	
-	// Following should be moved to test cases:
-	
-	public static Stored<String> aString;
-	
-	public static Stored<Integer> anInt;
-	
-	public static Stored<Integer[]> anIntArray;
-	
-	public static Stored<List<Integer>> anIntList;
-	
-	public static Stored<Map<String, Integer>> aMap;
-	
-	public static Stored<Map<Integer[], List<String>>> complex;
-	
-	public static class MyStorable implements Storable {
-		@Data private Integer myInt = 42;
-		@Data private String myString = "Hello world";
-		public MyStorable() {}
-		
-		@Override public String toString() {
-			return "MS(" + this.myInt + ", " + this.myString + ")";
-		}
-	}
-	
-	public static Stored<MyStorable> storable;
-	
-	public static void main( String[] args ) {
-		try {
-//			aString = Stored.get( "aString", "first value" );
-//			System.out.println( aString.get() );
-//			aString.set( "Next value" );
-//			System.out.println( aString.get() );
-
-//			anInt = Stored.get( "anInt", 0 );
-//			System.out.println( anInt.get() );
-//			anInt.set( anInt.get() + 1 );
-//			System.out.println( anInt.get() );
-			
-//			anIntArray = Stored.get( "anIntArray", new Integer[] {} );
-//			System.out.println( Strings.toString( anIntArray.get() ) );
-//			anIntArray.set( new Integer[] { 1, 2, 3} );
-//			System.out.println( Strings.toString( anIntArray.get() ) );
-			
-//			anIntList = Stored.get( "anIntList", new ArrayList<>() );
-//			System.out.println( Strings.toString( anIntList.get() ) );
-//			anIntList.get().add( 42 );
-//			anIntList.get().add( anIntList.get().get( 0 ) + 1 );
-//			System.out.println( Strings.toString( anIntList.get() ) );
-			
-//			aMap = Stored.get( "aMap", new HashMap<>() );
-//			System.out.println( Strings.toString( aMap.get() ) );
-//			aMap.get().put( "fourty-two", 42 );
-//			System.out.println( Strings.toString( aMap.get() ) );
-//			aMap.get().put( "One", aMap.get().get( "One" ) + 1 );
-//			aMap.get().put( "<a&b>", 0 );
-//			System.out.println( Strings.toString( aMap.get() ) );
-			
-//			complex = Stored.get( "complex", new HashMap<>() );
-//			System.out.println( Strings.toString( complex.get() ) );
-//			complex.get().put( new Integer[] {1}, List.of( "One" ) );
-//			System.out.println( Strings.toString( complex.get() ) );
-//			complex.get().put( new Integer[] {1, 2}, List.of("A", "B") );
-//			System.out.println( Strings.toString( complex.get() ) );
-//			complex.get().put( new Integer[] {1, 2, 3}, List.of("<hello>", "&world!" ) );
-//			System.out.println( Strings.toString( complex.get() ) );
-			
-			storable = Stored.get( "storable", new MyStorable() );
-			System.out.println( storable.get().toString() );
-			storable.get().myString = "Foo!";
-			System.out.println( storable.get().toString() );
-		} catch ( Exception ex ) {
-			ex.printStackTrace();
-		}
-		
-		System.out.println( "\nDone!" );
-	}
 
 }

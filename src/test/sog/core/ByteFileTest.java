@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import sog.core.App;
 import sog.core.AppRuntime;
 import sog.core.ByteFile;
 import sog.core.Procedure;
@@ -1333,7 +1334,7 @@ public class ByteFileTest extends Test.Container {
 	
 
 	public static void main( String[] args ) {
-		/* Toggle class results
+		//* Toggle class results
 		Test.eval( ByteFile.class )
 			.concurrent( false )
 			.showDetails( true )
@@ -1349,8 +1350,8 @@ public class ByteFileTest extends Test.Container {
 			.showProgress( true )
 			.print();
 		//*/
-		
-		System.out.println( "\nDone!" );
+
+		App.get().done();
 	}
 	
 	

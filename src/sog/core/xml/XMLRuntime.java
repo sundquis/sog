@@ -26,7 +26,6 @@ import sog.core.Test;
 /**
  * 
  */
-@Test.Skip( "Container" )
 @Test.Subject( "test." )
 public class XMLRuntime extends AppRuntime {
 	

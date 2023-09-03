@@ -47,6 +47,7 @@ public class StorableRep<T> extends XMLRepresentation<T> {
 	
 	private final ListRep<String> nameRep;
 	
+	@Test.Decl( "Throws AssertionError for null target type" )
 	public StorableRep( Class<T> targetType ) {
 		this.targetType = targetType;
 		this.dataFields = Arrays.stream( this.targetType.getDeclaredFields() )
@@ -57,11 +58,18 @@ public class StorableRep<T> extends XMLRepresentation<T> {
 
 
 	@Override
+	@Test.Decl( "Result is not empty" )
+	@Test.Decl( "Result does not contain entity characters" )
 	public String getName() {
 		return "storable";
 	}
 
 	@Override
+	@Test.Decl( "Throws AppRuntime if target type cannot be constructed" )
+	@Test.Decl( "Throws AssertionError for null reader" )
+	@Test.Decl( "Throws XMLRuntime for malformed content" )
+	@Test.Decl( "Fields annotated with Storable.Data are initialized" )
+	@Test.Decl( "Write followed by read produces instance equivalent to the original instance" )
 	public T fromXML( XMLReader in ) {
 		T result;
 		
@@ -91,6 +99,11 @@ public class StorableRep<T> extends XMLRepresentation<T> {
 	}
 
 	@Override
+	@Test.Decl( "Throws AssertionError for null instance" )
+	@Test.Decl( "Throws AssertionError for null writer" )
+	@Test.Decl( "Fields annotated with Storable.Data are stored" )
+	@Test.Decl( "Null fields are ignored" )
+	@Test.Decl( "Read followed by write produces an equivalent representation" )
 	public void toXML( T t, XMLWriter out ) {
 		out.writeOpenTag( this.getName() );
 		

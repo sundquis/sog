@@ -36,6 +36,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import sog.core.App;
 import sog.core.AppRuntime;
 import sog.core.LocalDir;
 import sog.core.Test;
@@ -2463,12 +2464,14 @@ public class XMLHandlerTest extends Test.Container {
 		//*/
 		
 		/* Toggle package results
-		//sog.util.Concurrent.safeModeOff();
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( XMLHandler.class )
 			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )
 			.print();
 		//*/
+		
+		App.get().done();
 	}
 }

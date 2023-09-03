@@ -19,6 +19,7 @@
 
 package test.sog.core.xml;
 
+import sog.core.App;
 import sog.core.Test;
 import sog.core.xml.XML;
 
@@ -76,6 +77,55 @@ public class XMLTest extends Test.Container {
 		tc.assertTrue( XML.get().getDeclaration().toLowerCase().contains( "version" ) );
 	}
 	
+    @Test.Impl( 
+    	member = "method: String XML.Entity.decode(String)", 
+    	description = "Ampersand is decoded" 
+    )
+    public void tm_00458498F( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String XML.Entity.decode(String)", 
+    	description = "Less than is decoded" 
+    )
+    public void tm_024F87A1C( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String XML.Entity.decode(String)", 
+    	description = "Throws AssertionError for null string" 
+    )
+    public void tm_05D6FBBDE( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String XML.Entity.encode(String)", 
+    	description = "Ampersand is encoded" 
+    )
+    public void tm_0746FC53F( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String XML.Entity.encode(String)", 
+    	description = "Less than is encoded" 
+    )
+    public void tm_0950FF5CC( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String XML.Entity.encode(String)", 
+    	description = "Throws AssertionError for null string" 
+    )
+    public void tm_0D29D0E06( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+	
+	
 	
 
 	public static void main( String[] args ) {
@@ -90,10 +140,12 @@ public class XMLTest extends Test.Container {
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( XML.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( false )
 			.showProgress( true )
 			.print();
 		//*/
+		
+		App.get().done();
 	}
 }

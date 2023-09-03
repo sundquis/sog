@@ -32,13 +32,16 @@ public class IterableIterator<T> implements Iterable<T> {
 	private final Iterator<T> iterator;
 	
 	private boolean done;
-	
+
+	@Test.Decl( "Throws AssertionError for null iterator" )
 	public IterableIterator( Iterator<T> iterator ) {
 		this.iterator = iterator;
 		this.done = false;
 	}
 
 	@Override
+	@Test.Decl( "Return is not null" )
+	@Test.Decl( "Thorws IllegalStateException when called twice" )
 	public Iterator<T> iterator() {
 		if ( this.done ) {
 			throw new IllegalStateException( "Multiple traversals not supported." );

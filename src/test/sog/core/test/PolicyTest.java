@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import sog.core.App;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.test.Policy;
@@ -713,7 +714,7 @@ public class PolicyTest extends Test.Container {
 	
 	
 	public static void main( String[] args ) {
-		//* Toggle class results
+		/* Toggle class results
 		Test.eval( Policy.class )
 			.concurrent( false )
 			.showDetails( true )
@@ -722,14 +723,15 @@ public class PolicyTest extends Test.Container {
 		//*/
 		
 		/* Toggle package results
+		sog.util.Concurrent.safeModeOff();
 		Test.evalPackage( Policy.class )
 			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )
 			.print();
 		//*/
-		
-		System.out.println( "\nDone!" );
+
+		App.get().done();
 	}
 
 }

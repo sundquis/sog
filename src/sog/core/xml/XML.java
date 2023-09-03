@@ -62,21 +62,26 @@ public class XML {
 	
 	
 	public enum Entity {
+		
+		@Test.Skip( "Enumerated value" )
 		AMP( "&", "&amp;"),
-		LT( "<", "&lt;" ),
-		GT( ">", "&gt;" ),
-		QUOT( "\"", "&quot;" ),
-		APOS( "'", "&apos;" );
+		
+		@Test.Skip( "Enumerated value" )
+		LT( "<", "&lt;" );
 		
 		private final String entity;
 		private final String replacement;
+		
 		private Entity( String entity, String replacement ) {
 			this.entity = entity;
 			this.replacement = replacement;
 		}
-		
+
+		@Test.Decl( "Throws AssertionError for null string" )
+		@Test.Decl( "Ampersand is encoded" )
+		@Test.Decl( "Less than is encoded" )
 		public static String encode( String s ) {
-			String result = s;
+			String result = Assert.nonNull( s );
 			
 			for ( Entity e : Entity.values() ) {
 				result = result.replace( e.entity, e.replacement );
@@ -85,8 +90,11 @@ public class XML {
 			return result;
 		}
 		
+		@Test.Decl( "Throws AssertionError for null string" )
+		@Test.Decl( "Ampersand is decoded" )
+		@Test.Decl( "Less than is decoded" )
 		public static String decode( String s ) {
-			String result = s;
+			String result = Assert.nonNull( s );
 			
 			for ( Entity e : Entity.values() ) {
 				result = result.replace( e.replacement, e.entity );
@@ -98,7 +106,8 @@ public class XML {
 
 
 	
-	
+
+	@Test.Skip( "Simple static functions" )
 	public interface Helpers {
 		
 		default public String tagStart( String tag ) {

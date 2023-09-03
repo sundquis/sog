@@ -1485,6 +1485,31 @@ public class AppTest extends Test.Container{
 		tc.expectError( AssertionError.class );
 		App.get().relativePathToClassname( App.get().root() );
 	}
+	
+    @Test.Impl( 
+    	member = "method: App App.message(String)", 
+    	description = "Prints an empty line for null or empty message" 
+    )
+    public void tm_0CD898459( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: App App.message(String)", 
+    	description = "Returns the App instance to allow chaining" 
+    )
+    public void tm_05B83C75D( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: void App.done()", 
+    	description = "Includes the exceution count" 
+    )
+    public void tm_055E1BECE( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+
 
 	
 	
@@ -1507,7 +1532,7 @@ public class AppTest extends Test.Container{
 			.print();
 		//*/
 
-		/* Global results
+		//* Global results
 		sog.util.Concurrent.safeModeOff();
 		sog.core.test.TestSet.forAllSourceDirs()
 			.concurrent( false )
@@ -1516,8 +1541,8 @@ public class AppTest extends Test.Container{
 			.print();
 		//*/
 		
-		
-		System.out.println( "\nDone!" );
+
+		App.get().done();
 	}
 }
 

@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 /**
  * 
  */
-@Test.Subject( "test." )
+@Test.Skip( "Abstract" )
 public interface Storable {
 	
 	

@@ -63,6 +63,7 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	 * @param path
 	 * @throws IOException
 	 */
+	@Test.Decl( "Throws AssertionError for null path" )
 	public XMLReader( Path path ) throws IOException {
 		this.stream = Files.lines( Assert.nonNull( path ) );
 		this.lines = this.stream.iterator();
@@ -79,6 +80,10 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	 * @return
 	 * @throws XMLRuntime		If the current position does not hold an open tag with the given name.
 	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
+	@Test.Decl( "Throws AppRuntime if reader does not hold an open tag with the given name" )
+	@Test.Decl( "Leading whitespace is skipped" )
+	@Test.Decl( "Advances reader beyond the end of tag" )
 	public XMLReader readOpenTag( String name ) throws XMLRuntime {
 		this.skipWhiteSpace();
 		this.expectString( this.tagStart( name ) );
@@ -94,6 +99,10 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	 * @return				The name of the tag.
 	 * @throws XMLRuntime	If the current position does not hold an element close tag.
 	 */
+	@Test.Decl( "Throws AssertionError for empty name" )
+	@Test.Decl( "Throws AppRuntime if reader does not hold a close tag with the given name" )
+	@Test.Decl( "Leading whitespace is skipped" )
+	@Test.Decl( "Advances reader beyond the end of tag" )
 	public XMLReader readCloseTag( String name ) throws XMLRuntime {
 		this.skipWhiteSpace();
 		this.expectString( this.tagEnd( name ) );
@@ -117,6 +126,9 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	 * 
 	 * @return
 	 */
+	@Test.Decl( "Return can be empty" )
+	@Test.Decl( "Return can contain entities" )
+	@Test.Decl( "Return can contain whitespace" )
 	public String readContent() {
 		this.buffer.setLength( 0 );
 		
@@ -203,8 +215,11 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	
 	
 	@Override
-	public void close() throws Exception {
+	@Test.Decl( "Characters not available after close" )
+	@Test.Decl( "Idempotent" )
+	public void close() {
 		this.stream.close();
+		this.currentLine = null;
 	}
 	
 	
@@ -212,6 +227,8 @@ public class XMLReader implements AutoCloseable, XML.Helpers {
 	 * The location where we start looking for the next character.
 	 * @return
 	 */
+	@Test.Decl( "Location includes the current line number" )
+	@Test.Decl( "Location includes the current column number" )
 	public String getLocation() {
 		return "(" + (this.lineIndex +1) + ", "  + (this.colIndex + 1) + ")";
 	}

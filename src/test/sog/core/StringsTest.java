@@ -935,15 +935,32 @@ public class StringsTest extends Test.Container {
 	public void tm_0BC98197D( Test.Case tc ) {
 		tc.assertEqual( "null", Strings.toString( null ) );
 	}
-	
+
+    @Test.Impl( 
+    	member = "method: String Strings.entryToString(Map.Entry)", 
+    	description = "Includes string representations for the key and value" 
+    )
+    public void tm_093C974C6( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+    
+    @Test.Impl( 
+    	member = "method: String Strings.entryToString(Map.Entry)", 
+    	description = "Throws AssertionError for null entry" 
+    )
+    public void tm_002E52DB4( Test.Case tc ) {
+    	tc.addMessage( "GENERATED STUB" );
+    }
+
 	
 	
 
 	public static void main( String[] args ) {
 		/* Toggle class results
 		Test.eval( Strings.class )
-			.concurrent( true )
+			.concurrent( false )
 			.showDetails( true )
+			.showProgress( false )
 			.print();
 		//*/
 		
@@ -951,9 +968,10 @@ public class StringsTest extends Test.Container {
 		Test.evalPackage( Strings.class )
 			.concurrent( false )
 			.showDetails( true )
+			.showProgress( false )
 			.print();
 		//*/
-		
-		System.out.println( "\nDone!" );
+
+		App.get().done();
 	}
 }

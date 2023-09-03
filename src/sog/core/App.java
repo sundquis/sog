@@ -78,6 +78,8 @@ public class App implements Runnable {
 	
 	private final String startDateTime;
 	
+	private Stored<Integer> executionCount = null;
+	
 	private App() {
 		this.root = Assert.rwDirectory( Property.get( "root", null, Path::of ) );
 		this.description = Assert.nonEmpty( Property.get( "description",  "<none>",  Parser.STRING ) );
@@ -564,6 +566,41 @@ public class App implements Runnable {
 			.findFirst()
 			.orElseThrow( () -> new AppRuntime( "Offset (" + offset + ") larger than depth of stack." ) )
 		);
+	}
+	
+	
+	private int getExecutionCount() {
+		if ( this.executionCount == null ) {
+			this.executionCount = Stored.get( "executionCount", 0 );
+			this.executionCount.set( this.executionCount.get() + 1 );
+		}
+		return this.executionCount.get();
+	}
+	
+	
+	/**
+	 * Convenience method for printing diagnostic information. 
+	 * 
+	 * @param s
+	 * @return
+	 */
+	@Test.Decl( "Prints an empty line for null or empty message" )
+	@Test.Decl( "Returns the App instance to allow chaining" )
+	public App message( String s ) {
+		String msg = (s == null || s.isEmpty()) ? "" : (">>> " + s);
+		System.out.println( msg );
+		return this;
+	}
+	
+
+	/**
+	 * Print a message signaling the termination of the application.
+	 */
+	@Test.Decl( "Includes the exceution count" )
+	public void done() {
+		this.message( "" );
+		this.message( "Execution #" + this.getExecutionCount() );
+		this.message( "Done!" );
 	}
 	
 

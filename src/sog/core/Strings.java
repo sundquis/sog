@@ -203,6 +203,8 @@ public final class Strings {
 		return obj.toString();
 	}
 	
+	@Test.Decl( "Throws AssertionError for null entry" )
+	@Test.Decl( "Includes string representations for the key and value" )
 	public static String entryToString( Map.Entry<?, ?> entry ) {
 		Assert.nonNull( entry );
 		
