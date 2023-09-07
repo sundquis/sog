@@ -19,11 +19,12 @@
 
 package test.sog.core.test;
 
+import java.io.ByteArrayOutputStream;
+
 import sog.core.Test;
 import sog.core.test.TestDecl;
 import sog.core.test.TestImpl;
 import sog.util.IndentWriter;
-import sog.util.StringOutputStream;
 
 /**
  * 
@@ -143,7 +144,7 @@ public class TestDeclTest extends Test.Container {
 	)
 	public void tm_0F238E18B( Test.Case tc ) {
 		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		decl.setImpl( impl );
 		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( "@Test.Impl" ) );
@@ -155,7 +156,7 @@ public class TestDeclTest extends Test.Container {
 	)
 	public void tm_0F3CCC7CB( Test.Case tc ) {
 		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		decl.setImpl( impl );
 		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( DESCRIPTION ) );
@@ -167,7 +168,7 @@ public class TestDeclTest extends Test.Container {
 	)
 	public void tm_0A99BB420( Test.Case tc ) {
 		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		decl.setImpl( impl );
 		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( MEMBER_NAME ) );
@@ -179,7 +180,7 @@ public class TestDeclTest extends Test.Container {
 	)
 	public void tm_01FDC4239( Test.Case tc ) {
 		TestDecl decl = this.getDecl(); TestImpl impl = this.getImpl();
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		decl.setImpl( impl );
 		decl.print( new IndentWriter( sos ) );
 		tc.assertTrue( sos.toString().contains( decl.getMethodName() ) );

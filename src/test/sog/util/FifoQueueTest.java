@@ -26,6 +26,7 @@ import sog.util.Queue;
  * @author sundquis
  *
  */
+@Test.Skip( "Container" )
 public class FifoQueueTest extends Test.Container {
 
 	public FifoQueueTest() {

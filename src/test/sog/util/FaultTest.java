@@ -18,6 +18,7 @@
  */
 package test.sog.util;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -27,7 +28,6 @@ import sog.core.Test;
 
 import sog.util.Fault;
 import sog.util.IndentWriter;
-import sog.util.StringOutputStream;
 
 /**
  * @author sundquis
@@ -44,14 +44,14 @@ public class FaultTest extends Test.Container {
 	private class FaultData {
 		
 		private final Fault fault;
-		private final StringOutputStream sos;
+		private final ByteArrayOutputStream sos;
 		private final IndentWriter out;
 		private final Object source;
 		
 		private FaultData( String description ) {
 			this.source = new Object() {};
 			this.fault = new Fault( this.source, description );
-			this.sos = new StringOutputStream();
+			this.sos = new ByteArrayOutputStream();
 			this.out = new IndentWriter( this.sos );
 		}
 		

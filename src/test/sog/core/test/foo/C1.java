@@ -51,7 +51,12 @@ public class C1 {
 		}
 
 		@Test.Impl( member = "constructor: C1()", description = "fail w = 2", weight = 2 )
-		public void tm_0A4759247( Test.Case tc ) { TEST.setRanFirst( "one" ); this.sleep( 2L ); tc.assertTrue( false ); }
+		public void tm_0A4759247( Test.Case tc ) { 
+			tc.addMessage( "For testing; Intended to fail." );
+			TEST.setRanFirst( "one" ); 
+			this.sleep( 2L ); 
+			tc.assertTrue( false ); 
+		}
 		
 		@Test.Impl( member = "method: void C1.m()", description = "pass w = 3", weight = 3 )
 		public void tm_0374FA689( Test.Case tc ) { TEST.setRanFirst( "two" ); this.sleep( 3L ); tc.assertTrue( true ); }

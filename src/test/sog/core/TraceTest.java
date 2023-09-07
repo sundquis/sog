@@ -19,6 +19,7 @@
 
 package test.sog.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +29,6 @@ import sog.core.AppRuntime;
 import sog.core.Procedure;
 import sog.core.Test;
 import sog.core.Trace;
-import sog.util.StringOutputStream;
 
 /**
  * 
@@ -40,17 +40,17 @@ public class TraceTest extends Test.Container {
 		super( Trace.class );
 	}
 
-	// These tests use shared instance values and are not concurrent in thier present version.
+	// These tests use shared instance values and are not concurrent in their present version.
 	// FIXME: Could rewrite to be concurrent and test thread-safety of the Trace interface
 	
-	private StringOutputStream sos;
+	private ByteArrayOutputStream baos;
 	private PrintWriter out;
 	
 	@Override
 	public Procedure beforeEach() {
 		return () -> {
-			this.sos = new StringOutputStream();
-			this.out = new PrintWriter( this.sos, true );
+			this.baos = new ByteArrayOutputStream();
+			this.out = new PrintWriter( this.baos, true );
 			Trace.enable( true );
 		};
 	}
@@ -58,7 +58,7 @@ public class TraceTest extends Test.Container {
 	@Override
 	public Procedure afterEach() {
 		return () -> {
-			this.sos = null;
+			this.baos = null;
 			this.out = null;
 		};
 	}
@@ -134,7 +134,7 @@ public class TraceTest extends Test.Container {
 	public void tm_0E392F861( Test.Case tc ) {
 		Trace.enable( false );
 		Trace.write( "Test", "DISABLED", this.out );
-		tc.assertFalse( this.sos.toString().contains( "DISABLED" ) );
+		tc.assertFalse( this.baos.toString().contains( "DISABLED" ) );
 	}
 		
 	@Test.Impl( 
@@ -147,7 +147,7 @@ public class TraceTest extends Test.Container {
 		Trace.write( "Test", "ENABLED", this.out );
 		// Cannot access queue/buffer directly so we check the PrintWriter
 		// This relies on the implementation of Trace.write(...)
-		tc.assertTrue( this.sos.toString().contains( "ENABLED" ) );
+		tc.assertTrue( this.baos.toString().contains( "ENABLED" ) );
 	}
 		
 	@Test.Impl( 
@@ -285,7 +285,7 @@ public class TraceTest extends Test.Container {
 	)
 	public void tm_066FF07D2( Test.Case tc ) {
 		Trace.write( this, "IMMEDIATE", this.out );
-		tc.assertTrue( this.sos.toString().contains( "IMMEDIATE") );
+		tc.assertTrue( this.baos.toString().contains( "IMMEDIATE") );
 	}
 		
 	@Test.Impl( 

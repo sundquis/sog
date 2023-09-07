@@ -18,6 +18,7 @@
  */
 package test.sog.core.test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,6 @@ import sog.core.test.TestDecl;
 import sog.core.test.TestSet;
 import sog.core.test.TestSubject;
 import sog.util.IndentWriter;
-import sog.util.StringOutputStream;
 
 /**
  * 
@@ -79,7 +79,7 @@ public class TestSubjectTest extends Test.Container {
 	
 	public void run( TestSubject ts ) {
 		// Print forces run
-		ts.print( new IndentWriter( new StringOutputStream() ) );
+		ts.print( new IndentWriter( new ByteArrayOutputStream() ) );
 	}
 	
 	public void print( TestSubject tr ) {
@@ -92,7 +92,7 @@ public class TestSubjectTest extends Test.Container {
 	}
 	
 	public String messages( TestSubject tr ) {
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		tr.print( new IndentWriter( sos, "" ) );
 		return sos.toString();
 	}

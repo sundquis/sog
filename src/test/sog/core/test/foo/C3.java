@@ -36,7 +36,11 @@ public class C3 {
 		TEST() { super( C3.class ); }
 
 		@Test.Impl( member = "constructor: C3()", description = "fail w = 4", weight = 4 )
-		public void tm_0A4759247( Test.Case tc ) { this.sleep( 4L ); tc.assertTrue( false ); }
+		public void tm_0A4759247( Test.Case tc ) { 
+			tc.addMessage( "For testing; Intended to fail." );
+			this.sleep( 4L ); 
+			tc.assertTrue( false ); 
+		}
 		
 		@Test.Impl( member = "method: void C3.m()", description = "pass w = 5", weight = 5 )
 		public void tm_006935AC9( Test.Case tc ) { this.sleep( 5L ); tc.assertTrue( true ); }

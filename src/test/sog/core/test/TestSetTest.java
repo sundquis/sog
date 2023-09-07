@@ -18,6 +18,7 @@
  */
 package test.sog.core.test;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,6 @@ import sog.core.test.Result;
 import sog.core.test.TestSubject;
 import sog.core.test.TestSet;
 import sog.util.IndentWriter;
-import sog.util.StringOutputStream;
 import test.sog.core.test.bar.ConcurrentTests;
 
 /**
@@ -340,7 +340,7 @@ public class TestSetTest extends Test.Container {
 		description = "Includes messages for each bad classname" 
 	)
 	public void tm_067F458BE( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		TestSet.forPackage( test.sog.core.test.foo.C1.class ).addClass( "foo.bar" ).print( new IndentWriter( sos, " " ) );
 		tc.assertTrue( sos.toString().contains( "SKIPPED" ) );
 	}
@@ -350,7 +350,7 @@ public class TestSetTest extends Test.Container {
 		description = "Includes summary for each TestSubject" 
 	)
 	public void tm_06F277C47( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		TestSet.forPackage( test.sog.core.test.foo.C1.class ).print( new IndentWriter( sos, " " ) );
 		String output = sos.toString();
 		Stream.of( test.sog.core.test.foo.C1.class, test.sog.core.test.foo.C2.class, test.sog.core.test.foo.C3.class )
@@ -362,7 +362,7 @@ public class TestSetTest extends Test.Container {
 		description = "Results are printed in alphabetaical order" 
 	)
 	public void tm_0119BF2CF( Test.Case tc ) {
-		StringOutputStream sos = new StringOutputStream();
+		ByteArrayOutputStream sos = new ByteArrayOutputStream();
 		new TestSet( "TESTING" )
 			.addClass( test.sog.core.test.foo.C3.class )
 			.addClass( test.sog.core.test.foo.C2.class )
@@ -471,7 +471,7 @@ public class TestSetTest extends Test.Container {
     )
     public void tm_0C480A0ED( Test.Case tc ) {
     	TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class ).showDetails( true );
-    	StringOutputStream sos = new StringOutputStream();
+    	ByteArrayOutputStream sos = new ByteArrayOutputStream();
     	set.print( new IndentWriter( sos ) );
     	tc.assertTrue( sos.toString().contains( "SKIPPED" ) );
     }
@@ -516,7 +516,7 @@ public class TestSetTest extends Test.Container {
     )
     public void tm_07ADA1208( Test.Case tc ) {
     	TestSet set = TestSet.forPackage( test.sog.core.test.foo.C1.class ).showDetails( true );
-    	StringOutputStream sos = new StringOutputStream();
+    	ByteArrayOutputStream sos = new ByteArrayOutputStream();
     	set.print( new IndentWriter( sos ) );
     	tc.assertTrue( sos.toString().contains( "RESULTS" ) );
     }

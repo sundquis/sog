@@ -1532,12 +1532,12 @@ public class AppTest extends Test.Container{
 			.print();
 		//*/
 
-		//* Global results
+		/* Global results
 		sog.util.Concurrent.safeModeOff();
-		sog.core.test.TestSet.forAllSourceDirs()
-			.concurrent( false )
-			.showDetails( false )
-			.showProgress( true )
+		sog.core.test.TestSet.forPackages( App.get().sourceDir( App.class ), Path.of( "sog" ) )
+			.concurrent( true )
+			.showDetails( true )
+			.showProgress( false )
 			.print();
 		//*/
 		

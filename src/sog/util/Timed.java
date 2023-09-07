@@ -25,30 +25,69 @@ import sog.core.Procedure;
 import sog.core.Test;
 
 /**
+ * A FunctionalInterface for objects that have an inherent processing time associated with them.
  * 
+ * Default methods provide formatting for the elapsed time using various scales.
  */
 @Test.Subject( "test." )
 @FunctionalInterface
 public interface Timed {
 
+	/**
+	 * Return the processing time associated with this instance.
+	 * @return
+	 */
 	public long getNano();
 	
+	/**
+	 * Return the processing time formatted in nanoseconds.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Prints elapsed time in nanoseconds" )
 	default public String formatNano() {
 		return String.format( "%d ns", this.getNano() );
 	}
 	
+	/**
+	 * Return the processing time formatted in microseconds.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Prints elapsed time in microseconds" )
 	default public String formatMicro() {
 		return String.format( "%.1f \u03BCs", this.getNano() / 1000.0 );
 	}
-	
+
+	/**
+	 * Return the processing time formatted in milliseconds.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Prints elapsed time in milliseconds" )
 	default public String formatMilli() {
 		return String.format( "%.1f ms", this.getNano() / 1000000.0 );
 	}
-	
+
+	/**
+	 * Return the processing time formatted in seconds.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Prints elapsed time in seconds" )
 	default public String formatSecond() {
 		return String.format( "%.1f s", this.getNano() / 1000000000.0 );
 	}
-	
+
+	/**
+	 * Return the processing time formatted in scale-appropriate form.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Times less than one microsecond use nanoseconds" )
+	@Test.Decl( "Times less than one millisecond use microseconds" )
+	@Test.Decl( "Times less than one second use milliseconds" )
+	@Test.Decl( "Times more than one second use seconds" )
 	default public String format() {
 		return this.getNano() < 1000 ? this.formatNano()
 			: this.getNano() < 1_000_000 ? this.formatMicro()
@@ -57,17 +96,33 @@ public interface Timed {
 	}
 	
 	
-	
+
+	/**
+	 * Marker interface for a Procedure that is also Timed.
+	 */
 	public interface Proc extends Timed, Procedure {}
-	
+
+	/**
+	 * Wrap the given Procedure in a Timed.Proc. The associated processing time is the
+	 * execution time of the given Procedure.
+	 * 
+	 * @param procedure
+	 * @return
+	 */
+	@Test.Decl( "Return is a non-null Procedure that is Timed" )
 	public static Proc wrap( final Procedure procedure ) {
+		
 		return new Proc() {
 			
 			private long nano = 0L;
 
-			@Override public long getNano() { return this.nano; }
+			@Override 
+			@Test.Decl( "Processing time reflects the execution time" )
+			public long getNano() { return this.nano; }
 
-			@Override public void exec() {
+			@Override 
+			@Test.Decl( "Given Procedure.exec() is called" )
+			public void exec() {
 				long start = System.nanoTime();
 				procedure.exec();
 				this.nano = System.nanoTime() - start;
@@ -77,17 +132,33 @@ public interface Timed {
 	}
 	
 	
-	
+
+	/**
+	 * Marker interface for a Function that is also Timed.
+	 */
 	public interface Func<T, R> extends Timed, Function<T, R> {}
 	
+	/**
+	 * Wrap the given Function in a Timed.Func. The associated processing time is the
+	 * execution time of the given Function.
+	 * 
+	 * @param procedure
+	 * @return
+	 */
+	@Test.Decl( "Return is a non-null Function that is Timed" )
 	public static <T, R> Timed.Func<T, R> wrap( final Function<T, R> function ) {
+		
 		return new Func<T, R>() {
 			
 			private long nano = 0L;
 
-			@Override public long getNano() { return this.nano; }
+			@Override 
+			@Test.Decl( "Processing time reflects the execution time" )
+			public long getNano() { return this.nano; }
 
-			@Override public R apply( T t ) {
+			@Override 
+			@Test.Decl( "Given Function.apply() is called" )
+			public R apply( T t ) {
 				long start = System.nanoTime();
 				R result = function.apply( t );
 				this.nano = System.nanoTime() - start;
@@ -97,33 +168,6 @@ public interface Timed {
 		};
 	}
 	
-	public static void main( String[] args ) {
-		/* Toggle class results
-		Test.eval( Timed.class )
-			.concurrent( false )
-			.showDetails( true )
-			.print();
-		//*/
-		
-		Procedure p = () -> {
-			try { Thread.sleep( 0L, 9 ); } catch ( InterruptedException e ) {}
-		};
-		Timed.Proc tp = Timed.wrap( p );
-		tp.exec();
-		System.out.println( "Nano: " + tp.formatNano() );
-		System.out.println( "Micro: " + tp.formatMicro() );
-		System.out.println( "Milli: " + tp.formatMilli() );
-		System.out.println( "Seconds: " + tp.formatSecond() );
-		System.out.println( "Time: " + tp.format() );
-		
-		/* Toggle package results
-		Test.evalPackage( Timed.class )
-			.concurrent( false )
-			.showDetails( true )
-			.print();
-		//*/
 
-		System.out.println( "\nDone!" );
-	}
 
 }

@@ -1,68 +1,79 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021, 2023
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.util;
+
+import sog.core.Test;
 
 /**
  * Abstraction of the queue operations.
+ * 
+ * The Queue contract:
+ * 
+ * Queues have three states: open, closed, and terminated.
+ * 
+ * Queues are created open.
+ * 
+ * Allowed transitions: close(), terminate()
+ * 		O -> C
+ * 		O -> T
+ * 		C -> T
+ * 
+ * State detected by predicates
+ * 		isOpen()
+ * 		isClosed()
+ *		isTerminated()
  *
+ * Queues are created empty
+ * 		isEmpty()
+ * 
+ * Queues may optionally specify a "full" property
+ * 
+ * Successful put/get operations alter empty status and, optionally, full status
+ * 
+ * Elements can be added to the queue: put( E elt )
+ * 		OPEN and not-full: accept the given element
+ * 		OPEN and full: unspecified
+ * 		CLOSED: Ignore the element, return false.
+ * 		TERMINATED: Ignore the element, return false.
+ * 
+ * Elements can be retrieved from the queue: E get()
+ * 		OPEN and non-empty: The next non-null element
+ * 		OPEN and empty: unspecified
+ * 		CLOSED: The next element or null if empty
+ * 		TERMINATED: null
+ * 		
+ * Implementations:
+ * 	1. Determine behavior for put( E elt ) when the queue is open and full
+ * 	2. Determine behavior for E get() when the queue is open and empty
+ * 	3. Determine the retrieval order policy
+ * 	4. Test the contract
+ * 
+ * The OPEN/CLOSED/TERMINATED semantics are enforced by the AbstractQueue.
+ * 
  * @see AbstractQueue
  * @see FifoQueue
  * @see MultiQueue
  * @see PriorityQueue
  */
+@Test.Skip( "Abstract" )
 public interface Queue<E> extends AutoCloseable {
 
-	/*
-	 * The Queue contract:
-	 * 
-	 * Queues have three states: open, closed, and terminated.
-	 * 
-	 * Queues are created open.
-	 * 
-	 * Allowed transitions: close(), terminate()
-	 * 		O -> C
-	 * 		O -> T
-	 * 		C -> T
-	 * 
-	 * State detected by predicates
-	 * 		isOpen()
-	 * 		isClosed()
-	 *		isTerminated()
-	 *
-	 * Queues are created empty
-	 * 		isEmpty()
-	 * 
-	 * Queues may optionally specify a "full" property
-	 * 
-	 * Successful put/get operations alter empty status and, optionally, full status
-	 * 
-	 * Elements can be added to the queue: put( E elt )
-	 * 		OPEN and not-full: accept the given element
-	 * 		OPEN and full: unspecified
-	 * 		CLOSED: Ignore the element, return false.
-	 * 		TERMINATED: Ignore the element, return false.
-	 * 
-	 * Elements can be retrieved from the queue: E get()
-	 * 		OPEN and non-empty: The next non-null element
-	 * 		OPEN and empty: unspecified
-	 * 		CLOSED: The next element or null if empty
-	 * 		TERMINATED: null
-	 * 		
-	 * Implementations:
-	 * 	1. Determine behavior for put( E elt ) when the queue is open and full
-	 * 	2. Determine behavior for E get() when the queue is open and empty
-	 * 	3. Determine the retrieval order policy
-	 * 	4. Test the contract
-	 * 
-	 * The OPEN/CLOSED/TERMINATED semantics are enforced by the AbstractQueue.
-	 * 
-	 */
-
-	
 	/**
 	 * Tells if the queue is empty.
 	 *

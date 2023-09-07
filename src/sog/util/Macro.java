@@ -1,10 +1,21 @@
-/*
- * Copyright (C) 2017-18 by TS Sundquist
+/**
+ * Copyright (C) 2021, 2023
+ * *** *** *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * All rights reserved.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * *** *** * 
+ * Sundquist
  */
-
 package sog.util;
 
 import java.util.Arrays;
@@ -28,6 +39,7 @@ import sog.core.Test;
  * @author sundquis
  *
  */
+@Test.Subject( "test." )
 public class Macro implements Function<String, Stream<String>> {
 	
 	/* Maximum recursive depth allowed */
@@ -132,9 +144,9 @@ public class Macro implements Function<String, Stream<String>> {
 	 * For restrictions on the key 
 	 * @see Macro#expand(String, String...)
 	 * 
-	 * @param key The nonempty key name to match.
-	 * @param values The collection of replacement values to use.
-	 * @return This {@code Macro} instance for chaining.
+	 * @param key 		The nonempty key name to match.
+	 * @param values 	The collection of replacement values to use.
+	 * @return 			This {@code Macro} instance for chaining.
 	 */
 	@Test.Decl( "Throws assertion error for null collection of values" )
 	@Test.Decl( "Empty value collection allowed" )
@@ -149,7 +161,24 @@ public class Macro implements Function<String, Stream<String>> {
 		this.expansions.put( key, values );
 		return this;
 	}
-	
+
+	/**
+	 * Register an expansion rule where the given key will be sequentially replaced by
+	 * the values in a given list.
+	 * 
+	 * For restrictions on the key @see Macro#expand(String, String...)
+	 * 
+	 * @param <T>		Type of elements in the list of replacements.
+	 * @param key		The non-empty key to match.
+	 * @param values	The list of replacements.
+	 * @param mapper	Mapper to convert objects to string representations.
+	 * @return			This {@code Macro} instance to allow chaining.
+	 */
+	@Test.Decl( "Throws assertion error for null collection of values" )
+	@Test.Decl( "Empty value collection allowed" )
+	@Test.Decl( "Throws AssertionError for null mapper" )
+	@Test.Decl( "Throws assertion error for a null mapper value" )
+	@Test.Decl( "Returns this Macro instance to allow chaining" )
 	public <T> Macro expand( String key, List<T> values, Function<? super T, String> mapper ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );

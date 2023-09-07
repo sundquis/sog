@@ -19,6 +19,7 @@
 
 package sog.util;
 
+import sog.core.Strings;
 import sog.core.Test;
 
 /**
@@ -29,23 +30,45 @@ public class Pair <X, Y> {
 	
 	private final X myX;
 	private final Y myY;
-	
+
+	/**
+	 * Construct an instance representing the given pair of elements.
+	 * 
+	 * @param myX
+	 * @param myY
+	 */
+	@Test.Decl( "First coordinate can be null" )
+	@Test.Decl( "Second coordinate can be null" )
 	public Pair( X myX, Y myY ) {
 		this.myX = myX;
 		this.myY = myY;
 	}
-	
+
+	/**
+	 * Return the first coordinate.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Returns original value" )
 	public X getX() {
 		return this.myX;
 	}
-	
+
+	/**
+	 * Return the second coordinate.
+	 * 
+	 * @return
+	 */
+	@Test.Decl( "Returns original value" )
 	public Y getY() {
 		return this.myY;
 	}
 	
 	@Override
+	@Test.Decl( "Uses canonical string representations for first coordinate" )
+	@Test.Decl( "Uses canonical string representations for second coordinate" )
 	public String toString() {
-		return "(" + this.myX + ", " + this.myY + ")";
+		return "(" + Strings.toString( this.myX ) + ", " + Strings.toString( this.myY ) + ")";
 	}
 
 }

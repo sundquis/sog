@@ -19,6 +19,7 @@
 package sog.util;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayDeque;
@@ -177,9 +178,9 @@ public class IndentWriter {
 	 */
 	@Test.Decl( "After toString write calls are ignored" )
 	public static IndentWriter stringIndentWriter() {
-		final StringOutputStream sos = new StringOutputStream();
-		IndentWriter result = new IndentWriter( sos ) {
-			@Override public String toString() { return sos.toString(); }
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		IndentWriter result = new IndentWriter( baos ) {
+			@Override public String toString() { return baos.toString(); }
 		};
 		return result;
 	}

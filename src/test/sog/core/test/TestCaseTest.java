@@ -18,6 +18,7 @@
  */
 package test.sog.core.test;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,6 @@ import sog.core.Test;
 import sog.core.test.TestCase;
 import sog.core.test.TestImpl;
 import sog.util.IndentWriter;
-import sog.util.StringOutputStream;
 
 /**
  * 
@@ -202,9 +202,9 @@ public class TestCaseTest extends Test.Container {
 		private void run() { this.container.evalSubjectMethod( this.testCase, "run", null ); }
 		
 		private String print() {
-			StringOutputStream sos = new StringOutputStream();
-			this.testCase.print( new IndentWriter( sos ) );
-			return sos.toString();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			this.testCase.print( new IndentWriter( baos ) );
+			return baos.toString();
 		}
 		
 		private void fail( String msg ) { this.container.evalSubjectMethod( this.testCase, "fail", null, msg ); }
