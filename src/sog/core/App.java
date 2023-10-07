@@ -586,21 +586,20 @@ public class App implements Runnable {
 	 */
 	@Test.Decl( "Prints an empty line for null or empty message" )
 	@Test.Decl( "Returns the App instance to allow chaining" )
-	public App message( String s ) {
-		String msg = (s == null || s.isEmpty()) ? "" : (">>> " + s);
+	public App msg( Object obj ) {
+		String msg = (obj == null ) ? "" : (">>> " + Strings.toString( obj ));
 		System.out.println( msg );
 		return this;
 	}
 	
-
 	/**
 	 * Print a message signaling the termination of the application.
 	 */
 	@Test.Decl( "Includes the exceution count" )
 	public void done() {
-		this.message( "" );
-		this.message( "Execution #" + this.getExecutionCount() );
-		this.message( "Done!" );
+		this.msg( null );
+		this.msg( "Execution #" + this.getExecutionCount() );
+		this.msg( "Done!" );
 	}
 	
 
