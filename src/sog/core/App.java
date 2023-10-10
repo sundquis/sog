@@ -587,8 +587,12 @@ public class App implements Runnable {
 	@Test.Decl( "Prints an empty line for null or empty message" )
 	@Test.Decl( "Returns the App instance to allow chaining" )
 	public App msg( Object obj ) {
-		String msg = (obj == null ) ? "" : (">>> " + Strings.toString( obj ));
-		System.out.println( msg );
+		System.out.println( ">>> " + Strings.toString( obj ) );
+		return this;
+	}
+	
+	public App msg() {
+		System.out.println();
 		return this;
 	}
 	
@@ -597,9 +601,9 @@ public class App implements Runnable {
 	 */
 	@Test.Decl( "Includes the exceution count" )
 	public void done() {
-		this.msg( null );
-		this.msg( "Execution #" + this.getExecutionCount() );
-		this.msg( "Done!" );
+		this.msg()
+			.msg( "Execution #" + this.getExecutionCount() )
+			.msg( "Done!" );
 	}
 	
 
