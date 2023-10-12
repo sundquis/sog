@@ -19,11 +19,11 @@
 
 package mciv.server.route.auth;
 
-import java.io.IOException;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
+import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.JSON;
@@ -46,7 +46,7 @@ public class Login extends Route {
 	 *   the handle used to create the user.
 	 * 	
 	 * REQUEST BODY:
-	 *   Request: {
+	 *   Response: {
 	 *     "email": str,
 	 *     "password": str,
 	 *     "handle": str
@@ -77,31 +77,15 @@ public class Login extends Route {
 	public Login() {}
 
 	@Override
-	public void handle( HttpExchange exchange ) throws IOException {
-		String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-
-		if ( exchange.getRequestHeaders().containsKey( "Origin" ) ) {
-			String origin = exchange.getRequestHeaders().getFirst( "Origin" );
-			exchange.getResponseHeaders().add( "Access-Control-Allow-Origin", origin );
-			exchange.getResponseHeaders().add( "Access-Control-Allow-Methods", "POST, GET" );
-			exchange.getResponseHeaders().add( "Access-Control-Allow-Headers", "Content-Type" );
-		}
-		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
-
-		String responseBody = JSON.obj()
+	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+		return Response.build( exchange, JSON.obj()
 			.add( "status", JSON.num( -1 ) )
 			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
 			.add( "error", JSON.arr() )
-			.toString();
-		
-		Log.get().accept( exchange, requestBody, responseBody );
-
-		exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
-		exchange.getResponseBody().write( responseBody.getBytes() );
-		exchange.close();
+			.add( "(REMOVE) Response", JSON.str( requestBody ) ) );
 	}
 
-	
+
 	@Override
 	public String getPath() {
 		return "/auth/login";
@@ -116,6 +100,5 @@ public class Login extends Route {
 	public int getSequence() {
 		return 10;
 	}
-
 
 }

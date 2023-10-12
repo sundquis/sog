@@ -17,92 +17,64 @@
  * Sundquist
  */
 
-package mciv.server.route.auth;
-
-
+package mciv.server.route.admin;
 
 import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.Server;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.JSON;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Register extends Route {
+public class Reload extends Route {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}">${path}</h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Use supplied credentials to create a new user.
-	 *   The required email address is used as the login name.
-	 *   The required password must have at least 8 characters.
-	 *   The required handle is used to identify the user in application messaging.
-	 *   Insert description of potential state transitions.
+	 *   Check for new Routes and register them with the server.
 	 * 	
 	 * REQUEST BODY:
-	 *   Response: {
-	 *     "email": str,
-	 *     "password": str,
-	 *     "handle": str
-	 *   }
+	 *   None.
 	 * 	
 	 * RESPONSE BODY:
-	 *   Response: {
-	 *     "status": int( <values enumerated in mciv.server.route.Codes> ),
-	 *     "data": Data,
-	 *     "error": Error
-	 *   }
-	 * 	
-	 *   Where Data: {
-	 *     "token": str
-	 *   }
-	 * 
-	 *   Where Error: [ str ]
-	 *   When status = 400, error is a stack trace corresponding to a programmatic error.
+	 *   None.
 	 * 
 	 * EXCEPTIONS:
-	 *   Status
-	 *   1: Email address does not parse
-	 *   2: Password does not meet requirements
-	 *   3: User exists
+	 *   None.
 	 * 
 	 * </pre>
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Register() {}
+	public Reload() {
+	}
 
-	
 	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
-		return Response.build( exchange, JSON.obj()
-			.add( "status", JSON.num( -1 ) )
-			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
-			.add( "error", JSON.arr() )
-			.add( "(REMOVE) Response", JSON.str( requestBody ) ) );
+		return Response.build( "Reloading routes...", () -> Server.get().load() );
 	}
 
 	@Override
-	public String getPath() {
-		return "/auth/register";
-	}
-	
-	@Override
 	public Category getCategory() {
-		return Route.Category.Authorization;
+		return Category.Administration;
 	}
 
 	@Override
 	public int getSequence() {
-		return 20;
+		return 50;
+	}
+
+	@Override
+	public String getPath() {
+		return "/admin/reload";
 	}
 
 }

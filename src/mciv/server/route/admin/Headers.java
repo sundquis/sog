@@ -17,92 +17,95 @@
  * Sundquist
  */
 
-package mciv.server.route.auth;
+package mciv.server.route.admin;
 
-
-
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.Log;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.JSON;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Register extends Route {
+public class Headers extends Route {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}">${path}</h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Use supplied credentials to create a new user.
-	 *   The required email address is used as the login name.
-	 *   The required password must have at least 8 characters.
-	 *   The required handle is used to identify the user in application messaging.
-	 *   Insert description of potential state transitions.
+	 *   Retrieve header information from recent transactions.
 	 * 	
 	 * REQUEST BODY:
-	 *   Response: {
-	 *     "email": str,
-	 *     "password": str,
-	 *     "handle": str
+	 *   Request: {
+	 *     n: int
 	 *   }
+	 *   
+	 *   Or supply n=count as a URL parameter.
 	 * 	
 	 * RESPONSE BODY:
-	 *   Response: {
-	 *     "status": int( <values enumerated in mciv.server.route.Codes> ),
-	 *     "data": Data,
-	 *     "error": Error
-	 *   }
-	 * 	
-	 *   Where Data: {
-	 *     "token": str
-	 *   }
-	 * 
-	 *   Where Error: [ str ]
-	 *   When status = 400, error is a stack trace corresponding to a programmatic error.
+	 *   None.
 	 * 
 	 * EXCEPTIONS:
-	 *   Status
-	 *   1: Email address does not parse
-	 *   2: Password does not meet requirements
-	 *   3: User exists
+	 *   None.
 	 * 
 	 * </pre>
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Register() {}
+	public Headers() {
+	}
 
-	
 	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
-		return Response.build( exchange, JSON.obj()
-			.add( "status", JSON.num( -1 ) )
-			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
-			.add( "error", JSON.arr() )
-			.add( "(REMOVE) Response", JSON.str( requestBody ) ) );
+		int count = 0;
+		try {
+			count = Integer.valueOf( params.get( "n" ) );
+		} catch ( Exception ex ) {
+			count = 10;
+		}
+		
+		// PRE <html>
+		// PRE <head><meta charset="utf-8"></head>
+		// PRE <body>
+		// PRE <H1>Headers</h1>
+		// PRE <pre>
+		
+		// POST </pre>
+		// POST </body>
+		// POST </html>
+		
+		StringWriter sw = new StringWriter();
+		final PrintWriter out = new PrintWriter( sw );
+		
+		this.getCommentedLines( "PRE" ).forEach( out::println );
+		Log.get().getHeaders( count ).forEach( out::println );
+		this.getCommentedLines( "POST" ).forEach( out::println );
+		
+		return Response.build( sw.toString() );
 	}
 
 	@Override
-	public String getPath() {
-		return "/auth/register";
-	}
-	
-	@Override
 	public Category getCategory() {
-		return Route.Category.Authorization;
+		return Category.Administration;
 	}
 
 	@Override
 	public int getSequence() {
-		return 20;
+		return 35;
 	}
+
+	@Override
+	public String getPath() {
+		return "/admin/hdrs";
+	}
+
 
 }

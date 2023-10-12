@@ -19,17 +19,19 @@
 
 package mciv.server.route.admin;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
 import mciv.server.route.Registrar;
+import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
+import sog.util.Macro;
 
 /**
  * 
@@ -60,39 +62,34 @@ public class RouteInfo extends Route {
 	public RouteInfo() {}
 
 	@Override
-	public void handle( HttpExchange exchange ) throws IOException {
-		String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-
+	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
 		StringWriter sw = new StringWriter();
 		final PrintWriter out = new PrintWriter( sw );
 		
-		// PRE	<html>
-		// PRE	<head><meta charset="utf-8"></head>
-		// PRE	<body>
-		// PRE	<h1>Routes</h1>
-		// PRE	<ul>
-		this.getCommentedLines( "PRE" ).forEach( out::println );
+		// HTML <html>
+		// HTML <head><meta charset="utf-8"></head>
+		// HTML <body>
+		// HTML <H1>Routes</h1>
+		// HTML <ul>
+		// HTML ${route links}
+		// HTML </ul>
+		// HTML ${route apis}
+		// HTML </body>
+		// HTML </html>
 		
 		Function<Route, String> map = (r) -> "<li><a href='#" + r.getPath() + "'>" + r.getPath() + "</a></li>";
-		Registrar.get().getRoutes().map( map ).forEach( out::println );
-		out.println( "</ul>" );
+		Macro mapper = new Macro()
+			.expand( "route links", 
+				Registrar.get().getRoutes().map( map ).collect( Collectors.toList() ) )
+			.expand( "route apis", 
+				Registrar.get().getRoutes().flatMap( Route::getDocunmentation ).collect( Collectors.toList() ) );
 		
-		Registrar.get().getRoutes().flatMap( Route::getDocunmentation ).forEach( out::println );
+		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
 
-		// POST	</body>
-		// POST	</html>
-		this.getCommentedLines( "POST" ).forEach( out::println );
-		
-		String responseBody = sw.toString();
-		
-		Log.get().accept( exchange, requestBody, responseBody );
-
-		exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
-		exchange.getResponseBody().write( responseBody.getBytes() );
-		exchange.close();
+		return Response.build( sw.toString() );
 	}
 
-		
+
 	@Override
 	public String getPath() {
 		return "/admin/routes";
@@ -107,6 +104,6 @@ public class RouteInfo extends Route {
 	public int getSequence() {
 		return 0;
 	}
-
-
+	
+	
 }

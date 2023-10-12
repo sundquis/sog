@@ -107,18 +107,18 @@ public interface Queue<E> extends AutoCloseable {
 	public boolean isTerminated();
 
 	/**
-	 * Request that this queue be closed, blocking further input.
+	 * Response that this queue be closed, blocking further input.
 	 */
 	public void close();
 
 	/**
-	 * Request that this queue be terminated. After this call the queue ignores calls 
+	 * Response that this queue be terminated. After this call the queue ignores calls 
 	 * to get, put, and close.
 	 */
 	public void terminate();
 	
 	/**
-	 * Request to add a non-null element to the queue.
+	 * Response to add a non-null element to the queue.
 	 * The behavior depends on the state of the queue and capacity:
 	 *
 	 * OPEN and not-full: accept the given element

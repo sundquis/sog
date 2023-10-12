@@ -21,12 +21,14 @@ package mciv.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 
 import mciv.server.route.Registrar;
+import sog.core.AppRuntime;
 import sog.core.Test;
 
 /**
@@ -37,7 +39,11 @@ public class Server {
 	
 	private static final int MCIV_PORT = 1104;
 
-	private static Server server;
+	private static final Server INSTANCE = new Server();
+	
+	public static Server get() {
+		return Server.INSTANCE;
+	}
 	
 	
 	
@@ -45,27 +51,55 @@ public class Server {
 	
 	private final ExecutorService exec;
 	
+	private final Date started;
 	
-	private Server() throws IOException {
-		this.httpServer = HttpServer.create( new InetSocketAddress( MCIV_PORT ), 0 );
+	
+	private Server() {
+		try {
+			this.httpServer = HttpServer.create();
+		} catch ( IOException e ) {
+			throw new AppRuntime( e );
+		}
 		this.exec = Executors.newCachedThreadPool();
+		this.started = new Date();
+	}
+	
+	public String getStartTime() {
+		return this.started.toString();
+	}
+	
+	public String getUpTime() {
+		return (int) (new Date().getTime() - this.started.getTime()) / 1000 / 60 / 60 + " hours.";
+	}
+	
+	
+	public void bind() throws IOException {
+		this.httpServer.bind( new InetSocketAddress( MCIV_PORT ), 0 );
 		this.httpServer.setExecutor( exec );
-		
-		Registrar.get().getRoutes().forEach( r -> httpServer.createContext( r.getPath(), r ) );
+	}
+	
+	public void load() {
+		Registrar.get().getNewRoutes()
+			.forEach( r -> { this.httpServer.createContext( r.getPath(), r ); } );
+	}
+	
+	public void start() {
 		this.httpServer.start();
 	}
 
 	
-	public static void stop( int delay ) {
-		Server.server.exec.shutdown();
-		Server.server.exec.shutdownNow();
-		Server.server.httpServer.stop( delay );
+	public void stop( int delay ) {
+		this.exec.shutdown();
+		this.exec.shutdownNow();
+		this.httpServer.stop( delay );
 	}
 
 	
 	public static void main( String[] args ) {
 		try {
-			Server.server = new Server();
+			Server.get().bind();
+			Server.get().load();
+			Server.get().start();
 		} catch ( IOException e ) {
 			e.printStackTrace();
 		}

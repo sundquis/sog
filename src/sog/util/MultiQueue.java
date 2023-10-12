@@ -92,7 +92,7 @@ public class MultiQueue<E> implements Queue<E> {
 	}
 
 	/**
-	 * Request that this queue be closed, blocking further input.
+	 * Response that this queue be closed, blocking further input.
 	 */
 	@Override
 	@Test.Decl( "Can close if open" )
@@ -103,7 +103,7 @@ public class MultiQueue<E> implements Queue<E> {
 	}
 
 	/**
-	 * Request that this queue be terminated. After this call the queue ignores calls 
+	 * Response that this queue be terminated. After this call the queue ignores calls 
 	 * to get, put, and close.
 	 */
 	@Override
@@ -115,7 +115,7 @@ public class MultiQueue<E> implements Queue<E> {
 	}
 	
 	/**
-	 * Request to add a non-null element to the queue.
+	 * Response to add a non-null element to the queue.
 	 *
 	 * @param elt
 	 * 		The non-null element to add to the queue.

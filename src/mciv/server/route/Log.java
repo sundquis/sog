@@ -19,15 +19,20 @@
 
 package mciv.server.route;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import sog.core.App;
+import sog.core.Strings;
 import sog.core.Test;
+import sog.util.Commented;
+import sog.util.Macro;
 
 /**
  * 
@@ -35,39 +40,72 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class Log {
 	
+	private static final int MAX_COUNT = 100;
+	
 	private static final Log INSTANCE = new Log();
 	
 	public static Log get() {
 		return Log.INSTANCE;
 	}
 	
-	public static class Entry {
-		
-	}
+	
+	private final LinkedList<List<String>> exchangeEntries;
 	
 	private Log() {
+		this.exchangeEntries = new LinkedList<>();
 	}
 	
-	public void accept( HttpExchange exchange, String requestBody, String responseBody ) {
-		// FIXME
-		App.get()
-			.msg()
-			.msg()
-			.msg( new Date() )
-			.msg( "URI: " + exchange.getRequestURI() )
-			.msg( "REMOTE: " + exchange.getRemoteAddress() )
-			.msg( "METHOD: " + exchange.getRequestMethod() )
-			.msg( "HEADERS:" );
-		
-		Map<String, List<String>> hdrs = exchange.getRequestHeaders();
-		for ( Map.Entry<String, List<String>> hdr : hdrs.entrySet() ) {
-			App.get().msg( "\t" + hdr.getKey() + ": " + hdr.getValue().stream().collect( Collectors.joining( ", " ) ) );
+	public synchronized Stream<String> getHeaders( int count ) {
+		return this.exchangeEntries.stream().limit( count ).flatMap( List::stream );
+	}
+
+	// ENTRY <hr>
+	// ENTRY ${Date}
+	// ENTRY   URI: ${URI}
+	// ENTRY   REMOTE: ${Remote}
+	// ENTRY   METHOD: ${Method}
+	// ENTRY   PARAMS: 
+	// ENTRY     ${Params}
+	// ENTRY   REQUEST HEADERS: 
+	// ENTRY     ${Request Headers}
+	// ENTRY   RESPONSE HEADERS:
+	// ENTRY     ${Response Headers}
+	// ENTRY   REQUEST BODY: ${Request Body}
+	// ENTRY   RESPONSE BODY: ${Response Body}
+	// ENTRY   
+	public synchronized void accept( HttpExchange exchange, String requestBody, String responseBody, String params ) {
+		Macro mapper = new Macro()
+			.expand( "Date", new Date().toString() )
+			.expand( "URI", exchange.getRequestURI().toString() )
+			.expand( "Remote", exchange.getRemoteAddress().toString() )
+			.expand( "Method", exchange.getRequestMethod() )
+			.expand( "Params", params )
+			.expand( "Request Headers", 
+				exchange.getRequestHeaders().entrySet().stream().map( Map.Entry.class::cast )
+					.map( this::toString ).collect( Collectors.toList() ) )
+			.expand( "Response Headers", 
+				exchange.getResponseHeaders().entrySet().stream().map( Map.Entry.class::cast )
+					.map( this::toString ).collect( Collectors.toList() ) )
+			.expand( "Request Body", 
+				requestBody.length() > 200 ? (requestBody.length() + " charcaters.") : requestBody )
+			.expand( "Response Body", 
+				responseBody.length() > 200 ? (responseBody.length() + " charcaters.") : responseBody );
+
+		try {
+			this.exchangeEntries.addFirst(
+				new Commented( Log.class ).getCommentedLines( "ENTRY" )
+				.flatMap( mapper ).collect(  Collectors.toList() ) );
+		} catch ( IOException ex ) {
+			Error.get().accept( ex );
 		}
 		
-		App.get()
-			.msg( "REQUEST BODY LENGTH: " + requestBody.length() )
-			.msg( "RESPONSE BODY LENGTH: " + responseBody.length() );
+		while ( this.exchangeEntries.size() > Log.MAX_COUNT ) {
+			this.exchangeEntries.removeLast();
+		}
+	}
 	
+	public String toString( Map.Entry<String, Object> entry ) {
+		return entry.getKey() + ": " + Strings.toString( entry.getValue() );
 	}
 
 

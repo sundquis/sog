@@ -19,12 +19,12 @@
 
 package mciv.server.route.admin;
 
-import java.io.IOException;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.Server;
-import mciv.server.route.Log;
+import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 
@@ -58,22 +58,10 @@ public class Shutdown extends Route {
 	public Shutdown() {}
 
 	@Override
-	public void handle( HttpExchange exchange ) throws IOException {
-		String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-
-		String responseBody = "Shutting down the server...";
-		
-		Log.get().accept( exchange, requestBody, responseBody );
-
-		exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
-		exchange.getResponseBody().write( responseBody.getBytes() );
-		exchange.close();
-		
-		Server.stop( 5 );
+	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+		return Response.build( "Shutting down the server...", () -> Server.get().stop( 5 ) );
 	}
 
-
-	
 
 	@Override
 	public String getPath() {
@@ -89,6 +77,5 @@ public class Shutdown extends Route {
 	public int getSequence() {
 		return 100;
 	}
-
 
 }

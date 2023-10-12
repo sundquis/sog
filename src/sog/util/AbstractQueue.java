@@ -99,7 +99,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	}
 
 	/**
-	 * Request to add a non-null element to the queue.
+	 * Response to add a non-null element to the queue.
 	 * The behavior depends on the state of the queue and capacity:
 	 *
 	 * OPEN and not-full: accept the given element
@@ -217,7 +217,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	}
 
 	/**
-	 * Request that this queue be closed, blocking further input. This call
+	 * Response that this queue be closed, blocking further input. This call
 	 * has no effect unless the queue is open.
 	 */
 	@Test.Decl( "Can close if open" )
@@ -229,7 +229,7 @@ public abstract class AbstractQueue<E> implements Queue<E> {
 	}
 
 	/**
-	 * Request that this queue be terminated. This causes the current contents
+	 * Response that this queue be terminated. This causes the current contents
 	 * to be discarded. After this call the queue ignores calls to get, put, and
 	 * close.
 	 */

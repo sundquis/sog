@@ -20,10 +20,18 @@
 package mciv.server.route;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import sog.core.Strings;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
@@ -62,7 +70,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 *   Insert description of potential state transitions.
 	 * 	
 	 * REQUEST BODY:
-	 *   Request: {
+	 *   Response: {
 	 *   }
 	 * 	
 	 * RESPONSE BODY:
@@ -90,9 +98,39 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	
 	private boolean logging;
 	
+	private int executionCount;
+	
+	private int errorCount;
+	
+	private final static Map<String, Integer> remoteCounts = new TreeMap<>();
+	
+	private final static Comparator<Map.Entry<String, Integer>> remoteComparator = new Comparator<>() {
+		@Override
+		public int compare( Entry<String, Integer> o1, Entry<String, Integer> o2 ) {
+			int count = o2.getValue() - o1.getValue();
+			return count == 0 ? o1.getKey().compareTo( o2.getKey() ) : count;
+		}
+		
+	};
+	
 	protected Route() {
 		this.logging = true;
+		this.executionCount = 0;
+		this.errorCount = 0;
 	}
+
+	/**
+	 * Perform all necessary state transitions and prepare the response body.
+	 * If response is stringified JSON, the implementation must set the header 
+	 *   "Content-Type: application/json"
+	 *   
+	 * @param exchange
+	 * @param requestBody
+	 * @param params TODO
+	 * @return
+	 * @throws Exception
+	 */
+	public abstract Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception;
 	
 	/* Corresponds to turn phase and package. */
 	public abstract Category getCategory();
@@ -104,6 +142,80 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	public abstract String getPath();
 		
 			
+	@Override
+	public void handle( HttpExchange exchange ) {
+		this.executionCount++;
+		this.remoteVisit( exchange.getRemoteAddress().getAddress().toString() );
+		
+		Response response = null;
+		try {
+			String requestBody = new String( exchange.getRequestBody().readAllBytes() );
+			Map<String, String> params = this.getParams( exchange.getRequestURI().getQuery() );
+			
+			response = this.getResponse( exchange, requestBody, params );
+			String responseBody = response.getBody();
+			
+			if ( exchange.getRequestHeaders().containsKey( "Origin" ) ) {
+				String origin = exchange.getRequestHeaders().getFirst( "Origin" );
+				exchange.getResponseHeaders().add( "Access-Control-Allow-Origin", origin );
+				exchange.getResponseHeaders().add( "Access-Control-Allow-Methods", "POST, GET" );
+				exchange.getResponseHeaders().add( "Access-Control-Allow-Headers", "Content-Type" );
+			}
+			
+			if ( this.isLogging() ) {
+				Log.get().accept( exchange, requestBody, responseBody, Strings.toString( params ) );
+			}
+
+			exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
+			exchange.getResponseBody().write( responseBody.getBytes() );
+		} catch ( Exception ex ) {
+			this.errorCount++;
+			Error.get().accept( ex );
+		} finally {
+			exchange.close();
+			if ( response.afterClose() != null ) {
+				response.afterClose().exec();
+			}
+		}
+	}
+	
+	/* 
+	 * Only handles case with simple queries of the form 
+	 *     ?key1=value1&key2=value2&...
+	 *     
+	 * Keys and values can be URL-encoded.
+	 */
+	public Map<String, String> getParams( String query ) {
+		Map<String, String> params = new TreeMap<>();
+		
+		if ( query != null ) {
+			String[] args = query.split( "&" );
+			for ( String arg : args ) {
+				String[] pair = arg.split( "=" );
+				if ( pair.length == 1 ) {
+					params.put( pair[0], "true" );
+				} else if ( pair.length == 2 ) {
+					params.put( pair[0], pair[1] );
+				}
+			}
+		}
+		
+		return params;
+	}
+	
+	public void remoteVisit( String remote ) {
+		Integer count = Route.remoteCounts.get( remote );
+		int newCount = count == null ? 1 : count.intValue() + 1;
+		Route.remoteCounts.put( remote, newCount );
+	}
+	
+	public Stream<Map.Entry<String, Integer>> getRemoteEntries() {
+		SortedSet<Map.Entry<String, Integer>> entries = new TreeSet<>( Route.remoteComparator );
+		entries.addAll( Route.remoteCounts.entrySet() );
+		return entries.stream();
+	}
+
+	
 	public Stream<String> getDocunmentation() {
 		return this.getTaggedLines( "API" ).flatMap(  new Macro().expand( "path", this.getPath() ) );
 	}
@@ -112,7 +224,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		try {
 			return new Commented( this.getClass() ).getTaggedBlock( tag );
 		} catch ( IOException e ) {
-			e.printStackTrace();
+			Error.get().accept( e );
 			return Stream.of();
 		}
 	}
@@ -121,7 +233,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		try {
 			return new Commented( this.getClass() ).getCommentedLines( label );
 		} catch ( IOException e ) {
-			e.printStackTrace();
+			Error.get().accept( e );
 			return Stream.of();
 		}
 	}
@@ -137,12 +249,22 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	@Override
 	public int compareTo( Route other ) {
 		int cat = this.getCategory().compareTo( other.getCategory() );
-		return cat == 0 ? this.getSequence() - other.getSequence() : cat;
+		int seq = this.getSequence() - other.getSequence();
+		int path = this.getPath().compareTo( other.getPath() );
+		return cat != 0 ? cat : seq != 0 ? seq : path;
 	}
 	
 	@Override
 	public String toString() {
 		return this.getPath();
+	}
+	
+	public int getExecutionCount() {
+		return this.executionCount;
+	}
+	
+	public int getErrorCount() {
+		return this.errorCount;
 	}
 	
 }

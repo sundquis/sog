@@ -19,13 +19,13 @@
 
 package mciv.server.route.auth;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
+import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 
@@ -58,29 +58,17 @@ public class Home extends Route {
 	public Home() {}
 
 	@Override
-	public void handle( HttpExchange exchange ) throws IOException {
-		String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-
+	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
 		// FIXME
 		Path p = Path.of( "/", "home", "sundquis", "book", "MegaEmpires", "static", "bundle.js" );
 
 		String pre = "<html><head><meta charset='utf-8'></head><body><div id='root'></div><script>";
-		String content = "";
-		try {
-			content = new String( Files.readAllBytes( p ) );
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
+		String content = new String( Files.readAllBytes( p ) );
 		String post = "</script></body></html>";
 
-		String responseBody = pre + content + post;
-		
-		Log.get().accept( exchange, requestBody, responseBody );
-
-		exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
-		exchange.getResponseBody().write( responseBody.getBytes() );
-		exchange.close();
+		return Response.build( pre + content + post );
 	}
+
 
 	@Override
 	public Category getCategory() {
@@ -96,6 +84,5 @@ public class Home extends Route {
 	public String getPath() {
 		return "/auth/home";
 	}
-
 
 }
