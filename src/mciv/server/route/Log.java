@@ -71,9 +71,9 @@ public class Log {
 	// ENTRY   RESPONSE HEADERS:
 	// ENTRY     ${Response Headers}
 	// ENTRY   REQUEST BODY: ${Request Body}
-	// ENTRY   RESPONSE BODY: ${Response Body}
+	// ENTRY   RESPONSE LENGTH: ${Response Length} bytes.
 	// ENTRY   
-	public synchronized void accept( HttpExchange exchange, String requestBody, String responseBody, String params ) {
+	public synchronized void accept( HttpExchange exchange, String requestBody, long responseLength, String params ) {
 		Macro mapper = new Macro()
 			.expand( "Date", new Date().toString() )
 			.expand( "URI", exchange.getRequestURI().toString() )
@@ -88,8 +88,7 @@ public class Log {
 					.map( this::toString ).collect( Collectors.toList() ) )
 			.expand( "Request Body", 
 				requestBody.length() > 200 ? (requestBody.length() + " charcaters.") : requestBody )
-			.expand( "Response Body", 
-				responseBody.length() > 200 ? (responseBody.length() + " charcaters.") : responseBody );
+			.expand( "Response Length", "" + responseLength );
 
 		try {
 			this.exchangeEntries.addFirst(

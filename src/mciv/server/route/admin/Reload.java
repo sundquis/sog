@@ -19,14 +19,13 @@
 
 package mciv.server.route.admin;
 
-import java.util.Map;
-
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.Server;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
+import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -36,7 +35,7 @@ public class Reload extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Check for new Routes and register them with the server.
@@ -57,8 +56,8 @@ public class Reload extends Route {
 	public Reload() {
 	}
 
-	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+	@Override 
+	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
 		return Response.build( "Reloading routes...", () -> Server.get().load() );
 	}
 

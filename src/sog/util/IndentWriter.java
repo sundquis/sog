@@ -22,6 +22,7 @@ package sog.util;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -36,7 +37,7 @@ import sog.core.Test;
  *
  */
 @Test.Subject( "test." )
-public class IndentWriter {
+public class IndentWriter implements AutoCloseable {
 
 	private final PrintWriter out;
 	private final String indent;
@@ -46,7 +47,7 @@ public class IndentWriter {
 	@Test.Decl( "Throws assertion error for null indent" )
 	@Test.Decl( "Indent can be empty" )
 	public IndentWriter( OutputStream os, String indent ) {
-		this.out = new PrintWriter( Assert.nonNull( os ), true );
+		this.out = new PrintWriter( Assert.nonNull( os ), true, Charset.forName( "UTF-8" ) );
 		this.indent = Assert.nonNull( indent );
 		this.prefix = new ArrayDeque<>();
 		this.prefix.push( "" );
@@ -162,11 +163,11 @@ public class IndentWriter {
 	
 	@Test.Decl( "Return this IndentWriter to allow chaining" )
 	@Test.Decl( "Write fails after close" )
-	public IndentWriter close() {
+	@Override
+	public void close() {
 		if ( this.out != null ) {
 			this.out.close();
 		}
-		return this;
 	}
 	
 	

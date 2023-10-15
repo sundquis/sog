@@ -379,8 +379,8 @@ public class XMLHandlerTest extends Test.Container {
     	tc.addMessage( "Should see parsing events, including:" );
     	tc.addMessage( "Parser set Locator" );
     	tc.addMessage( "Document started" );
-    	tc.addMessage( "Element started" );
-    	tc.addMessage( "Element complete" );
+    	tc.addMessage( "JElement started" );
+    	tc.addMessage( "JElement complete" );
     	tc.addMessage( "Document complete" );
     	handler.showContentEvents().parse();
     	tc.assertFail( "Verify messages" );
@@ -405,7 +405,7 @@ public class XMLHandlerTest extends Test.Container {
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see declaration events, including:" );
-    	tc.addMessage( "Element declaration" );
+    	tc.addMessage( "JElement declaration" );
     	tc.addMessage( "Name: root" );
     	tc.addMessage( "Model: EMPTY" );
     	handler.showDeclarationEvents().parse();
@@ -438,7 +438,7 @@ public class XMLHandlerTest extends Test.Container {
     	// TOGGLE
     	/* */ tc.expectError( AppRuntime.class ); handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see error events, including:" );
-    	tc.addMessage( "SAX Error: org.xml.sax.SAXParseException; ... Element type \"A\" must be declared." );
+    	tc.addMessage( "SAX Error: org.xml.sax.SAXParseException; ... JElement type \"A\" must be declared." );
     	tc.addMessage( "SAX Fatal Error: org.xml.sax.SAXParseException; ... The element type \"root\" must be terminated by the matching end-tag \"</root>\"." );
     	handler.showErrorEvents().parse();
     	tc.assertFail( "Verify messages" );
@@ -640,7 +640,7 @@ public class XMLHandlerTest extends Test.Container {
     
     @Test.Impl( 
     	member = "method: void XMLHandler.attributeDecl(String, String, String, String, String)", 
-    	description = "Element name is not empty" 
+    	description = "JElement name is not empty" 
     )
     public void tm_0879EB099( Test.Case tc ) {
     	VAR<String> theElementName = new VAR<>();
@@ -664,7 +664,7 @@ public class XMLHandlerTest extends Test.Container {
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
-    	tc.addMessage( "Element declaration" );
+    	tc.addMessage( "JElement declaration" );
     	tc.addMessage( "Attribute declaration" );
     	handler.showDeclarationEvents().parse();
     	tc.assertFail( "Verify messages" );
@@ -825,7 +825,7 @@ public class XMLHandlerTest extends Test.Container {
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
     	tc.addMessage( "Character data found" );
-    	tc.addMessage( "Element complete" );
+    	tc.addMessage( "JElement complete" );
     	handler.showContentEvents().parse();
     	tc.assertFail( "Verify messages" );
     	/* */
@@ -938,7 +938,7 @@ public class XMLHandlerTest extends Test.Container {
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
-    	tc.addMessage( "Element declaration" );
+    	tc.addMessage( "JElement declaration" );
     	tc.addMessage( "Name: root" );
     	tc.addMessage( "Model: EMPTY" );
     	handler.showDeclarationEvents().parse();
@@ -1220,7 +1220,7 @@ public class XMLHandlerTest extends Test.Container {
 
     
     
-    /* <Element>
+    /* <JElement>
      *	${ xml }
      *	<!DOCTYPE A [
      *		<!ELEMENT	A	(B)>
@@ -1240,7 +1240,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_0DD1B1E73( Test.Case tc ) {
     	List<String> closed = new ArrayList<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String name ) {
     			super.endElement( name );
     			closed.add( name );
@@ -1257,7 +1257,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_03EF39A0D( Test.Case tc ) {
     	VAR<String> theLocation = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String name ) {
     			super.endElement( name );
     			if ( theLocation.get() == null ) {
@@ -1276,7 +1276,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_01BE8000E( Test.Case tc ) {
     	VAR<String> theName = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String name ) {
     			super.endElement( name );
     			theName.set( name );
@@ -1291,13 +1291,13 @@ public class XMLHandlerTest extends Test.Container {
     	description = "Feedback provided if showContentEvents() has been called" 
     )
     public void tm_0F41011F1( Test.Case tc ) {
-    	XMLHandler handler = new XMLHandler( this.getLines( "Element" ) );
+    	XMLHandler handler = new XMLHandler( this.getLines( "JElement" ) );
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
-    	tc.addMessage( "Element complete: C" );
-    	tc.addMessage( "Element complete: B" );
-    	tc.addMessage( "Element complete: A" );
+    	tc.addMessage( "JElement complete: C" );
+    	tc.addMessage( "JElement complete: B" );
+    	tc.addMessage( "JElement complete: A" );
     	handler.showContentEvents().parse();
     	tc.assertFail( "Check messages above." );
     	/* */
@@ -1310,7 +1310,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_0A1159725( Test.Case tc ) {
     	VAR<String> theLocalName = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String uri, String localName, String qName ) throws SAXException {
     			// Don't want super here.
     			theLocalName.set( localName );
@@ -1327,7 +1327,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_026D3575F( Test.Case tc ) {
     	VAR<String> theQName = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String uri, String localName, String qName ) throws SAXException {
     			// Don't want super here.
     			theQName.set( qName );
@@ -1344,7 +1344,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_06A6DB40F( Test.Case tc ) {
     	VAR<String> theUri = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void endElement( String uri, String localName, String qName ) throws SAXException {
     			// Don't want super here.
     			theUri.set( uri );
@@ -2210,13 +2210,13 @@ public class XMLHandlerTest extends Test.Container {
     	description = "Feedback provided if showContentEvents() has been called" 
     )
     public void tm_06CCE369A( Test.Case tc ) {
-    	XMLHandler handler = new XMLHandler( this.getLines( "Element" ) );
+    	XMLHandler handler = new XMLHandler( this.getLines( "JElement" ) );
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
-    	tc.addMessage( "Element started: A" );
-    	tc.addMessage( "Element started: B" );
-    	tc.addMessage( "Element started: C" );
+    	tc.addMessage( "JElement started: A" );
+    	tc.addMessage( "JElement started: B" );
+    	tc.addMessage( "JElement started: C" );
     	handler.showContentEvents().parse();
     	tc.assertFail( "See messages above" );
     	/* */
@@ -2229,7 +2229,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_0911D7840( Test.Case tc ) {
     	VAR<String> theLocation = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void startElement( String name, Map<String, String> attributes ) {
     			super.startElement( name, attributes );
     			theLocation.set( this.getLocation().toString() );
@@ -2246,7 +2246,7 @@ public class XMLHandlerTest extends Test.Container {
     public void tm_01BE2CDFB( Test.Case tc ) {
     	VAR<String> theName = new VAR<>();
     	
-    	new XMLHandler( this.getLines( "Element" ) ) {
+    	new XMLHandler( this.getLines( "JElement" ) ) {
     		@Override public void startElement( String name, Map<String, String> attributes ) {
     			super.startElement( name, attributes );
     			theName.set( name );
@@ -2363,7 +2363,7 @@ public class XMLHandlerTest extends Test.Container {
     	// TOGGLE
     	/* */ handler.parse(); tc.assertPass(); /*
     	tc.addMessage( "Should see parsing events including:" );
-    	tc.addMessage( "Element started: root" );
+    	tc.addMessage( "JElement started: root" );
     	tc.addMessage( "Local name:" );
     	tc.addMessage( "URI:" );
     	tc.addMessage( "Has attrubutes: true" );

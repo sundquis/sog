@@ -17,40 +17,33 @@
  * Sundquist
  */
 
-package mciv.server.route.admin;
+package mciv.server.route.auth;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.nio.file.Path;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
-import mciv.server.route.Error;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.LocalDir;
 import sog.core.Test;
-import sog.util.json.JSON.JElement;
 import sog.util.json.JSON.JObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Headers extends Route {
+public class Static  extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}/index.html">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Retrieve header information from recent transactions.
+	 *   Retrieve asset from the /static directory.
 	 * 	
 	 * REQUEST BODY:
-	 *   Request: {
-	 *     : int
-	 *   }
-	 *   
-	 *   Or supply n=count as a URL parameter.
+	 *   None.
 	 * 	
 	 * RESPONSE BODY:
 	 *   None.
@@ -62,54 +55,30 @@ public class Headers extends Route {
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Headers() {
+	public Static() {
 	}
 
-	@Override 
+	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
-		int count = 10;
-		JElement countElt = params.toJavaMap().get( "n" );
-		if ( countElt != null ) {
-			try {
-				count = Integer.parseInt( countElt.toJString().toJavaString() );
-			} catch ( NumberFormatException nfe ) {
-				Error.get().accept( nfe );
-			}
-		}
-		
-		// PRE <html>
-		// PRE <head><meta charset="utf-8"></head>
-		// PRE <body>
-		// PRE <H1>Headers</h1>
-		// PRE <pre>
-		
-		// POST </pre>
-		// POST </body>
-		// POST </html>
-		
-		StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter( sw );
-		
-		this.getCommentedLines( "PRE" ).forEach( out::println );
-		Log.get().getHeaders( count ).forEach( out::println );
-		this.getCommentedLines( "POST" ).forEach( out::println );
-		
-		return Response.build( sw.toString() );
+		String file = exchange.getRequestURI().getPath();
+		Path path = new LocalDir().sub( "ext" ).getDir().resolve( file.replaceAll( "^/", "" ) );
+
+		return Response.build( path );
 	}
 
 	@Override
 	public Category getCategory() {
-		return Category.Administration;
+		return Category.Authorization;
 	}
 
 	@Override
 	public int getSequence() {
-		return 35;
+		return 9;
 	}
 
 	@Override
 	public String getPath() {
-		return "/admin/hdrs";
+		return "/static";
 	}
 
 

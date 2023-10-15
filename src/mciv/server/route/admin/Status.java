@@ -33,6 +33,7 @@ import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.FixedWidth;
 import sog.util.Macro;
+import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class Status extends Route {
 
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Print statistics about the current mciv server instance.
@@ -83,8 +84,8 @@ public class Status extends Route {
 	}
 
 
-	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+	@Override 
+	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
 		StringWriter sw = new StringWriter();
 		final PrintWriter out = new PrintWriter( sw );
 		

@@ -31,10 +31,11 @@ import java.util.stream.Stream;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import sog.core.Strings;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
+import sog.util.json.JSON;
+import sog.util.json.JSON.JObject;
 
 
 /**
@@ -64,7 +65,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Insert description of potential state transitions.
@@ -121,8 +122,6 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 
 	/**
 	 * Perform all necessary state transitions and prepare the response body.
-	 * If response is stringified JSON, the implementation must set the header 
-	 *   "Content-Type: application/json"
 	 *   
 	 * @param exchange
 	 * @param requestBody
@@ -130,7 +129,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception;
+	public abstract Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception;
 	
 	/* Corresponds to turn phase and package. */
 	public abstract Category getCategory();
@@ -150,10 +149,9 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		Response response = null;
 		try {
 			String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-			Map<String, String> params = this.getParams( exchange.getRequestURI().getQuery() );
+			JObject params = this.getParams( exchange.getRequestURI().getQuery() );
 			
 			response = this.getResponse( exchange, requestBody, params );
-			String responseBody = response.getBody();
 			
 			if ( exchange.getRequestHeaders().containsKey( "Origin" ) ) {
 				String origin = exchange.getRequestHeaders().getFirst( "Origin" );
@@ -163,11 +161,11 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 			}
 			
 			if ( this.isLogging() ) {
-				Log.get().accept( exchange, requestBody, responseBody, Strings.toString( params ) );
+				Log.get().accept( exchange, requestBody, response.getLength(), params.toJSON() );
 			}
 
-			exchange.sendResponseHeaders( 200, responseBody.getBytes().length );
-			exchange.getResponseBody().write( responseBody.getBytes() );
+			exchange.sendResponseHeaders( 200, response.getLength() );
+			response.getBody().transferTo( exchange.getResponseBody() );
 		} catch ( Exception ex ) {
 			this.errorCount++;
 			Error.get().accept( ex );
@@ -185,17 +183,19 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 *     
 	 * Keys and values can be URL-encoded.
 	 */
-	public Map<String, String> getParams( String query ) {
-		Map<String, String> params = new TreeMap<>();
+	public JObject getParams( String query ) {
+		JObject params = JSON.obj();
 		
 		if ( query != null ) {
 			String[] args = query.split( "&" );
 			for ( String arg : args ) {
 				String[] pair = arg.split( "=" );
 				if ( pair.length == 1 ) {
-					params.put( pair[0], "true" );
+					params.add( pair[0], JSON.TRUE );
 				} else if ( pair.length == 2 ) {
-					params.put( pair[0], pair[1] );
+					params.add( pair[0], JSON.str( pair[1] ) );
+				} else {
+					params.add( "err", JSON.str( arg ) );
 				}
 			}
 		}
@@ -216,8 +216,10 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	}
 
 	
-	public Stream<String> getDocunmentation() {
-		return this.getTaggedLines( "API" ).flatMap(  new Macro().expand( "path", this.getPath() ) );
+	public Stream<String> getDocunmentation( String host ) {
+		return this.getTaggedLines( "API" ).flatMap(  
+			new Macro().expand( "path", this.getPath() ).expand( "host", host )
+		);
 	}
 	
 	protected Stream<String> getTaggedLines( String tag ) {

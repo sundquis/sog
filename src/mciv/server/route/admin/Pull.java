@@ -19,38 +19,31 @@
 
 package mciv.server.route.admin;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
-import mciv.server.route.Error;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.LocalDir;
 import sog.core.Test;
-import sog.util.json.JSON.JElement;
 import sog.util.json.JSON.JObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Headers extends Route {
+public class Pull extends Route {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Retrieve header information from recent transactions.
+	 *   Pull the current MegaEmpires repo, exposing assets in ./static
 	 * 	
 	 * REQUEST BODY:
-	 *   Request: {
-	 *     : int
-	 *   }
-	 *   
-	 *   Or supply n=count as a URL parameter.
+	 *   None.
 	 * 	
 	 * RESPONSE BODY:
 	 *   None.
@@ -62,39 +55,16 @@ public class Headers extends Route {
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Headers() {
+	public Pull() {
 	}
 
-	@Override 
+	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
-		int count = 10;
-		JElement countElt = params.toJavaMap().get( "n" );
-		if ( countElt != null ) {
-			try {
-				count = Integer.parseInt( countElt.toJString().toJavaString() );
-			} catch ( NumberFormatException nfe ) {
-				Error.get().accept( nfe );
-			}
-		}
+		String cmd = new LocalDir().sub( "tool" ).sub( "bin" ).getFile( "MCIV_PULL", LocalDir.Type.BASH ).toString();
+		Process proc = Runtime.getRuntime().exec( cmd );
+		proc.waitFor( 2, TimeUnit.SECONDS );
 		
-		// PRE <html>
-		// PRE <head><meta charset="utf-8"></head>
-		// PRE <body>
-		// PRE <H1>Headers</h1>
-		// PRE <pre>
-		
-		// POST </pre>
-		// POST </body>
-		// POST </html>
-		
-		StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter( sw );
-		
-		this.getCommentedLines( "PRE" ).forEach( out::println );
-		Log.get().getHeaders( count ).forEach( out::println );
-		this.getCommentedLines( "POST" ).forEach( out::println );
-		
-		return Response.build( sw.toString() );
+		return Response.build( new String( proc.getInputStream().readAllBytes() ) );
 	}
 
 	@Override
@@ -104,13 +74,13 @@ public class Headers extends Route {
 
 	@Override
 	public int getSequence() {
-		return 35;
+		return 210;
 	}
 
 	@Override
 	public String getPath() {
-		return "/admin/hdrs";
+		return "/admin/pull";
 	}
 
-
+	
 }

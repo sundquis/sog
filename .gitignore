@@ -6,6 +6,9 @@
 /html
 /trace
 
+# Extrenally managed resources
+/ext
+
 # May need to include this at some point
 /data
 

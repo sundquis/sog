@@ -19,15 +19,15 @@
 
 package mciv.server.route.auth;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.LocalDir;
 import sog.core.Test;
+import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class Home extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Present the starting page of the application.
@@ -58,15 +58,10 @@ public class Home extends Route {
 	public Home() {}
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
-		// FIXME
-		Path p = Path.of( "/", "home", "sundquis", "book", "MegaEmpires", "static", "bundle.js" );
+	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+		Path path = new LocalDir().sub( "ext" ).sub( "static" ).getFile( "index", LocalDir.Type.HTML );
 
-		String pre = "<html><head><meta charset='utf-8'></head><body><div id='root'></div><script>";
-		String content = new String( Files.readAllBytes( p ) );
-		String post = "</script></body></html>";
-
-		return Response.build( pre + content + post );
+		return Response.build( path );
 	}
 
 

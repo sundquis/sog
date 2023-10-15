@@ -21,7 +21,6 @@ package mciv.server.route.admin;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,6 +31,7 @@ import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.Macro;
+import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class RouteInfo extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Display information about all registered routes.
@@ -61,11 +61,11 @@ public class RouteInfo extends Route {
 	 */
 	public RouteInfo() {}
 
-	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+	@Override 
+	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
 		StringWriter sw = new StringWriter();
 		final PrintWriter out = new PrintWriter( sw );
-		
+
 		// HTML <html>
 		// HTML <head><meta charset="utf-8"></head>
 		// HTML <body>
@@ -77,12 +77,13 @@ public class RouteInfo extends Route {
 		// HTML </body>
 		// HTML </html>
 		
+		final String host = exchange.getLocalAddress().toString();
 		Function<Route, String> map = (r) -> "<li><a href='#" + r.getPath() + "'>" + r.getPath() + "</a></li>";
 		Macro mapper = new Macro()
 			.expand( "route links", 
 				Registrar.get().getRoutes().map( map ).collect( Collectors.toList() ) )
 			.expand( "route apis", 
-				Registrar.get().getRoutes().flatMap( Route::getDocunmentation ).collect( Collectors.toList() ) );
+				Registrar.get().getRoutes().flatMap( r -> r.getDocunmentation( host ) ).collect( Collectors.toList() ) );
 		
 		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
 

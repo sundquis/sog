@@ -21,14 +21,13 @@ package mciv.server.route.auth;
 
 
 
-import java.util.Map;
-
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.JSON;
+import sog.util.json.JSON;
+import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -38,7 +37,7 @@ public class Register extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}">${path}</h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
 	 *   Use supplied credentials to create a new user.
@@ -81,13 +80,13 @@ public class Register extends Route {
 	public Register() {}
 
 	
-	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Map<String, String> params ) throws Exception {
+	@Override 
+	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
 		return Response.build( exchange, JSON.obj()
 			.add( "status", JSON.num( -1 ) )
 			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
 			.add( "error", JSON.arr() )
-			.add( "(REMOVE) Response", JSON.str( requestBody ) ) );
+			.add( "(TMP) Response", JSON.str( requestBody ) ) );
 	}
 
 	@Override

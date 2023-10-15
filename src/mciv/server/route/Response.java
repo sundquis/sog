@@ -19,11 +19,18 @@
 
 package mciv.server.route;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 import com.sun.net.httpserver.HttpExchange;
 
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.JSON;
+import sog.util.json.JSON;
 
 /**
  * 
@@ -32,17 +39,45 @@ import sog.util.JSON;
 public interface Response {
 
 	/* The String for the response body */
-	public String getBody();
+	public InputStream getBody() throws IOException;
+
+	/* Total length in bytes */
+	public long getLength();
 	
 	/* A Procedure to execute after the Exchange is closed */
 	public Procedure afterClose();
 	
 	/* Add builders for each type of response. */
 	
+	private static InputStream forString( String s ) {
+		return new ByteArrayInputStream( s.getBytes() );
+	}
+	
+	public static Response build( final Path file ) {
+		final long length = file.toFile().length();
+		return new Response() {
+			@Override public InputStream getBody() throws IOException {
+				return Files.newInputStream( file, StandardOpenOption.READ );
+			}
+			
+			@Override
+			public long getLength() {
+				return length;
+			}
+
+			@Override
+			public Procedure afterClose() {
+				return Procedure.NOOP;
+			}
+			
+		};
+	}
+	
 	/* String response, no closing operation */
 	public static Response build( final String body ) {
 		return new Response() {
-			@Override public String getBody() { return body; }
+			@Override public long getLength() { return body.getBytes().length; }
+			@Override public InputStream getBody() { return Response.forString( body ); }
 			@Override public Procedure afterClose() { return Procedure.NOOP; }
 		};
 	}
@@ -50,7 +85,8 @@ public interface Response {
 	/* String response, with closing operation */
 	public static Response build( final String body, final Procedure afterClose ) {
 		return new Response() {
-			@Override public String getBody() { return body; }
+			@Override public long getLength() { return body.getBytes().length; }
+			@Override public InputStream getBody() { return Response.forString( body ); }
 			@Override public Procedure afterClose() { return afterClose; }
 		};
 	}
@@ -59,10 +95,12 @@ public interface Response {
 	 * JSON response, no closing operation.
 	 * The correct response header is added to the exchange.
 	 */
-	public static Response build( HttpExchange exchange, JSON.Element json) {
+	public static Response build( HttpExchange exchange, JSON.JElement json) {
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
+		String body = json.toJSON();
 		return new Response() {
-			@Override public String getBody() { return json.toString(); }
+			@Override public long getLength() { return body.getBytes().length; }
+			@Override public InputStream getBody() { return Response.forString( body ); }
 			@Override public Procedure afterClose() { return Procedure.NOOP; }
 		};
 	}
@@ -71,10 +109,12 @@ public interface Response {
 	 * JSON response, with closing operation.
 	 * The correct response header is added to the exchange.
 	 */
-	public static Response build( HttpExchange exchange, JSON.Element json, Procedure afterClose ) {
+	public static Response build( HttpExchange exchange, JSON.JElement json, Procedure afterClose ) {
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
+		String body = json.toJSON();
 		return new Response() {
-			@Override public String getBody() { return json.toString(); }
+			@Override public long getLength() { return body.getBytes().length; }
+			@Override public InputStream getBody() { return Response.forString( body ); }
 			@Override public Procedure afterClose() { return afterClose; }
 		};
 	}

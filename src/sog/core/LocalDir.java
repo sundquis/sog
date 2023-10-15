@@ -69,6 +69,10 @@ public class LocalDir {
 		/** Text file */
 		@Test.Skip( "Enumerated constant" )
 		TEXT( "txt" ),
+		
+		/** Bash script */
+		@Test.Skip( "Enumerated constant" )
+		BASH( "sh" ),
 
 		/** Java source file */
 		@Test.Skip( "Enumerated constant" ) 		
@@ -77,6 +81,10 @@ public class LocalDir {
 		/** HTML file */
 		@Test.Skip( "Enumerated constant" ) 		
 		HTML( "html" ),
+		
+		/** Javascript */
+		@Test.Skip( "Enumerated constant" )
+		JAVASCRIPT( "js" ),
 		
 		/** An xml file */
 		@Test.Skip( "Enumerated constant" ) 		
