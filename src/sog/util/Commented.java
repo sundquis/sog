@@ -60,7 +60,7 @@ import sog.core.Test;
  * 		 * /
  * The TAG cannot contain "<" or ">".
  * 
- * In both cases, the extraction methods belwo may fail if LABEL or TAG contain regular
+ * In both cases, the extraction methods below may fail if LABEL or TAG contain regular
  * expression character sequences, but this is not checked currently.
  * 
  * @author sundquis

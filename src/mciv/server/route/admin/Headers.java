@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.Log;
+import mciv.server.route.API;
 import mciv.server.route.Error;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
@@ -110,6 +111,11 @@ public class Headers extends Route {
 	@Override
 	public String getPath() {
 		return "/admin/hdrs";
+	}
+	
+	public API getRequestAPI() {
+		return API.obj( "Request", "JSON request object" )
+			.member( "count", "The number of headers to return" ).integer(  );
 	}
 
 

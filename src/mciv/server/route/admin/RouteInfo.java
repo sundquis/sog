@@ -77,7 +77,8 @@ public class RouteInfo extends Route {
 		// HTML </body>
 		// HTML </html>
 		
-		final String host = exchange.getLocalAddress().toString();
+		final String host = "/23.88.147.138:1104"; //exchange.getLocalAddress().toString();
+		
 		Function<Route, String> map = (r) -> "<li><a href='#" + r.getPath() + "'>" + r.getPath() + "</a></li>";
 		Macro mapper = new Macro()
 			.expand( "route links", 

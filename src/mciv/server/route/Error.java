@@ -43,6 +43,7 @@ public class Error {
 	
 	public void accept( Exception ex ) {
 		// FIXME
+		//API.obj( "t", "d" ).getType();
 		App.get().msg( ex );
 		App.get().getLocationMatching( ex, "^sog.*|^mciv.*"  ).forEach( System.out::println );
 		//ex.printStackTrace();
