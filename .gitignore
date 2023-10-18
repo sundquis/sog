@@ -7,7 +7,7 @@
 /trace
 
 # Extrenally managed resources
-/ext
+/web/static
 
 # May need to include this at some point
 /data
