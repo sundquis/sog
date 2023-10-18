@@ -253,7 +253,7 @@ public final class Strings {
 	@Test.Decl( "Omitted elements are indicated with 'more'" )
 	@Test.Decl( "For long arrays first element is shown" )
 	@Test.Decl( "For long arrays last element is shown" )
-	public static String arrayToString( Object[] objects ) {
+	public static String arrayToString( Object... objects ) {
 		Assert.nonNull( objects );
 		int length = objects.length;
 		

@@ -22,10 +22,11 @@ package mciv.server.route.admin;
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.Server;
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -42,10 +43,10 @@ public class Shutdown extends Route {
 	 *   Halts the mciv server.
 	 * 
 	 * REQUEST BODY:
-	 *   None.
-	 * 
+	 *   ${Request}
+	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -57,8 +58,10 @@ public class Shutdown extends Route {
 	public Shutdown() {}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
-		return Response.build( "Shutting down the server...", () -> Server.get().stop( 5 ) );
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		int delay = params.getInt( "delay", 5 );
+
+		return Response.build( "Shutting down the server in " + delay + " seconds.", () -> Server.get().stop( delay ) );
 	}
 
 
@@ -75,6 +78,17 @@ public class Shutdown extends Route {
 	@Override
 	public int getSequence() {
 		return 100;
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI()
+			.member( "delay", "Number of seconds to wait before shutting down; default is 5." ).integer(  );
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 }

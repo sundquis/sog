@@ -27,13 +27,14 @@ import java.util.stream.Collectors;
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.Server;
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Registrar;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.FixedWidth;
 import sog.util.Macro;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -49,10 +50,10 @@ public class Status extends Route {
 	 *   Print statistics about the current mciv server instance.
 	 * 	
 	 * REQUEST BODY:
-	 *   None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -85,7 +86,7 @@ public class Status extends Route {
 
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		StringWriter sw = new StringWriter();
 		final PrintWriter out = new PrintWriter( sw );
 		
@@ -156,6 +157,17 @@ public class Status extends Route {
 	@Override
 	public String getPath() {
 		return "/admin/status";
+	}
+
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 

@@ -23,11 +23,12 @@ import java.nio.file.Path;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.LocalDir;
 import sog.core.Test;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -43,10 +44,10 @@ public class Home extends Route {
 	 *   Present the starting page of the application.
 	 * 	
 	 * REQUEST BODY:
-	 *     None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *     None.
+	 *   ${Response}
 	 * 	
 	 * EXCEPTIONS:
 	 *     None.
@@ -58,7 +59,8 @@ public class Home extends Route {
 	public Home() {}
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		exchange.getResponseHeaders().add( "Content-Type", "text/html" );
 		Path path = new LocalDir().sub( "ext" ).sub( "static" ).getFile( "index", LocalDir.Type.HTML );
 
 		return Response.build( path );
@@ -78,6 +80,16 @@ public class Home extends Route {
 	@Override
 	public String getPath() {
 		return "/auth/home";
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 }

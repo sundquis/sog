@@ -26,12 +26,13 @@ import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Registrar;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.Macro;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -47,10 +48,10 @@ public class RouteInfo extends Route {
 	 *   Display information about all registered routes.
 	 * 	
 	 * REQUEST BODY:
-	 *   None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 	
 	 * EXCEPTIONS:
 	 *   None.
@@ -62,7 +63,7 @@ public class RouteInfo extends Route {
 	public RouteInfo() {}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		StringWriter sw = new StringWriter();
 		final PrintWriter out = new PrintWriter( sw );
 
@@ -105,6 +106,16 @@ public class RouteInfo extends Route {
 	@Override
 	public int getSequence() {
 		return 0;
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 	
 	

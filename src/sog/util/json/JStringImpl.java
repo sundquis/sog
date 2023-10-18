@@ -35,7 +35,18 @@ public class JStringImpl implements JString {
 	private final String value;
 	
 	JStringImpl( String value ) {
-		this.value = value;
+		this.value = this.escape( value );
+	}
+	
+	/*
+	 * Currently we only escape the required characters, quotation mark (") and reverse solidus (\)
+	 */
+	private String escape( String value ) {
+		if ( value == null ) {
+			return null;
+		}
+		
+		return value.replace( "\\", "\\\\" ).replace( "\"", "\\\"" );
 	}
 
 	@Override

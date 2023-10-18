@@ -20,6 +20,7 @@
 package sog.util;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import sog.core.Test;
 
@@ -43,6 +44,41 @@ public interface StringAppender extends AutoCloseable {
 	/* Subclasses override as needed. */
 	public default void close() {}
 	
+	
+	
+	public static StringAppender wrap( final List<String> list ) {
+		return new StringAppender() {
+			StringBuilder buf = new StringBuilder();
+
+			private StringAppender flush() {
+				list.add( this.buf.toString() );
+				this.buf.setLength( 0 );
+				return this;
+			}
+			
+			@Override
+			public StringAppender append( String s ) {
+				this.buf.append( s );
+				return this;
+			}
+			
+			@Override
+			public StringAppender appendln( String s ) {
+				this.buf.append( s );
+				return this.flush();
+			}
+			
+			@Override
+			public StringAppender appendln() {
+				return this.flush();
+			}
+			
+			@Override
+			public void close() {
+				this.flush();
+			}
+		};
+	}
 	
 	public static StringAppender wrap( final PrintWriter out ) {
 		return new StringAppender() {

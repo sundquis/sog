@@ -23,11 +23,12 @@ import java.util.concurrent.TimeUnit;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.LocalDir;
 import sog.core.Test;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -43,10 +44,10 @@ public class Pull extends Route {
 	 *   Pull the current MegaEmpires repo, exposing assets in ./static
 	 * 	
 	 * REQUEST BODY:
-	 *   None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -59,10 +60,12 @@ public class Pull extends Route {
 	}
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		int timeout = params.getInt( "timeout", 5 );
+		
 		String cmd = new LocalDir().sub( "tool" ).sub( "bin" ).getFile( "MCIV_PULL", LocalDir.Type.BASH ).toString();
 		Process proc = Runtime.getRuntime().exec( cmd );
-		proc.waitFor( 2, TimeUnit.SECONDS );
+		proc.waitFor( timeout, TimeUnit.SECONDS );
 		
 		return Response.build( new String( proc.getInputStream().readAllBytes() ) );
 	}
@@ -80,6 +83,17 @@ public class Pull extends Route {
 	@Override
 	public String getPath() {
 		return "/admin/pull";
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI()
+			.member( "timeout", "Seconds to wait for command to complete; default is 5." ).integer();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 	

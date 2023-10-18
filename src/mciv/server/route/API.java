@@ -171,6 +171,12 @@ public class API implements Comparable<API> {
 			api.getObj( out );
 		}
 	}
+	
+	public List<String> getAPI() {
+		List<String> list = new ArrayList<>();
+		this.getAPI( StringAppender.wrap( list ) );
+		return list;
+	}
 
 	private void getObj( StringAppender out ) {
 		out.appendln( this.type + ": { // " + this.doc );
@@ -258,35 +264,39 @@ public class API implements Comparable<API> {
 	}
 
 	
-//	public static void main( String[] args ) {
-//		API child = API.obj( "Game", "Game state" )
-//			.member( "id", "The ganme id" ).integer()
-//			.member( "cur", "The current player" ).string( )
-//			.member( "A ridiculously long key name", "Foo" ).arrayOf().arrayOf().arrayOf().arrayOf().integer()
-//			;
-//		
-//		API obj = API.obj( "Response", "The JSON Response object" )
-//			.member( "foo", "The doc for foo" ).string()
-//			.member( "anInt", "Doc for an int" ).integer()
-//			.member( "aDEc", "Doc for a decimal" ).decimal()
-//			.member( "done?", "Doc for the boolean done" ).bool()
-//			.member( "ids", "Doc for list of ids" ).arrayOf().string()
-//			.member( "multi", "Rectangular boolean array" ).arrayOf().arrayOf().bool()
-//			.member( "enum", "A, B, C, ..., Z" ).string( "A", "B", "C", "D", "E", "F", "G", "Z" )
-//			.member( "int_enum", "0..10" ).integer( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
-//			.member( "enum_array", "Status array" ).arrayOf().string( "ON", "OFF" )
-//			.member( "game", "The Game" ).obj( child )
-//			;
-//		
-//		child.member( "parent", "Recursive" ).obj( obj );
-//		
-//		PrintWriter out = new PrintWriter( System.out, true );
-//		StringBuilder buf = new StringBuilder();
-//
-//		obj.getAPI( StringAppender.wrap( buf ) );
-//		System.out.println( buf.toString() );
-//		
-//		App.get().done();
-//	}
+	public static void main( String[] args ) {
+		API child = API.obj( "Game", "Game state" )
+			.member( "id", "The ganme id" ).integer()
+			.member( "cur", "The current player" ).string( )
+			.member( "A ridiculously long key name", "Foo" ).arrayOf().arrayOf().arrayOf().arrayOf().integer()
+			;
+		
+		API obj = API.obj( "Response", "The JSON Response object" )
+			.member( "foo", "The doc for foo" ).string()
+			.member( "anInt", "Doc for an int" ).integer()
+			.member( "aDEc", "Doc for a decimal" ).decimal()
+			.member( "done?", "Doc for the boolean done" ).bool()
+			.member( "ids", "Doc for list of ids" ).arrayOf().string()
+			.member( "multi", "Rectangular boolean array" ).arrayOf().arrayOf().bool()
+			.member( "enum", "A, B, C, ..., Z" ).string( "A", "B", "C", "D", "E", "F", "G", "Z" )
+			.member( "int_enum", "0..10" ).integer( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
+			.member( "enum_array", "Status array" ).arrayOf().string( "ON", "OFF" )
+			.member( "game", "The Game" ).obj( child )
+			;
+		
+		child.member( "parent", "Recursive" ).obj( obj );
+		
+		//PrintWriter out = new PrintWriter( System.out, true );
+		//StringBuilder buf = new StringBuilder();
+
+		//obj.getAPI( StringAppender.wrap( buf ) );
+		//List<String> results = new ArrayList<>();
+		//obj.getAPI( StringAppender.wrap( results ) );
+		//results.forEach( System.out::println );
+		//System.out.println( buf.toString() );
+		obj.getAPI().forEach( System.out::println );
+		
+		sog.core.App.get().done();
+	}
 
 }

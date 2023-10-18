@@ -23,11 +23,12 @@ package mciv.server.route.auth;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.json.JSON;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -47,25 +48,10 @@ public class Register extends Route {
 	 *   Insert description of potential state transitions.
 	 * 	
 	 * REQUEST BODY:
-	 *   Response: {
-	 *     "email": str,
-	 *     "password": str,
-	 *     "handle": str
-	 *   }
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   Response: {
-	 *     "status": int( <values enumerated in mciv.server.route.Codes> ),
-	 *     "data": Data,
-	 *     "error": Error
-	 *   }
-	 * 	
-	 *   Where Data: {
-	 *     "token": str
-	 *   }
-	 * 
-	 *   Where Error: [ str ]
-	 *   When status = 400, error is a stack trace corresponding to a programmatic error.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   Status
@@ -81,12 +67,13 @@ public class Register extends Route {
 
 	
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 		return Response.build( exchange, JSON.obj()
 			.add( "status", JSON.num( -1 ) )
 			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
 			.add( "error", JSON.arr() )
-			.add( "(TMP) Response", JSON.str( requestBody ) ) );
+			.add( "(REMOVE) Request was", JSON.str( requestBody ) ) );
 	}
 
 	@Override
@@ -102,6 +89,19 @@ public class Register extends Route {
 	@Override
 	public int getSequence() {
 		return 20;
+	}
+
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI()
+			.member( "FIXME", "Determine request structure" ).string( );
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI()
+			.member( "FIXME", "Determine response structure" ).string( );
 	}
 
 }

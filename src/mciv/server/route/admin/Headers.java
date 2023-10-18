@@ -25,13 +25,11 @@ import java.io.StringWriter;
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.Log;
+import mciv.server.route.Params;
 import mciv.server.route.API;
-import mciv.server.route.Error;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.json.JSON.JElement;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -47,14 +45,10 @@ public class Headers extends Route {
 	 *   Retrieve header information from recent transactions.
 	 * 	
 	 * REQUEST BODY:
-	 *   Request: {
-	 *     : int
-	 *   }
-	 *   
-	 *   Or supply n=count as a URL parameter.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -67,16 +61,8 @@ public class Headers extends Route {
 	}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
-		int count = 10;
-		JElement countElt = params.toJavaMap().get( "n" );
-		if ( countElt != null ) {
-			try {
-				count = Integer.parseInt( countElt.toJString().toJavaString() );
-			} catch ( NumberFormatException nfe ) {
-				Error.get().accept( nfe );
-			}
-		}
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		int count = params.getInt( "count", 10 );
 		
 		// PRE <html>
 		// PRE <head><meta charset="utf-8"></head>
@@ -113,9 +99,15 @@ public class Headers extends Route {
 		return "/admin/hdrs";
 	}
 	
+	@Override
 	public API getRequestAPI() {
-		return API.obj( "Request", "JSON request object" )
-			.member( "count", "The number of headers to return" ).integer(  );
+		return super.getRequestAPI()
+			.member( "count", "The number of headers to return; default is 10." ).integer(  );
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 

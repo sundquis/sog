@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import sog.core.Strings;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
@@ -103,8 +102,8 @@ public class Log {
 		}
 	}
 	
-	public String toString( Map.Entry<String, Object> entry ) {
-		return entry.getKey() + ": " + Strings.toString( entry.getValue() );
+	public String toString( Map.Entry<String, List<String>> entry ) {
+		return entry.getKey() + ": " + entry.getValue().stream().collect( Collectors.joining( ", ") );
 	}
 
 

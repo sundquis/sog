@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import com.sun.net.httpserver.HttpServer;
 
 import mciv.server.route.Registrar;
+import sog.core.App;
 import sog.core.AppRuntime;
 import sog.core.Test;
 
@@ -100,6 +101,7 @@ public class Server {
 			Server.get().bind();
 			Server.get().load();
 			Server.get().start();
+			App.get().msg( "Server started." );
 		} catch ( IOException e ) {
 			e.printStackTrace();
 		}

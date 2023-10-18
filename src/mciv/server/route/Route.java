@@ -35,7 +35,6 @@ import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
 import sog.util.json.JSON;
-import sog.util.json.JSON.JObject;
 
 
 /**
@@ -71,20 +70,10 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 *   Insert description of potential state transitions.
 	 * 	
 	 * REQUEST BODY:
-	 *   Response: {
-	 *   }
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   Response: {
-	 *     "status": int( <values enumerated in mciv.server.route.Codes> ),
-	 *     "data": Data,
-	 *     "error": Error
-	 *   }
-	 * 
-	 *   Where Data: {
-	 *   }
-	 * 
-	 *   Where Error: [ str ]
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   Description of non-programmatic exceptions.
@@ -129,7 +118,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception;
+	public abstract Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception;
 	
 	/* Corresponds to turn phase and package. */
 	public abstract Category getCategory();
@@ -139,6 +128,26 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	
 	/* End point for the route. */
 	public abstract String getPath();
+	
+	/**
+	 * The default implementation gives an empty request object.
+	 * Routes override by calling super.getRequestAPI() and then adding custom structure.
+	 * 
+	 * @return
+	 */
+	public API getRequestAPI() {
+		return API.obj( "Request", "The JSON Request object" );
+	}
+	
+	/**
+	 * The default implementation gives an empty response object.
+	 * Routes override by calling super.getResponseAPI() and then adding custom structure.
+	 * 
+	 * @return
+	 */
+	public API getResponseAPI() {
+		return API.obj( "Response", "The JSON Response object" );
+	}
 		
 			
 	@Override
@@ -147,9 +156,12 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		this.remoteVisit( exchange.getRemoteAddress().getAddress().toString() );
 		
 		Response response = null;
+		String requestBody = null;
+		Params params = null;
+		
 		try {
-			String requestBody = new String( exchange.getRequestBody().readAllBytes() );
-			JObject params = this.getParams( exchange.getRequestURI().getQuery() );
+			requestBody = new String( exchange.getRequestBody().readAllBytes() );
+			params = new Params( exchange.getRequestURI().getQuery() );
 			
 			response = this.getResponse( exchange, requestBody, params );
 			
@@ -161,14 +173,13 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 			}
 			
 			if ( this.isLogging() ) {
-				Log.get().accept( exchange, requestBody, response.getLength(), params.toJSON() );
+				Log.get().accept( exchange, requestBody, response.getLength(), params.toString() );
 			}
 
 			exchange.sendResponseHeaders( 200, response.getLength() );
 			response.getBody().transferTo( exchange.getResponseBody() );
 		} catch ( Exception ex ) {
-			this.errorCount++;
-			Error.get().accept( ex );
+			this.sendErrorResponse( exchange, ex, requestBody, params );
 		} finally {
 			exchange.close();
 			if ( response.afterClose() != null ) {
@@ -177,31 +188,28 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		}
 	}
 	
-	/* 
-	 * Only handles case with simple queries of the form 
-	 *     ?key1=value1&key2=value2&...
-	 *     
-	 * Keys and values can be URL-encoded.
-	 */
-	public JObject getParams( String query ) {
-		JObject params = JSON.obj();
+	private void sendErrorResponse( HttpExchange exchange, Exception ex, String requestBody, Params params ) {
+		this.errorCount++;
+		Error.get().accept( ex );
 		
-		if ( query != null ) {
-			String[] args = query.split( "&" );
-			for ( String arg : args ) {
-				String[] pair = arg.split( "=" );
-				if ( pair.length == 1 ) {
-					params.add( pair[0], JSON.TRUE );
-				} else if ( pair.length == 2 ) {
-					params.add( pair[0], JSON.str( pair[1] ) );
-				} else {
-					params.add( "err", JSON.str( arg ) );
-				}
-			}
+		String error = JSON.obj()
+			.add( "status", JSON.num( 400 ) )
+			.add( "type", JSON.str( ex.getClass().toString() ) )
+			.add( "message", JSON.str( ex.getMessage() ) )
+			.add( "URL_parameters", JSON.str( params.toString() ) )
+			.add( "request_body", JSON.str( requestBody ) )
+			.toJSON();
+		try {
+			exchange.getResponseHeaders().add( "Content-Type", "application/json" );
+			exchange.sendResponseHeaders( 200, error.getBytes().length );
+			exchange.getResponseBody().write( error.getBytes() );
+		} catch ( IOException e ) {
+			// Graceful response failed, log another error
+			this.errorCount++;
+			Error.get().accept( e );
 		}
-		
-		return params;
 	}
+	
 	
 	public void remoteVisit( String remote ) {
 		Integer count = Route.remoteCounts.get( remote );
@@ -217,9 +225,13 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 
 	
 	public Stream<String> getDocunmentation( String host ) {
-		return this.getTaggedLines( "API" ).flatMap(  
-			new Macro().expand( "path", this.getPath() ).expand( "host", host )
-		);
+		Macro mapper = new Macro()
+			.expand( "path", this.getPath() )
+			.expand( "host", host )
+			.expand( "Request", this.getRequestAPI().getAPI() )
+			.expand( "Response", this.getResponseAPI().getAPI() );
+		
+		return this.getTaggedLines( "API" ).flatMap( mapper );
 	}
 	
 	protected Stream<String> getTaggedLines( String tag ) {

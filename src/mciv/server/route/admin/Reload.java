@@ -22,10 +22,11 @@ package mciv.server.route.admin;
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.Server;
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -41,10 +42,10 @@ public class Reload extends Route {
 	 *   Check for new Routes and register them with the server.
 	 * 	
 	 * REQUEST BODY:
-	 *   None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -57,7 +58,7 @@ public class Reload extends Route {
 	}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		return Response.build( "Reloading routes...", () -> Server.get().load() );
 	}
 
@@ -74,6 +75,16 @@ public class Reload extends Route {
 	@Override
 	public String getPath() {
 		return "/admin/reload";
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 }

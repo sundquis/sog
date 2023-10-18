@@ -19,15 +19,18 @@
 
 package mciv.server.route.auth;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.route.API;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.App;
 import sog.core.LocalDir;
 import sog.core.Test;
-import sog.util.json.JSON.JObject;
 
 /**
  * 
@@ -43,10 +46,10 @@ public class Static  extends Route {
 	 *   Retrieve asset from the /static directory.
 	 * 	
 	 * REQUEST BODY:
-	 *   None.
+	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
-	 *   None.
+	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
 	 *   None.
@@ -59,10 +62,15 @@ public class Static  extends Route {
 	}
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, JObject params ) throws Exception {
+	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		String file = exchange.getRequestURI().getPath();
-		Path path = new LocalDir().sub( "ext" ).getDir().resolve( file.replaceAll( "^/", "" ) );
+		Path path = new LocalDir().sub( "ext" ).getDir().resolve( file.replaceFirst( "^/", "" ) );
+		
+		App.get().msg( "File: " + path.toString() );
+		App.get().msg( "Content-Type: " + Files.probeContentType( path ) );
 
+		// FIXME: Type will depend on file extension
+		//exchange.getResponseHeaders().add( "Content-Type", "text/html" );
 		return Response.build( path );
 	}
 
@@ -79,6 +87,16 @@ public class Static  extends Route {
 	@Override
 	public String getPath() {
 		return "/static";
+	}
+
+	@Override
+	public API getRequestAPI() {
+		return super.getRequestAPI();
+	}
+
+	@Override
+	public API getResponseAPI() {
+		return super.getResponseAPI();
 	}
 
 
