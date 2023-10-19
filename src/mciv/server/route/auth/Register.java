@@ -68,11 +68,8 @@ public class Register extends Route {
 	
 	@Override 
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
-		return Response.build( exchange, JSON.obj()
+		return Response.forJSON( exchange, JSON.obj()
 			.add( "status", JSON.num( -1 ) )
-			.add( "data", JSON.obj().add( "token", JSON.str( "authenticated-token" ) ) )
-			.add( "error", JSON.arr() )
 			.add( "(REMOVE) Request was", JSON.str( requestBody ) ) );
 	}
 

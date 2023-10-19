@@ -66,8 +66,9 @@ public class Pull extends Route {
 		String cmd = new LocalDir().sub( "tool" ).sub( "bin" ).getFile( "MCIV_PULL", LocalDir.Type.BASH ).toString();
 		Process proc = Runtime.getRuntime().exec( cmd );
 		proc.waitFor( timeout, TimeUnit.SECONDS );
-		
-		return Response.build( new String( proc.getInputStream().readAllBytes() ) );
+		String msg = new String( proc.getInputStream().readAllBytes() );
+
+		return Response.forMessage( msg, exchange );
 	}
 
 	@Override

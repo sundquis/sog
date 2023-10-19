@@ -61,7 +61,8 @@ public class Shutdown extends Route {
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		int delay = params.getInt( "delay", 5 );
 
-		return Response.build( "Shutting down the server in " + delay + " seconds.", () -> Server.get().stop( delay ) );
+		return Response.forMessage( "Shutting down the server in " + delay + " seconds.", exchange, 
+			() -> Server.get().stop( delay ) );
 	}
 
 

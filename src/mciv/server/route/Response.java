@@ -33,7 +33,10 @@ import sog.core.Test;
 import sog.util.json.JSON;
 
 /**
- * 
+ * Responsible for:
+ *  + Setting the Content-Type header
+ *  + Determining the length of the response
+ *  + Providing the InputStream representing the response
  */
 @Test.Subject( "test." )
 public interface Response {
@@ -53,8 +56,17 @@ public interface Response {
 		return new ByteArrayInputStream( s.getBytes() );
 	}
 	
-	public static Response build( final Path file ) {
+	/* Serve a file from the web directory */
+	public static Response forFile( final Path file, HttpExchange exchange ) throws IOException {
 		final long length = file.toFile().length();
+
+		String content = Files.probeContentType( file );
+		if ( content == null ) {
+			exchange.getResponseHeaders().add( "Content-Type", "text/plain" );
+		} else {
+			exchange.getResponseHeaders().add( "Content-Type", content );
+		}
+
 		return new Response() {
 			@Override public InputStream getBody() throws IOException {
 				return Files.newInputStream( file, StandardOpenOption.READ );
@@ -72,18 +84,22 @@ public interface Response {
 			
 		};
 	}
-	
-	/* String response, no closing operation */
-	public static Response build( final String body ) {
-		return new Response() {
-			@Override public long getLength() { return body.getBytes().length; }
-			@Override public InputStream getBody() { return Response.forString( body ); }
-			@Override public Procedure afterClose() { return Procedure.NOOP; }
-		};
-	}
 
-	/* String response, with closing operation */
-	public static Response build( final String body, final Procedure afterClose ) {
+	/* Simple message, with closing operation */
+	public static Response forMessage( String msg, HttpExchange exchange, Procedure afterClose ) {
+		String body = "<!DOCTYPE html><html><body><h1>MCIV Server:</h1><pre>" + msg + "</pre></body></html>";
+		
+		return Response.forHtml( body, exchange, afterClose );
+	}
+	
+	/* Simple message, non closing operation */
+	public static Response forMessage( String msg, HttpExchange exchange ) {
+		return Response.forMessage( msg, exchange, Procedure.NOOP );
+	}
+	
+	/* HTML response, with closing operation */
+	public static Response forHtml( String body, HttpExchange exchange, Procedure afterClose ) {
+		exchange.getResponseHeaders().add( "Content-Type", "text/html" );
 		return new Response() {
 			@Override public long getLength() { return body.getBytes().length; }
 			@Override public InputStream getBody() { return Response.forString( body ); }
@@ -91,25 +107,13 @@ public interface Response {
 		};
 	}
 	
-	/*
-	 * JSON response, no closing operation.
-	 * The correct response header is added to the exchange.
-	 */
-	public static Response build( HttpExchange exchange, JSON.JElement json) {
-		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
-		String body = json.toJSON();
-		return new Response() {
-			@Override public long getLength() { return body.getBytes().length; }
-			@Override public InputStream getBody() { return Response.forString( body ); }
-			@Override public Procedure afterClose() { return Procedure.NOOP; }
-		};
+	/* HTML response, no closing operation */
+	public static Response forHtml( String body, HttpExchange exchange ) {
+		return Response.forHtml( body, exchange, Procedure.NOOP );
 	}
-
-	/*
-	 * JSON response, with closing operation.
-	 * The correct response header is added to the exchange.
-	 */
-	public static Response build( HttpExchange exchange, JSON.JElement json, Procedure afterClose ) {
+	
+	/* JSON response, with closing operation. */
+	public static Response forJSON( HttpExchange exchange, JSON.JElement json, Procedure afterClose ) {
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 		String body = json.toJSON();
 		return new Response() {
@@ -117,6 +121,11 @@ public interface Response {
 			@Override public InputStream getBody() { return Response.forString( body ); }
 			@Override public Procedure afterClose() { return afterClose; }
 		};
+	}
+
+	/* JSON response, no closing operation. */
+	public static Response forJSON( HttpExchange exchange, JSON.JElement json) {
+		return Response.forJSON( exchange, json, Procedure.NOOP );
 	}
 
 

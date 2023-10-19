@@ -37,6 +37,10 @@ import sog.core.Test;
  */
 @Test.Subject( "test." )
 public class Server {
+
+	// FIXME: Make port changeable
+	
+	public static final String SOCKET_ADDRESS = "/23.88.147.138:1104";
 	
 	private static final int MCIV_PORT = 1104;
 

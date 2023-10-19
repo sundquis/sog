@@ -62,8 +62,12 @@ public class Headers extends Route {
 
 	@Override 
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+		int trunc = params.getInt( "trunc", 100 );
+		Log.get().truncate( trunc );
+		
 		int count = params.getInt( "count", 10 );
 		
+		// PRE <!DOCTYPE HTML>
 		// PRE <html>
 		// PRE <head><meta charset="utf-8"></head>
 		// PRE <body>
@@ -74,14 +78,14 @@ public class Headers extends Route {
 		// POST </body>
 		// POST </html>
 		
-		StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter( sw );
+		StringWriter html = new StringWriter();
+		final PrintWriter out = new PrintWriter( html );
 		
 		this.getCommentedLines( "PRE" ).forEach( out::println );
 		Log.get().getHeaders( count ).forEach( out::println );
 		this.getCommentedLines( "POST" ).forEach( out::println );
-		
-		return Response.build( sw.toString() );
+
+		return Response.forHtml( html.toString(), exchange );
 	}
 
 	@Override
@@ -102,7 +106,8 @@ public class Headers extends Route {
 	@Override
 	public API getRequestAPI() {
 		return super.getRequestAPI()
-			.member( "count", "The number of headers to return; default is 10." ).integer(  );
+			.member( "trunc", "Delete all but the given number of headers." ).integer()
+			.member( "count", "The number of headers to return; default is 10." ).integer();
 	}
 
 	@Override

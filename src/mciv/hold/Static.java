@@ -17,29 +17,34 @@
  * Sundquist
  */
 
-package mciv.server.route.admin;
+package mciv.hold;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.Server;
 import mciv.server.route.API;
 import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.LocalDir;
 import sog.core.Test;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Reload extends Route {
+public abstract class Static  extends Route {
+
+	// FIXME: May be obsolete due to Root 
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}/index.html">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Check for new Routes and register them with the server.
+	 *   Retrieve asset from the /static directory.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
@@ -54,27 +59,37 @@ public class Reload extends Route {
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Reload() {
+	public Static() {
 	}
 
-	@Override 
+	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		return Response.forMessage( "Reloading routes...", exchange, () -> Server.get().load() );
+		String file = exchange.getRequestURI().getPath();
+		Path path = new LocalDir().sub( "web" ).getDir().resolve( file.replaceFirst( "^/", "" ) );
+		
+		String content = Files.probeContentType( path );
+		if ( content == null ) {
+			exchange.getResponseHeaders().add( "Content-Type", "text/plain" );
+		} else {
+			exchange.getResponseHeaders().add( "Content-Type", content );
+		}
+
+		return Response.forFile( path, exchange );
 	}
 
 	@Override
 	public Category getCategory() {
-		return Category.Administration;
+		return Category.Authorization;
 	}
 
 	@Override
 	public int getSequence() {
-		return 50;
+		return 9;
 	}
 
 	@Override
 	public String getPath() {
-		return "/admin/reload";
+		return "/static/";
 	}
 
 	@Override
@@ -86,5 +101,6 @@ public class Reload extends Route {
 	public API getResponseAPI() {
 		return super.getResponseAPI();
 	}
+
 
 }

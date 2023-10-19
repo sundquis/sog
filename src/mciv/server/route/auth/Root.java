@@ -24,11 +24,11 @@ import java.nio.file.Path;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import mciv.server.McivException;
 import mciv.server.route.API;
 import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
-import sog.core.App;
 import sog.core.LocalDir;
 import sog.core.Test;
 
@@ -36,14 +36,16 @@ import sog.core.Test;
  * 
  */
 @Test.Subject( "test." )
-public class Static  extends Route {
+public class Root extends Route {
 	
 	/* <API>
 	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}/index.html">${path}</a></h2>
+	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Retrieve asset from the /static directory.
+	 *   This route serves files from the root of the mciv root directory,
+	 *   Any unimplemented routes will resolve to this handler, and attempt to serve
+	 *   the corresponding file, resulting in a file not found error.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
@@ -52,41 +54,52 @@ public class Static  extends Route {
 	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
-	 *   None.
 	 * 
 	 * </pre>
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Static() {
+	public Root() {
 	}
+	
+	private static final Path ROOT = new LocalDir().sub( "web" ).getDir();
 
 	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		String file = exchange.getRequestURI().getPath();
-		Path path = new LocalDir().sub( "ext" ).getDir().resolve( file.replaceFirst( "^/", "" ) );
+		String fileName = exchange.getRequestURI().getPath();
+		if ( fileName.startsWith( "/" ) ) {
+			fileName = fileName.substring( 1 );
+		}
+		if ( fileName.isEmpty() ) {
+			fileName = "index.html";
+		}
 		
-		App.get().msg( "File: " + path.toString() );
-		App.get().msg( "Content-Type: " + Files.probeContentType( path ) );
+		Path path = ROOT.resolve( fileName );
 
-		// FIXME: Type will depend on file extension
-		//exchange.getResponseHeaders().add( "Content-Type", "text/html" );
-		return Response.build( path );
+		if ( ! Files.exists( path ) ) {
+			throw new McivException( "File not found: " + path );
+		}
+		
+		if ( ! Files.isRegularFile( path ) ) {
+			throw new McivException( "Not a regular file: " + path );
+		}
+		
+		return Response.forFile( path, exchange );
 	}
 
 	@Override
 	public Category getCategory() {
-		return Category.Authorization;
+		return Category.Root;
 	}
 
 	@Override
 	public int getSequence() {
-		return 9;
+		return 0;
 	}
 
 	@Override
 	public String getPath() {
-		return "/static";
+		return "/";
 	}
 
 	@Override

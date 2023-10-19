@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import mciv.server.Server;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
@@ -55,6 +56,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 * sub-package of mciv.server.route.
 	 */
 	public static enum Category {
+		Root,
 		Administration,
 		Authorization
 	}
@@ -224,10 +226,10 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	}
 
 	
-	public Stream<String> getDocunmentation( String host ) {
+	public Stream<String> getDocunmentation() {
 		Macro mapper = new Macro()
 			.expand( "path", this.getPath() )
-			.expand( "host", host )
+			.expand( "host", Server.SOCKET_ADDRESS )
 			.expand( "Request", this.getRequestAPI().getAPI() )
 			.expand( "Response", this.getResponseAPI().getAPI() );
 		

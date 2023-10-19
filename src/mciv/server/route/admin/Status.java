@@ -87,9 +87,10 @@ public class Status extends Route {
 
 	@Override 
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter( sw );
-		
+		StringWriter html = new StringWriter();
+		final PrintWriter out = new PrintWriter( html );
+
+		// HTML <!DOCTYPE html>
 		// HTML	<html>
 		// HTML	<head><meta charset="utf-8"></head>
 		// HTML	<body>
@@ -128,8 +129,8 @@ public class Status extends Route {
 			.expand( "error rows", 
 				Registrar.get().getRoutes().map( this::getErrorStats ).collect( Collectors.toList() ) );
 		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
-		
-		return Response.build( sw.toString() );
+				
+		return Response.forHtml( html.toString(), exchange );
 	}
 	
 	private String getServiceStats( Route r ) {

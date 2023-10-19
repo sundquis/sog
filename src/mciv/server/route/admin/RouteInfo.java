@@ -64,9 +64,10 @@ public class RouteInfo extends Route {
 
 	@Override 
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter( sw );
+		StringWriter html = new StringWriter();
+		final PrintWriter out = new PrintWriter( html );
 
+		// HTML <!DOCTYPE html>
 		// HTML <html>
 		// HTML <head><meta charset="utf-8"></head>
 		// HTML <body>
@@ -78,18 +79,16 @@ public class RouteInfo extends Route {
 		// HTML </body>
 		// HTML </html>
 		
-		final String host = "/23.88.147.138:1104"; //exchange.getLocalAddress().toString();
-		
 		Function<Route, String> map = (r) -> "<li><a href='#" + r.getPath() + "'>" + r.getPath() + "</a></li>";
 		Macro mapper = new Macro()
 			.expand( "route links", 
 				Registrar.get().getRoutes().map( map ).collect( Collectors.toList() ) )
 			.expand( "route apis", 
-				Registrar.get().getRoutes().flatMap( r -> r.getDocunmentation( host ) ).collect( Collectors.toList() ) );
+				Registrar.get().getRoutes().flatMap( Route::getDocunmentation ).collect( Collectors.toList() ) );
 		
 		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
 
-		return Response.build( sw.toString() );
+		return Response.forHtml( html.toString(), exchange );
 	}
 
 

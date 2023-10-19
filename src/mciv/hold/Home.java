@@ -17,7 +17,7 @@
  * Sundquist
  */
 
-package mciv.server.route.auth;
+package mciv.hold;
 
 import java.nio.file.Path;
 
@@ -34,7 +34,7 @@ import sog.core.Test;
  * 
  */
 @Test.Subject( "test." )
-public class Home extends Route {
+public abstract class Home extends Route {
 	
 	/* <API>
 	 * <hr>
@@ -61,9 +61,9 @@ public class Home extends Route {
 	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		exchange.getResponseHeaders().add( "Content-Type", "text/html" );
-		Path path = new LocalDir().sub( "ext" ).sub( "static" ).getFile( "index", LocalDir.Type.HTML );
+		Path path = new LocalDir().sub( "web" ).sub( "static" ).getFile( "index", LocalDir.Type.HTML );
 
-		return Response.build( path );
+		return Response.forFile( path, exchange );
 	}
 
 
@@ -79,7 +79,7 @@ public class Home extends Route {
 
 	@Override
 	public String getPath() {
-		return "/auth/home";
+		return "/auth/home/";
 	}
 
 	@Override

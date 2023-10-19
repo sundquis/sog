@@ -54,6 +54,12 @@ public class Log {
 		this.exchangeEntries = new LinkedList<>();
 	}
 	
+	public synchronized void truncate( int length ) {
+		while ( this.exchangeEntries.size() > length ) {
+			this.exchangeEntries.removeLast();
+		}
+	}
+	
 	public synchronized Stream<String> getHeaders( int count ) {
 		return this.exchangeEntries.stream().limit( count ).flatMap( List::stream );
 	}

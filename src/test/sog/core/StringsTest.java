@@ -81,7 +81,7 @@ public class StringsTest extends Test.Container {
 		description = "Enclosed in square brackets" 
 	)
 	public void tm_0B270C477( Test.Case tc ) {
-		String s = Strings.arrayToString( this.shortArray );
+		String s = Strings.arrayToString( (Object[])this.shortArray );
 		tc.assertTrue( s.startsWith( "[" ) );
 		tc.assertTrue( s.endsWith( "]" ) );
 	}
@@ -91,7 +91,7 @@ public class StringsTest extends Test.Container {
 		description = "For long arrays first element is shown" 
 	)
 	public void tm_0CA58A2C5( Test.Case tc ) {
-		String s = Strings.arrayToString( this.longArray );
+		String s = Strings.arrayToString( (Object[])this.longArray );
 		tc.assertTrue( s.contains( this.FIRST + ", " ) );
 	}
 		
@@ -100,7 +100,7 @@ public class StringsTest extends Test.Container {
 		description = "For long arrays last element is shown" 
 	)
 	public void tm_096276709( Test.Case tc ) {
-		String s = Strings.arrayToString( this.longArray );
+		String s = Strings.arrayToString( (Object[])this.longArray );
 		tc.assertTrue( s.contains( " " + this.LAST ) );
 	}
 		
@@ -109,7 +109,7 @@ public class StringsTest extends Test.Container {
 		description = "Omitted elements are indicated with 'more'" 
 	)
 	public void tm_06312C4CE( Test.Case tc ) {
-		String s = Strings.arrayToString( this.longArray );
+		String s = Strings.arrayToString( (Object[])this.longArray );
 		tc.assertTrue( s.contains( "more" ) );
 	}
 		
@@ -121,7 +121,7 @@ public class StringsTest extends Test.Container {
 		Object[] empty = new String[] {};
 		String emptyS = Strings.arrayToString( empty );
 
-		String longS = Strings.arrayToString( this.longArray );
+		String longS = Strings.arrayToString( (Object[])this.longArray );
 		
 		Object[] object = new Object[] { new Object(), new Object() };
 		String objectS = Strings.arrayToString( object );
@@ -172,9 +172,9 @@ public class StringsTest extends Test.Container {
 		Boolean[] booleans = new Boolean[] { true, false };
 		Character[] chars = new Character[] { '_', '#', '?' };
 		
-		tc.assertTrue( Strings.arrayToString( ints ).contains( "34567") );
-		tc.assertTrue( Strings.arrayToString( booleans ).contains( "true") );
-		tc.assertTrue( Strings.arrayToString( chars ).contains( "#") );
+		tc.assertTrue( Strings.arrayToString( (Object[])ints ).contains( "34567") );
+		tc.assertTrue( Strings.arrayToString( (Object[])booleans ).contains( "true") );
+		tc.assertTrue( Strings.arrayToString( (Object[])chars ).contains( "#") );
 	}
 		
 	@Test.Impl( 
@@ -183,7 +183,7 @@ public class StringsTest extends Test.Container {
 	)
 	public void tm_079C8F674( Test.Case tc ) {
 		tc.expectError( AssertionError.class );
-		Strings.arrayToString( null );
+		Strings.arrayToString( (Object[])null );
 	}
 		
 	@Test.Impl( 
@@ -239,7 +239,7 @@ public class StringsTest extends Test.Container {
 		Object[] empty = new String[] {};
 		String emptyS = Strings.arrayToString( empty );
 
-		String longS = Strings.arrayToString( this.longArray );
+		String longS = Strings.arrayToString( (Object[])this.longArray );
 		
 		Object[] object = new Object[] { new Object(), new Object() };
 		String objectS = Strings.arrayToString( object );
