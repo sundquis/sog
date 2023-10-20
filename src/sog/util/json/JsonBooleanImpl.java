@@ -19,59 +19,54 @@
 
 package sog.util.json;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import sog.core.Test;
-import sog.util.json.JSON.JArray;
-import sog.util.json.JSON.JBoolean;
-import sog.util.json.JSON.JNumber;
-import sog.util.json.JSON.JObject;
-import sog.util.json.JSON.JString;
+import sog.util.json.JSON.JsonBoolean;
+import sog.util.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JBooleanImpl implements JBoolean {
+public class JsonBooleanImpl implements JsonBoolean {
 	
 	private final boolean value;
 	
-	JBooleanImpl( boolean value ) {
+	JsonBooleanImpl( boolean value ) {
 		this.value = value;
 	}
 
 	@Override
-	public String toJSON() {
+	public Boolean toJavaBoolean() {
+		return this.value;
+	}
+	
+	@Override
+	public String toJsonString() {
 		return this.value ? "true" : "false";
 	}
 
 	@Override
-	public Boolean toJavaObject() {
-		return this.value;
+	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
+		char c = reader.skipWhiteSpace().curChar();
+		switch (c) {
+		case 't':
+			reader.consume( "true" );
+			return JSON.TRUE;
+		case 'f':
+			reader.consume( "false" );
+			return JSON.FALSE;
+		default:
+			throw new JsonParseException( "Illegal character for boolean value", reader.getColumn() );
+		}
 	}
-
+	
+	
 	@Override
-	public JObject toJObject() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Boolean", "JSON Object" );
+	public void write( BufferedWriter writer ) throws IOException {
+		writer.append( this.value ? "true" : "false" );
 	}
-
-	@Override
-	public JArray toJArray() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Boolean", "JSON Array" );
-	}
-
-	@Override
-	public JString toJString() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Boolean", "JSON String" );
-	}
-
-	@Override
-	public JNumber toJNumber() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Boolean", "JSON Number" );
-	}
-
-	@Override
-	public JBoolean toJBoolean() throws JsonIllegalCast {
-		return this;
-	}
-
 
 }

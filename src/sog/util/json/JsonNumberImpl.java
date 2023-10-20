@@ -19,35 +19,35 @@
 
 package sog.util.json;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import sog.core.Test;
-import sog.util.json.JSON.JArray;
-import sog.util.json.JSON.JBoolean;
-import sog.util.json.JSON.JNumber;
-import sog.util.json.JSON.JObject;
-import sog.util.json.JSON.JString;
+import sog.util.json.JSON.JsonNumber;
+import sog.util.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JNumberImpl implements JNumber {
+public class JsonNumberImpl implements JsonNumber {
 	
 	private final int integer;
 	private final int fraction;
 	private final int exponent;
 
-	JNumberImpl( int integer, int fraction, int exponent ) {
+	JsonNumberImpl( int integer, int fraction, int exponent ) {
 		this.integer = integer;
 		this.fraction = fraction;
 		this.exponent = exponent;
 	}
 
-	@Override
-	public String toJSON() {
-		return "" + this.integer 
-			+ (this.fraction > 0 ? "." + this.fraction : "") 
-			+ (this.exponent == 0 ? "" : "E" + this.exponent );
-	}
+//	@Override
+//	public String toJSON() {
+//		return "" + this.integer 
+//			+ (this.fraction > 0 ? "." + this.fraction : "") 
+//			+ (this.exponent == 0 ? "" : "E" + this.exponent );
+//	}
 
 	@Override
 	public Integer toJavaInteger() {
@@ -56,12 +56,12 @@ public class JNumberImpl implements JNumber {
 
 	@Override
 	public Float toJavaFloat() {
-		return Float.parseFloat( this.toJSON() );
+		return Float.parseFloat( "FIXME" );
 	}
 
 	@Override
 	public Double toJavaDouble() {
-		return Double.parseDouble( this.toJSON() );
+		return Double.parseDouble( "FIXME" );
 	}
 
 	@Override
@@ -71,28 +71,42 @@ public class JNumberImpl implements JNumber {
 	}
 
 	@Override
-	public JObject toJObject() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Number", "JSON Object" );
-	}
-
-	@Override
-	public JArray toJArray() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Number", "JSON Array" );
-	}
-
-	@Override
-	public JString toJString() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Number", "JSON String" );
-	}
-
-	@Override
-	public JNumber toJNumber() throws JsonIllegalCast {
+	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
+		// TODO Auto-generated method stub
 		return this;
 	}
+//	public JsonNumber readNumber() throws IOException, JsonParseException {
+//		this.skipWhiteSpace();
+//
+//		int integer;
+//		if ( this.curChar() == '-' ) {
+//			integer = -1;
+//		} else {
+//			integer = 1;
+//		}
+//		integer *= this.readDigits();
+//		
+//		int fraction = 0;
+//		if ( this.curChar() == '.' ) {
+//			fraction = this.readDigits();
+//		}
+//		
+//		int exponent = 0;
+//		
+//		
+//		
+//		return JSON.exp( integer, fraction, exponent );
+//	}
+//	
+//	private int readDigits() throws IOException, JsonParseException {
+//		StringBuilder buf = new StringBuilder();
+//		return 0;
+//	}
 
 	@Override
-	public JBoolean toJBoolean() throws JsonIllegalCast {
-		throw new JsonIllegalCast( "JSON Number", "JSON Boolean" );
+	public void write( BufferedWriter writer ) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 
 

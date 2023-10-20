@@ -203,7 +203,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 				.add( "message", JSON.str( ex.getMessage() ) )
 				.add( "URL_parameters", JSON.str( params.toString() ) )
 				.add( "request_body", JSON.str( requestBody ) )
-				.toJSON();
+				.toJsonString();
 			exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 			exchange.sendResponseHeaders( 200, error.getBytes().length );
 			exchange.getResponseBody().write( error.getBytes() );

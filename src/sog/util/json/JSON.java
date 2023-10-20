@@ -20,15 +20,21 @@
 package sog.util.json;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import sog.core.AppRuntime;
 import sog.core.Test;
 
 /**
@@ -40,98 +46,111 @@ public class JSON {
 	private JSON() {}
 	
 	
-	public static JElement read( Reader in ) throws IOException, JsonParseException {
+	public static JsonValue read( Reader reader ) throws IOException, JsonParseException {
 		try ( 
-			BufferedReader buf = new BufferedReader( in );
-			JsonReader reader = new JsonReader( buf )
+			BufferedReader buf = new BufferedReader( reader );
+			JsonReader json = new JsonReader( buf )
 		) {
-			return reader.readElement();
+			return json.readValue();
 		}
 	}
 	
-	public static JElement read( InputStream in ) throws IOException, JsonParseException {
-		return JSON.read( new InputStreamReader( in, Charset.forName( "UTF-8" ) ) );
+	public static JsonValue read( InputStream input ) throws IOException, JsonParseException {
+		return JSON.read( new InputStreamReader( input, Charset.forName( "UTF-8" ) ) );
 	}
 	
-	public static JElement read( String s ) throws IOException, JsonParseException {
+	public static JsonValue fromJsonString( String s ) throws IOException, JsonParseException {
 		return JSON.read( new StringReader( s ) );
 	}
 
 	
-	public interface JElement {
+	
+	public interface JsonValue {
+		
+		public JsonValue read( JsonReader reader ) throws IOException, JsonParseException;
+		
+		public void write( BufferedWriter writer ) throws IOException;
+		
+		public default void write( Writer writer, boolean formatted ) throws IOException {
+			try ( 
+				BufferedWriter buf = new BufferedWriter( writer )
+			) {
+				this.write( buf );
+			}
+		}
+		
+		public default void write( OutputStream output ) throws IOException {
+			this.write( new OutputStreamWriter( output, Charset.forName( "UTF-8" ) ), false );
+		}
 		
 		/**
 		 * Produce the canonical JSON string representation for the element.
 		 * See: "https://www.json.org/json-en.html"
 		 * 
+		 * 'Primitive' JSON types override this using internal state.
+		 * 
 		 * @return
+		 * @throws IOException 
 		 */
-		public String toJSON();
-		
-		/** Attempt to cast to JObject */
-		public JObject toJObject() throws JsonIllegalCast;
-		
-		/** Attempt to cast to JAray */
-		public JArray toJArray() throws JsonIllegalCast;
-		
-		/** Attempt to cast to JObject */
-		public JString toJString() throws JsonIllegalCast;
-		
-		/** Attempt to cast to JObject */
-		public JNumber toJNumber() throws JsonIllegalCast;
-		
-		/** Attempt to cast to JObject */
-		public JBoolean toJBoolean() throws JsonIllegalCast;
+		public default String toJsonString() {
+			try ( Writer sw = new StringWriter() ) {
+				this.write( sw, true );
+				return sw.toString();
+			} catch ( IOException ex ) {
+				// Probably only happens if we are out of resources, for large object?
+				throw new AppRuntime( "Unable to construct string representation" );
+			}
+		}
 		
 	}
 
 	
 	
-	public static interface JObject extends JElement {
+	public static interface JsonObject extends JsonValue {
 		
-		public JObject add( JString key, JElement value );
+		public JsonObject add( JsonString key, JsonValue value );
 		
-		public JObject add( String key, JElement value );
+		public JsonObject add( String key, JsonValue value );
 		
-		public Map<String, JElement> toJavaMap();
+		public Map<String, JsonValue> toJavaMap();
 		
 		
-		
-	}
-	
-	public static JObject obj() {
-		return new JObjectImpl();
-	}
-	
-	
-	
-	public static interface JArray extends JElement {
-		
-		public JArray add( JElement element );
-		
-		public List<JElement> toJavaList();
 		
 	}
 	
-	public static JArray arr() {
-		return new JArrayImpl();
+	public static JsonObject obj() {
+		return new JsonObjectImpl();
 	}
 	
 	
 	
-	public static interface JString extends JElement {
+	public static interface JsonArray extends JsonValue {
+		
+		public JsonArray add( JsonValue element );
+		
+		public List<JsonValue> toJavaList();
+		
+	}
+	
+	public static JsonArray arr() {
+		return new JsonArrayImpl();
+	}
+	
+	
+	
+	public static interface JsonString extends JsonValue {
 		
 		public String toJavaString();
 		
 	}
 	
-	public static JString str( String s ) {
-		return s == null ? JSON.NULL : new JStringImpl( s );
+	public static JsonString str( String s ) {
+		return s == null ? JSON.NULL : new JsonStringImpl( s );
 	}
 	
 	
 	
-	public static interface JNumber extends JElement {
+	public static interface JsonNumber extends JsonValue {
 		
 		public Integer toJavaInteger();
 		
@@ -143,33 +162,33 @@ public class JSON {
 		
 	}
 	
-	public static JNumber num( int num ) {
-		return new JNumberImpl( num, 0, 0 );
+	public static JsonNumber num( int num ) {
+		return new JsonNumberImpl( num, 0, 0 );
 	}
 		
-	public static JNumber dec( int num, int frac ) {
-		return new JNumberImpl( num, frac, 0 );
+	public static JsonNumber dec( int num, int frac ) {
+		return new JsonNumberImpl( num, frac, 0 );
 	}
 	
-	public static JNumber exp( int num, int frac, int exp ) {
-		return new JNumberImpl( num, frac, exp );
+	public static JsonNumber exp( int num, int frac, int exp ) {
+		return new JsonNumberImpl( num, frac, exp );
 	}
 	
 	
 	
-	public static interface JBoolean extends JElement {
-		public Boolean toJavaObject();
+	public static interface JsonBoolean extends JsonValue {
+		public Boolean toJavaBoolean();
 	}
 	
-	public static final JBoolean TRUE = new JBooleanImpl( true );
+	public static final JsonBoolean TRUE = new JsonBooleanImpl( true );
 	
-	public static final JBoolean FALSE = new JBooleanImpl( false );
+	public static final JsonBoolean FALSE = new JsonBooleanImpl( false );
 	
 	
 	
-	public static interface JNull extends JObject, JArray, JString, JNumber, JBoolean {}
+	public static interface JsonNull extends JsonObject, JsonArray, JsonString, JsonNumber, JsonBoolean {}
 	
-	public static final JNull NULL = new JNullImpl();
+	public static final JsonNull NULL = new JsonNullImpl();
 	
 	
 }

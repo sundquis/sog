@@ -20,20 +20,10 @@
 package sog.util.json;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
-import sog.core.App;
 import sog.core.Test;
-import sog.util.json.JSON.JArray;
-import sog.util.json.JSON.JBoolean;
-import sog.util.json.JSON.JElement;
-import sog.util.json.JSON.JNumber;
-import sog.util.json.JSON.JObject;
-import sog.util.json.JSON.JString;
+import sog.util.json.JSON.JsonValue;
 
 /**
  * When reading elements, always start by skipping whitespace, but allow trailing whitespace.
@@ -43,23 +33,82 @@ public class JsonReader implements AutoCloseable {
 	
 	private final BufferedReader buf;
 	
-	private int current;
+	private int current = -1;
 	
-	private int charCount;
+	private int charCount = 0;
 	
-	JsonReader( BufferedReader buf ) {
+	public JsonReader( BufferedReader buf ) throws IOException {
 		this.buf = buf;
+		this.advance();
 	}
 	
-	public JElement readElement() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-		char c = this.peekChar();
+	public boolean hasChar() {
+		return this.current != -1;
+	}
+	
+	public char curChar() {
+		return (char) this.current;
+	}
+	
+	public void advance() throws IOException {
+		this.current = this.buf.read();
+		this.charCount++;
+	}
+	
+	public int getColumn() {
+		return this.charCount;
+	}
+	
+	@Override
+	public void close() throws IOException {
+		this.buf.close();
+	}
+	
+	public void consume( char c ) throws IOException, JsonParseException {
+		if ( c == this.curChar() ) {
+			this.advance();
+		} else {
+			throw new JsonParseException( "Expected '" + c + "' but got '" + this.curChar() + "'", this.charCount );
+		}
+	}
+	
+	public void consume( String s ) throws IOException, JsonParseException {
+		for ( int i = 0; i < s.length(); i++ ) {
+			this.consume( s.charAt( i ) );
+		}
+	}
+	
+	public JsonReader skipWhiteSpace() throws IOException {
+		while ( this.hasChar() ) {
+			char c = this.curChar();
+			switch (c) {
+			case ' ':
+			case '\t':
+			case '\n':
+			case '\r':
+				this.advance();
+				break;
+			default:
+				break;
+			}
+		}
+		return this;
+	}
+	
+	private static final char EOF = (char)-1;
+	
+	/*
+	 * If the stream is empty at the point where we expect to read a value, we return JSON null.
+	 */
+	public JsonValue readValue() throws IOException, JsonParseException {
+		char c = this.skipWhiteSpace().curChar();
 		switch (c) {
-		case '{': return this.readObject();
-		case '[': return this.readArray();
-		case '"': return this.readString();
-		case 't':
-		case 'f': return this.readBoolean();
+		case '{': return JSON.obj().read( this );
+		case '[': return JSON.arr().read( this );
+		case '"': return JSON.str( "" ).read( this );
+		case 't': return JSON.TRUE.read( this );
+		case 'f': return JSON.FALSE.read( this );
+		case 'n': return JSON.NULL.read( this );
 		case '-':
 		case '0':
 		case '1':
@@ -70,184 +119,10 @@ public class JsonReader implements AutoCloseable {
 		case '6':
 		case '7':
 		case '8':
-		case '9':
-			return this.readNumber();
-		default: throw new JsonParseException( "Illegal character", this.charCount );
+		case '9': return JSON.num( 0 ).read( this );
+		case EOF: return JSON.NULL;  // Not sure about this.
+		default: throw new JsonParseException( "Illegal character: " + c, this.charCount );
 		}
-	}
-	
-	public JObject readObject() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-		this.consume( '{' );
-		JObject result = JSON.obj();
-		
-		this.skipWhiteSpace();
-		while ( this.peekChar() == '"' ) {
-			JString key = this.readString();
-			this.skipWhiteSpace();
-			this.consume( ':' );
-			JElement value = this.readElement();
-			result.add( key, value );
-			this.skipWhiteSpace();
-			if ( this.peekChar() == ',' ) {
-				this.consume( ',' );
-				this.skipWhiteSpace();
-			}
-		}
-
-		this.consume( '}' );
-		return result;
-	}
-	
-	public JArray readArray() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-		this.consume( '[' );
-		JArray result = JSON.arr();
-		
-		this.skipWhiteSpace();
-		while ( this.peekChar() != ']' ) {
-			JElement elt = this.readElement();
-			result.add( elt );
-			this.skipWhiteSpace();
-			if ( this.peekChar() == ',' ) {
-				this.consume( ',' );
-				this.skipWhiteSpace();
-			}
-		}
-		
-		this.consume( ']' );
-		return result;
-	}
-	
-	public JString readString() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-		this.consume( '"' );
-		
-		StringBuilder buf = new StringBuilder();
-		boolean escape = false;
-		char cur;
-		while ( this.hasChar() ) {
-			cur = this.peekChar();
-			if ( escape ) {
-				buf.append( this.getEscape( cur ) );
-				escape = false;
-			} else if ( cur == '\\' ) {
-				escape = true;
-			} else if ( cur == '"' ) {
-				break;
-			} else {
-				buf.append( cur );
-			}
-			this.nextChar();
-		}
-		
-		this.consume( '"' );
-		return JSON.str( buf.toString() );
 	}
 
-	public JBoolean readBoolean() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-		if ( this.peekChar() == 't' ) {
-			this.consume( "true" );
-			return JSON.TRUE;
-		} else {
-			this.consume( "false)" );
-			return JSON.FALSE;
-		}
-	}
-	
-	public JNumber readNumber() throws IOException, JsonParseException {
-		this.skipWhiteSpace();
-
-		int integer;
-		if ( this.peekChar() == '-' ) {
-			integer = -1;
-		} else {
-			integer = 1;
-		}
-		integer *= this.readDigits();
-		
-		int fraction = 0;
-		if ( this.peekChar() == '.' ) {
-			fraction = this.readDigits();
-		}
-		
-		int exponent = 0;
-		
-		
-		
-		return JSON.exp( integer, fraction, exponent );
-	}
-	
-	private int readDigits() throws IOException, JsonParseException {
-		StringBuilder buf = new StringBuilder();
-		return 0;
-	}
-	
-	@Override
-	public void close() throws IOException {
-		//in.close();
-	}
-	
-	private char getEscape( char c ) throws JsonParseException {
-		switch (c) {
-		case '\\': return '\\';
-		case '"': return '"';
-		case '/': return '/';
-		case 'b': return '\b';
-		case 'f': return '\f';
-		case 'n': return '\n';
-		case 'r': return '\r';
-		case 't': return '\t';
-		default:
-			throw new JsonParseException( "Illegal escape character: " + c, this.charCount );
-		}
-	}
-	
-	
-	private void consume( char c ) throws IOException, JsonParseException {
-		if ( c == this.peekChar() ) {
-			this.nextChar();
-		} else {
-			throw new JsonParseException( "Expected '" + c + "' bt got '" + this.peekChar() + "'", this.charCount );
-		}
-	}
-	
-	private void consume( String s ) throws IOException, JsonParseException {
-		for ( int i = 0; i < s.length(); i++ ) {
-			this.consume( s.charAt( i ) );
-		}
-	}
-	
-	private void skipWhiteSpace() throws IOException {
-		while ( this.hasChar() ) {
-			char c = this.peekChar();
-			switch (c) {
-			case ' ':
-			case '\t':
-			case '\n':
-			case '\r':
-				this.nextChar();
-				break;
-			default:
-				return;
-			}
-		}
-	}
-	
-	private boolean hasChar() {
-		return this.current != -1;
-	}
-	
-	private char peekChar() {
-		return (char) this.current;
-	}
-	
-	private char nextChar() throws IOException {
-		this.current = this.buf.read();
-		this.charCount++;
-		return this.peekChar();
-	}
-
-	
 }

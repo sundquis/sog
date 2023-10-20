@@ -113,9 +113,9 @@ public interface Response {
 	}
 	
 	/* JSON response, with closing operation. */
-	public static Response forJSON( HttpExchange exchange, JSON.JElement json, Procedure afterClose ) {
+	public static Response forJSON( HttpExchange exchange, JSON.JsonValue json, Procedure afterClose ) {
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
-		String body = json.toJSON();
+		String body = json.toJsonString();
 		return new Response() {
 			@Override public long getLength() { return body.getBytes().length; }
 			@Override public InputStream getBody() { return Response.forString( body ); }
@@ -124,7 +124,7 @@ public interface Response {
 	}
 
 	/* JSON response, no closing operation. */
-	public static Response forJSON( HttpExchange exchange, JSON.JElement json) {
+	public static Response forJSON( HttpExchange exchange, JSON.JsonValue json) {
 		return Response.forJSON( exchange, json, Procedure.NOOP );
 	}
 

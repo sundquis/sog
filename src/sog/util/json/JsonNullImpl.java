@@ -19,67 +19,34 @@
 
 package sog.util.json;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import sog.core.Test;
-import sog.util.json.JSON.JArray;
-import sog.util.json.JSON.JBoolean;
-import sog.util.json.JSON.JElement;
-import sog.util.json.JSON.JNull;
-import sog.util.json.JSON.JNumber;
-import sog.util.json.JSON.JObject;
-import sog.util.json.JSON.JString;
+import sog.util.json.JSON.JsonArray;
+import sog.util.json.JSON.JsonValue;
+import sog.util.json.JSON.JsonNull;
+import sog.util.json.JSON.JsonObject;
+import sog.util.json.JSON.JsonString;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JNullImpl implements JNull {
+public class JsonNullImpl implements JsonNull {
 	
-	JNullImpl() {}
-
-	
-	@Override
-	public String toJSON() {
-		return "null";
-	}
+	JsonNullImpl() {}
 
 	
 	@Override
-	public JObject toJObject() throws JsonIllegalCast {
-		return this;
-	}
-
-	@Override
-	public JArray toJArray() throws JsonIllegalCast {
-		return this;
-	}
-
-	@Override
-	public JString toJString() throws JsonIllegalCast {
-		return this;
-	}
-
-	@Override
-	public JNumber toJNumber() throws JsonIllegalCast {
-		return this;
-	}
-
-	@Override
-	public JBoolean toJBoolean() throws JsonIllegalCast {
-		return this;
-	}
-
-	
-	
-	@Override
-	public Map<String, JElement> toJavaMap() {
+	public Map<String, JsonValue> toJavaMap() {
 		return null;
 	}
 
 	@Override
-	public List<JElement> toJavaList() {
+	public List<JsonValue> toJavaList() {
 		return null;
 	}
 
@@ -109,7 +76,7 @@ public class JNullImpl implements JNull {
 	}
 
 	@Override
-	public Boolean toJavaObject() {
+	public Boolean toJavaBoolean() {
 		return null;
 	}
 
@@ -118,19 +85,36 @@ public class JNullImpl implements JNull {
 	
 	
 	@Override
-	public JObject add( JString key, JElement value ) {
+	public JsonObject add( JsonString key, JsonValue value ) {
 		throw new JsonIllegalOperation( "add" );
 	}
 
 	@Override
-	public JObject add( String key, JElement value ) {
+	public JsonObject add( String key, JsonValue value ) {
 		throw new JsonIllegalOperation( "add" );
 	}
 
 	@Override
-	public JArray add( JElement element ) {
+	public JsonArray add( JsonValue element ) {
 		throw new JsonIllegalOperation( "add" );
 	}
+	
+	@Override
+	public String toJsonString() {
+		return "null";
+	}
 
+
+	@Override
+	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
+		reader.skipWhiteSpace().consume( "null" );
+		return JSON.NULL;
+	}
+
+	@Override
+	public void write( BufferedWriter writer ) throws IOException {
+		writer.append( "null" );
+	}
+	
 
 }

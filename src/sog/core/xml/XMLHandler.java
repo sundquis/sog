@@ -358,7 +358,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	public void startElement( String uri, String localName, String qName, Attributes atts ) throws SAXException {
 		this.startElement( qName,  attributesToMap( atts ) );
 		if ( this.showContentEvents ) {
-			this.out( "JElement started", qName, "Local name", localName, "URI", uri, "Has attrubutes", (atts != null && atts.getLength() > 0) );
+			this.out( "JsonValue started", qName, "Local name", localName, "URI", uri, "Has attrubutes", (atts != null && atts.getLength() > 0) );
 		}
 	}
 
@@ -398,7 +398,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	public void endElement( String uri, String localName, String qName ) throws SAXException {
 		this.endElement( qName );
 		if ( this.showContentEvents ) {
-			this.out( "JElement complete", qName );
+			this.out( "JsonValue complete", qName );
 		}
 	}
 	
@@ -538,7 +538,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	@Test.Decl( "Feedback provided if showDeclarationEvents() has been called" )
 	public void elementDecl( String name, String model ) throws SAXException {
 		if ( this.showDeclarationEvents ) {
-			this.out( "JElement declaration", " ", "Name", name, "Model", model );
+			this.out( "JsonValue declaration", " ", "Name", name, "Model", model );
 		}
 	}
 
@@ -548,7 +548,7 @@ public class XMLHandler implements ContentHandler, ErrorHandler, DeclHandler, Le
 	 */
 	@Override
 	@Test.Decl( "Location is identified" )
-	@Test.Decl( "JElement name is not empty" )
+	@Test.Decl( "JsonValue name is not empty" )
 	@Test.Decl( "Attribute name is not empty" )
 	@Test.Decl( "Type is correct" )
 	@Test.Decl( "Mode is correct" )
