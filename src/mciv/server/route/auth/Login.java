@@ -72,7 +72,7 @@ public class Login extends Route {
 
 	@Override
 	public String getPath() {
-		return "/auth/login";
+		return "/api/auth/login";
 	}
 
 	@Override

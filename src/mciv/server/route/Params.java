@@ -58,6 +58,10 @@ public class Params {
 			}
 		}
 	}
+	
+	public List<Entry<String,String>> getEntries() {
+		return this.entries;
+	}
 
 	/**
 	 * Find the first Entry with matching key and attempt to parse the corresponding

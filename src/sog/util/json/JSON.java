@@ -19,6 +19,13 @@
 
 package sog.util.json;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +38,24 @@ import sog.core.Test;
 public class JSON {
 	
 	private JSON() {}
+	
+	
+	public static JElement read( Reader in ) throws IOException, JsonParseException {
+		try ( 
+			BufferedReader buf = new BufferedReader( in );
+			JsonReader reader = new JsonReader( buf )
+		) {
+			return reader.readElement();
+		}
+	}
+	
+	public static JElement read( InputStream in ) throws IOException, JsonParseException {
+		return JSON.read( new InputStreamReader( in, Charset.forName( "UTF-8" ) ) );
+	}
+	
+	public static JElement read( String s ) throws IOException, JsonParseException {
+		return JSON.read( new StringReader( s ) );
+	}
 
 	
 	public interface JElement {
@@ -44,19 +69,19 @@ public class JSON {
 		public String toJSON();
 		
 		/** Attempt to cast to JObject */
-		public JObject toJObject() throws IllegalCast;
+		public JObject toJObject() throws JsonIllegalCast;
 		
 		/** Attempt to cast to JAray */
-		public JArray toJArray() throws IllegalCast;
+		public JArray toJArray() throws JsonIllegalCast;
 		
 		/** Attempt to cast to JObject */
-		public JString toJString() throws IllegalCast;
+		public JString toJString() throws JsonIllegalCast;
 		
 		/** Attempt to cast to JObject */
-		public JNumber toJNumber() throws IllegalCast;
+		public JNumber toJNumber() throws JsonIllegalCast;
 		
 		/** Attempt to cast to JObject */
-		public JBoolean toJBoolean() throws IllegalCast;
+		public JBoolean toJBoolean() throws JsonIllegalCast;
 		
 	}
 
@@ -69,6 +94,8 @@ public class JSON {
 		public JObject add( String key, JElement value );
 		
 		public Map<String, JElement> toJavaMap();
+		
+		
 		
 	}
 	
@@ -99,7 +126,7 @@ public class JSON {
 	}
 	
 	public static JString str( String s ) {
-		return new JStringImpl( s );
+		return s == null ? JSON.NULL : new JStringImpl( s );
 	}
 	
 	

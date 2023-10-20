@@ -101,28 +101,28 @@ public class JObjectImpl implements JSON.JObject {
 	}
 
 	@Override
-	public JObject toJObject() throws IllegalCast {
+	public JObject toJObject() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
-		throw new IllegalCast( "JSON Object", "JSON Array" );
+	public JArray toJArray() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Object", "JSON Array" );
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
-		throw new IllegalCast( "JSON Object", "JSON String" );
+	public JString toJString() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Object", "JSON String" );
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
-		throw new IllegalCast( "JSON Object", "JSON Number" );
+	public JNumber toJNumber() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Object", "JSON Number" );
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
-		throw new IllegalCast( "JSON Object", "JSON Boolean" );
+	public JBoolean toJBoolean() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Object", "JSON Boolean" );
 	}
 
 }

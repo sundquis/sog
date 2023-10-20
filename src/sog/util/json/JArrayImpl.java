@@ -64,28 +64,28 @@ public class JArrayImpl implements JArray {
 	}
 
 	@Override
-	public JObject toJObject() throws IllegalCast {
-		throw new IllegalCast( "JSON Array", "JSON Object" );
+	public JObject toJObject() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Array", "JSON Object" );
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
+	public JArray toJArray() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
-		throw new IllegalCast( "JSON Array", "JSON String" );
+	public JString toJString() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Array", "JSON String" );
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
-		throw new IllegalCast( "JSON Array", "JSON Number" );
+	public JNumber toJNumber() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Array", "JSON Number" );
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
-		throw new IllegalCast( "JSON Array", "JSON Boolean" );
+	public JBoolean toJBoolean() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Array", "JSON Boolean" );
 	}
 
 }

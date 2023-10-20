@@ -47,27 +47,27 @@ public class JNullImpl implements JNull {
 
 	
 	@Override
-	public JObject toJObject() throws IllegalCast {
+	public JObject toJObject() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
+	public JArray toJArray() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
+	public JString toJString() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
+	public JNumber toJNumber() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
+	public JBoolean toJBoolean() throws JsonIllegalCast {
 		return this;
 	}
 
@@ -119,17 +119,17 @@ public class JNullImpl implements JNull {
 	
 	@Override
 	public JObject add( JString key, JElement value ) {
-		throw new IllegalOperation( "add" );
+		throw new JsonIllegalOperation( "add" );
 	}
 
 	@Override
 	public JObject add( String key, JElement value ) {
-		throw new IllegalOperation( "add" );
+		throw new JsonIllegalOperation( "add" );
 	}
 
 	@Override
 	public JArray add( JElement element ) {
-		throw new IllegalOperation( "add" );
+		throw new JsonIllegalOperation( "add" );
 	}
 
 

@@ -71,28 +71,28 @@ public class JNumberImpl implements JNumber {
 	}
 
 	@Override
-	public JObject toJObject() throws IllegalCast {
-		throw new IllegalCast( "JSON Number", "JSON Object" );
+	public JObject toJObject() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Number", "JSON Object" );
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
-		throw new IllegalCast( "JSON Number", "JSON Array" );
+	public JArray toJArray() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Number", "JSON Array" );
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
-		throw new IllegalCast( "JSON Number", "JSON String" );
+	public JString toJString() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Number", "JSON String" );
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
+	public JNumber toJNumber() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
-		throw new IllegalCast( "JSON Number", "JSON Boolean" );
+	public JBoolean toJBoolean() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Number", "JSON Boolean" );
 	}
 
 

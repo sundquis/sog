@@ -100,7 +100,7 @@ public class Log {
 				new Commented( Log.class ).getCommentedLines( "ENTRY" )
 				.flatMap( mapper ).collect(  Collectors.toList() ) );
 		} catch ( IOException ex ) {
-			Error.get().accept( ex );
+			Error.get().accept( ex, exchange.getRequestURI().toString() );
 		}
 		
 		while ( this.exchangeEntries.size() > Log.MAX_COUNT ) {

@@ -49,27 +49,27 @@ public class JBooleanImpl implements JBoolean {
 	}
 
 	@Override
-	public JObject toJObject() throws IllegalCast {
-		throw new IllegalCast( "JSON Boolean", "JSON Object" );
+	public JObject toJObject() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Boolean", "JSON Object" );
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
-		throw new IllegalCast( "JSON Boolean", "JSON Array" );
+	public JArray toJArray() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Boolean", "JSON Array" );
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
-		throw new IllegalCast( "JSON Boolean", "JSON String" );
+	public JString toJString() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Boolean", "JSON String" );
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
-		throw new IllegalCast( "JSON Boolean", "JSON Number" );
+	public JNumber toJNumber() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON Boolean", "JSON Number" );
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
+	public JBoolean toJBoolean() throws JsonIllegalCast {
 		return this;
 	}
 

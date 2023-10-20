@@ -68,7 +68,7 @@ public class Registrar {
 		try {
 			clazz = Class.forName( className );
 		} catch ( ClassNotFoundException ex ) {
-			Error.get().accept( ex );
+			Error.get().accept( ex, "Loading " + className );
 			return null;
 		}
 		
@@ -81,7 +81,7 @@ public class Registrar {
 			route = (Route) clazz.getDeclaredConstructor().newInstance();
 		} catch ( InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException ex ) {
-			Error.get().accept( ex );
+			Error.get().accept( ex, "Constructing " + className );
 			return null;
 		}
 

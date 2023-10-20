@@ -21,14 +21,12 @@ package mciv.server.route.admin;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Map.Entry;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.Log;
-import mciv.server.route.Params;
-import mciv.server.route.Registrar;
 import mciv.server.route.API;
+import mciv.server.route.Error;
+import mciv.server.route.Params;
 import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
@@ -37,14 +35,14 @@ import sog.core.Test;
  * 
  */
 @Test.Subject( "test." )
-public class Headers extends Route {
+public class Errs extends Route {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Retrieve header information from recent transactions.
+	 *   Retrieve information regarding recent errors.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
@@ -59,23 +57,21 @@ public class Headers extends Route {
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Headers() {
+	public Errs() {
 	}
 
-	@Override 
+	@Override
 	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
 		int trunc = params.getInt( "trunc", 100 );
-		Log.get().truncate( trunc );
+		Error.get().truncate( trunc );
 		
 		int count = params.getInt( "count", 10 );
-		
-		params.getEntries().forEach( this::enableDisable );
-		
+
 		// PRE <!DOCTYPE HTML>
 		// PRE <html>
 		// PRE <head><meta charset="utf-8"></head>
 		// PRE <body>
-		// PRE <H1>Headers</h1>
+		// PRE <H1>Errors</h1>
 		// PRE <pre>
 		
 		// POST </pre>
@@ -86,23 +82,10 @@ public class Headers extends Route {
 		final PrintWriter out = new PrintWriter( html );
 		
 		this.getCommentedLines( "PRE" ).forEach( out::println );
-		Log.get().getHeaders( count ).forEach( out::println );
+		Error.get().getErrors( count ).forEach( out::println );
 		this.getCommentedLines( "POST" ).forEach( out::println );
 
 		return Response.forHtml( html.toString(), exchange );
-	}
-	
-	private void enableDisable( Entry<String, String> entry ) {
-		Boolean enable = "enable".equals( entry.getKey() ) ? Boolean.TRUE
-			: "disable".equals( entry.getKey() ) ? Boolean.FALSE : null;
-		
-		if ( enable == null ) {
-			return;
-		}
-		
-		Registrar.get().getRoutes()
-			.filter( r -> r.getPath().startsWith( entry.getValue() ) )
-			.forEach( r -> r.setLogging( enable ) );
 	}
 
 	@Override
@@ -112,21 +95,19 @@ public class Headers extends Route {
 
 	@Override
 	public int getSequence() {
-		return 35;
+		return 36;
 	}
 
 	@Override
 	public String getPath() {
-		return "/admin/hdrs";
+		return "/admin/errs";
 	}
-	
+
 	@Override
 	public API getRequestAPI() {
 		return super.getRequestAPI()
-			.member( "trunc", "Delete all but the given number of headers." ).integer()
-			.member( "enable", "Enable logging for the given path and any descendants" ).string()
-			.member( "disable", "Disable logging for the given path and any descendants" ).string()
-			.member( "count", "The number of headers to return; default is 10." ).integer();
+			.member( "trunc", "Delete all but the given number of errors." ).integer()
+			.member( "count", "The number of errors to return; default is 10." ).integer();
 	}
 
 	@Override

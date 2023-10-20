@@ -75,7 +75,7 @@ public class Register extends Route {
 
 	@Override
 	public String getPath() {
-		return "/auth/register";
+		return "/api/auth/register";
 	}
 	
 	@Override

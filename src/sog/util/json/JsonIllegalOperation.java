@@ -25,12 +25,12 @@ import sog.core.Test;
  * 
  */
 @Test.Subject( "test." )
-public class IllegalCast extends Exception {
+public class JsonIllegalOperation extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 
-	public IllegalCast( String from, String to ) {
-		super( "Cannot cast from " + from + " to " + to + "." );
+	public JsonIllegalOperation( String op ) {
+		super( "Cannot perform '" + op + "' on JSON Null" );
 	}
 
 

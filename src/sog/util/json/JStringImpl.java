@@ -19,6 +19,9 @@
 
 package sog.util.json;
 
+import java.util.Arrays;
+
+import sog.core.App;
 import sog.core.Test;
 import sog.util.json.JSON.JArray;
 import sog.util.json.JSON.JBoolean;
@@ -35,23 +38,59 @@ public class JStringImpl implements JString {
 	private final String value;
 	
 	JStringImpl( String value ) {
-		this.value = this.escape( value );
+		this.value = value;
 	}
 	
 	/*
-	 * Currently we only escape the required characters, quotation mark (") and reverse solidus (\)
+	 * NOTE:
+	 * This does not handle unicode escapes
 	 */
-	private String escape( String value ) {
-		if ( value == null ) {
-			return null;
-		}
-		
-		return value.replace( "\\", "\\\\" ).replace( "\"", "\\\"" );
-	}
-
+	// FIXME: Needs an exhaustive set of test cases.
 	@Override
 	public String toJSON() {
-		return "\"" + this.value + "\"";
+		StringBuilder buf = new StringBuilder().append( '"' );
+
+		int start = 0;
+		int current = 0;
+		char c = 0;
+		int length = this.value.length();
+		
+		while ( current < length ) {
+			c = this.value.charAt( current );
+			switch (c) {
+			case '\\':
+			case '"':
+			case '/':
+				buf.append( this.value, start, current ).append( '\\' );
+				start = current++;
+				break;
+			case '\b':
+				buf.append( this.value, start, current ).append( "\\b" );
+				start = ++current;
+				break;
+			case '\f':
+				buf.append( this.value, start, current ).append( "\\f" );
+				start = ++current;
+				break;
+			case '\n':
+				buf.append( this.value, start, current ).append( "\\n" );
+				start = ++current;
+				break;
+			case '\r':
+				buf.append( this.value, start, current ).append( "\\r" );
+				start = ++current;
+				break;
+			case '\t':
+				buf.append( this.value, start, current ).append( "\\t" );
+				start = ++current;
+				break;
+			default:
+				current++;
+			}
+		}
+		buf.append( this.value, start, length );
+		
+		return buf.append( '"' ).toString();
 	}
 
 	@Override
@@ -60,28 +99,45 @@ public class JStringImpl implements JString {
 	}
 
 	@Override
-	public JObject toJObject() throws IllegalCast {
-		throw new IllegalCast( "JSON String", "JSON Object" );
+	public JObject toJObject() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON String", "JSON Object" );
 	}
 
 	@Override
-	public JArray toJArray() throws IllegalCast {
-		throw new IllegalCast( "JSON String", "JSON Array" );
+	public JArray toJArray() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON String", "JSON Array" );
 	}
 
 	@Override
-	public JString toJString() throws IllegalCast {
+	public JString toJString() throws JsonIllegalCast {
 		return this;
 	}
 
 	@Override
-	public JNumber toJNumber() throws IllegalCast {
-		throw new IllegalCast( "JSON String", "JSON Number" );
+	public JNumber toJNumber() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON String", "JSON Number" );
 	}
 
 	@Override
-	public JBoolean toJBoolean() throws IllegalCast {
-		throw new IllegalCast( "JSON String", "JSON Boolean" );
+	public JBoolean toJBoolean() throws JsonIllegalCast {
+		throw new JsonIllegalCast( "JSON String", "JSON Boolean" );
 	}
 
+	
+	
+	
+	public static void main( String[] args ) {
+		Arrays.stream( args ).forEach( JStringImpl::print );
+		//JString js = JSON.str( null );
+		//App.get().msg( "Java: " + js.toJavaString() );
+		//App.get().msg( "JSON: " + js.toJSON() );
+	}
+	
+	// For testing
+	private static void print( String s ) {
+		JString js = JSON.str( s );
+		App.get().msg( "Java: " + js.toJavaString() );
+		App.get().msg( "JSON: " + js.toJSON() );
+	}
+	
 }
