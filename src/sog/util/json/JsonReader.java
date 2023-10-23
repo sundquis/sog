@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import sog.core.App;
@@ -371,8 +373,7 @@ public class JsonReader implements AutoCloseable {
 		return JSON.NULL;
 	}
 	
-	
-	
+
 	private static Consumer<String> nullTest = (s) -> {
 		try (
 			JsonReader in = new JsonReader( s );
@@ -518,16 +519,16 @@ public class JsonReader implements AutoCloseable {
 	private static String[] badDoubleTestCases = {
 		"+1", "- 1", "", "123E400", "-1E400", "-1e-400", "1e-4000", "x0.9", "10.01E--1",
 	};
-		
+	
 	private static Consumer<String> arrayTest = (s) -> {
 		try (
 			JsonReader in = new JsonReader( s );
 		) {
 			App.get().msg();
 			App.get().msg( "CASE: " + s );
-			JsonArray json = in.readArray();
-			//JsonArray json = in.readValue().castToJsonArray();
-			App.get().msg( "JSON: " + json.toString() );
+			//JsonArray json = in.readArray();
+			JsonArray json = in.readValue().castToJsonArray();
+			App.get().msg( "JSON: " + JSON.toString( json ) );
 			App.get().msg( "ELEMENT TYPES: " );
 			json.toJavaList().stream().map( Object::getClass ).map( Class::getName )
 				.map( n -> "\t" + n ).forEach( System.out::println );
@@ -540,12 +541,41 @@ public class JsonReader implements AutoCloseable {
 	public static String[] arrayTestCases = {
 		"[]",
 		"[1, 2, 3]",
+		"[1, \"A\", [], \"foo\", [1, 2, 3, 4], null, 0.1234567, \"Hello\\tWorld\", 42E42]",
+		"[{}, [{}], {\"arr\": []}, []]",
+		"[  null, \t false, \ntrue   ]",
+		"[ [ ] , [[]], [[], []], { \"key_1\" : \"value_1\", \"\" : null }]",
+		"[ 1, 2, 3, 4, 5, 6, \"...\", 42 ]", 
+	};
+	
+	private static Consumer<String> objectTest = (s) -> {
+		try (
+			JsonReader in = new JsonReader( s );
+		) {
+			App.get().msg();
+			App.get().msg( "CASE: " + s );
+			JsonObject json = in.readObject();
+			//JsonObject json = in.readValue().castToJsonObject();
+			App.get().msg( "JSON: " + JSON.toString( json ) );
+			App.get().msg( "MEMBERSS: " );
+			json.toJavaMap().entrySet().stream()
+				.map( e -> "    " + e.getKey().toString() + " -> " + e.getValue().toString() ).forEach( System.out::println );
+		} catch ( Throwable ex ) {
+			App.get().msg( "ERROR: " + ex.toString() );
+			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+		}
+	};
+	
+	private static String[] objectTestCases = {
+		"{}",
+		"{ \"arr\": [], \"obj\": {}, \"string\": \"x\", \"number\": 123.456, \"true\":true, \"false\": false, \"&null\" : null}",
+		
 	};
 	
 	public static void main( String[] args ) {
 		App.get().msg( "TEST CASES:" );
 
-		Arrays.stream( arrayTestCases ).forEach( arrayTest );
+		Arrays.stream( objectTestCases ).forEach( objectTest );
 		
 		App.get().done();
 	}

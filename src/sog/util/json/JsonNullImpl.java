@@ -19,7 +19,6 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +34,19 @@ import sog.util.json.JSON.JsonString;
  * 
  */
 @Test.Subject( "test." )
-public class JsonNullImpl extends JsonValueImpl implements JsonNull {
+public class JsonNullImpl implements JsonNull {
 	
 	static final JsonNullImpl NULL = new JsonNullImpl();
 	
 	private JsonNullImpl() {}
 
+	
+	
+	
+	@Override
+	public Map<JsonString, JsonValue> getMembers() {
+		return null;
+	}
 	
 	@Override
 	public Map<String, JsonValue> toJavaMap() {
@@ -76,9 +82,12 @@ public class JsonNullImpl extends JsonValueImpl implements JsonNull {
 	}
 
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		writer.append( "null" );
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeNull();
 	}
-	
+
+
+
+
 
 }

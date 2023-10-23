@@ -19,11 +19,9 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 
-import sog.core.App;
 import sog.core.Test;
 import sog.util.json.JSON.JsonNumber;
 
@@ -31,7 +29,7 @@ import sog.util.json.JSON.JsonNumber;
  * 
  */
 @Test.Subject( "test." )
-public class JsonNumberImpl extends JsonValueImpl implements JsonNumber {
+public class JsonNumberImpl implements JsonNumber {
 	
 	private final BigDecimal javaValue;
 	
@@ -72,10 +70,13 @@ public class JsonNumberImpl extends JsonValueImpl implements JsonNumber {
 
 
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		App.get().msg( "appending " + this.jsonValue);
-		writer.append( this.jsonValue );
-		App.get().msg( "appended " + this.jsonValue);
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeNumber( this );
+	}
+
+	@Override
+	public int compareTo( JsonNumber other ) {
+		return this.toJavaBigDecimal().compareTo( other.toJavaBigDecimal() );
 	}
 
 

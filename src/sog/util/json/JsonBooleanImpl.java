@@ -19,7 +19,6 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 import sog.core.Test;
@@ -29,7 +28,7 @@ import sog.util.json.JSON.JsonBoolean;
  * 
  */
 @Test.Subject( "test." )
-public class JsonBooleanImpl extends JsonValueImpl implements JsonBoolean {
+public class JsonBooleanImpl implements JsonBoolean {
 	
 	static final JsonBooleanImpl TRUE = new JsonBooleanImpl( true );
 	
@@ -53,8 +52,8 @@ public class JsonBooleanImpl extends JsonValueImpl implements JsonBoolean {
 	}
 
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		writer.append( this.value ? "true" : "false" );
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeBoolean( this );
 	}
 
 }

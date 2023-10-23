@@ -19,12 +19,10 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sog.core.App;
 import sog.core.Test;
 import sog.util.json.JSON.JsonArray;
 import sog.util.json.JSON.JsonValue;
@@ -33,7 +31,7 @@ import sog.util.json.JSON.JsonValue;
  * 
  */
 @Test.Subject( "test." )
-public class JsonArrayImpl extends JsonValueImpl implements JsonArray {
+public class JsonArrayImpl implements JsonArray {
 	
 	private final List<JsonValue> values;
 	
@@ -54,24 +52,12 @@ public class JsonArrayImpl extends JsonValueImpl implements JsonArray {
 	
 	@Override
 	public String toString() {
-		return this.toStringImpl();
+		return "JSON.Array";
 	}
 	
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		writer.append( '[' );
-		boolean first = true;
-		for ( JsonValue value : this.values ) {
-			if ( first ) {
-				first = false;
-			} else {
-				App.get().msg( "appending ," );
-				writer.append( ',' );
-				App.get().msg( "appended ," );
-			}
-			value.write( writer );
-		}
-		writer.append( ']' );
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeArray( this );
 	}
 
 }

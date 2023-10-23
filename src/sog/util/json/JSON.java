@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
 
@@ -41,26 +41,40 @@ public class JSON {
 	private JSON() {}
 	
 	public static JsonValue read( Reader reader ) throws IOException, JsonParseException {
-		try ( 
-			JsonReader json = new JsonReader( reader )
-		) {
+		try ( JsonReader json = new JsonReader( reader ) ) {
 			return json.readValue();
 		}
 	}
 	
 	public static JsonValue read( InputStream input ) throws IOException, JsonParseException {
-		try ( 
-			JsonReader json = new JsonReader( input )
-		) {
+		try ( JsonReader json = new JsonReader( input ) ) {
 			return json.readValue();
 		}
 	}
 	
 	public static JsonValue fromString( String s ) throws IOException, JsonParseException {
-		try ( 
-			JsonReader json = new JsonReader( s )
-		) {
+		try ( JsonReader json = new JsonReader( s ) ) {
 			return json.readValue();
+		}
+	}
+	
+	public static void write( JsonValue  value, Writer writer ) throws IOException {
+		try ( JsonWriter json = new JsonWriter( writer ) ) {
+			json.writeValue( value );
+		}
+	}
+
+	public static void write( JsonValue  value, OutputStream output ) throws IOException {
+		try ( JsonWriter json = new JsonWriter( output ) ) {
+			json.writeValue( value );
+		}
+	}
+
+	public static String toString( JsonValue value ) throws IOException {
+		try ( StringWriter sw = new StringWriter(); JsonWriter json = new JsonWriter( sw ); ) {
+			json.writeValue( value );
+			json.flush();
+			return sw.toString();
 		}
 	}
 
@@ -68,27 +82,30 @@ public class JSON {
 	
 	public interface JsonValue {
 		
-		public void write( Writer writer ) throws IOException;
-		
-		public void write( OutputStream output ) throws IOException;
-		
+		public void write( JsonWriter writer ) throws IOException;
 		
 		/**
-		 * Produce the canonical JSON string representation for the element.
-		 * See: "https://www.json.org/json-en.html"
+		 * The implementation for simple JSON values (null, boolean, number, and string)
+		 * returns the canonical JSON string representation for the element.
+		 * (See: "https://www.json.org/json-en.html")
+		 * 
+		 * But the composite types (object and array) can represent arbitrarily large
+		 * data structures and generally should not be converted to a String representation.
+		 * Rather, one of the JSON.write methods can be used to write the representation
+		 * to a Stream or Writer.
 		 */
 		@Override
 		public String toString();
 		
-		public JsonObject castToJsonObject() throws ClassCastException;
+		public default JsonObject castToJsonObject() { return (JsonObject) this; }
 		
-		public JsonArray castToJsonArray() throws ClassCastException;
+		public default JsonArray castToJsonArray() { return (JsonArray) this; }
 		
-		public JsonString castToJsonString() throws ClassCastException;
+		public default JsonString castToJsonString() { return (JsonString) this; }
 		
-		public JsonNumber castToJsonNumber() throws ClassCastException;
+		public default JsonNumber castToJsonNumber() { return (JsonNumber) this; }
 		
-		public JsonBoolean castToJsonBoolean() throws ClassCastException;
+		public default JsonBoolean castToJsonBoolean() { return (JsonBoolean) this; }
 		
 	}
 
@@ -101,6 +118,8 @@ public class JSON {
 		public JsonObject add( String key, JsonValue value );
 		
 		public Map<String, JsonValue> toJavaMap();
+		
+		public Map<JsonString, JsonValue> getMembers();
 		
 	}
 	
@@ -133,7 +152,7 @@ public class JSON {
 	
 	
 	
-	public static interface JsonString extends JsonValue {
+	public static interface JsonString extends JsonValue, Comparable<JsonString> {
 		
 		public String toJavaString();
 		
@@ -150,7 +169,7 @@ public class JSON {
 	
 	
 	
-	public static interface JsonNumber extends JsonValue {
+	public static interface JsonNumber extends JsonValue, Comparable<JsonNumber> {
 		
 		public Integer toJavaInteger() throws ArithmeticException;
 		
@@ -188,9 +207,5 @@ public class JSON {
 	
 	public static final JsonNull NULL = JsonNullImpl.NULL;
 	
-	
-	public static void main (String[] args ) {
-		App.get().msg(); // int.int double or float?
-	}
 	
 }

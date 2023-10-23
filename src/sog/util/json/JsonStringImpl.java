@@ -19,7 +19,6 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 import sog.core.Test;
@@ -29,7 +28,7 @@ import sog.util.json.JSON.JsonString;
  * 
  */
 @Test.Subject( "test." )
-public class JsonStringImpl extends JsonValueImpl implements JsonString {
+public class JsonStringImpl implements JsonString {
 	
 	static JsonString forJavaValue( String javaValue ) {
 		return new JsonStringImpl( javaValue, javaToJson( javaValue ) );
@@ -56,7 +55,7 @@ public class JsonStringImpl extends JsonValueImpl implements JsonString {
 
 	/*
 	 * NOTE:
-	 * This does not handle unicode escapes
+	 * This does not escape unicode characters.
 	 */
 	private static String javaToJson( String javaValue ) {
 		StringBuilder buf = new StringBuilder().append( '"' );
@@ -105,8 +104,13 @@ public class JsonStringImpl extends JsonValueImpl implements JsonString {
 	}
 
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		writer.append( this.jsonValue );
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeString( this );
+	}
+
+	@Override
+	public int compareTo( JsonString other ) {
+		return this.toJavaString().compareTo( other.toJavaString() );
 	}
 
 	

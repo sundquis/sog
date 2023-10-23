@@ -19,7 +19,6 @@
 
 package sog.util.json;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,13 +33,18 @@ import sog.util.json.JSON.JsonString;
  * 
  */
 @Test.Subject( "test." )
-public class JsonObjectImpl extends JsonValueImpl implements JSON.JsonObject {
+public class JsonObjectImpl implements JSON.JsonObject {
 	
 	
 	private final Map<JsonString, JsonValue> members;
 	
 	JsonObjectImpl() {
 		this.members = new TreeMap<>();
+	}
+	
+	@Override
+	public Map<JsonString, JsonValue> getMembers() {
+		return this.members;
 	}
 	
 	@Override
@@ -51,7 +55,8 @@ public class JsonObjectImpl extends JsonValueImpl implements JSON.JsonObject {
 
 	@Override
 	public JsonObject add( JsonString key, JsonValue value ) {
-		return this.add( key, value );
+		this.members.put( key, value );
+		return this;
 	}
 
 	@Override
@@ -65,24 +70,12 @@ public class JsonObjectImpl extends JsonValueImpl implements JSON.JsonObject {
 	
 	@Override
 	public String toString() {
-		return this.toStringImpl();
+		return "JSON.Object";
 	}
 
 	@Override
-	protected void write( BufferedWriter writer ) throws IOException {
-		writer.append( '{' );
-		boolean first = true;
-		for ( Entry<JsonString, JsonValue> entry : this.members.entrySet() ) {
-			if ( first ) {
-				first = false;
-			} else {
-				writer.append( ',' );
-			}
-			entry.getKey().write( writer );
-			writer.append( ':' );
-			entry.getValue().write( writer );
-		}
-		writer.append( '}' );
+	public void write( JsonWriter writer ) throws IOException {
+		writer.writeObject( this );
 	}
 
 }
