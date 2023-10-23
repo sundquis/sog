@@ -35,9 +35,11 @@ import sog.util.json.JSON.JsonString;
  * 
  */
 @Test.Subject( "test." )
-public class JsonNullImpl implements JsonNull {
+public class JsonNullImpl extends JsonValueImpl implements JsonNull {
 	
-	JsonNullImpl() {}
+	static final JsonNullImpl NULL = new JsonNullImpl();
+	
+	private JsonNullImpl() {}
 
 	
 	@Override
@@ -50,39 +52,8 @@ public class JsonNullImpl implements JsonNull {
 		return null;
 	}
 
-	@Override
-	public String toJavaString() {
-		return null;
-	}
-
-	@Override
-	public Integer toJavaInteger() {
-		return null;
-	}
-
-	@Override
-	public Float toJavaFloat() {
-		return null;
-	}
-
-	@Override
-	public Double toJavaDouble() {
-		return null;
-	}
-
-	@Override
-	public Number toJavaNumber() {
-		return null;
-	}
-
-	@Override
-	public Boolean toJavaBoolean() {
-		return null;
-	}
 
 
-	
-	
 	
 	@Override
 	public JsonObject add( JsonString key, JsonValue value ) {
@@ -100,19 +71,12 @@ public class JsonNullImpl implements JsonNull {
 	}
 	
 	@Override
-	public String toJsonString() {
+	public String toString() {
 		return "null";
 	}
 
-
 	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		reader.skipWhiteSpace().consume( "null" );
-		return JSON.NULL;
-	}
-
-	@Override
-	public void write( BufferedWriter writer ) throws IOException {
+	protected void write( BufferedWriter writer ) throws IOException {
 		writer.append( "null" );
 	}
 	

@@ -24,17 +24,21 @@ import java.io.IOException;
 
 import sog.core.Test;
 import sog.util.json.JSON.JsonBoolean;
-import sog.util.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonBooleanImpl implements JsonBoolean {
+public class JsonBooleanImpl extends JsonValueImpl implements JsonBoolean {
+	
+	static final JsonBooleanImpl TRUE = new JsonBooleanImpl( true );
+	
+	static final JsonBooleanImpl FALSE = new JsonBooleanImpl( false );
+
 	
 	private final boolean value;
 	
-	JsonBooleanImpl( boolean value ) {
+	private JsonBooleanImpl( boolean value ) {
 		this.value = value;
 	}
 
@@ -44,28 +48,12 @@ public class JsonBooleanImpl implements JsonBoolean {
 	}
 	
 	@Override
-	public String toJsonString() {
+	public String toString() {
 		return this.value ? "true" : "false";
 	}
 
 	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		char c = reader.skipWhiteSpace().curChar();
-		switch (c) {
-		case 't':
-			reader.consume( "true" );
-			return JSON.TRUE;
-		case 'f':
-			reader.consume( "false" );
-			return JSON.FALSE;
-		default:
-			throw new JsonParseException( "Illegal character for boolean value", reader.getColumn() );
-		}
-	}
-	
-	
-	@Override
-	public void write( BufferedWriter writer ) throws IOException {
+	protected void write( BufferedWriter writer ) throws IOException {
 		writer.append( this.value ? "true" : "false" );
 	}
 

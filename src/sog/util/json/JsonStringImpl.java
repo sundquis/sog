@@ -24,162 +24,89 @@ import java.io.IOException;
 
 import sog.core.Test;
 import sog.util.json.JSON.JsonString;
-import sog.util.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonStringImpl implements JsonString {
+public class JsonStringImpl extends JsonValueImpl implements JsonString {
 	
-	private String javaValue;
+	static JsonString forJavaValue( String javaValue ) {
+		return new JsonStringImpl( javaValue, javaToJson( javaValue ) );
+	}
 	
-	private String jsonValue;
+	private final String javaValue;
 	
-	JsonStringImpl( String value ) {
-		this.javaValue = value;
-		// FIXME set the JSON value
-		this.jsonValue = null;
+	private final String jsonValue;
+	
+	JsonStringImpl( String javaValue, String jsonValue ) {
+		this.javaValue = javaValue;
+		this.jsonValue = jsonValue;
+	}
+
+	@Override
+	public String toString() {
+		return this.jsonValue;
 	}
 	
 	@Override
 	public String toJavaString() {
 		return this.javaValue;
 	}
-	
-	@Override
-	public String toJsonString() {
-		return this.jsonValue;
-	}
 
 	/*
 	 * NOTE:
 	 * This does not handle unicode escapes
 	 */
-	// FIXME: Needs an exhaustive set of test cases.
-//	@Override
-//	public String toJSON() {
-//		StringBuilder buf = new StringBuilder().append( '"' );
-//
-//		int start = 0;
-//		int current = 0;
-//		char c = 0;
-//		int length = this.value.length();
-//		
-//		while ( current < length ) {
-//			c = this.value.charAt( current );
-//			switch (c) {
-//			case '\\':
-//			case '"':
-//			case '/':
-//				buf.append( this.value, start, current ).append( '\\' );
-//				start = current++;
-//				break;
-//			case '\b':
-//				buf.append( this.value, start, current ).append( "\\b" );
-//				start = ++current;
-//				break;
-//			case '\f':
-//				buf.append( this.value, start, current ).append( "\\f" );
-//				start = ++current;
-//				break;
-//			case '\n':
-//				buf.append( this.value, start, current ).append( "\\n" );
-//				start = ++current;
-//				break;
-//			case '\r':
-//				buf.append( this.value, start, current ).append( "\\r" );
-//				start = ++current;
-//				break;
-//			case '\t':
-//				buf.append( this.value, start, current ).append( "\\t" );
-//				start = ++current;
-//				break;
-//			default:
-//				current++;
-//			}
-//		}
-//		buf.append( this.value, start, length );
-//		
-//		return buf.append( '"' ).toString();
-//	}
+	private static String javaToJson( String javaValue ) {
+		StringBuilder buf = new StringBuilder().append( '"' );
 
-	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		StringBuilder java = new StringBuilder();
-		StringBuilder json = new StringBuilder();
+		int start = 0;
+		int current = 0;
+		char c = 0;
+		int length = javaValue.length();
 		
-		reader.skipWhiteSpace().consume( '"' );
-		json.append( '"' );
-		
-		boolean escape = false;
-		char cur;
-		while ( reader.hasChar() ) {
-			cur = reader.curChar();
-			json.append( cur );
-			if ( escape ) {
-				java.append( this.getEscape( cur, reader.getColumn() ) );
-				escape = false;
-			} else if ( cur == '\\' ) {
-				escape = true;
-			} else if ( cur == '"' ) {
+		while ( current < length ) {
+			c = javaValue.charAt( current );
+			switch (c) {
+			case '\\':
+			case '"':
+			case '/':
+				buf.append( javaValue, start, current ).append( '\\' );
+				start = current++;
 				break;
-			} else {
-				java.append( cur );
+			case '\b':
+				buf.append( javaValue, start, current ).append( "\\b" );
+				start = ++current;
+				break;
+			case '\f':
+				buf.append( javaValue, start, current ).append( "\\f" );
+				start = ++current;
+				break;
+			case '\n':
+				buf.append( javaValue, start, current ).append( "\\n" );
+				start = ++current;
+				break;
+			case '\r':
+				buf.append( javaValue, start, current ).append( "\\r" );
+				start = ++current;
+				break;
+			case '\t':
+				buf.append( javaValue, start, current ).append( "\\t" );
+				start = ++current;
+				break;
+			default:
+				current++;
 			}
 		}
-
-		this.javaValue = java.toString();
-		this.jsonValue = json.toString();
-		return this;
+		buf.append( javaValue, start, length );
+		
+		return buf.append( '"' ).toString();
 	}
-//	public JsonString readString() throws IOException, JsonParseException {
-//		this.skipWhiteSpace();
-//		this.consume( '"' );
-//		
-//		StringBuilder buf = new StringBuilder();
-//		boolean escape = false;
-//		char cur;
-//		while ( this.hasChar() ) {
-//			cur = this.curChar();
-//			if ( escape ) {
-//				buf.append( this.getEscape( cur ) );
-//				escape = false;
-//			} else if ( cur == '\\' ) {
-//				escape = true;
-//			} else if ( cur == '"' ) {
-//				break;
-//			} else {
-//				buf.append( cur );
-//			}
-//			this.advance();
-//		}
-//		
-//		this.consume( '"' );
-//		return JSON.str( buf.toString() );
-//	}
-	
-	private char getEscape( char c, int location ) throws JsonParseException {
-		switch (c) {
-		case '\\': return '\\';
-		case '"': return '"';
-		case '/': return '/';
-		case 'b': return '\b';
-		case 'f': return '\f';
-		case 'n': return '\n';
-		case 'r': return '\r';
-		case 't': return '\t';
-		default:
-			throw new JsonParseException( "Illegal escape character: " + c, location );
-		}
-	}
-	
-	
 
 	@Override
-	public void write( BufferedWriter writer ) throws IOException {
-		// TODO Auto-generated method stub
-		
+	protected void write( BufferedWriter writer ) throws IOException {
+		writer.append( this.jsonValue );
 	}
 
 	

@@ -115,7 +115,8 @@ public interface Response {
 	/* JSON response, with closing operation. */
 	public static Response forJSON( HttpExchange exchange, JSON.JsonValue json, Procedure afterClose ) {
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
-		String body = json.toJsonString();
+		// FIXME
+		String body = json.toString();
 		return new Response() {
 			@Override public long getLength() { return body.getBytes().length; }
 			@Override public InputStream getBody() { return Response.forString( body ); }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import sog.core.App;
 import sog.core.Test;
 import sog.util.json.JSON.JsonArray;
 import sog.util.json.JSON.JsonValue;
@@ -32,7 +33,7 @@ import sog.util.json.JSON.JsonValue;
  * 
  */
 @Test.Subject( "test." )
-public class JsonArrayImpl implements JsonArray {
+public class JsonArrayImpl extends JsonValueImpl implements JsonArray {
 	
 	private final List<JsonValue> values;
 	
@@ -50,33 +51,23 @@ public class JsonArrayImpl implements JsonArray {
 	public List<JsonValue> toJavaList() {
 		return this.values;
 	}
-
+	
 	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		reader.skipWhiteSpace().consume( '[' );
-		
-		if ( reader.skipWhiteSpace().curChar() != ']' ) {
-			this.add( reader.readValue() );
-		}
-		
-		while ( reader.skipWhiteSpace().curChar() != ']' ) {
-			reader.consume( ',' );
-			this.add( reader.readValue() );
-		}
-
-		reader.consume( ']' );
-		return this;
+	public String toString() {
+		return this.toStringImpl();
 	}
-
+	
 	@Override
-	public void write( BufferedWriter writer ) throws IOException {
+	protected void write( BufferedWriter writer ) throws IOException {
 		writer.append( '[' );
 		boolean first = true;
 		for ( JsonValue value : this.values ) {
 			if ( first ) {
 				first = false;
 			} else {
+				App.get().msg( "appending ," );
 				writer.append( ',' );
+				App.get().msg( "appended ," );
 			}
 			value.write( writer );
 		}

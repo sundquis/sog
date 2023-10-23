@@ -35,7 +35,6 @@ import mciv.server.Server;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
-import sog.util.json.JsonReader;
 import sog.util.json.JSON;
 
 
@@ -163,7 +162,9 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		Params params = null;
 		
 		try {
-			//requestBody = new JsonReader( exchange.getRequestBody() ).readObject().toJSON();
+			// FIXME
+			//requestBody = JSON.read( exchange.getRequestBody() );
+					//new JsonReader( exchange.getRequestBody() ).readObject().toJSON();
 			requestBody = new String( exchange.getRequestBody().readAllBytes() );
 			params = new Params( exchange.getRequestURI().getQuery() );
 			
@@ -203,7 +204,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 				.add( "message", JSON.str( ex.getMessage() ) )
 				.add( "URL_parameters", JSON.str( params.toString() ) )
 				.add( "request_body", JSON.str( requestBody ) )
-				.toJsonString();
+				.toString();
 			exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 			exchange.sendResponseHeaders( 200, error.getBytes().length );
 			exchange.getResponseBody().write( error.getBytes() );

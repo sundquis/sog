@@ -19,22 +19,17 @@
 
 package sog.util.json;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import sog.core.AppRuntime;
+import sog.core.App;
+import sog.core.Assert;
 import sog.core.Test;
 
 /**
@@ -45,62 +40,55 @@ public class JSON {
 	
 	private JSON() {}
 	
-	
 	public static JsonValue read( Reader reader ) throws IOException, JsonParseException {
 		try ( 
-			BufferedReader buf = new BufferedReader( reader );
-			JsonReader json = new JsonReader( buf )
+			JsonReader json = new JsonReader( reader )
 		) {
 			return json.readValue();
 		}
 	}
 	
 	public static JsonValue read( InputStream input ) throws IOException, JsonParseException {
-		return JSON.read( new InputStreamReader( input, Charset.forName( "UTF-8" ) ) );
+		try ( 
+			JsonReader json = new JsonReader( input )
+		) {
+			return json.readValue();
+		}
 	}
 	
-	public static JsonValue fromJsonString( String s ) throws IOException, JsonParseException {
-		return JSON.read( new StringReader( s ) );
+	public static JsonValue fromString( String s ) throws IOException, JsonParseException {
+		try ( 
+			JsonReader json = new JsonReader( s )
+		) {
+			return json.readValue();
+		}
 	}
 
 	
 	
 	public interface JsonValue {
 		
-		public JsonValue read( JsonReader reader ) throws IOException, JsonParseException;
+		public void write( Writer writer ) throws IOException;
 		
-		public void write( BufferedWriter writer ) throws IOException;
+		public void write( OutputStream output ) throws IOException;
 		
-		public default void write( Writer writer, boolean formatted ) throws IOException {
-			try ( 
-				BufferedWriter buf = new BufferedWriter( writer )
-			) {
-				this.write( buf );
-			}
-		}
-		
-		public default void write( OutputStream output ) throws IOException {
-			this.write( new OutputStreamWriter( output, Charset.forName( "UTF-8" ) ), false );
-		}
 		
 		/**
 		 * Produce the canonical JSON string representation for the element.
 		 * See: "https://www.json.org/json-en.html"
-		 * 
-		 * 'Primitive' JSON types override this using internal state.
-		 * 
-		 * @return
-		 * @throws IOException 
 		 */
-		public default String toJsonString() {
-			try ( Writer sw = new StringWriter() ) {
-				this.write( sw, true );
-				return sw.toString();
-			} catch ( IOException ex ) {
-				// Probably only happens if we are out of resources, for large object?
-				throw new AppRuntime( "Unable to construct string representation" );
-			}
-		}
+		@Override
+		public String toString();
+		
+		public JsonObject castToJsonObject() throws ClassCastException;
+		
+		public JsonArray castToJsonArray() throws ClassCastException;
+		
+		public JsonString castToJsonString() throws ClassCastException;
+		
+		public JsonNumber castToJsonNumber() throws ClassCastException;
+		
+		public JsonBoolean castToJsonBoolean() throws ClassCastException;
 		
 	}
 
@@ -114,10 +102,13 @@ public class JSON {
 		
 		public Map<String, JsonValue> toJavaMap();
 		
-		
-		
 	}
 	
+	/**
+	 * Return an empty JSON Object.
+	 * 
+	 * @return
+	 */
 	public static JsonObject obj() {
 		return new JsonObjectImpl();
 	}
@@ -131,7 +122,11 @@ public class JSON {
 		public List<JsonValue> toJavaList();
 		
 	}
-	
+
+	/**
+	 * Return an empty JSON Array
+	 * @return
+	 */
 	public static JsonArray arr() {
 		return new JsonArrayImpl();
 	}
@@ -143,22 +138,25 @@ public class JSON {
 		public String toJavaString();
 		
 	}
-	
+
+	/**
+	 * Return an immutable JSON String
+	 * @param s
+	 * @return
+	 */
 	public static JsonString str( String s ) {
-		return s == null ? JSON.NULL : new JsonStringImpl( s );
+		return JsonStringImpl.forJavaValue( Assert.nonNull( s ) );
 	}
 	
 	
 	
 	public static interface JsonNumber extends JsonValue {
 		
-		public Integer toJavaInteger();
+		public Integer toJavaInteger() throws ArithmeticException;
 		
-		public Float toJavaFloat();
+		public Double toJavaDouble() throws ArithmeticException;
 		
-		public Double toJavaDouble();
-		
-		public Number toJavaNumber();
+		public BigDecimal toJavaBigDecimal();
 		
 	}
 	
@@ -180,15 +178,19 @@ public class JSON {
 		public Boolean toJavaBoolean();
 	}
 	
-	public static final JsonBoolean TRUE = new JsonBooleanImpl( true );
+	public static final JsonBoolean TRUE = JsonBooleanImpl.TRUE;
 	
-	public static final JsonBoolean FALSE = new JsonBooleanImpl( false );
+	public static final JsonBoolean FALSE = JsonBooleanImpl.FALSE;
 	
 	
 	
-	public static interface JsonNull extends JsonObject, JsonArray, JsonString, JsonNumber, JsonBoolean {}
+	public static interface JsonNull extends JsonObject, JsonArray {}
 	
-	public static final JsonNull NULL = new JsonNullImpl();
+	public static final JsonNull NULL = JsonNullImpl.NULL;
 	
+	
+	public static void main (String[] args ) {
+		App.get().msg(); // int.int double or float?
+	}
 	
 }

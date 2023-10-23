@@ -21,92 +21,61 @@ package sog.util.json;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 
+import sog.core.App;
 import sog.core.Test;
 import sog.util.json.JSON.JsonNumber;
-import sog.util.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonNumberImpl implements JsonNumber {
+public class JsonNumberImpl extends JsonValueImpl implements JsonNumber {
 	
-	private final int integer;
-	private final int fraction;
-	private final int exponent;
+	private final BigDecimal javaValue;
+	
+	private final String jsonValue;
+	
+	JsonNumberImpl( String jsonValue ) {
+		this.javaValue = new BigDecimal( jsonValue );
+		this.jsonValue = jsonValue;
+	}
 
 	JsonNumberImpl( int integer, int fraction, int exponent ) {
-		this.integer = integer;
-		this.fraction = fraction;
-		this.exponent = exponent;
-	}
-
-//	@Override
-//	public String toJSON() {
-//		return "" + this.integer 
-//			+ (this.fraction > 0 ? "." + this.fraction : "") 
-//			+ (this.exponent == 0 ? "" : "E" + this.exponent );
-//	}
-
-	@Override
-	public Integer toJavaInteger() {
-		return this.integer;
+		this( "" + integer + (fraction > 0 ? fraction : "") + (exponent != 0 ? "E" + exponent : "") );
 	}
 
 	@Override
-	public Float toJavaFloat() {
-		return Float.parseFloat( "FIXME" );
+	public String toString() {
+		return this.jsonValue;
 	}
 
 	@Override
-	public Double toJavaDouble() {
-		return Double.parseDouble( "FIXME" );
+	public Integer toJavaInteger() throws ArithmeticException {
+		return this.javaValue.intValueExact();
 	}
 
 	@Override
-	public Number toJavaNumber() {
-		return this.fraction == 0 ? this.toJavaInteger()
-			: this.exponent == 0 ? this.toJavaFloat() : this.toJavaDouble();
+	public Double toJavaDouble() throws ArithmeticException {
+		Double result = this.javaValue.doubleValue();
+		if ( result == Double.NEGATIVE_INFINITY || result == Double.POSITIVE_INFINITY ) {
+			throw new ArithmeticException( "Magnitude too large");
+		}
+		return result;
 	}
 
 	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		// TODO Auto-generated method stub
-		return this;
+	public BigDecimal toJavaBigDecimal() {
+		return this.javaValue;
 	}
-//	public JsonNumber readNumber() throws IOException, JsonParseException {
-//		this.skipWhiteSpace();
-//
-//		int integer;
-//		if ( this.curChar() == '-' ) {
-//			integer = -1;
-//		} else {
-//			integer = 1;
-//		}
-//		integer *= this.readDigits();
-//		
-//		int fraction = 0;
-//		if ( this.curChar() == '.' ) {
-//			fraction = this.readDigits();
-//		}
-//		
-//		int exponent = 0;
-//		
-//		
-//		
-//		return JSON.exp( integer, fraction, exponent );
-//	}
-//	
-//	private int readDigits() throws IOException, JsonParseException {
-//		StringBuilder buf = new StringBuilder();
-//		return 0;
-//	}
+
 
 	@Override
-	public void write( BufferedWriter writer ) throws IOException {
-		// TODO Auto-generated method stub
-		
+	protected void write( BufferedWriter writer ) throws IOException {
+		App.get().msg( "appending " + this.jsonValue);
+		writer.append( this.jsonValue );
+		App.get().msg( "appended " + this.jsonValue);
 	}
 
 

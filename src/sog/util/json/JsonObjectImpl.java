@@ -34,7 +34,7 @@ import sog.util.json.JSON.JsonString;
  * 
  */
 @Test.Subject( "test." )
-public class JsonObjectImpl implements JSON.JsonObject {
+public class JsonObjectImpl extends JsonValueImpl implements JSON.JsonObject {
 	
 	
 	private final Map<JsonString, JsonValue> members;
@@ -62,32 +62,14 @@ public class JsonObjectImpl implements JSON.JsonObject {
 		}
 		return result;
 	}
-
+	
 	@Override
-	public JsonValue read( JsonReader reader ) throws IOException, JsonParseException {
-		reader.skipWhiteSpace().consume( '{' );
-
-		if ( reader.skipWhiteSpace().curChar() != '}' ) {
-			JsonString key = JSON.str( "" );
-			key.read( reader );
-			reader.skipWhiteSpace().consume( ':' );
-			this.add( key, reader.readValue() );
-		}
-
-		while ( reader.skipWhiteSpace().curChar() != '}' ) {
-			reader.consume( ',' );
-			JsonString key = JSON.str( "" );
-			key.read( reader );
-			reader.skipWhiteSpace().consume( ':' );
-			this.add( key, reader.readValue() );
-		}
-		
-		reader.consume( '}' );
-		return this;
+	public String toString() {
+		return this.toStringImpl();
 	}
 
 	@Override
-	public void write( BufferedWriter writer ) throws IOException {
+	protected void write( BufferedWriter writer ) throws IOException {
 		writer.append( '{' );
 		boolean first = true;
 		for ( Entry<JsonString, JsonValue> entry : this.members.entrySet() ) {
