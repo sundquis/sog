@@ -19,10 +19,7 @@
 
 package mciv.server.route.admin;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -30,17 +27,18 @@ import mciv.server.Server;
 import mciv.server.route.API;
 import mciv.server.route.Params;
 import mciv.server.route.Registrar;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.util.FixedWidth;
 import sog.util.Macro;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Status extends Route {
+public class Status extends AdminRoute {
 
 	/* <API>
 	 * <hr>
@@ -86,51 +84,42 @@ public class Status extends Route {
 
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		StringWriter html = new StringWriter();
-		final PrintWriter out = new PrintWriter( html );
+	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
 
-		// HTML <!DOCTYPE html>
-		// HTML	<html>
-		// HTML	<head><meta charset="utf-8"></head>
-		// HTML	<body>
-		// HTML	<h1>MCIV Server Status</h1>
-		// HTML <pre>
-		// HTML OPERATION:
-		// HTML   Server Started: ${start time}
-		// HTML   Uptime: ${up time}
-		// HTML 
-		// HTML SERVICES:
-		// HTML   ${service header}
-		// HTML   ${service rows}
-		// HTML 
-		// HTML CLIENTS:
-		// HTML   ${remote header}
-		// HTML   ${remote rows}
-		// HTML 
-		// HTML ERRORS:
-		// HTML   ${error header}
-		// HTML   ${error rows}
-		// HTML 
-		// HTML </pre>
-		// HTML </body>
-		// HTML </html>
+		// BODY <h1>MCIV Server Status</h1>
+		// BODY <pre>
+		// BODY OPERATION:
+		// BODY   Server Started: ${start time}
+		// BODY   Uptime: ${up time}
+		// BODY 
+		// BODY SERVICES:
+		// BODY   ${service header}
+		// BODY   ${service rows}
+		// BODY 
+		// BODY CLIENTS:
+		// BODY   ${remote header}
+		// BODY   ${remote rows}
+		// BODY 
+		// BODY ERRORS:
+		// BODY   ${error header}
+		// BODY   ${error rows}
+		// BODY 
+		// BODY </pre>
+		// BODY </body>
 		
 		Macro mapper = new Macro()
 			.expand( "start time", Server.get().getStartTime() )
 			.expand( "up time", Server.get().getUpTime() )
 			.expand( "service header", this.serviceStats.header() )
-			.expand( "service rows", 
-				Registrar.get().getRoutes().map( this::getServiceStats ).collect( Collectors.toList() ) )
+			.expand( "service rows", Registrar.get().getRoutes().map( this::getServiceStats ) )
 			.expand( "remote header", this.remoteStats.header() )
-			.expand( "remote rows",
-				this.getRemoteEntries().map( this::getRemoteStats ).collect( Collectors.toList() ) )
+			.expand( "remote rows", this.getRemoteEntries().map( this::getRemoteStats ) )
 			.expand( "error header", this.errorStats.header() )
-			.expand( "error rows", 
-				Registrar.get().getRoutes().map( this::getErrorStats ).collect( Collectors.toList() ) );
-		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
+			.expand( "error rows", Registrar.get().getRoutes().map( this::getErrorStats ) );
+		
+		this.sendHtml( exchange, this.getCommentedLines( "BODY" ).flatMap( mapper ) );
 				
-		return Response.forHtml( html.toString(), exchange );
+		return Procedure.NOOP;
 	}
 	
 	private String getServiceStats( Route r ) {

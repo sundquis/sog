@@ -115,7 +115,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.arrayToString(Object[])", 
-		description = "Sample cases for arrays of arrays" 
+		description = "SampleAction cases for arrays of arrays" 
 	)
 	public void tm_00A1A7140( Test.Case tc ) {
 		Object[] empty = new String[] {};
@@ -140,7 +140,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.arrayToString(Object[])", 
-		description = "Sample cases for arrays of collections" 
+		description = "SampleAction cases for arrays of collections" 
 	)
 	public void tm_037D4ADA5( Test.Case tc ) {
 		Collection<Object> empty = List.of();
@@ -165,7 +165,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.arrayToString(Object[])", 
-		description = "Sample cases for arrays of primitive" 
+		description = "SampleAction cases for arrays of primitive" 
 	)
 	public void tm_0D3F439B7( Test.Case tc ) {
 		Integer[] ints = new Integer[] { 1, 34567, 2 };
@@ -233,7 +233,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.collectionToString(Collection)", 
-		description = "Sample cases for collections of arrays" 
+		description = "SampleAction cases for collections of arrays" 
 	)
 	public void tm_033792411( Test.Case tc ) {
 		Object[] empty = new String[] {};
@@ -258,7 +258,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.collectionToString(Collection)", 
-		description = "Sample cases for collections of collections" 
+		description = "SampleAction cases for collections of collections" 
 	)
 	public void tm_05C7A1574( Test.Case tc ) {
 		Collection<Object> empty = List.of();
@@ -283,7 +283,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.collectionToString(Collection)", 
-		description = "Sample cases for collections of primitive" 
+		description = "SampleAction cases for collections of primitive" 
 	)
 	public void tm_0171F4946( Test.Case tc ) {
 		Collection<Integer> ints = Set.of( 1, 34567, 2 );
@@ -613,7 +613,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.strip(String)", 
-		description = "Sample cases" 
+		description = "SampleAction cases" 
 	)
 	public void tm_0F3CE2A47( Test.Case tc ) {
 		String[] args = {
@@ -739,7 +739,7 @@ public class StringsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: String Strings.toCamelCase(String)", 
-		description = "Sample cases" 
+		description = "SampleAction cases" 
 	)
 	public void tm_0A739A934( Test.Case tc ) {
 		String[] args = {

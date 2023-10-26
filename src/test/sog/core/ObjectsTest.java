@@ -84,7 +84,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.deepArrayEquals(Object, Object)", 
-		description = "Sample cases deep equal" 
+		description = "SampleAction cases deep equal" 
 	)
 	public void tm_02A278907( Test.Case tc ) {
 		Object[] array1 = new Object[] { deepArrayA1, deepCollA1, arrayA2, collA2, 7 };
@@ -97,7 +97,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.deepArrayEquals(Object, Object)", 
-		description = "Sample cases deep not equal" 
+		description = "SampleAction cases deep not equal" 
 	)
 	public void tm_0BEA760BA( Test.Case tc ) {
 		Object[] array1 = new Object[] { deepArrayA1, deepCollA1, deepCollB1, collA2, 7 };
@@ -157,7 +157,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.deepCollectionEquals(Collection, Collection)", 
-		description = "Sample cases deep equal" 
+		description = "SampleAction cases deep equal" 
 	)
 	public void tm_0B37430CE( Test.Case tc ) {
 		Collection<Object> coll1 = List.of( deepArrayA1, deepCollA1, arrayA2, collA2, 7 );
@@ -170,7 +170,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.deepCollectionEquals(Collection, Collection)", 
-		description = "Sample cases deep not equal" 
+		description = "SampleAction cases deep not equal" 
 	)
 	public void tm_0FE3CCD01( Test.Case tc ) {
 		Collection<Object> coll1 = List.of( deepArrayA1, deepCollA2, arrayA2, collA2, 7 );
@@ -273,7 +273,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.equals(Object, Object)", 
-		description = "Sample cases for equals" 
+		description = "SampleAction cases for equals" 
 	)
 	public void tm_0638962F8( Test.Case tc ) {
 		Object[] args1 = new Object[] {
@@ -289,7 +289,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.equals(Object, Object)", 
-		description = "Sample cases for not equals" 
+		description = "SampleAction cases for not equals" 
 	)
 	public void tm_0B893A6A5( Test.Case tc ) {
 		Object[] args1 = new Object[] {
@@ -337,7 +337,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowArrayEquals(Object, Object)", 
-		description = "Sample cases shallow but not deep" 
+		description = "SampleAction cases shallow but not deep" 
 	)
 	public void tm_02B19A06B( Test.Case tc ) {
 		List<String> list1 = new EqList();
@@ -358,7 +358,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowArrayEquals(Object, Object)", 
-		description = "Sample cases shallow equal" 
+		description = "SampleAction cases shallow equal" 
 	)
 	public void tm_08476B897( Test.Case tc ) {
 		tc.assertTrue( Objects.shallowArrayEquals( arrayA1, arrayA2 ) );
@@ -369,7 +369,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowArrayEquals(Object, Object)", 
-		description = "Sample cases shallow not equal" 
+		description = "SampleAction cases shallow not equal" 
 	)
 	public void tm_0F7B4484A( Test.Case tc ) {
 		tc.assertFalse( Objects.shallowArrayEquals( arrayA1, arrayB1 ) );
@@ -430,7 +430,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowCollectionEquals(Collection, Collection)", 
-		description = "Sample cases shallow but not deep" 
+		description = "SampleAction cases shallow but not deep" 
 	)
 	public void tm_04934ED72( Test.Case tc ) {
 		List<String> list1 = new EqList();
@@ -451,7 +451,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowCollectionEquals(Collection, Collection)", 
-		description = "Sample cases shallow equal" 
+		description = "SampleAction cases shallow equal" 
 	)
 	public void tm_039BEF570( Test.Case tc ) {
 		tc.assertTrue( Objects.shallowCollectionEquals( collA1, collA2 ) );
@@ -462,7 +462,7 @@ public class ObjectsTest extends Test.Container {
 		
 	@Test.Impl( 
 		member = "method: boolean Objects.shallowCollectionEquals(Collection, Collection)", 
-		description = "Sample cases shallow not equal" 
+		description = "SampleAction cases shallow not equal" 
 	)
 	public void tm_0227070A3( Test.Case tc ) {
 		tc.assertFalse( Objects.shallowCollectionEquals( collA1, collB1 ) );

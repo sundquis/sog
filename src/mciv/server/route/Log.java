@@ -64,6 +64,7 @@ public class Log {
 		return this.exchangeEntries.stream().limit( count ).flatMap( List::stream );
 	}
 
+	// ENTRY <pre>
 	// ENTRY <hr>
 	// ENTRY ${Date}
 	// ENTRY   URI: ${URI}
@@ -73,12 +74,11 @@ public class Log {
 	// ENTRY     ${Params}
 	// ENTRY   REQUEST HEADERS: 
 	// ENTRY     ${Request Headers}
-	// ENTRY   RESPONSE HEADERS:
-	// ENTRY     ${Response Headers}
 	// ENTRY   REQUEST BODY: ${Request Body}
-	// ENTRY   RESPONSE LENGTH: ${Response Length} bytes.
 	// ENTRY   
-	public synchronized void accept( HttpExchange exchange, String requestBody, long responseLength, String params ) {
+	// ENTRY </pre>
+	
+	public synchronized void accept( HttpExchange exchange, String requestBody, String params ) {
 		Macro mapper = new Macro()
 			.expand( "Date", new Date().toString() )
 			.expand( "URI", exchange.getRequestURI().toString() )
@@ -86,19 +86,15 @@ public class Log {
 			.expand( "Method", exchange.getRequestMethod() )
 			.expand( "Params", params )
 			.expand( "Request Headers", 
-				exchange.getRequestHeaders().entrySet().stream().map( Map.Entry.class::cast )
-					.map( this::toString ).collect( Collectors.toList() ) )
-			.expand( "Response Headers", 
-				exchange.getResponseHeaders().entrySet().stream().map( Map.Entry.class::cast )
-					.map( this::toString ).collect( Collectors.toList() ) )
-			.expand( "Request Body", 
-				requestBody.length() > 200 ? (requestBody.length() + " charcaters.") : requestBody )
-			.expand( "Response Length", "" + responseLength );
+				exchange.getRequestHeaders().entrySet().stream()
+					.map( Map.Entry.class::cast ).map( this::toString ) )
+			.expand( "Request Body",
+				requestBody.length() > 200 ? (requestBody.length() + " charcaters.") : requestBody );
 
 		try {
 			this.exchangeEntries.addFirst(
 				new Commented( Log.class ).getCommentedLines( "ENTRY" )
-				.flatMap( mapper ).collect(  Collectors.toList() ) );
+					.flatMap( mapper ).collect(  Collectors.toList() ) );
 		} catch ( IOException ex ) {
 			Error.get().accept( ex, exchange.getRequestURI().toString() );
 		}

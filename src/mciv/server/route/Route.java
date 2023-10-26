@@ -32,10 +32,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import mciv.server.Server;
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.util.Commented;
 import sog.util.Macro;
 import sog.util.json.JSON;
+import sog.util.json.JSON.JsonObject;
 
 
 /**
@@ -58,7 +60,9 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	public static enum Category {
 		Root,
 		Administration,
-		Authorization
+		Authorization,
+		Action,
+		Poll,
 	}
 	
 	
@@ -120,7 +124,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception;
+	public abstract Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception;
 	
 	/* Corresponds to turn phase and package. */
 	public abstract Category getCategory();
@@ -157,18 +161,15 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		this.executionCount++;
 		this.remoteVisit( exchange.getRemoteAddress().getAddress().toString() );
 		
-		Response response = null;
-		String requestBody = null;
+		JsonObject requestBody = null;
 		Params params = null;
+		Procedure afterClose = Procedure.NOOP;
 		
 		try {
-			// FIXME
-			//requestBody = JSON.read( exchange.getRequestBody() );
-					//new JsonReader( exchange.getRequestBody() ).readObject().toJSON();
-			requestBody = new String( exchange.getRequestBody().readAllBytes() );
+			//requestBody = new String( exchange.getRequestBody().readAllBytes() );
+			requestBody = JSON.read( exchange.getRequestBody() ).castToJsonObject();
+			exchange.getRequestBody().close();
 			params = new Params( exchange.getRequestURI().getQuery() );
-			
-			response = this.getResponse( exchange, requestBody, params );
 			
 			if ( exchange.getRequestHeaders().containsKey( "Origin" ) ) {
 				String origin = exchange.getRequestHeaders().getFirst( "Origin" );
@@ -178,33 +179,32 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 			}
 			
 			if ( this.isLogging() ) {
-				Log.get().accept( exchange, requestBody, response.getLength(), params.toString() );
+				Log.get().accept( exchange, JSON.toString( requestBody ), params.toString() );
 			}
 
-			exchange.sendResponseHeaders( 200, response.getLength() );
-			response.getBody().transferTo( exchange.getResponseBody() );
+			afterClose = this.makeResponse( exchange, requestBody, params );
+			
+			//exchange.sendResponseHeaders( 200, response.getLength() );
+			//response.getBody().transferTo( exchange.getResponseBody() );
 		} catch ( Exception ex ) {
-			this.sendErrorResponse( exchange, ex, requestBody, params );
+			this.sendErrorResponse( exchange, ex );
 		} finally {
 			exchange.close();
-			if ( response.afterClose() != null ) {
-				response.afterClose().exec();
+			if ( afterClose != null ) {
+				afterClose.exec();
 			}
 		}
 	}
 	
-	private void sendErrorResponse( HttpExchange exchange, Exception ex, String requestBody, Params params ) {
+	private void sendErrorResponse( HttpExchange exchange, Exception ex ) {
 		try {
 			this.errorCount++;
 			Error.get().accept( ex, exchange.getRequestURI().toString() );
 			
-			String error = JSON.obj()
+			String error = JSON.toString( JSON.obj()
 				.add( "status", JSON.num( 400 ) )
-				.add( "type", JSON.str( ex.getClass().toString() ) )
 				.add( "message", JSON.str( ex.getMessage() ) )
-				.add( "URL_parameters", JSON.str( params.toString() ) )
-				.add( "request_body", JSON.str( requestBody ) )
-				.toString();
+			);
 			exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 			exchange.sendResponseHeaders( 200, error.getBytes().length );
 			exchange.getResponseBody().write( error.getBytes() );

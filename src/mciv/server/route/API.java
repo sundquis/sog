@@ -54,7 +54,7 @@ public class API implements Comparable<API> {
 	 */
 	public static API obj( String type, String doc ) {
 		API result = new API( type, doc );
-		result.objects.add(  result );
+		result.objects.add( result );
 		return result;
 	}
 	

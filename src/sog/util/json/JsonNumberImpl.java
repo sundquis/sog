@@ -41,7 +41,7 @@ public class JsonNumberImpl implements JsonNumber {
 	}
 
 	JsonNumberImpl( int integer, int fraction, int exponent ) {
-		this( "" + integer + (fraction > 0 ? fraction : "") + (exponent != 0 ? "E" + exponent : "") );
+		this( "" + integer + (fraction > 0 ? "." + fraction : "") + (exponent != 0 ? "E" + exponent : "") );
 	}
 
 	@Override

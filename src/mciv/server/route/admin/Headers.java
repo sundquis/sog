@@ -19,9 +19,8 @@
 
 package mciv.server.route.admin;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -29,15 +28,15 @@ import mciv.server.route.Log;
 import mciv.server.route.Params;
 import mciv.server.route.Registrar;
 import mciv.server.route.API;
-import mciv.server.route.Response;
-import mciv.server.route.Route;
+import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Headers extends Route {
+public class Headers extends AdminRoute {
 	
 	/* <API>
 	 * <hr>
@@ -63,33 +62,17 @@ public class Headers extends Route {
 	}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
 		int trunc = params.getInt( "trunc", 100 );
 		Log.get().truncate( trunc );
 		
 		int count = params.getInt( "count", 10 );
 		
 		params.getEntries().forEach( this::enableDisable );
-		
-		// PRE <!DOCTYPE HTML>
-		// PRE <html>
-		// PRE <head><meta charset="utf-8"></head>
-		// PRE <body>
-		// PRE <H1>Headers</h1>
-		// PRE <pre>
-		
-		// POST </pre>
-		// POST </body>
-		// POST </html>
-		
-		StringWriter html = new StringWriter();
-		final PrintWriter out = new PrintWriter( html );
-		
-		this.getCommentedLines( "PRE" ).forEach( out::println );
-		Log.get().getHeaders( count ).forEach( out::println );
-		this.getCommentedLines( "POST" ).forEach( out::println );
 
-		return Response.forHtml( html.toString(), exchange );
+		this.sendHtml( exchange, Stream.concat( Stream.of( "<h1>Headers:</h1>" ), Log.get().getHeaders( count ) ) );
+
+		return Procedure.NOOP;
 	}
 	
 	private void enableDisable( Entry<String, String> entry ) {

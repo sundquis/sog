@@ -17,31 +17,25 @@
  * Sundquist
  */
 
-package mciv.hold;
+package mciv.server.route.action;
 
-import java.nio.file.Path;
-
-import com.sun.net.httpserver.HttpExchange;
-
-import mciv.server.route.API;
-import mciv.server.route.Params;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
-import sog.core.LocalDir;
 import sog.core.Test;
+import sog.util.json.JSON;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public abstract class Home extends Route {
+public class SampleAction extends ActionRoute {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Present the starting page of the application.
+	 *   Sample action route.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
@@ -50,26 +44,24 @@ public abstract class Home extends Route {
 	 *   ${Response}
 	 * 	
 	 * EXCEPTIONS:
-	 *     None.
+	 *   Status
 	 * 	
-	 * </pre>
+	 * 	</pre>
 	 * <a href="#">Top</a>
 	 * 	
 	 */
-	public Home() {}
+	public SampleAction() {}
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		exchange.getResponseHeaders().add( "Content-Type", "text/html" );
-		Path path = new LocalDir().sub( "web" ).sub( "static" ).getFile( "index", LocalDir.Type.HTML );
-
-		return Response.forFile( path, exchange );
+	public JsonObject respond( JsonObject requestBody ) throws Exception {
+		return JSON.obj()
+			.add( "message", JSON.str( "Unimplemented" ) )
+			.add( "status", JSON.num( -1 ) );
 	}
-
 
 	@Override
 	public Category getCategory() {
-		return Route.Category.Authorization;
+		return Route.Category.Action;
 	}
 
 	@Override
@@ -79,17 +71,8 @@ public abstract class Home extends Route {
 
 	@Override
 	public String getPath() {
-		return "/auth/home/";
+		return "/action/sample";
 	}
 
-	@Override
-	public API getRequestAPI() {
-		return super.getRequestAPI();
-	}
-
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI();
-	}
 
 }

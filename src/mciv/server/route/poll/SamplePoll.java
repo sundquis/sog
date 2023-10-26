@@ -17,75 +17,62 @@
  * Sundquist
  */
 
-package mciv.server.route.admin;
+package mciv.server.route.poll;
 
-import com.sun.net.httpserver.HttpExchange;
-
-import mciv.server.Server;
-import mciv.server.route.API;
-import mciv.server.route.Params;
-import sog.core.Procedure;
+import mciv.server.route.Route;
 import sog.core.Test;
+import sog.util.json.JSON;
 import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Reload extends AdminRoute {
+public class SamplePoll extends PollRoute {
 	
 	/* <API>
 	 * <hr>
 	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
 	 * <pre>
 	 * DESCRIPTION:
-	 *   Check for new Routes and register them with the server.
+	 *   Sample poll route.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
 	 * 	
 	 * RESPONSE BODY:
 	 *   ${Response}
-	 * 
+	 * 	
 	 * EXCEPTIONS:
-	 *   None.
-	 * 
-	 * </pre>
+	 *   Status
+	 * 	
+	 * 	</pre>
 	 * <a href="#">Top</a>
-	 * 
+	 * 	
 	 */
-	public Reload() {
-	}
+	public SamplePoll() {}
 
-	@Override 
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
-		this.sendHtml( exchange, "Reloading routes..." );
-		return () -> Server.get().load();
+	@Override
+	public JsonObject respond( JsonObject requestBody ) throws Exception {
+		return JSON.obj()
+			.add( "message", JSON.str( "Unimplemented" ) )
+			.add( "status", JSON.num( -1 ) );
 	}
 
 	@Override
 	public Category getCategory() {
-		return Category.Administration;
+		return Route.Category.Poll;
 	}
 
 	@Override
 	public int getSequence() {
-		return 50;
+		return 0;
 	}
 
 	@Override
 	public String getPath() {
-		return "/admin/reload";
+		return "/poll/sample";
 	}
 
-	@Override
-	public API getRequestAPI() {
-		return super.getRequestAPI();
-	}
-
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI();
-	}
 
 }

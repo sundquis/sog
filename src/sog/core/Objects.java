@@ -40,8 +40,8 @@ public class Objects {
 	@Test.Decl( "null equals null" )
 	@Test.Decl( "null not equal non null" )
 	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases for equals" )
-	@Test.Decl( "Sample cases for not equals" )
+	@Test.Decl( "SampleAction cases for equals" )
+	@Test.Decl( "SampleAction cases for not equals" )
 	public static boolean equals( Object o1, Object o2 ) {
 		if ( o1 == null || o2 == null ) {
 			return o1 == o2;
@@ -129,9 +129,9 @@ public class Objects {
 	@Test.Decl( "null equals null" )
 	@Test.Decl( "null not equal non null" )
 	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases shallow equal" )
-	@Test.Decl( "Sample cases shallow not equal" )
-	@Test.Decl( "Sample cases shallow but not deep" )
+	@Test.Decl( "SampleAction cases shallow equal" )
+	@Test.Decl( "SampleAction cases shallow not equal" )
+	@Test.Decl( "SampleAction cases shallow but not deep" )
 	public static boolean shallowArrayEquals( Object a1, Object a2 ) {
 		if ( a1 == null || a2 == null ) {
 			return a1 == a2;
@@ -164,8 +164,8 @@ public class Objects {
 	@Test.Decl( "null equals null" )
 	@Test.Decl( "null not equal non null" )
 	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases deep equal" )
-	@Test.Decl( "Sample cases deep not equal" )
+	@Test.Decl( "SampleAction cases deep equal" )
+	@Test.Decl( "SampleAction cases deep not equal" )
 	public static boolean deepArrayEquals( Object a1, Object a2 ) {
 		if ( a1 == null || a2 == null ) {
 			return a1 == a2;
@@ -197,9 +197,9 @@ public class Objects {
 	@Test.Decl( "null equals null" )
 	@Test.Decl( "null not equal non null" )
 	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases shallow equal" )
-	@Test.Decl( "Sample cases shallow not equal" )
-	@Test.Decl( "Sample cases shallow but not deep" )
+	@Test.Decl( "SampleAction cases shallow equal" )
+	@Test.Decl( "SampleAction cases shallow not equal" )
+	@Test.Decl( "SampleAction cases shallow but not deep" )
 	public static boolean shallowCollectionEquals( Collection<?> c1, Collection<?> c2 ) {
 		if ( c1 == null || c2 == null ) {
 			return c1 == c2;
@@ -228,8 +228,8 @@ public class Objects {
 	@Test.Decl( "null equals null" )
 	@Test.Decl( "null not equal non null" )
 	@Test.Decl( "Is symmetric" )
-	@Test.Decl( "Sample cases deep equal" )
-	@Test.Decl( "Sample cases deep not equal" )
+	@Test.Decl( "SampleAction cases deep equal" )
+	@Test.Decl( "SampleAction cases deep not equal" )
 	public static boolean deepCollectionEquals( Collection<?> c1, Collection<?> c2 ) {
 		if ( c1 == null || c2 == null ) {
 			return c1 == c2;

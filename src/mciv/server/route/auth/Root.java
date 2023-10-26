@@ -21,16 +21,17 @@ package mciv.server.route.auth;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.McivException;
-import mciv.server.route.API;
 import mciv.server.route.Params;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.LocalDir;
+import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
@@ -59,13 +60,12 @@ public class Root extends Route {
 	 * <a href="#">Top</a>
 	 * 
 	 */
-	public Root() {
-	}
+	public Root() {}
 	
 	private static final Path ROOT = new LocalDir().sub( "web" ).getDir();
 
 	@Override
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
 		String fileName = exchange.getRequestURI().getPath();
 		if ( fileName.startsWith( "/" ) ) {
 			fileName = fileName.substring( 1 );
@@ -84,7 +84,19 @@ public class Root extends Route {
 			throw new McivException( "Not a regular file: " + path );
 		}
 		
-		return Response.forFile( path, exchange );
+		long length = path.toFile().length();
+
+		String content = Files.probeContentType( path );
+		if ( content == null ) {
+			exchange.getResponseHeaders().add( "Content-Type", "text/plain" );
+		} else {
+			exchange.getResponseHeaders().add( "Content-Type", content );
+		}
+
+		exchange.sendResponseHeaders( 200, length );
+		Files.newInputStream( path, StandardOpenOption.READ ).transferTo( exchange.getResponseBody() );
+		
+		return Procedure.NOOP;
 	}
 
 	@Override
@@ -101,16 +113,5 @@ public class Root extends Route {
 	public String getPath() {
 		return "/";
 	}
-
-	@Override
-	public API getRequestAPI() {
-		return super.getRequestAPI();
-	}
-
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI();
-	}
-
 
 }

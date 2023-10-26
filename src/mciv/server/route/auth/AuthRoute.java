@@ -17,85 +17,52 @@
  * Sundquist
  */
 
-package mciv.server.route.admin;
-
-import java.util.concurrent.TimeUnit;
+package mciv.server.route.auth;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.API;
 import mciv.server.route.Params;
-import sog.core.LocalDir;
+import mciv.server.route.Route;
 import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.json.JSON;
 import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Pull extends AdminRoute {
+public abstract class AuthRoute extends Route {
 	
-	/* <API>
-	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
-	 * <pre>
-	 * DESCRIPTION:
-	 *   Pull the current MegaEmpires repo, exposing assets in ./static
-	 * 	
-	 * REQUEST BODY:
-	 *   ${Request}
-	 * 	
-	 * RESPONSE BODY:
-	 *   ${Response}
-	 * 
-	 * EXCEPTIONS:
-	 *   None.
-	 * 
-	 * </pre>
-	 * <a href="#">Top</a>
-	 * 
-	 */
-	public Pull() {
-	}
+	protected AuthRoute() {}
+	
+	public abstract JsonObject respond( JsonObject requestBody ) throws Exception;
 
 	@Override
 	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
-		int timeout = params.getInt( "timeout", 5 );
+		JsonObject responseBody = this.respond( requestBody );
+		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 		
-		String cmd = new LocalDir().sub( "tool" ).sub( "bin" ).getFile( "MCIV_PULL", LocalDir.Type.BASH ).toString();
-		Process proc = Runtime.getRuntime().exec( cmd );
-		proc.waitFor( timeout, TimeUnit.SECONDS );
-		this.sendHtml( exchange, new String( proc.getInputStream().readAllBytes() ) );
-
+		exchange.sendResponseHeaders( 200, 0 );
+		JSON.write( responseBody, exchange.getResponseBody() );
 		return Procedure.NOOP;
 	}
-
-	@Override
-	public Category getCategory() {
-		return Category.Administration;
-	}
-
-	@Override
-	public int getSequence() {
-		return 210;
-	}
-
-	@Override
-	public String getPath() {
-		return "/admin/pull";
-	}
-
+	
 	@Override
 	public API getRequestAPI() {
 		return super.getRequestAPI()
-			.member( "timeout", "Seconds to wait for command to complete; default is 5." ).integer();
+			.member( "email", "The identifying email address of the player." ).string( )
+			.member( "handle", "The optional screen name used to identify players in the game." ).string();
 	}
 
 	@Override
 	public API getResponseAPI() {
-		return super.getResponseAPI();
+		return super.getResponseAPI()
+			.member( "status", "Status code. See mciv.server.route.Status." ).integer( -1, 0, 1, 2, 3, 4, 5, 400 )
+			.member( "message", "Descriptive erorr message when status > 0." ).string()
+			.member( "playerId", "Authentication token used to identify the plater." ).string( );
 	}
-
 	
+
 }

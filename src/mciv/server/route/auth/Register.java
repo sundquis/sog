@@ -21,20 +21,16 @@ package mciv.server.route.auth;
 
 
 
-import com.sun.net.httpserver.HttpExchange;
-
-import mciv.server.route.API;
-import mciv.server.route.Params;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.json.JSON;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Register extends Route {
+public class Register extends AuthRoute {
 	
 	/* <API>
 	 * <hr>
@@ -43,9 +39,7 @@ public class Register extends Route {
 	 * DESCRIPTION:
 	 *   Use supplied credentials to create a new user.
 	 *   The required email address is used as the login name.
-	 *   The required password must have at least 8 characters.
 	 *   The required handle is used to identify the user in application messaging.
-	 *   Insert description of potential state transitions.
 	 * 	
 	 * REQUEST BODY:
 	 *   ${Request}
@@ -54,10 +48,6 @@ public class Register extends Route {
 	 *   ${Response}
 	 * 
 	 * EXCEPTIONS:
-	 *   Status
-	 *   1: Email address does not parse
-	 *   2: Password does not meet requirements
-	 *   3: User exists
 	 * 
 	 * </pre>
 	 * <a href="#">Top</a>
@@ -65,17 +55,19 @@ public class Register extends Route {
 	 */
 	public Register() {}
 
-	
-	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		return Response.forJSON( exchange, JSON.obj()
-			.add( "status", JSON.num( -1 ) )
-			.add( "(REMOVE) Request was", JSON.str( requestBody ) ) );
-	}
 
 	@Override
+	public JsonObject respond( JsonObject requestBody ) throws Exception {
+		return JSON.obj()
+			.add( "status", JSON.num( -1 ) )
+			.add( "message", JSON.str( "Unimplemented" ) )
+			.add( "playerId", JSON.NULL );
+	}
+
+	
+	@Override
 	public String getPath() {
-		return "/api/auth/register";
+		return "/auth/register";
 	}
 	
 	@Override
@@ -86,19 +78,6 @@ public class Register extends Route {
 	@Override
 	public int getSequence() {
 		return 20;
-	}
-
-
-	@Override
-	public API getRequestAPI() {
-		return super.getRequestAPI()
-			.member( "FIXME", "Determine request structure" ).string( );
-	}
-
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI()
-			.member( "FIXME", "Determine response structure" ).string( );
 	}
 
 }

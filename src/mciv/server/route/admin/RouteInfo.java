@@ -19,26 +19,24 @@
 
 package mciv.server.route.admin;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import mciv.server.route.API;
 import mciv.server.route.Params;
 import mciv.server.route.Registrar;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.Procedure;
 import sog.core.Test;
 import sog.util.Macro;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class RouteInfo extends Route {
+public class RouteInfo extends AdminRoute {
 	
 	/* <API>
 	 * <hr>
@@ -63,32 +61,22 @@ public class RouteInfo extends Route {
 	public RouteInfo() {}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		StringWriter html = new StringWriter();
-		final PrintWriter out = new PrintWriter( html );
+	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
 
-		// HTML <!DOCTYPE html>
-		// HTML <html>
-		// HTML <head><meta charset="utf-8"></head>
-		// HTML <body>
-		// HTML <H1>Routes</h1>
-		// HTML <ul>
-		// HTML ${route links}
-		// HTML </ul>
-		// HTML ${route apis}
-		// HTML </body>
-		// HTML </html>
+		// BODY <H1>Routes</h1>
+		// BODY <ul>
+		// BODY ${route links}
+		// BODY </ul>
+		// BODY ${route apis}
 		
 		Function<Route, String> map = (r) -> "<li><a href='#" + r.getPath() + "'>" + r.getPath() + "</a></li>";
 		Macro mapper = new Macro()
-			.expand( "route links", 
-				Registrar.get().getRoutes().map( map ).collect( Collectors.toList() ) )
-			.expand( "route apis", 
-				Registrar.get().getRoutes().flatMap( Route::getDocunmentation ).collect( Collectors.toList() ) );
+			.expand( "route links", Registrar.get().getRoutes().map( map ) )
+			.expand( "route apis", Registrar.get().getRoutes().flatMap( Route::getDocunmentation ) );
 		
-		this.getCommentedLines( "HTML" ).flatMap( mapper ).forEach( out::println );
-
-		return Response.forHtml( html.toString(), exchange );
+		this.sendHtml( exchange, this.getCommentedLines( "BODY" ).flatMap( mapper ) );
+		
+		return Procedure.NOOP;
 	}
 
 

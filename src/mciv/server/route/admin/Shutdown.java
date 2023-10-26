@@ -24,15 +24,16 @@ import com.sun.net.httpserver.HttpExchange;
 import mciv.server.Server;
 import mciv.server.route.API;
 import mciv.server.route.Params;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
+import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Shutdown extends Route {
+public class Shutdown extends AdminRoute {
 	
 	
 	/* <API>
@@ -58,11 +59,12 @@ public class Shutdown extends Route {
 	public Shutdown() {}
 
 	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
 		int delay = params.getInt( "delay", 5 );
 
-		return Response.forMessage( "Shutting down the server in " + delay + " seconds.", exchange, 
-			() -> Server.get().stop( delay ) );
+		this.sendHtml( exchange, "Shutting down the server in " + delay + " seconds." );
+		
+		return () -> Server.get().stop( delay );
 	}
 
 

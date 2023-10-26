@@ -575,7 +575,29 @@ public class JsonReader implements AutoCloseable {
 	public static void main( String[] args ) {
 		App.get().msg( "TEST CASES:" );
 
-		Arrays.stream( objectTestCases ).forEach( objectTest );
+		//Arrays.stream( stringTestCases ).forEach( stringTest );
+
+		try {
+			//"quote \", esc \\, tab \\t, consecutive \\n\\nDone!"
+			StringBuilder buf = new StringBuilder();
+			buf.append( "Quote " ).append( '"' )
+				.append( " Escape " ).append( '\\' )
+				.append( " Tab " ).append( '\\' ).append( '\t' )
+				.append( " Consecutive newlines " ).append( '\n' ).append( '\n' )
+				.append( " Done!" );
+			JsonValue value = JSON.obj().add( "Nul", JSON.NULL ).add( "True", JSON.TRUE )
+					.add( "False", JSON.FALSE ).add( "Integer", JSON.num( 1234567890 ) )
+					.add( "Decimal", JSON.dec( 123, 456 ) ).add( "Exponential", JSON.exp( 123, 456, 789 ) )
+					.add( "Array", JSON.arr().add( JSON.TRUE ).add( JSON.FALSE ) )
+					.add( "Empty-Object", JSON.obj() )
+					.add( "Wild String", JSON.str( buf.toString() ) );
+				String rep = JSON.toString( value );
+				JsonValue value2 = JSON.fromString( rep );
+				App.get().msg( "REP1: " + rep );
+				App.get().msg( "REP2: " + JSON.toString( value2 ) );
+		} catch ( Exception ex ) {
+			ex.printStackTrace();
+		}
 		
 		App.get().done();
 	}

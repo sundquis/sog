@@ -62,6 +62,7 @@ public class Error {
 		return this.errors.stream().limit( count ).flatMap( List::stream );
 	}
 
+	// ERR <pre>
 	// ERR <hr>
 	// ERR   EXCEPTION: ${Exception}
 	// ERR   MESSAGE: ${Message}
@@ -69,6 +70,7 @@ public class Error {
 	// ERR   TRACE:
 	// ERR     ${Trace}
 	// ERR 
+	// ERR </pre>
 	
 	public void accept( Exception ex, String context ) {
 		Macro mapper = new Macro()

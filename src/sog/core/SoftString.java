@@ -145,8 +145,8 @@ public class SoftString implements Comparable<SoftString> {
 	}
 	
 	@Override
-	@Test.Decl( "Sample cases equal" )
-	@Test.Decl( "Sample cases not equal" )
+	@Test.Decl( "SampleAction cases equal" )
+	@Test.Decl( "SampleAction cases not equal" )
 	@Test.Decl( "If equals then compareTo is zero" )
 	@Test.Decl( "If compareTo is zero then equals" )
 	public boolean equals( Object other ) {

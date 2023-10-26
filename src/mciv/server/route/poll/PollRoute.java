@@ -17,75 +17,44 @@
  * Sundquist
  */
 
-package mciv.server.route.admin;
+package mciv.server.route.poll;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.Server;
 import mciv.server.route.API;
 import mciv.server.route.Params;
+import mciv.server.route.Route;
 import sog.core.Procedure;
 import sog.core.Test;
+import sog.util.json.JSON;
 import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Reload extends AdminRoute {
-	
-	/* <API>
-	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
-	 * <pre>
-	 * DESCRIPTION:
-	 *   Check for new Routes and register them with the server.
-	 * 	
-	 * REQUEST BODY:
-	 *   ${Request}
-	 * 	
-	 * RESPONSE BODY:
-	 *   ${Response}
-	 * 
-	 * EXCEPTIONS:
-	 *   None.
-	 * 
-	 * </pre>
-	 * <a href="#">Top</a>
-	 * 
-	 */
-	public Reload() {
-	}
+public abstract class PollRoute extends Route {
 
-	@Override 
+	public PollRoute() {}
+
+	public abstract JsonObject respond( JsonObject requestBody ) throws Exception;
+
+	@Override
 	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
-		this.sendHtml( exchange, "Reloading routes..." );
-		return () -> Server.get().load();
+		JsonObject responseBody = this.respond( requestBody );
+		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
+		
+		exchange.sendResponseHeaders( 200, 0 );
+		JSON.write( responseBody, exchange.getResponseBody() );
+		return Procedure.NOOP;
 	}
-
-	@Override
-	public Category getCategory() {
-		return Category.Administration;
-	}
-
-	@Override
-	public int getSequence() {
-		return 50;
-	}
-
-	@Override
-	public String getPath() {
-		return "/admin/reload";
-	}
-
+	
 	@Override
 	public API getRequestAPI() {
-		return super.getRequestAPI();
+		return super.getRequestAPI()
+			.member( "playerId", "Authentication token used to identify the player." ).string( )
+		;
 	}
 
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI();
-	}
 
 }

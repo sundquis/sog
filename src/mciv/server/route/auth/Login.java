@@ -19,20 +19,17 @@
 
 package mciv.server.route.auth;
 
-import com.sun.net.httpserver.HttpExchange;
 
-import mciv.server.route.API;
-import mciv.server.route.Params;
-import mciv.server.route.Response;
 import mciv.server.route.Route;
 import sog.core.Test;
 import sog.util.json.JSON;
+import sog.util.json.JSON.JsonObject;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class Login extends Route {
+public class Login extends AuthRoute {
 	
 	/* <API>
 	 * <hr>
@@ -41,7 +38,6 @@ public class Login extends Route {
 	 * DESCRIPTION:
 	 *   Use supplied credentials to log in a user.
 	 *   The required email address is the login name.
-	 *   The required password must match stored value.
 	 *   The optional handle is used to identify the user in application messaging, overriding
 	 *   the handle used to create the user.
 	 * 	
@@ -53,7 +49,6 @@ public class Login extends Route {
 	 * 	
 	 * EXCEPTIONS:
 	 *   Status
-	 *   4: Authentication failure
 	 * 	
 	 * 	</pre>
 	 * <a href="#">Top</a>
@@ -62,17 +57,20 @@ public class Login extends Route {
 	
 	public Login() {}
 
-	@Override 
-	public Response getResponse( HttpExchange exchange, String requestBody, Params params ) throws Exception {
-		return Response.forJSON( exchange, JSON.obj()
+
+
+	@Override
+	public JsonObject respond( JsonObject requestBody ) throws Exception {
+		return JSON.obj()
 			.add( "status", JSON.num( -1 ) )
-			.add( "(REMOVE) Request was", JSON.str( requestBody ) ) );
+			.add( "message", JSON.str( "Unimplemented" ) )
+			.add( "playerId", JSON.NULL );
 	}
 
 
 	@Override
 	public String getPath() {
-		return "/api/auth/login";
+		return "/auth/login";
 	}
 
 	@Override
@@ -85,16 +83,6 @@ public class Login extends Route {
 		return 10;
 	}
 
-	@Override
-	public API getRequestAPI() {
-		return super.getRequestAPI()
-			.member( "FIXME", "Determine request structure" ).string( );
-	}
 
-	@Override
-	public API getResponseAPI() {
-		return super.getResponseAPI()
-			.member( "FIXME", "Determine response structure" ).string( );
-	}
 
 }

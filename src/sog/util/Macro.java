@@ -130,8 +130,8 @@ public class Macro implements Function<String, Stream<String>> {
 	public Macro expand( String key, String... values ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );
-		Assert.isTrue( Stream.of( values ).allMatch( s -> s != null ) );
 
+		//this.expansions.put( key, Stream.of( values ) );
 		this.expansions.put( key, Arrays.asList( values ) );
 		return this;
 	}
@@ -156,9 +156,17 @@ public class Macro implements Function<String, Stream<String>> {
 	public Macro expand( String key, List<String> values ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );
-		Assert.isTrue( values.stream().allMatch( s -> s != null ) );
 
+		//this.expansions.put( key, values.stream() );
 		this.expansions.put( key, values );
+		return this;
+	}
+
+	public Macro expand( String key, Stream<String> values ) {
+		Assert.isTrue( Macro.isLegal( key ) );
+		Assert.nonNull( values );
+
+		this.expansions.put( key, values.collect( Collectors.toList() ) );
 		return this;
 	}
 
@@ -182,8 +190,8 @@ public class Macro implements Function<String, Stream<String>> {
 	public <T> Macro expand( String key, List<T> values, Function<? super T, String> mapper ) {
 		Assert.isTrue( Macro.isLegal( key ) );
 		Assert.nonNull( values );
-		Assert.isTrue( values.stream().allMatch( s -> s != null ) );
 		
+		//this.expansions.put( key, values.stream().map( mapper ) );
 		this.expansions.put( key, values.stream().map( mapper ).collect( Collectors.toList() ) );
 		return this;
 	}
@@ -237,8 +245,10 @@ public class Macro implements Function<String, Stream<String>> {
 					String head = current.substring( 0,  this.matcher.start() );
 					String key = this.matcher.group( 1 );
 					String tail = current.substring( this.matcher.end() );
+					//Stream<String> expansions = this.getExpansions( key );
 					List<String> expansions = this.getExpansions( key );
 					length += expansions.size();
+					//length ++;
 					expansions.forEach( s -> pending.put( head + s + tail ) );
 				} else {
 					results.add( current );
