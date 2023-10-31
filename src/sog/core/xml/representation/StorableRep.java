@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import sog.core.AppRuntime;
 import sog.core.Fatal;
+import sog.core.Storable;
 import sog.core.Storable.Data;
 import sog.core.Test;
 import sog.core.xml.XMLReader;
@@ -39,7 +40,7 @@ import sog.core.xml.XMLWriter;
  * 
  */
 @Test.Subject( "test." )
-public class StorableRep<T> extends XMLRepresentation<T> {
+public class StorableRep<T extends Storable> extends XMLRepresentation<T> {
 
 	private final Class<T> targetType;
 	
@@ -122,11 +123,11 @@ public class StorableRep<T> extends XMLRepresentation<T> {
 	
 	private class FieldRep {
 
-		private Field field;
+		private final Field field;
 		
-		private XMLRepresentation<Object> rep;
+		private final XMLRepresentation<Object> rep;
 		
-		private T instance;
+		private final T instance;
 		
 		private Object value;
 		

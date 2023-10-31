@@ -43,6 +43,11 @@ public class JsonNumberImpl implements JsonNumber {
 	JsonNumberImpl( int integer, int fraction, int exponent ) {
 		this( "" + integer + (fraction > 0 ? "." + fraction : "") + (exponent != 0 ? "E" + exponent : "") );
 	}
+	
+	JsonNumberImpl( BigDecimal javaValue ) {
+		this.javaValue = javaValue;
+		this.jsonValue = javaValue.toString();
+	}
 
 	@Override
 	public String toString() {

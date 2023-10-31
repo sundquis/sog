@@ -191,6 +191,10 @@ public class JSON {
 		return new JsonNumberImpl( num, frac, exp );
 	}
 	
+	public static JsonNumber big( BigDecimal big ) {
+		return new JsonNumberImpl( Assert.nonNull( big ) );
+	}
+	
 	
 	
 	public static interface JsonBoolean extends JsonValue {

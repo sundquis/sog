@@ -26,12 +26,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-
-import sog.core.App;
+//import java.util.Arrays;
+//import java.util.Map;
+//import java.util.Map.Entry;
+//import java.util.function.Consumer;
+//
+//import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
 import sog.util.json.JSON.JsonArray;
@@ -374,233 +374,233 @@ public class JsonReader implements AutoCloseable {
 	}
 	
 
-	private static Consumer<String> nullTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: [" + s + "]" );
-			JsonNull json = in.readNull();
-			App.get().msg( "JSON: " + json.toString() );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] nullTestCases = {
-		"null", "", "nu ll", "     null", "null       ", null, "\tnull", "Null", "123", "\rnull", "\nnull", "\"null\""
-	};
-	
-	private static Consumer<String> booleanTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: [" + s + "]" );
-			//JsonBoolean json = in.readBoolean();
-			JsonBoolean json = in.readValue().castToJsonBoolean();
-			App.get().msg( "JSON: " + json.toString() );
-			App.get().msg( "JAVA: " + json.toJavaBoolean() );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] booleanTestCases = {
-		"true", "false", 
-		"     true", "  false", 
-		"true     ", "false    ", 
-		"\t\r \n true", "  false\t", 
-		"True", "fal se", 
-		null, "null", 
-		"12", "\"false\"", 
-	};
-	
-	private static Consumer<String> stringTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: [" + s + "]" );
-			JsonString json = in.readString();
-			//JsonString json = in.readValue().castToJsonString();
-			App.get().msg( "JSON: [" + json.toString() + "]" );
-			App.get().msg( "JAVA: [" + json.toJavaString() + "]" );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] stringTestCases = {
-		"\"A perfectly fine JSON string\"",	
-		"\"\"",	
-		"\"A string with \" quote inside\"",	
-		"\"A string with escaped \\\" quote inside\"",	
-		"\"A string with \\ escape inside\"",	
-		"\"A string with escaped \\\\ escape inside\"",	
-		"\"A string with / solidus inside\"",	
-		"\"A string with escaped \\/ solidus inside\"",	
-		"\"A string with backspace \b inside\"",	
-		"\"A string with escaped backspace \\b inside\"",	
-		"\"A string with formfeed \f inside\"",	
-		"\"A string with escaped formfeed \\f inside\"",	
-		"\"A string with linefeed \n inside\"",	
-		"\"A string with escaped linefeed \\n inside\"",	
-		"\"A string with carriage return \r inside\"",	
-		"\"A string with escaped carriage return \\r inside\"",	
-		"\"A string with horizontal tab \t inside\"",	
-		"\"A string with escaped horizontal tab \\t inside\"",	
-		"\"A string with unicode \u42AB inside\"",	
-		"\"A string with escaped unicode \\\u42AB inside\"",
-		"\"Consecutive tabs: \t\t inside\"",
-		"\"Consecutive escaped tabs: \\t\\t inside\"",
-		"Not a JSON string",
-		"\"Not a JSON string",
-		"Not a JSON string\"",
-		null,
-	};
-	
-	private static Consumer<String> integerTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: [" + s + "]" );
-			JsonNumber json = in.readNumber();
-			//JsonNumber json = in.readValue().castToJsonNumber();
-			App.get().msg( "JSON: [" + json.toString() + "]" );
-			App.get().msg( "BIG: [" + json.toJavaBigDecimal() + "]" );
-			App.get().msg( "INT: [" + json.toJavaInteger() + "]" );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] goodIntegerTestCases = {
-		"1", "0", "42", "-1", "-0", "1234567890", "" + Integer.MAX_VALUE, "" + Integer.MIN_VALUE,
-		"1.0", "12.3E2", "42000E-3", "420000.0e-4", "-123E0", "-34e00", "450e0001", "67.0000"
-	};
-	
-	private static String[] badIntegerTestCases = {
-			".1", "00", "42.00000000001", "12345678900", "-12345678900",
-			"1.1", "12.34E1", "42000E-4", "420000.0e-5", "42AF", "+1", "- 1",
-			"", "123E40", "1e-1.1", "-1E40", "-1e-1", "420000000000e-12", "1e-4000"
-		};
-		
-	private static Consumer<String> doubleTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: [" + s + "]" );
-			//JsonNumber json = in.readNumber();
-			JsonNumber json = in.readValue().castToJsonNumber();
-			App.get().msg( "JSON: [" + json.toString() + "]" );
-			App.get().msg( "BIGDEC: [" + json.toJavaBigDecimal() + "]" );
-			App.get().msg( "DOUBLE: [" + json.toJavaDouble() + "]" );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] goodDoubleTestCases = {
-		"1", "0", "42", "-1", "-0", "1234567890", "" + Integer.MAX_VALUE, "" + Integer.MIN_VALUE,
-		"1.0", "12.3E2", "42000E-3", "420000.0e-4", "-123E0", "-34e00", "450e0001", "67.0000",
-		"0.05", "-0.1234567890", 
-		"1.0000000000000000000000000000000001", "-3.141595879843769874e5", "420000000000e-12", 
-		"" + Double.MAX_VALUE, "" + Double.MIN_VALUE, "1e42", "1E-42", "-1E+42", "-1e-42"
-	};
-		
-	private static String[] badDoubleTestCases = {
-		"+1", "- 1", "", "123E400", "-1E400", "-1e-400", "1e-4000", "x0.9", "10.01E--1",
-	};
-	
-	private static Consumer<String> arrayTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: " + s );
-			//JsonArray json = in.readArray();
-			JsonArray json = in.readValue().castToJsonArray();
-			App.get().msg( "JSON: " + JSON.toString( json ) );
-			App.get().msg( "ELEMENT TYPES: " );
-			json.toJavaList().stream().map( Object::getClass ).map( Class::getName )
-				.map( n -> "\t" + n ).forEach( System.out::println );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	public static String[] arrayTestCases = {
-		"[]",
-		"[1, 2, 3]",
-		"[1, \"A\", [], \"foo\", [1, 2, 3, 4], null, 0.1234567, \"Hello\\tWorld\", 42E42]",
-		"[{}, [{}], {\"arr\": []}, []]",
-		"[  null, \t false, \ntrue   ]",
-		"[ [ ] , [[]], [[], []], { \"key_1\" : \"value_1\", \"\" : null }]",
-		"[ 1, 2, 3, 4, 5, 6, \"...\", 42 ]", 
-	};
-	
-	private static Consumer<String> objectTest = (s) -> {
-		try (
-			JsonReader in = new JsonReader( s );
-		) {
-			App.get().msg();
-			App.get().msg( "CASE: " + s );
-			JsonObject json = in.readObject();
-			//JsonObject json = in.readValue().castToJsonObject();
-			App.get().msg( "JSON: " + JSON.toString( json ) );
-			App.get().msg( "MEMBERSS: " );
-			json.toJavaMap().entrySet().stream()
-				.map( e -> "    " + e.getKey().toString() + " -> " + e.getValue().toString() ).forEach( System.out::println );
-		} catch ( Throwable ex ) {
-			App.get().msg( "ERROR: " + ex.toString() );
-			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
-		}
-	};
-	
-	private static String[] objectTestCases = {
-		"{}",
-		"{ \"arr\": [], \"obj\": {}, \"string\": \"x\", \"number\": 123.456, \"true\":true, \"false\": false, \"&null\" : null}",
-		
-	};
-	
-	public static void main( String[] args ) {
-		App.get().msg( "TEST CASES:" );
-
-		//Arrays.stream( stringTestCases ).forEach( stringTest );
-
-		try {
-			//"quote \", esc \\, tab \\t, consecutive \\n\\nDone!"
-			StringBuilder buf = new StringBuilder();
-			buf.append( "Quote " ).append( '"' )
-				.append( " Escape " ).append( '\\' )
-				.append( " Tab " ).append( '\\' ).append( '\t' )
-				.append( " Consecutive newlines " ).append( '\n' ).append( '\n' )
-				.append( " Done!" );
-			JsonValue value = JSON.obj().add( "Nul", JSON.NULL ).add( "True", JSON.TRUE )
-					.add( "False", JSON.FALSE ).add( "Integer", JSON.num( 1234567890 ) )
-					.add( "Decimal", JSON.dec( 123, 456 ) ).add( "Exponential", JSON.exp( 123, 456, 789 ) )
-					.add( "Array", JSON.arr().add( JSON.TRUE ).add( JSON.FALSE ) )
-					.add( "Empty-Object", JSON.obj() )
-					.add( "Wild String", JSON.str( buf.toString() ) );
-				String rep = JSON.toString( value );
-				JsonValue value2 = JSON.fromString( rep );
-				App.get().msg( "REP1: " + rep );
-				App.get().msg( "REP2: " + JSON.toString( value2 ) );
-		} catch ( Exception ex ) {
-			ex.printStackTrace();
-		}
-		
-		App.get().done();
-	}
+//	private static Consumer<String> nullTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: [" + s + "]" );
+//			JsonNull json = in.readNull();
+//			App.get().msg( "JSON: " + json.toString() );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] nullTestCases = {
+//		"null", "", "nu ll", "     null", "null       ", null, "\tnull", "Null", "123", "\rnull", "\nnull", "\"null\""
+//	};
+//	
+//	private static Consumer<String> booleanTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: [" + s + "]" );
+//			//JsonBoolean json = in.readBoolean();
+//			JsonBoolean json = in.readValue().castToJsonBoolean();
+//			App.get().msg( "JSON: " + json.toString() );
+//			App.get().msg( "JAVA: " + json.toJavaBoolean() );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] booleanTestCases = {
+//		"true", "false", 
+//		"     true", "  false", 
+//		"true     ", "false    ", 
+//		"\t\r \n true", "  false\t", 
+//		"True", "fal se", 
+//		null, "null", 
+//		"12", "\"false\"", 
+//	};
+//	
+//	private static Consumer<String> stringTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: [" + s + "]" );
+//			JsonString json = in.readString();
+//			//JsonString json = in.readValue().castToJsonString();
+//			App.get().msg( "JSON: [" + json.toString() + "]" );
+//			App.get().msg( "JAVA: [" + json.toJavaString() + "]" );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] stringTestCases = {
+//		"\"A perfectly fine JSON string\"",	
+//		"\"\"",	
+//		"\"A string with \" quote inside\"",	
+//		"\"A string with escaped \\\" quote inside\"",	
+//		"\"A string with \\ escape inside\"",	
+//		"\"A string with escaped \\\\ escape inside\"",	
+//		"\"A string with / solidus inside\"",	
+//		"\"A string with escaped \\/ solidus inside\"",	
+//		"\"A string with backspace \b inside\"",	
+//		"\"A string with escaped backspace \\b inside\"",	
+//		"\"A string with formfeed \f inside\"",	
+//		"\"A string with escaped formfeed \\f inside\"",	
+//		"\"A string with linefeed \n inside\"",	
+//		"\"A string with escaped linefeed \\n inside\"",	
+//		"\"A string with carriage return \r inside\"",	
+//		"\"A string with escaped carriage return \\r inside\"",	
+//		"\"A string with horizontal tab \t inside\"",	
+//		"\"A string with escaped horizontal tab \\t inside\"",	
+//		"\"A string with unicode \u42AB inside\"",	
+//		"\"A string with escaped unicode \\\u42AB inside\"",
+//		"\"Consecutive tabs: \t\t inside\"",
+//		"\"Consecutive escaped tabs: \\t\\t inside\"",
+//		"Not a JSON string",
+//		"\"Not a JSON string",
+//		"Not a JSON string\"",
+//		null,
+//	};
+//	
+//	private static Consumer<String> integerTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: [" + s + "]" );
+//			JsonNumber json = in.readNumber();
+//			//JsonNumber json = in.readValue().castToJsonNumber();
+//			App.get().msg( "JSON: [" + json.toString() + "]" );
+//			App.get().msg( "BIG: [" + json.toJavaBigDecimal() + "]" );
+//			App.get().msg( "INT: [" + json.toJavaInteger() + "]" );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] goodIntegerTestCases = {
+//		"1", "0", "42", "-1", "-0", "1234567890", "" + Integer.MAX_VALUE, "" + Integer.MIN_VALUE,
+//		"1.0", "12.3E2", "42000E-3", "420000.0e-4", "-123E0", "-34e00", "450e0001", "67.0000"
+//	};
+//	
+//	private static String[] badIntegerTestCases = {
+//			".1", "00", "42.00000000001", "12345678900", "-12345678900",
+//			"1.1", "12.34E1", "42000E-4", "420000.0e-5", "42AF", "+1", "- 1",
+//			"", "123E40", "1e-1.1", "-1E40", "-1e-1", "420000000000e-12", "1e-4000"
+//		};
+//		
+//	private static Consumer<String> doubleTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: [" + s + "]" );
+//			//JsonNumber json = in.readNumber();
+//			JsonNumber json = in.readValue().castToJsonNumber();
+//			App.get().msg( "JSON: [" + json.toString() + "]" );
+//			App.get().msg( "BIGDEC: [" + json.toJavaBigDecimal() + "]" );
+//			App.get().msg( "DOUBLE: [" + json.toJavaDouble() + "]" );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] goodDoubleTestCases = {
+//		"1", "0", "42", "-1", "-0", "1234567890", "" + Integer.MAX_VALUE, "" + Integer.MIN_VALUE,
+//		"1.0", "12.3E2", "42000E-3", "420000.0e-4", "-123E0", "-34e00", "450e0001", "67.0000",
+//		"0.05", "-0.1234567890", 
+//		"1.0000000000000000000000000000000001", "-3.141595879843769874e5", "420000000000e-12", 
+//		"" + Double.MAX_VALUE, "" + Double.MIN_VALUE, "1e42", "1E-42", "-1E+42", "-1e-42"
+//	};
+//		
+//	private static String[] badDoubleTestCases = {
+//		"+1", "- 1", "", "123E400", "-1E400", "-1e-400", "1e-4000", "x0.9", "10.01E--1",
+//	};
+//	
+//	private static Consumer<String> arrayTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: " + s );
+//			//JsonArray json = in.readArray();
+//			JsonArray json = in.readValue().castToJsonArray();
+//			App.get().msg( "JSON: " + JSON.toString( json ) );
+//			App.get().msg( "ELEMENT TYPES: " );
+//			json.toJavaList().stream().map( Object::getClass ).map( Class::getName )
+//				.map( n -> "\t" + n ).forEach( System.out::println );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	public static String[] arrayTestCases = {
+//		"[]",
+//		"[1, 2, 3]",
+//		"[1, \"A\", [], \"foo\", [1, 2, 3, 4], null, 0.1234567, \"Hello\\tWorld\", 42E42]",
+//		"[{}, [{}], {\"arr\": []}, []]",
+//		"[  null, \t false, \ntrue   ]",
+//		"[ [ ] , [[]], [[], []], { \"key_1\" : \"value_1\", \"\" : null }]",
+//		"[ 1, 2, 3, 4, 5, 6, \"...\", 42 ]", 
+//	};
+//	
+//	private static Consumer<String> objectTest = (s) -> {
+//		try (
+//			JsonReader in = new JsonReader( s );
+//		) {
+//			App.get().msg();
+//			App.get().msg( "CASE: " + s );
+//			JsonObject json = in.readObject();
+//			//JsonObject json = in.readValue().castToJsonObject();
+//			App.get().msg( "JSON: " + JSON.toString( json ) );
+//			App.get().msg( "MEMBERSS: " );
+//			json.toJavaMap().entrySet().stream()
+//				.map( e -> "    " + e.getKey().toString() + " -> " + e.getValue().toString() ).forEach( System.out::println );
+//		} catch ( Throwable ex ) {
+//			App.get().msg( "ERROR: " + ex.toString() );
+//			App.get().getLocation( ex ).map( (l) -> "\t" + l ).forEach( System.out::println );
+//		}
+//	};
+//	
+//	private static String[] objectTestCases = {
+//		"{}",
+//		"{ \"arr\": [], \"obj\": {}, \"string\": \"x\", \"number\": 123.456, \"true\":true, \"false\": false, \"&null\" : null}",
+//		
+//	};
+//	
+//	public static void main( String[] args ) {
+//		App.get().msg( "TEST CASES:" );
+//
+//		//Arrays.stream( stringTestCases ).forEach( stringTest );
+//
+//		try {
+//			//"quote \", esc \\, tab \\t, consecutive \\n\\nDone!"
+//			StringBuilder buf = new StringBuilder();
+//			buf.append( "Quote " ).append( '"' )
+//				.append( " Escape " ).append( '\\' )
+//				.append( " Tab " ).append( '\\' ).append( '\t' )
+//				.append( " Consecutive newlines " ).append( '\n' ).append( '\n' )
+//				.append( " Done!" );
+//			JsonValue value = JSON.obj().add( "Nul", JSON.NULL ).add( "True", JSON.TRUE )
+//					.add( "False", JSON.FALSE ).add( "Integer", JSON.num( 1234567890 ) )
+//					.add( "Decimal", JSON.dec( 123, 456 ) ).add( "Exponential", JSON.exp( 123, 456, 789 ) )
+//					.add( "Array", JSON.arr().add( JSON.TRUE ).add( JSON.FALSE ) )
+//					.add( "Empty-Object", JSON.obj() )
+//					.add( "Wild String", JSON.str( buf.toString() ) );
+//				String rep = JSON.toString( value );
+//				JsonValue value2 = JSON.fromString( rep );
+//				App.get().msg( "REP1: " + rep );
+//				App.get().msg( "REP2: " + JSON.toString( value2 ) );
+//		} catch ( Exception ex ) {
+//			ex.printStackTrace();
+//		}
+//		
+//		App.get().done();
+//	}
 
 
 }

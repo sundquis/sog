@@ -80,8 +80,10 @@ public class Error {
 			.expand( "Trace", App.get().getLocationMatching( ex, "^sog.*|^mciv.*"  ).collect( Collectors.toList() ) );
 		
 		try {
-			this.errors.addFirst( new Commented( Error.class )
-				.getCommentedLines( "ERR" ).flatMap( mapper ).collect(  Collectors.toList() ) );
+			List<String> err = new Commented( Error.class )
+				.getCommentedLines( "ERR" ).flatMap( mapper ).collect(  Collectors.toList() );
+			err.forEach( System.out::println );
+			this.errors.addFirst( err );
 		} catch ( IOException e ) {
 			App.get().msg( "In Error.accept()" );
 			e.printStackTrace();
