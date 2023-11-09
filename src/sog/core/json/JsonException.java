@@ -17,7 +17,7 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
 import sog.core.Test;
 
@@ -26,12 +26,20 @@ import sog.core.Test;
  */
 @Test.Skip( "Container" )
 @Test.Subject( "test." )
-public class JsonParseException extends Exception {
+public class JsonException extends Exception {
 	
 	private static final long serialVersionUID = 5207115341201377011L;
 
-	public JsonParseException( String msg, int column ) {
+	public JsonException( String msg, int column ) {
 		super( "Column " + column + ": " + msg );
+	}
+
+	public JsonException( String msg, Exception cause ) {
+		super( msg, cause );
+	}
+
+	public JsonException( String msg ) {
+		super( msg );
 	}
 
 

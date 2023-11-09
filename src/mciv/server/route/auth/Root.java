@@ -31,7 +31,7 @@ import mciv.server.route.Route;
 import sog.core.LocalDir;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -65,7 +65,7 @@ public class Root extends Route {
 	private static final Path ROOT = new LocalDir().sub( "web" ).getDir();
 
 	@Override
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 		String fileName = exchange.getRequestURI().getPath();
 		if ( fileName.startsWith( "/" ) ) {
 			fileName = fileName.substring( 1 );

@@ -21,8 +21,8 @@ package mciv.server.route.action;
 
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.json.JSON;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -53,7 +53,7 @@ public class SampleAction extends ActionRoute {
 	public SampleAction() {}
 
 	@Override
-	public JsonObject respond( JsonObject requestBody ) throws Exception {
+	public JsonValue respond( JsonValue requestBody ) throws Exception {
 		return JSON.obj()
 			.add( "message", JSON.str( "Unimplemented" ) )
 			.add( "status", JSON.num( -1 ) );

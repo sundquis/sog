@@ -17,49 +17,33 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json.model;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.Writer;
 
 import sog.core.Test;
-import sog.util.json.JSON.JsonArray;
-import sog.util.json.JSON.JsonValue;
+import sog.core.json.PrimitiveWriter;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonArrayImpl implements JsonArray {
+public class ModelWriter extends PrimitiveWriter {
 	
-	private final List<JsonValue> values;
-	
-	JsonArrayImpl() {
-		this.values = new ArrayList<>();
-	}
-
-	@Override
-	public JsonArray add( JsonValue element ) {
-		this.values.add(  element );
-		return this;
-	}
-
-	@Override
-	public List<JsonValue> toJavaList() {
-		return this.values;
+	public ModelWriter( BufferedWriter buf ) {
+		super( buf );
 	}
 	
-	@Override
-	public String toString() {
-		return "JSON.Array";
+	public ModelWriter( Writer writer ) {
+		super( writer );
 	}
 	
-	@Override
-	public void write( JsonWriter writer ) throws IOException {
-		writer.writeArray( this );
+	public ModelWriter( OutputStream out ) {
+		super( out );
 	}
-
+	
 	
 
 }

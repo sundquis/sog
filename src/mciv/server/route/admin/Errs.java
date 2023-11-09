@@ -28,7 +28,7 @@ import mciv.server.route.Error;
 import mciv.server.route.Params;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -59,7 +59,7 @@ public class Errs extends AdminRoute {
 	public Errs() {}
 
 	@Override
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 		int trunc = params.getInt( "trunc", 100 );
 		Error.get().truncate( trunc );
 		

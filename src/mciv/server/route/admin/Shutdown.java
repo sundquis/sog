@@ -27,7 +27,7 @@ import mciv.server.route.Params;
 import mciv.server.route.Route;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -59,7 +59,7 @@ public class Shutdown extends AdminRoute {
 	public Shutdown() {}
 
 	@Override 
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 		int delay = params.getInt( "delay", 5 );
 
 		this.sendHtml( exchange, "Shutting down the server in " + delay + " seconds." );

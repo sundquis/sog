@@ -78,7 +78,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Protection.Level Protection.getProtectionLevel(Member)", 
+    	member = "method: Protection.Level Protection.getProtectionLevel(Model)", 
     	description = "Correct for package member" 
     )
     public void tm_09E09F6A8( Test.Case tc ) {
@@ -86,7 +86,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Protection.Level Protection.getProtectionLevel(Member)", 
+    	member = "method: Protection.Level Protection.getProtectionLevel(Model)", 
     	description = "Correct for private member" 
     )
     public void tm_0B00D1A0B( Test.Case tc ) {
@@ -94,7 +94,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Protection.Level Protection.getProtectionLevel(Member)", 
+    	member = "method: Protection.Level Protection.getProtectionLevel(Model)", 
     	description = "Correct for protected member" 
     )
     public void tm_0DB439A00( Test.Case tc ) {
@@ -102,7 +102,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Protection.Level Protection.getProtectionLevel(Member)", 
+    	member = "method: Protection.Level Protection.getProtectionLevel(Model)", 
     	description = "Correct for public member" 
     )
     public void tm_005AEC5D3( Test.Case tc ) {
@@ -110,7 +110,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Protection.Level Protection.getProtectionLevel(Member)", 
+    	member = "method: Protection.Level Protection.getProtectionLevel(Model)", 
     	description = "Throws AssertionError for null member" 
     )
     public void tm_02012EF84( Test.Case tc ) {
@@ -142,7 +142,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPackageProtection(Member)", 
+    	member = "method: boolean Protection.hasPackageProtection(Model)", 
     	description = "Correct for non-package member" 
     )
     public void tm_011D623C3( Test.Case tc ) {
@@ -150,7 +150,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPackageProtection(Member)", 
+    	member = "method: boolean Protection.hasPackageProtection(Model)", 
     	description = "Correct for package member" 
     )
     public void tm_09CEC5EC3( Test.Case tc ) {
@@ -158,7 +158,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPackageProtection(Member)", 
+    	member = "method: boolean Protection.hasPackageProtection(Model)", 
     	description = "Throws AssertionError for null member" 
     )
     public void tm_05ADBF889( Test.Case tc ) {
@@ -190,7 +190,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPrivateProtection(Member)", 
+    	member = "method: boolean Protection.hasPrivateProtection(Model)", 
     	description = "Correct for non-private member" 
     )
     public void tm_0441F2209( Test.Case tc ) {
@@ -198,7 +198,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPrivateProtection(Member)", 
+    	member = "method: boolean Protection.hasPrivateProtection(Model)", 
     	description = "Correct for private member" 
     )
     public void tm_089C44689( Test.Case tc ) {
@@ -206,7 +206,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPrivateProtection(Member)", 
+    	member = "method: boolean Protection.hasPrivateProtection(Model)", 
     	description = "Throws AssertionError for null member" 
     )
     public void tm_02FD7A846( Test.Case tc ) {
@@ -238,7 +238,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasProtectedProtection(Member)", 
+    	member = "method: boolean Protection.hasProtectedProtection(Model)", 
     	description = "Correct for non-protected member" 
     )
     public void tm_0C995D433( Test.Case tc ) {
@@ -246,7 +246,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasProtectedProtection(Member)", 
+    	member = "method: boolean Protection.hasProtectedProtection(Model)", 
     	description = "Correct for protected member" 
     )
     public void tm_091A6FB33( Test.Case tc ) {
@@ -254,7 +254,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasProtectedProtection(Member)", 
+    	member = "method: boolean Protection.hasProtectedProtection(Model)", 
     	description = "Throws AssertionError for null member" 
     )
     public void tm_0678E37B1( Test.Case tc ) {
@@ -286,7 +286,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPublicProtection(Member)", 
+    	member = "method: boolean Protection.hasPublicProtection(Model)", 
     	description = "Correct for non-public member" 
     )
     public void tm_0DBEC9859( Test.Case tc ) {
@@ -294,7 +294,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPublicProtection(Member)", 
+    	member = "method: boolean Protection.hasPublicProtection(Model)", 
     	description = "Correct for public member" 
     )
     public void tm_01EFCA5D9( Test.Case tc ) {
@@ -302,7 +302,7 @@ public class ProtectionTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: boolean Protection.hasPublicProtection(Member)", 
+    	member = "method: boolean Protection.hasPublicProtection(Model)", 
     	description = "Throws AssertionError for null member" 
     )
     public void tm_0EAA2F68A( Test.Case tc ) {

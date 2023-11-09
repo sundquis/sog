@@ -30,7 +30,7 @@ import mciv.server.route.Registrar;
 import mciv.server.route.API;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class Headers extends AdminRoute {
 	}
 
 	@Override 
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 		int trunc = params.getInt( "trunc", 100 );
 		Log.get().truncate( trunc );
 		

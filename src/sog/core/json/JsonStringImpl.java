@@ -17,62 +17,46 @@
  * Sundquist
  */
 
-package mciv.server.route.poll;
+package sog.core.json;
 
-import mciv.server.route.Route;
 import sog.core.Test;
-import sog.core.json.JSON;
-import sog.core.json.JSON.JsonValue;
+import sog.core.json.JSON.JsonString;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class SamplePoll extends PollRoute {
+public final class JsonStringImpl implements JsonString {
 	
-	/* <API>
-	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
-	 * <pre>
-	 * DESCRIPTION:
-	 *   Sample poll route.
-	 * 	
-	 * REQUEST BODY:
-	 *   ${Request}
-	 * 	
-	 * RESPONSE BODY:
-	 *   ${Response}
-	 * 	
-	 * EXCEPTIONS:
-	 *   Status
-	 * 	
-	 * 	</pre>
-	 * <a href="#">Top</a>
-	 * 	
-	 */
-	public SamplePoll() {}
-
-	@Override
-	public JsonValue respond( JsonValue requestBody ) throws Exception {
-		return JSON.obj()
-			.add( "message", JSON.str( "Unimplemented" ) )
-			.add( "status", JSON.num( -1 ) );
+	private final String javaValue;
+	
+	JsonStringImpl( String javaValue ) {
+		this.javaValue = javaValue;
 	}
 
 	@Override
-	public Category getCategory() {
-		return Route.Category.Poll;
+	public String toJavaString() {
+		return this.javaValue;
 	}
 
 	@Override
-	public int getSequence() {
-		return 0;
+	public int compareTo( JsonString other ) {
+		return this.toJavaString().compareTo( other.toJavaString() );
 	}
-
+	
 	@Override
-	public String getPath() {
-		return "/poll/sample";
+	public int hashCode() {
+		return this.javaValue.hashCode();
+	}
+	
+	@Override
+	public boolean equals( Object other ) {
+		if ( other instanceof JsonString js ) {
+			return this.toJavaString().equals( js.toJavaString() );
+		} else {
+			return false;
+		}
 	}
 
-
+	
 }

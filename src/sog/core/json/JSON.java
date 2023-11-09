@@ -17,7 +17,7 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,23 +40,25 @@ public class JSON {
 	
 	private JSON() {}
 	
-	public static JsonValue read( Reader reader ) throws IOException, JsonParseException {
+	public static JsonValue read( Reader reader ) throws IOException, JsonException {
 		try ( JsonReader json = new JsonReader( reader ) ) {
-			return json.readValue();
+			return json.readJsonValue();
 		}
 	}
 	
-	public static JsonValue read( InputStream input ) throws IOException, JsonParseException {
+	public static JsonValue read( InputStream input ) throws IOException, JsonException {
 		try ( JsonReader json = new JsonReader( input ) ) {
-			return json.readValue();
+			return json.readJsonValue();
 		}
 	}
 	
-	public static JsonValue fromString( String s ) throws IOException, JsonParseException {
+	public static JsonValue fromString( String s ) throws IOException, JsonException {
 		try ( JsonReader json = new JsonReader( s ) ) {
-			return json.readValue();
+			return json.readJsonValue();
 		}
 	}
+	
+	
 	
 	public static void write( JsonValue  value, Writer writer ) throws IOException {
 		try ( JsonWriter json = new JsonWriter( writer ) ) {
@@ -70,6 +72,13 @@ public class JSON {
 		}
 	}
 
+	/**
+	 * Use with caution. JsonValue instances may be arbitrarily complex.
+	 * 
+	 * @param value
+	 * @return
+	 * @throws IOException
+	 */
 	public static String toString( JsonValue value ) throws IOException {
 		try ( StringWriter sw = new StringWriter(); JsonWriter json = new JsonWriter( sw ); ) {
 			json.writeValue( value );
@@ -80,46 +89,13 @@ public class JSON {
 
 	
 	
-	public interface JsonValue {
-		
-		public void write( JsonWriter writer ) throws IOException;
-		
-		/**
-		 * The implementation for simple JSON values (null, boolean, number, and string)
-		 * returns the canonical JSON string representation for the element.
-		 * (See: "https://www.json.org/json-en.html")
-		 * 
-		 * But the composite types (object and array) can represent arbitrarily large
-		 * data structures and generally should not be converted to a String representation.
-		 * Rather, one of the JSON.write methods can be used to write the representation
-		 * to a Stream or Writer.
-		 */
-		@Override
-		public String toString();
-		
-		public default JsonObject castToJsonObject() { return (JsonObject) this; }
-		
-		public default JsonArray castToJsonArray() { return (JsonArray) this; }
-		
-		public default JsonString castToJsonString() { return (JsonString) this; }
-		
-		public default JsonNumber castToJsonNumber() { return (JsonNumber) this; }
-		
-		public default JsonBoolean castToJsonBoolean() { return (JsonBoolean) this; }
-		
-	}
+	public sealed interface JsonValue permits JsonObject, JsonArray, JsonString, JsonNumber, JsonBoolean {}
 
 	
 	
-	public static interface JsonObject extends JsonValue {
-		
-		public JsonObject add( JsonString key, JsonValue value );
-		
-		public JsonObject add( String key, JsonValue value );
+	public static non-sealed interface JsonObject extends JsonValue {
 		
 		public Map<String, JsonValue> toJavaMap();
-		
-		public Map<JsonString, JsonValue> getMembers();
 		
 	}
 	
@@ -128,15 +104,13 @@ public class JSON {
 	 * 
 	 * @return
 	 */
-	public static JsonObject obj() {
+	public static JsonObjectImpl obj() {
 		return new JsonObjectImpl();
 	}
 	
 	
 	
-	public static interface JsonArray extends JsonValue {
-		
-		public JsonArray add( JsonValue element );
+	public static non-sealed interface JsonArray extends JsonValue {
 		
 		public List<JsonValue> toJavaList();
 		
@@ -146,13 +120,13 @@ public class JSON {
 	 * Return an empty JSON Array
 	 * @return
 	 */
-	public static JsonArray arr() {
+	public static JsonArrayImpl arr() {
 		return new JsonArrayImpl();
 	}
 	
 	
 	
-	public static interface JsonString extends JsonValue, Comparable<JsonString> {
+	public static non-sealed interface JsonString extends JsonValue, Comparable<JsonString> {
 		
 		public String toJavaString();
 		
@@ -163,13 +137,13 @@ public class JSON {
 	 * @param s
 	 * @return
 	 */
-	public static JsonString str( String s ) {
-		return JsonStringImpl.forJavaValue( Assert.nonNull( s ) );
+	public static JsonStringImpl str( String s ) {
+		return new JsonStringImpl( Assert.nonNull( s ) );
 	}
 	
 	
 	
-	public static interface JsonNumber extends JsonValue, Comparable<JsonNumber> {
+	public static non-sealed interface JsonNumber extends JsonValue, Comparable<JsonNumber> {
 		
 		public Integer toJavaInteger() throws ArithmeticException;
 		
@@ -179,25 +153,21 @@ public class JSON {
 		
 	}
 	
-	public static JsonNumber num( int num ) {
-		return new JsonNumberImpl( num, 0, 0 );
+	public static JsonNumberImpl num( int num ) {
+		return new JsonNumberImpl( num );
 	}
 		
-	public static JsonNumber dec( int num, int frac ) {
-		return new JsonNumberImpl( num, frac, 0 );
+	public static JsonNumberImpl dec( double num ) {
+		return new JsonNumberImpl( num );
 	}
 	
-	public static JsonNumber exp( int num, int frac, int exp ) {
-		return new JsonNumberImpl( num, frac, exp );
-	}
-	
-	public static JsonNumber big( BigDecimal big ) {
+	public static JsonNumberImpl big( BigDecimal big ) {
 		return new JsonNumberImpl( Assert.nonNull( big ) );
 	}
 	
 	
 	
-	public static interface JsonBoolean extends JsonValue {
+	public static non-sealed interface JsonBoolean extends JsonValue {
 		public Boolean toJavaBoolean();
 	}
 	
@@ -205,9 +175,10 @@ public class JSON {
 	
 	public static final JsonBoolean FALSE = JsonBooleanImpl.FALSE;
 	
+
 	
 	
-	public static interface JsonNull extends JsonObject, JsonArray {}
+	public static sealed interface JsonNull extends JsonObject, JsonArray permits JsonNullImpl {}
 	
 	public static final JsonNull NULL = JsonNullImpl.NULL;
 	

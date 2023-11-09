@@ -17,21 +17,37 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
 import sog.core.Test;
+import sog.core.json.JSON.JsonBoolean;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonIllegalOperation extends RuntimeException {
+public final class JsonBooleanImpl implements JsonBoolean {
 	
-	private static final long serialVersionUID = 1L;
+	static final JsonBooleanImpl TRUE = new JsonBooleanImpl( true );
+	
+	static final JsonBooleanImpl FALSE = new JsonBooleanImpl( false );
 
-	public JsonIllegalOperation( String op ) {
-		super( "Cannot perform '" + op + "' on JSON Null" );
+	
+	private final boolean value;
+	
+	private JsonBooleanImpl( boolean value ) {
+		this.value = value;
 	}
 
+	@Override
+	public Boolean toJavaBoolean() {
+		return this.value;
+	}
+	
+	@Override
+	public String toString() {
+		return this.value ? "true" : "false";
+	}
+	
 
 }

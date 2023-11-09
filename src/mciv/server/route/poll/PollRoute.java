@@ -26,8 +26,8 @@ import mciv.server.route.Params;
 import mciv.server.route.Route;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -37,11 +37,11 @@ public abstract class PollRoute extends Route {
 
 	public PollRoute() {}
 
-	public abstract JsonObject respond( JsonObject requestBody ) throws Exception;
+	public abstract JsonValue respond( JsonValue requestBody ) throws Exception;
 
 	@Override
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
-		JsonObject responseBody = this.respond( requestBody );
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
+		JsonValue responseBody = this.respond( requestBody );
 		exchange.getResponseHeaders().add( "Content-Type", "application/json" );
 		
 		exchange.sendResponseHeaders( 200, 0 );

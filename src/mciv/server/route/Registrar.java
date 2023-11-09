@@ -91,6 +91,9 @@ public class Registrar {
 		return route;
 	}
 	
+	// FIXME: We only need to search Route sub-packages
+	private static String FIXME;
+	
 	public synchronized Stream<Route> getNewRoutes() {
 		return App.get().classesUnderDir( App.get().sourceDir( Route.class ) )
 			.map( this::newRouteForName )

@@ -17,43 +17,41 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
-import java.io.IOException;
-
-import sog.core.Test;
-import sog.util.json.JSON.JsonBoolean;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Model.Structure marker interface
+ * 
+ * Structure instances have annotated Member fields.
+ * 
+ * Member fields can be
+ * + Primitive
+ * + Non-Entity Structure
+ * + List<above>
+ * 
+ * Entity is persistent Structure
+ * 
+ * Entity instances can have references to Entity
  * 
  */
-@Test.Subject( "test." )
-public class JsonBooleanImpl implements JsonBoolean {
+public class Model {
 	
-	static final JsonBooleanImpl TRUE = new JsonBooleanImpl( true );
+	private Model() {}
 	
-	static final JsonBooleanImpl FALSE = new JsonBooleanImpl( false );
-
+	public static interface Structure {}
 	
-	private final boolean value;
+	public static interface Entity extends Structure {}
 	
-	private JsonBooleanImpl( boolean value ) {
-		this.value = value;
-	}
-
-	@Override
-	public Boolean toJavaBoolean() {
-		return this.value;
-	}
+	@Retention( RetentionPolicy.RUNTIME )
+	@Target( { ElementType.FIELD } )
+	@Documented
+	public @interface Member {}
 	
-	@Override
-	public String toString() {
-		return this.value ? "true" : "false";
-	}
-
-	@Override
-	public void write( JsonWriter writer ) throws IOException {
-		writer.writeBoolean( this );
-	}
-
+	
 }

@@ -336,7 +336,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	private void scanMember( TestMember member ) {
 		if ( member.isSkipped() ) {
 			if ( member.hasDecls() ) {
-				this.addError( null, "Member has declarations and is marked for skipping", member );
+				this.addError( null, "Model has declarations and is marked for skipping", member );
 			} else {
 				this.addSkip( member, member.getSkipReason() );
 			}
@@ -354,7 +354,7 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 	private void addDecl( TestDecl decl ) {
 		if ( this.declMap.containsKey( decl.getKey() ) ) {
 			this.addError( null, "Duplicate declaration", decl, 
-				"Member", decl.getMemberName(), "Description", decl.getDescription() );
+				"Model", decl.getMemberName(), "Description", decl.getDescription() );
 		} else {
 			this.declMap.put( decl.getKey(), decl );
 		}
@@ -420,13 +420,13 @@ public class TestSubject extends Result implements Comparable<TestSubject> {
 		TestDecl decl = this.declMap.get( impl.getKey() );
 		if ( decl == null ) {
 			this.addError( null, "Orphaned test implementation", this.containerLocation, 
-				"Member", impl.getMemberName(), "Description", impl.getDescription() );		
+				"Model", impl.getMemberName(), "Description", impl.getDescription() );		
 		} else {
 			if ( decl.setImpl( impl ) ) {
 				this.testCases.add( new TestCase( impl, this.container ).showProgress( this.showProgress ) );
 			} else {
 				this.addError( null, "Duplicate test implementation", this.containerLocation,
-					"Member", impl.getMemberName(), "Description", impl.getDescription() );
+					"Model", impl.getMemberName(), "Description", impl.getDescription() );
 			}
 		}		
 	}

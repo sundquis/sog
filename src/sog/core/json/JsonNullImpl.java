@@ -17,24 +17,20 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import sog.core.Test;
-import sog.util.json.JSON.JsonArray;
-import sog.util.json.JSON.JsonValue;
-import sog.util.json.JSON.JsonNull;
-import sog.util.json.JSON.JsonObject;
-import sog.util.json.JSON.JsonString;
+import sog.core.json.JSON.JsonNull;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonNullImpl implements JsonNull {
+public final class JsonNullImpl implements JsonNull {
 	
 	static final JsonNullImpl NULL = new JsonNullImpl();
 	
@@ -44,50 +40,19 @@ public class JsonNullImpl implements JsonNull {
 	
 	
 	@Override
-	public Map<JsonString, JsonValue> getMembers() {
-		return null;
-	}
-	
-	@Override
 	public Map<String, JsonValue> toJavaMap() {
 		return null;
 	}
-
+	
 	@Override
 	public List<JsonValue> toJavaList() {
 		return null;
-	}
-
-
-
-	
-	@Override
-	public JsonObject add( JsonString key, JsonValue value ) {
-		throw new JsonIllegalOperation( "add" );
-	}
-
-	@Override
-	public JsonObject add( String key, JsonValue value ) {
-		throw new JsonIllegalOperation( "add" );
-	}
-
-	@Override
-	public JsonArray add( JsonValue element ) {
-		throw new JsonIllegalOperation( "add" );
 	}
 	
 	@Override
 	public String toString() {
 		return "null";
 	}
-
-	@Override
-	public void write( JsonWriter writer ) throws IOException {
-		writer.writeNull();
-	}
-
-
-
 
 
 }

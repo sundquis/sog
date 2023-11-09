@@ -17,61 +17,35 @@
  * Sundquist
  */
 
-package mciv.server.route.poll;
+package sog.core.json;
 
-import mciv.server.route.Route;
+import java.util.Map;
+import java.util.TreeMap;
+
 import sog.core.Test;
-import sog.core.json.JSON;
 import sog.core.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class SamplePoll extends PollRoute {
+public final class JsonObjectImpl implements JSON.JsonObject {
 	
-	/* <API>
-	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
-	 * <pre>
-	 * DESCRIPTION:
-	 *   Sample poll route.
-	 * 	
-	 * REQUEST BODY:
-	 *   ${Request}
-	 * 	
-	 * RESPONSE BODY:
-	 *   ${Response}
-	 * 	
-	 * EXCEPTIONS:
-	 *   Status
-	 * 	
-	 * 	</pre>
-	 * <a href="#">Top</a>
-	 * 	
-	 */
-	public SamplePoll() {}
-
-	@Override
-	public JsonValue respond( JsonValue requestBody ) throws Exception {
-		return JSON.obj()
-			.add( "message", JSON.str( "Unimplemented" ) )
-			.add( "status", JSON.num( -1 ) );
+	
+	private final Map<String, JsonValue> members;
+	
+	JsonObjectImpl() {
+		this.members = new TreeMap<>();
 	}
-
+	
 	@Override
-	public Category getCategory() {
-		return Route.Category.Poll;
+	public Map<String, JsonValue> toJavaMap() {
+		return this.members;
 	}
-
-	@Override
-	public int getSequence() {
-		return 0;
-	}
-
-	@Override
-	public String getPath() {
-		return "/poll/sample";
+	
+	public JsonObjectImpl add( String key, JsonValue value ) {
+		this.members.put( key, value );
+		return this;
 	}
 
 

@@ -28,7 +28,7 @@ import mciv.server.route.Params;
 import sog.core.LocalDir;
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -60,11 +60,11 @@ public class Pull extends AdminRoute {
 	}
 
 	@Override
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 		int timeout = params.getInt( "timeout", 5 );
 		
 		String cmd = new LocalDir().sub( "tool" ).sub( "bin" ).getFile( "MCIV_PULL", LocalDir.Type.BASH ).toString();
-		Process proc = Runtime.getRuntime().exec( cmd );
+		Process proc = Runtime.getRuntime().exec( new String[] { cmd } );
 		proc.waitFor( timeout, TimeUnit.SECONDS );
 		this.sendHtml( exchange, new String( proc.getInputStream().readAllBytes() ) );
 

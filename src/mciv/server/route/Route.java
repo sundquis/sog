@@ -34,10 +34,10 @@ import com.sun.net.httpserver.HttpHandler;
 import mciv.server.Server;
 import sog.core.Procedure;
 import sog.core.Test;
+import sog.core.json.JSON;
+import sog.core.json.JSON.JsonValue;
 import sog.util.Commented;
 import sog.util.Macro;
-import sog.util.json.JSON;
-import sog.util.json.JSON.JsonObject;
 
 
 /**
@@ -124,7 +124,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception;
+	public abstract Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception;
 	
 	/* Corresponds to turn phase and package. */
 	public abstract Category getCategory();
@@ -161,13 +161,13 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 		this.executionCount++;
 		this.remoteVisit( exchange.getRemoteAddress().getAddress().toString() );
 		
-		JsonObject requestBody = null;
+		JsonValue requestBody = null;
 		Params params = null;
 		Procedure afterClose = Procedure.NOOP;
 		
 		try {
 			//requestBody = new String( exchange.getRequestBody().readAllBytes() );
-			requestBody = JSON.read( exchange.getRequestBody() ).castToJsonObject();
+			requestBody = JSON.read( exchange.getRequestBody() );
 			exchange.getRequestBody().close();
 			params = new Params( exchange.getRequestURI().getQuery() );
 			

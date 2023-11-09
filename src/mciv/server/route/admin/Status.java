@@ -30,9 +30,9 @@ import mciv.server.route.Registrar;
 import mciv.server.route.Route;
 import sog.core.Procedure;
 import sog.core.Test;
+import sog.core.json.JSON.JsonValue;
 import sog.util.FixedWidth;
 import sog.util.Macro;
-import sog.util.json.JSON.JsonObject;
 
 /**
  * 
@@ -84,7 +84,7 @@ public class Status extends AdminRoute {
 
 
 	@Override 
-	public Procedure makeResponse( HttpExchange exchange, JsonObject requestBody, Params params ) throws Exception {
+	public Procedure makeResponse( HttpExchange exchange, JsonValue requestBody, Params params ) throws Exception {
 
 		// BODY <h1>MCIV Server Status</h1>
 		// BODY <pre>

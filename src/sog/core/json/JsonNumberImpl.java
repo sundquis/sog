@@ -17,41 +17,35 @@
  * Sundquist
  */
 
-package sog.util.json;
+package sog.core.json;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import sog.core.Test;
-import sog.util.json.JSON.JsonNumber;
+import sog.core.json.JSON.JsonNumber;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class JsonNumberImpl implements JsonNumber {
+public final class JsonNumberImpl implements JsonNumber {
 	
 	private final BigDecimal javaValue;
 	
-	private final String jsonValue;
-	
 	JsonNumberImpl( String jsonValue ) {
 		this.javaValue = new BigDecimal( jsonValue );
-		this.jsonValue = jsonValue;
 	}
 
-	JsonNumberImpl( int integer, int fraction, int exponent ) {
-		this( "" + integer + (fraction > 0 ? "." + fraction : "") + (exponent != 0 ? "E" + exponent : "") );
+	JsonNumberImpl( int integer ) {
+		this.javaValue = new BigDecimal( integer );
+	}
+	
+	JsonNumberImpl( double num ) {
+		this.javaValue = new BigDecimal( num );
 	}
 	
 	JsonNumberImpl( BigDecimal javaValue ) {
 		this.javaValue = javaValue;
-		this.jsonValue = javaValue.toString();
-	}
-
-	@Override
-	public String toString() {
-		return this.jsonValue;
 	}
 
 	@Override
@@ -75,14 +69,47 @@ public class JsonNumberImpl implements JsonNumber {
 
 
 	@Override
-	public void write( JsonWriter writer ) throws IOException {
-		writer.writeNumber( this );
+	public String toString() {
+		return this.javaValue.toString();
 	}
-
+	
 	@Override
 	public int compareTo( JsonNumber other ) {
 		return this.toJavaBigDecimal().compareTo( other.toJavaBigDecimal() );
 	}
 
+	@Override
+	public int hashCode() {
+		return this.javaValue.hashCode();
+	}
+	
+	@Override
+	public boolean equals( Object other ) {
+		if ( other instanceof JsonNumber num ) {
+			return this.toJavaBigDecimal().equals( num.toJavaBigDecimal() );
+		} else {
+			return false;
+		}
+	}
+	
+//	public static void main( String[] args ) {
+//		JsonNumber[] nums = new JsonNumber[] {
+//			JSON.num( 42 ),
+//			JSON.num( -42 ),
+//			JSON.dec( 42.0 ),
+//			JSON.dec( 42.35 ),
+//			JSON.dec( -42.6 ),
+//			JSON.dec( -42.0 ),
+//			JSON.dec( 0.0 ),
+//			JSON.dec( 0.2 ),
+//			JSON.dec( -0.000000001 ),
+//			JSON.dec( 0.0000000000000000000000000000000000000001 ),
+//			JSON.dec( 12743574398759843754370598093875093838957298742598276871.1942878974 ),
+//			JSON.big( new BigDecimal( "12476287364287.83297498274298E-5324" ) )
+//		};
+//		
+//		Arrays.stream( nums ).forEach( App.get()::msg );
+//	}
+	
 
 }

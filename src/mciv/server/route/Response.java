@@ -30,7 +30,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import sog.core.Procedure;
 import sog.core.Test;
-import sog.util.json.JSON;
+import sog.core.json.JSON;
 
 /**
  * Responsible for:

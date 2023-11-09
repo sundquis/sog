@@ -22,8 +22,8 @@ package mciv.server.route.auth;
 
 import mciv.server.route.Route;
 import sog.core.Test;
-import sog.util.json.JSON;
-import sog.util.json.JSON.JsonObject;
+import sog.core.json.JSON;
+import sog.core.json.JSON.JsonValue;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class Login extends AuthRoute {
 
 
 	@Override
-	public JsonObject respond( JsonObject requestBody ) throws Exception {
+	public JsonValue respond( JsonValue requestBody ) throws Exception {
 		return JSON.obj()
 			.add( "status", JSON.num( -1 ) )
 			.add( "message", JSON.str( "Unimplemented" ) )

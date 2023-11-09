@@ -17,62 +17,35 @@
  * Sundquist
  */
 
-package mciv.server.route.poll;
+package sog.core.json;
 
-import mciv.server.route.Route;
+import java.util.ArrayList;
+import java.util.List;
+
 import sog.core.Test;
-import sog.core.json.JSON;
+import sog.core.json.JSON.JsonArray;
 import sog.core.json.JSON.JsonValue;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class SamplePoll extends PollRoute {
+public final class JsonArrayImpl implements JsonArray {
 	
-	/* <API>
-	 * <hr>
-	 * <h2 id="${path}"><a href="http:/${host}${path}">${path}</a></h2>
-	 * <pre>
-	 * DESCRIPTION:
-	 *   Sample poll route.
-	 * 	
-	 * REQUEST BODY:
-	 *   ${Request}
-	 * 	
-	 * RESPONSE BODY:
-	 *   ${Response}
-	 * 	
-	 * EXCEPTIONS:
-	 *   Status
-	 * 	
-	 * 	</pre>
-	 * <a href="#">Top</a>
-	 * 	
-	 */
-	public SamplePoll() {}
+	private final List<JsonValue> values;
+	
+	JsonArrayImpl() {
+		this.values = new ArrayList<>();
+	}
 
-	@Override
-	public JsonValue respond( JsonValue requestBody ) throws Exception {
-		return JSON.obj()
-			.add( "message", JSON.str( "Unimplemented" ) )
-			.add( "status", JSON.num( -1 ) );
+	public JsonArrayImpl add( JsonValue element ) {
+		this.values.add(  element );
+		return this;
 	}
 
 	@Override
-	public Category getCategory() {
-		return Route.Category.Poll;
-	}
-
-	@Override
-	public int getSequence() {
-		return 0;
-	}
-
-	@Override
-	public String getPath() {
-		return "/poll/sample";
-	}
-
+	public List<JsonValue> toJavaList() {
+		return this.values;
+	}	
 
 }

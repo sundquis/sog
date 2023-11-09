@@ -188,7 +188,7 @@ public class TestSubjectTest extends Test.Container {
 	)
 	public void tm_09AD22058( Test.Case tc ) {
 		TestSubject tr = TestSubject.forSubject( MemberHasDeclarationsAndAsMarkedForSkipping.class );
-		tc.assertTrue( this.messages( tr ).contains( "Member has declarations and is marked for skipping" ) );
+		tc.assertTrue( this.messages( tr ).contains( "Model has declarations and is marked for skipping" ) );
 	}
 		
 	@Test.Impl( 
