@@ -20,10 +20,15 @@
 package sog.core.json.model;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import sog.core.Test;
+import sog.core.json.Model;
+import sog.core.json.Model.Structure;
 import sog.core.json.PrimitiveWriter;
 
 /**
@@ -43,7 +48,55 @@ public class ModelWriter extends PrimitiveWriter {
 	public ModelWriter( OutputStream out ) {
 		super( out );
 	}
+
 	
 	
+	public void writeStructure( Structure s ) throws IOException {
+		this.append( '{' );
+
+		boolean first = true;
+		Field[] fields = s.getClass().getDeclaredFields();
+		for ( Field field : fields ) {
+			Member member = new Member( s, field );
+			if ( member.hasData() ) {
+				if ( first ) {
+					first = false;
+				} else {
+					this.append( ',' );
+				}
+				
+			}
+		}
+		
+		this.append( '}' );
+	}
+	
+	private class Member {
+		
+		private final Structure instance;
+		
+		private final Field field;
+		
+		private Object value;
+		
+		Member( Structure instance, Field field ) {
+			this.instance = instance;
+			this.field = field;
+		}
+		
+		boolean hasData() {
+			if ( this.field.getDeclaredAnnotation( Model.Member.class ) == null ) {
+				return false;
+			}
+			
+			try {
+				this.value = this.field.get( this.instance );
+			} catch ( IllegalArgumentException | IllegalAccessException e ) {
+				this.value = null;
+			}
+			return this.value != null;
+		}
+		
+	}
 
 }

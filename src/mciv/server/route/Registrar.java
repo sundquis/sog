@@ -21,6 +21,7 @@ package mciv.server.route;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -91,11 +92,8 @@ public class Registrar {
 		return route;
 	}
 	
-	// FIXME: We only need to search Route sub-packages
-	private static String FIXME;
-	
 	public synchronized Stream<Route> getNewRoutes() {
-		return App.get().classesUnderDir( App.get().sourceDir( Route.class ) )
+		return App.get().classesUnderDir( App.get().sourceDir( Route.class ), Path.of( "mciv", "server", "route" ) )
 			.map( this::newRouteForName )
 			.filter( Objects::nonNull )
 			.sorted();
@@ -104,6 +102,5 @@ public class Registrar {
 	public Stream<Route> getRoutes() {
 		return this.routes.stream();
 	}
-	
 
 }

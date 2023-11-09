@@ -122,7 +122,7 @@ public class ModelReader extends PrimitiveReader {
 			case ParameterizedType pt when ( pt.getRawType() instanceof Class c ) && List.class.isAssignableFrom( c ) -> 
 				() -> this.readList( this.getReader( pt.getActualTypeArguments()[0] ) );
 			case ParameterizedType pt -> 
-				throw new ModelException( "Unsopported parameterized type: " + pt );
+				throw new ModelException( "Unsupported parameterized type: " + pt );
 			case Class<?> c when Model.Entity.class.isAssignableFrom( c ) ->
 				throw new ModelException( "Reference required for entity: " + c );
 			case Class<?> c when Model.Structure.class.isAssignableFrom( c ) ->
