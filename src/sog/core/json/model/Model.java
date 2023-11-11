@@ -17,13 +17,21 @@
  * Sundquist
  */
 
-package sog.core.json;
+package sog.core.json.model;
 
+import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+import sog.core.json.JsonException;
+import sog.core.json.PrimitiveReader;
+import sog.core.json.PrimitiveWriter;
 
 /**
  * Model.Structure marker interface
@@ -52,6 +60,45 @@ public class Model {
 	@Target( { ElementType.FIELD } )
 	@Documented
 	public @interface Member {}
+
+
 	
+	
+	public interface Rep<T> {
+		
+		public T read( PrimitiveReader reader ) throws IOException, JsonException;
+		
+		public void write( T t, PrimitiveWriter writer ) throws IOException;
+		
+	}
+	
+	public static Rep<?> repForType( Type type ) throws ModelException {
+		return switch ( type ) {
+			case ParameterizedType pt when ( pt.getRawType() instanceof Class c ) -> 
+				Model.repForClass( c, pt.getActualTypeArguments() );
+			case ParameterizedType pt -> 
+				throw new ModelException( "Unsupported parameterized type: " + pt );
+			case Class<?> c when Entity.class.isAssignableFrom( c ) ->
+				Model.repForClass( Entity.class, c );
+			case Class<?> c when Structure.class.isAssignableFrom( c ) ->
+				Model.repForClass( Structure.class, c );
+			case Class<?> c -> Model.repForClass( c );
+			default -> throw new ModelException( "Illegal Type: " + type );
+		};
+	}
+	
+	public static Rep<?> repForClass( Class<?> rawType, Type... params ) throws ModelException {
+		return null;
+	}
+	
+	
+
+	private static final Map<String, Builder> BUILDER_MAP = null;
+	
+	@FunctionalInterface
+	public static interface Builder {
+		public Rep<?> build( Type[] params );
+	}
+
 	
 }

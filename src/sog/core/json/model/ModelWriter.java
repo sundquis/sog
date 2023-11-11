@@ -27,9 +27,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import sog.core.Test;
-import sog.core.json.Model;
-import sog.core.json.Model.Structure;
 import sog.core.json.PrimitiveWriter;
+import sog.core.json.model.Model.Structure;
 
 /**
  * 

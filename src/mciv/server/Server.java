@@ -30,6 +30,8 @@ import com.sun.net.httpserver.HttpServer;
 import mciv.server.route.Registrar;
 import sog.core.App;
 import sog.core.AppRuntime;
+import sog.core.Parser;
+import sog.core.Property;
 import sog.core.Test;
 
 /**
@@ -38,16 +40,13 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class Server {
 
-	// FIXME: Make port changeable
-	
-	public static final String SOCKET_ADDRESS = "/23.88.147.138:1104";
-	//public static final String SOCKET_ADDRESS = "/localhost:1104";
-	
-	private static final int MCIV_PORT = 1104;
-
-	private static final Server INSTANCE = new Server();
+	private static Server INSTANCE = null;
 	
 	public static Server get() {
+		if ( Server.INSTANCE == null ) {
+			Server.INSTANCE = new Server();
+		}
+		
 		return Server.INSTANCE;
 	}
 	
@@ -59,6 +58,10 @@ public class Server {
 	
 	private final Date started;
 	
+	private final int mcivPort;
+	
+	private final String mcivAddress;
+	
 	
 	private Server() {
 		try {
@@ -68,6 +71,8 @@ public class Server {
 		}
 		this.exec = Executors.newCachedThreadPool();
 		this.started = new Date();
+		this.mcivPort = Property.get( "mciv.port", -1, Parser.INTEGER );
+		this.mcivAddress = Property.get( "mcvi.address", "", Parser.STRING );
 	}
 	
 	public String getStartTime() {
@@ -78,13 +83,18 @@ public class Server {
 		return (int) (new Date().getTime() - this.started.getTime()) / 1000 / 60 / 60 + " hours.";
 	}
 	
+	public String getSocketAddress() {
+		return this.mcivAddress + ":" + this.mcivPort;
+	}
+	
 	
 	public void bind() throws IOException {
-		this.httpServer.bind( new InetSocketAddress( MCIV_PORT ), 0 );
+		this.httpServer.bind( new InetSocketAddress( this.mcivPort ), 0 );
 		this.httpServer.setExecutor( exec );
 	}
 	
 	public void load() {
+		
 		Registrar.get().getNewRoutes()
 			.forEach( r -> { this.httpServer.createContext( r.getPath(), r ); } );
 	}
@@ -107,7 +117,7 @@ public class Server {
 			Server.get().load();
 			Server.get().start();
 			App.get().msg( "Server started." );
-		} catch ( IOException e ) {
+		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
 	}

@@ -232,7 +232,7 @@ public abstract class Route implements HttpHandler, Comparable<Route> {
 	public Stream<String> getDocunmentation() {
 		Macro mapper = new Macro()
 			.expand( "path", this.getPath() )
-			.expand( "host", Server.SOCKET_ADDRESS )
+			.expand( "host", Server.get().getSocketAddress() )
 			.expand( "Request", this.getRequestAPI().getAPI() )
 			.expand( "Response", this.getResponseAPI().getAPI() );
 		

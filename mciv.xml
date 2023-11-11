@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Either need to hard-code location of DTD or use internal. -->
-<!-- FIXME: Verify this and/or fix. -->
-<!-- <!DOCTYPE system SYSTEM "file://home/sundquis/book/sog/system.dtd">  -->
-
 <!DOCTYPE system [
     <!ELEMENT system (class)* >
     <!ATTLIST system
@@ -27,15 +23,12 @@
     >
 ]>
 
-<system description="Developmental demonstration version.">
-<!-- 
-Multiline comment
- -->
+<system description="The MCIV Server.">
 
     <!-- Properties for the mciv Server -->
 	<class fullname="mciv.server.Server">
-		<property name="mciv.port" value="11104" />
-		<property name="mcvi.address" value="/localhost" />
+		<property name="mciv.port" value="1104" />
+		<property name="mcvi.address" value="/23.88.147.138" />
 	</class>
 	
 	<class fullname="sog.util.Concurrent">
@@ -45,8 +38,8 @@ Multiline comment
     <!-- Properties for App -->
     <class fullname="sog.core.App">
         <property name="description" value="Developmental version of application framework" />
-        <property name="root" value="/home/sundquis/book/sog" />
-        <property name="source.dirs" value="/home/sundquis/book/sog/src" />
+        <property name="root" value="/home/sundquis/mciv/sog" />
+        <property name="source.dirs" value="/home/sundquis/mciv/sog/src" />
     </class>
 
     <!-- Properties for Trace -->
@@ -73,31 +66,6 @@ Multiline comment
 		<property name="collection.max.length" value="7" />
 		<property name="array.max.length" value="7" />
 	</class>
-
-    <!-- For testing -->
-	<class fullname="test.sog.core.PropertyTest">
-		<property name="repeated" value="foo" />
-		<property name="repeated" value="bar" />
-		<property name="message" value="bar" />
-		<text name="empty message"></text>
-		<text name="message">Bar</text>
-		<text name="repeated">One</text>
-		<text name="repeated">Two</text>
-		<text name="repeated">Bar</text>
-	</class>
-
-    <!-- For testing -->
-	<class fullname="test.sog.core.PropertyTest$Inner$Nested">
-		<property name="message" value="bar" />
-		<text name="message">Message.</text>
-	</class>
-
-    <!-- For testing -->
-	<class fullname="test.sog.core.PropertyTest$Inner">
-		<property name="message" value="bar" />
-		<text name="message">Message.</text>
-	</class>
-	
 
 	<class fullname="sog.core.xml.XML">
 		<text name="declaration"><![CDATA[<?xml version="1.0" encoding="utf-8"?>]]></text>

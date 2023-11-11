@@ -569,15 +569,6 @@ public class App implements Runnable {
 	}
 	
 	
-	private int getExecutionCount() {
-		if ( this.executionCount == null ) {
-			this.executionCount = Stored.get( "executionCount", 0 );
-			this.executionCount.set( this.executionCount.get() + 1 );
-		}
-		return this.executionCount.get();
-	}
-	
-	
 	/**
 	 * Convenience method for printing diagnostic information. 
 	 * 
@@ -594,6 +585,14 @@ public class App implements Runnable {
 	public App msg() {
 		System.out.println();
 		return this;
+	}
+	
+	public int getExecutionCount() {
+		if ( this.executionCount == null ) {
+			this.executionCount = Stored.get( "executionCount", 0 );
+			this.executionCount.set( this.executionCount.get() + 1 );
+		}
+		return this.executionCount.get();
 	}
 	
 	/**

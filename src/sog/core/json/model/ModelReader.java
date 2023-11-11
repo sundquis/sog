@@ -32,13 +32,12 @@ import java.util.List;
 
 import sog.core.Test;
 import sog.core.json.JsonException;
-import sog.core.json.Model;
 import sog.core.json.PrimitiveReader;
 
 /**
  * To extend model types:
  * 
- * For new primitive types add to Rep
+ * For new primitive types add to Representation
  * For new parameterized types, enhance ModelReader.getReader( Type )
  */
 @Test.Subject( "test." )
@@ -128,7 +127,7 @@ public class ModelReader extends PrimitiveReader {
 			case Class<?> c when Model.Structure.class.isAssignableFrom( c ) ->
 				() -> this.readStructure( (Class<? extends Model.Structure>) c );
 			case Class<?> c ->
-				() -> Rep.forClass( c ).read( this );
+				() -> Model.repForClass( c ).read( this );
 			default -> throw new ModelException( "Illegal Type: " + type );
 		};
 	}

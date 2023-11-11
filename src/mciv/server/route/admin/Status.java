@@ -91,7 +91,7 @@ public class Status extends AdminRoute {
 		// BODY OPERATION:
 		// BODY   Server Started: ${start time}
 		// BODY   Uptime: ${up time}
-		// BODY   Memory: Total = ${total} mb, Free = ${free} mb
+		// BODY   Memory: Total = ${total} mb, Free = ${free} mb, Max = ${max} mb.
 		// BODY 
 		// BODY SERVICES:
 		// BODY   ${service header}
@@ -113,6 +113,7 @@ public class Status extends AdminRoute {
 			.expand( "up time", Server.get().getUpTime() )
 			.expand( "total", "" + Runtime.getRuntime().totalMemory()/1000000 )
 			.expand(  "free", "" + Runtime.getRuntime().freeMemory()/1000000 )
+			.expand(  "max", "" + Runtime.getRuntime().maxMemory()/1000000 )
 			.expand( "service header", this.serviceStats.header() )
 			.expand( "service rows", Registrar.get().getRoutes().map( this::getServiceStats ) )
 			.expand( "remote header", this.remoteStats.header() )

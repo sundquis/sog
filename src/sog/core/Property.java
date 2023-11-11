@@ -143,10 +143,12 @@ public class Property extends XMLHandler {
 	}
 	
 
-	private static final String ERR_MSG = ""
-		+ "\n\nThe system property 'system.dir' must be set to an absolute path to the directory continaing\n"
-		+ "the properties file. Typically this is set as a JVM arg, for example:\n"
-		+ "\t-Dsystem.dir=/home/user/apps/sog/\n";
+	private static final String ERR_MSG = """
+				
+		The system property 'system.dir' must be set to an absolute path to the directory containing
+		the properties file. Typically this is set as a JVM arg, for example:
+		    -Dsystem.dir=/home/user/apps/sog/
+		""";
 	
 	
 	@Test.Decl( "Prints instructions when system property file not found" )
@@ -266,6 +268,5 @@ public class Property extends XMLHandler {
 	private String getTextValue( String key ) {
 		return this.text.get( key );
 	}
-
 
 }
