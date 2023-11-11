@@ -50,7 +50,7 @@ public class PrimitiveWriter implements AutoCloseable {
 	}
 	
 	
-	protected void append( char c ) throws IOException {
+	public void append( char c ) throws IOException {
 		this.buf.append( c );
 	}
 	
