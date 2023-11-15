@@ -7,10 +7,11 @@
 /trace
 
 # Extrenally managed resources
-/web/static
+/web
 
 # May need to include this at some point
 /data
+/json
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

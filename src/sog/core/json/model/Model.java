@@ -19,22 +19,15 @@
 
 package sog.core.json.model;
 
-import java.io.IOException;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
-import sog.core.json.JsonException;
-import sog.core.json.PrimitiveReader;
-import sog.core.json.PrimitiveWriter;
 import sog.core.json.model.rep.ListRep;
+import sog.core.json.model.rep.MapRep;
 import sog.core.json.model.rep.StructureRep;
 
 /**
@@ -54,46 +47,6 @@ import sog.core.json.model.rep.StructureRep;
  */
 public class Model {
 
-	/**
-	 * Marker interface for classes that represent a JSON Object.
-	 */
-	public interface Structure {}
-	
-	/**
-	 * Marker interface for Structure classes that are also persistent.
-	 */
-	public interface Entity extends Structure {}
-	
-	/**
-	 * Structure classes use this annotation to mark persistent member fields.
-	 * Unmarked fields are ignored.
-	 */
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.FIELD } )
-	@Documented
-	public @interface Member {}
-
-
-	/**
-	 * A Rep (representation) implements a bijection between instances of a given type
-	 * a JSON representation.
-	 */
-	public interface Rep<T> {
-		
-		public T read( PrimitiveReader reader ) throws IOException, JsonException, ModelException;
-		
-		public void write( T t, PrimitiveWriter writer ) throws IOException, ModelException;
-		
-	}
-	
-	@FunctionalInterface
-	public interface Builder {
-		
-		public Rep<?> build( Type[] params ) throws ModelException;
-		
-	}
-	
-	
 	private static Model INSTANCE;
 	
 	public static Model get() {
@@ -109,6 +62,13 @@ public class Model {
 	
 	
 	
+	@FunctionalInterface
+	public interface Builder {
+		
+		public ModelRep<?> build( Type[] params ) throws ModelException;
+		
+	}
+	
 	private final Map<String, Builder> nameToBuilder;
 	
 	/*
@@ -121,7 +81,7 @@ public class Model {
 		PrimitiveRep[] preps = PrimitiveRep.values();
 		for ( PrimitiveRep prep : preps ) {
 			String name = prep.getRawType().getCanonicalName();
-			final Rep<?> rep = prep.getRep();
+			final ModelRep<?> rep = prep.getRep();
 			Builder builder = (params) -> rep;
 			this.nameToBuilder.put( name, builder );
 		}
@@ -129,9 +89,11 @@ public class Model {
 		// Register stateful representations here. Implementations are in sog.core.json.model.rep
 		this.nameToBuilder.put( List.class.getCanonicalName(), ListRep::forType );
 		this.nameToBuilder.put( Structure.class.getCanonicalName(), StructureRep::forType );
+		this.nameToBuilder.put( Map.class.getCanonicalName(), (params) -> MapRep.forType( false, params ) );
+		this.nameToBuilder.put( SortedMap.class.getCanonicalName(), (params) -> MapRep.forType( true, params ) );
 	}
 
-	public Rep<?> repForType( Type type ) throws ModelException {
+	public ModelRep<?> repForType( Type type ) throws ModelException {
 		return switch ( type ) {
 			case ParameterizedType pt when ( pt.getRawType() instanceof Class c ) -> 
 				this.repForClass( c, pt.getActualTypeArguments() );
@@ -146,7 +108,7 @@ public class Model {
 		};
 	}
 	
-	public Rep<?> repForClass( Class<?> rawType, Type... params ) throws ModelException {
+	public ModelRep<?> repForClass( Class<?> rawType, Type... params ) throws ModelException {
 		Builder builder = this.nameToBuilder.get( rawType.getCanonicalName() );
 		if ( builder == null ) {
 			throw new ModelException( "No registered representation for raw type: " + rawType );

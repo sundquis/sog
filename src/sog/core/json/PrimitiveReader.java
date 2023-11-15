@@ -27,6 +27,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import sog.core.Assert;
 import sog.core.Test;
@@ -54,6 +56,10 @@ public class PrimitiveReader implements AutoCloseable {
 	
 	public PrimitiveReader( InputStream input ) throws IOException {
 		this( new InputStreamReader( input, Charset.forName( "UTF-8" ) ) );
+	}
+	
+	public PrimitiveReader( Path path ) throws IOException {
+		this( Files.newBufferedReader( path ) );
 	}
 	
 	public PrimitiveReader( String jsonValue ) throws IOException {

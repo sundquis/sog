@@ -86,6 +86,10 @@ public class LocalDir {
 		@Test.Skip( "Enumerated constant" )
 		JAVASCRIPT( "js" ),
 		
+		/** JSON data file */
+		@Test.Skip( "Enumerated constant" )
+		JSON( "json" ),
+		
 		/** An xml file */
 		@Test.Skip( "Enumerated constant" ) 		
 		XML( "xml" ),

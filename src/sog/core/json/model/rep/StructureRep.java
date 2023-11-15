@@ -31,14 +31,14 @@ import sog.core.json.JsonException;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 import sog.core.json.model.ModelException;
-import sog.core.json.model.Model.Rep;
-import sog.core.json.model.Model.Structure;
+import sog.core.json.model.ModelRep;
+import sog.core.json.model.Structure;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class StructureRep<S extends Structure> implements Rep<S> {
+public class StructureRep<S extends Structure> implements ModelRep<S> {
 	
 	/*
 	 * We only need one instance per concrete Structure class. Save instances here:
@@ -136,8 +136,8 @@ public class StructureRep<S extends Structure> implements Rep<S> {
 
 	
 //	private static class CHILD implements Structure {
-//		//@Member private Entity illegal;
-//		@Member private String name = "Tom";
+//		//@Model.Member private Model.Entity illegal;
+//		@Model.Member private String name = "Tom";
 //		private CHILD( String name ) {
 //			this.name = name;
 //		}
@@ -145,18 +145,18 @@ public class StructureRep<S extends Structure> implements Rep<S> {
 //	}
 //	
 //	private static class TEST implements Structure {
-//		@Member private String aString = "Hello world!";
-//		@Member private Integer anInteger = 42;
-//		@Member private Double aDouble = -12345.6789;
-//		@Member private Long aLong = Long.MAX_VALUE;
-//		@Member private Boolean aBoolean = true;
-//		@Member private java.util.Date aDate = new java.util.Date();
-//		@Member private java.util.List<String> aList = java.util.List.of( "foo", "bar" );
-//		@Member private CHILD aChild = new CHILD();
-//		@Member private java.util.List<CHILD> children = java.util.List.of( new CHILD("Patrick"),  new CHILD("Andrew"));
-//		@Member private List<List<List<List<String>>>> aNestedList = List.of( List.of(List.of(List.of("ha!"))));
+//		@Model.Member private String aString = "Hello world!";
+//		@Model.Member private Integer anInteger = 42;
+//		@Model.Member private Double aDouble = -12345.6789;
+//		@Model.Member private Long aLong = Long.MAX_VALUE;
+//		@Model.Member private Boolean aBoolean = true;
+//		@Model.Member private java.util.Date aDate = new java.util.Date();
+//		@Model.Member private java.util.List<String> aList = java.util.List.of( "foo", "bar" );
+//		@Model.Member private CHILD aChild = new CHILD();
+//		@Model.Member private java.util.List<CHILD> children = java.util.List.of( new CHILD("Patrick"),  new CHILD("Andrew"));
+//		@Model.Member private List<List<List<List<String>>>> aNestedList = List.of( List.of(List.of(List.of("ha!"))));
 //		
-//		//@Member private Entity illegal;
+//		//@Model.Member private Model.Entity illegal;
 //		
 //		private String ignored = "Ignored";
 //		
@@ -169,18 +169,18 @@ public class StructureRep<S extends Structure> implements Rep<S> {
 //	
 //	public static void main( String[] args ) {
 //		try (
-//			StringWriter sw = new StringWriter();
+//			java.io.StringWriter sw = new java.io.StringWriter();
 //			PrimitiveWriter out = new PrimitiveWriter( sw );
 //		){
-//			Rep<TEST> rep = (Rep<TEST>) Model.get().repForType( StructureRep.class.getDeclaredField( "foo" ).getGenericType() );
+//			ModelRep<TEST> rep = (ModelRep<TEST>) Model.get().repForType( StructureRep.class.getDeclaredField( "foo" ).getGenericType() );
 //			rep.write( foo, out );
 //			out.flush();
 //			String JSON = sw.toString();
-//			App.get().msg( JSON );
+//			sog.core.App.get().msg( JSON );
 //			
 //			PrimitiveReader pr = new PrimitiveReader( JSON );
 //			TEST test = rep.read( pr );
-//			App.get().msg( test );
+//			sog.core.App.get().msg( test );
 //			test.aBoolean = false;
 //			test.aString = "New string";
 //			test.aDate = null;
@@ -188,9 +188,9 @@ public class StructureRep<S extends Structure> implements Rep<S> {
 //			sw.getBuffer().setLength( 0 );
 //			rep.write( test, out );
 //			out.flush();
-//			App.get().msg( sw.toString() );
+//			sog.core.App.get().msg( sw.toString() );
 //			
-//			App.get().done();
+//			sog.core.App.get().done();
 //		} catch ( Exception ex ) {
 //			ex.printStackTrace();
 //		}

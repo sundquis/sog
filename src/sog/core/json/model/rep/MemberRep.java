@@ -25,11 +25,11 @@ import java.lang.reflect.Field;
 import sog.core.Test;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
+import sog.core.json.model.Entity;
+import sog.core.json.model.Member;
 import sog.core.json.model.Model;
-import sog.core.json.model.Model.Entity;
-import sog.core.json.model.Model.Member;
-import sog.core.json.model.Model.Rep;
 import sog.core.json.model.ModelException;
+import sog.core.json.model.ModelRep;
 
 /**
  * 
@@ -40,7 +40,7 @@ public class MemberRep<T> {
 
 	private final Field field;
 	
-	private Rep<T> rep = null;
+	private ModelRep<T> rep = null;
 	
 	public MemberRep( Field field ) {
 		this.field = field;
@@ -57,7 +57,7 @@ public class MemberRep<T> {
 	
 	@SuppressWarnings( "unchecked" )
 	public void setRep() throws ModelException {
-		this.rep = (Rep<T>) Model.get().repForType( this.field.getGenericType() );
+		this.rep = (ModelRep<T>) Model.get().repForType( this.field.getGenericType() );
 	}
 	
 	public String getName() {

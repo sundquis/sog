@@ -25,6 +25,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import sog.core.Assert;
 import sog.core.Test;
@@ -47,6 +50,11 @@ public class PrimitiveWriter implements AutoCloseable {
 	
 	public PrimitiveWriter( OutputStream out ) {
 		this( new OutputStreamWriter( out, Charset.forName( "UTF-8" ) ) );
+	}
+	
+	public PrimitiveWriter( Path path ) throws IOException {
+		this( Files.newBufferedWriter( path, 
+			StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE ) );
 	}
 	
 	

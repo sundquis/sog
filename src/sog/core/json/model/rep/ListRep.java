@@ -30,7 +30,7 @@ import sog.core.json.JsonException;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 import sog.core.json.model.Model;
-import sog.core.json.model.Model.Rep;
+import sog.core.json.model.ModelRep;
 import sog.core.json.model.ModelException;
 import sog.core.Test;
 
@@ -38,7 +38,7 @@ import sog.core.Test;
  * 
  */
 @Test.Subject( "test." )
-public class ListRep<E> implements Rep<List<E>>{
+public class ListRep<E> implements ModelRep<List<E>>{
 
 	/*
 	 * The only state is the representation for the element type so we can
@@ -62,16 +62,15 @@ public class ListRep<E> implements Rep<List<E>>{
 	}
 	
 	
-	private final Rep<E> elementRep;
+	private final ModelRep<E> elementRep;
 	
-	private ListRep( Rep<E> elementRep ) {
+	private ListRep( ModelRep<E> elementRep ) {
 		this.elementRep = elementRep;
 	}
 
-	@SuppressWarnings( "unchecked" )
 	@Override
 	public List<E> read( PrimitiveReader reader ) throws IOException, JsonException, ModelException {
-		List<Object> result = new ArrayList<>();
+		List<E> result = new ArrayList<>();
 		reader.skipWhiteSpace().consume( '[' );
 		
 		boolean first = true;
@@ -113,14 +112,14 @@ public class ListRep<E> implements Rep<List<E>>{
 //			PrimitiveWriter out = new PrimitiveWriter( System.out );
 //			PrimitiveReader in = new PrimitiveReader( "[0, 1, 2, 3, 42]" );
 //		) {
-//			Rep<List<Integer>> rep1 = (Rep<List<Integer>>) Model.get().repForType( ListRep.class.getDeclaredField( "int1" ).getGenericType() );
-//			Rep<List<Integer>> rep2 = (Rep<List<Integer>>) Model.get().repForType( ListRep.class.getDeclaredField( "int2" ).getGenericType() );
-//			App.get().msg( "Same?: " + (rep1 == rep2) );
+//			ModelRep<List<Integer>> rep1 = (ModelRep<List<Integer>>) Model.get().repForType( ListRep.class.getDeclaredField( "int1" ).getGenericType() );
+//			ModelRep<List<Integer>> rep2 = (ModelRep<List<Integer>>) Model.get().repForType( ListRep.class.getDeclaredField( "int2" ).getGenericType() );
+//			sog.core.App.get().msg( "Same?: " + (rep1 == rep2) );
 //			rep1.write( int1, out );
 //			rep2.write( int2, out );
 //			out.flush();
-//			App.get().msg( rep1.read( in ) );
-//			App.get().done();
+//			sog.core.App.get().msg( rep1.read( in ) );
+//			sog.core.App.get().done();
 //		} catch ( Exception ex ) {
 //			ex.printStackTrace();
 //		}

@@ -26,7 +26,6 @@ import sog.core.Test;
 import sog.core.json.JsonException;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
-import sog.core.json.model.Model.Rep;
 
 /**
  * 
@@ -34,7 +33,7 @@ import sog.core.json.model.Model.Rep;
 @Test.Subject( "test." )
 public enum PrimitiveRep {
 
-	DATE( Date.class, new Rep<Date>() {
+	DATE( Date.class, new ModelRep<Date>() {
 
 		@Override public Date read( PrimitiveReader reader ) throws IOException, JsonException {
 			return new Date( reader.readNumber().longValueExact() );
@@ -46,7 +45,7 @@ public enum PrimitiveRep {
 		
 	}),
 	
-	LONG( Long.class, new Rep<Long>() {
+	LONG( Long.class, new ModelRep<Long>() {
 
 			@Override
 			public Long read( PrimitiveReader reader ) throws IOException, JsonException {
@@ -60,7 +59,7 @@ public enum PrimitiveRep {
 			
 	}),
 	
-	BOOLEAN( Boolean.class, new Rep<Boolean>() {
+	BOOLEAN( Boolean.class, new ModelRep<Boolean>() {
 
 			@Override
 			public Boolean read( PrimitiveReader reader ) throws IOException, JsonException {
@@ -74,7 +73,7 @@ public enum PrimitiveRep {
 			
 	}),
 	
-	DOUBLE( Double.class, new Rep<Double>() {
+	DOUBLE( Double.class, new ModelRep<Double>() {
 
 			@Override
 			public Double read( PrimitiveReader reader ) throws IOException, JsonException {
@@ -88,7 +87,7 @@ public enum PrimitiveRep {
 			
 	}),
 	
-	INTEGER( Integer.class, new Rep<Integer>() {
+	INTEGER( Integer.class, new ModelRep<Integer>() {
 
 			@Override
 			public Integer read( PrimitiveReader reader ) throws IOException, JsonException {
@@ -102,7 +101,7 @@ public enum PrimitiveRep {
 			
 	}),
 	
-	STRING( String.class, new Rep<String>() {
+	STRING( String.class, new ModelRep<String>() {
 			
 			@Override public String read( PrimitiveReader reader ) throws IOException, JsonException {
 				return reader.readString();
@@ -117,16 +116,16 @@ public enum PrimitiveRep {
 	;
 	
 	private Class<?> rawType;
-	private Rep<?> rep;
+	private ModelRep<?> rep;
 	
-	private PrimitiveRep( Class<?> rawType, Rep<?> rep ) {
+	private PrimitiveRep( Class<?> rawType, ModelRep<?> rep ) {
 		this.rawType = rawType;
 		this.rep = rep;
 	}
 	
 	public Class<?> getRawType() { return this.rawType; }
 	
-	public Rep<?> getRep() { return this.rep; }
+	public ModelRep<?> getRep() { return this.rep; }
 
 
 }
