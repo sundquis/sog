@@ -31,19 +31,7 @@ import sog.core.json.model.rep.MapRep;
 import sog.core.json.model.rep.StructureRep;
 
 /**
- * Model.Structure marker interface
- * 
- * Structure instances have annotated Member fields.
- * 
- * Member fields can be
- * + Primitive
- * + Non-Entity Structure
- * + List<above>
- * 
- * Entity is persistent Structure
- * 
- * Entity instances can have references to Entity
- * 
+ * Manages JSON representations for various types.
  */
 public class Model {
 
@@ -61,7 +49,9 @@ public class Model {
 	}
 	
 	
-	
+	/**
+	 * In general, representations can depend on type parameters.
+	 */
 	@FunctionalInterface
 	public interface Builder {
 		
@@ -69,6 +59,9 @@ public class Model {
 		
 	}
 	
+	/*
+	 * Canonical name to Builder instance. 
+	 */
 	private final Map<String, Builder> nameToBuilder;
 	
 	/*
@@ -77,7 +70,7 @@ public class Model {
 	private Model() {
 		this.nameToBuilder = new TreeMap<>();
 		
-		// PrimitiveRep instances are the shared, stateless representations
+		// Enumerated PrimitiveRep instances are the shared, stateless representations
 		PrimitiveRep[] preps = PrimitiveRep.values();
 		for ( PrimitiveRep prep : preps ) {
 			String name = prep.getRawType().getCanonicalName();
@@ -86,7 +79,7 @@ public class Model {
 			this.nameToBuilder.put( name, builder );
 		}
 		
-		// Register stateful representations here. Implementations are in sog.core.json.model.rep
+		// Register state-ful representations here. Implementations are in sog.core.json.model.rep
 		this.nameToBuilder.put( List.class.getCanonicalName(), ListRep::forType );
 		this.nameToBuilder.put( Structure.class.getCanonicalName(), StructureRep::forType );
 		this.nameToBuilder.put( Map.class.getCanonicalName(), (params) -> MapRep.forType( false, params ) );
@@ -99,8 +92,8 @@ public class Model {
 				this.repForClass( c, pt.getActualTypeArguments() );
 			case ParameterizedType pt -> 
 				throw new ModelException( "Unsupported parameterized type: " + pt );
-			case Class<?> c when Entity.class.isAssignableFrom( c ) ->
-				this.repForClass( Entity.class, c );
+//			case Class<?> c when Entity.class.isAssignableFrom( c ) ->
+//				this.repForClass( Entity.class, c );
 			case Class<?> c when Structure.class.isAssignableFrom( c ) ->
 				this.repForClass( Structure.class, c );
 			case Class<?> c -> this.repForClass( c );

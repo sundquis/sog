@@ -23,6 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import sog.core.App;
+import sog.core.Assert;
 import sog.core.Test;
 
 /**
@@ -31,31 +32,41 @@ import sog.core.Test;
 @Test.Subject( "test." )
 public class ID<E extends Entity> {
 
-	private static class Info extends Singleton {
+	private final static class State extends Singleton {
 		
 		@Member private SortedMap<String, Integer> classToCID = new TreeMap<>();
 		
-		@Member private Integer nextCID = 130_691_232;
+		@Member private Integer nextCID = 130_691_232;  // 42^5
 		
-		@Member private Long nextIID = 717_368_321_110_468_608L;
+		@Member private Long nextIID = 717_368_321_110_468_608L;  // 42^11
+		
+		private long nextIID() {
+			long result = this.nextIID;
+			this.nextIID += 130691237;  // Prime after 42^5
+			return result;
+		}
+		
+		private int getCID( String entityClassName ) {
+			Integer result = this.classToCID.get( entityClassName );
+			if ( result == null ) {
+				result = this.nextCID;
+				this.nextCID += 74093;  // Prime after 42^3
+				this.classToCID.put( entityClassName, result );
+			}
+			return result;
+		}
 		
 	}
 	
-	private static Info info = Singleton.getInstance( Info.class );
+	private final static State state = Singleton.getInstance( State.class );
 	
 	
-	static synchronized <F extends Entity> ID<F> createID( Class<F> entityClass ) {
-		String className = entityClass.getCanonicalName();
-		Integer cid = ID.info.classToCID.get( className );
-		if ( cid == null ) {
-			cid = ID.info.nextCID;
-			ID.info.nextCID += 74093;
-			ID.info.classToCID.put( className, cid );
-		}
-		long iid = ID.info.nextIID;
-		ID.info.nextIID += 130691237;
+	final static synchronized <F extends Entity> ID<F> createID( Class<F> entityClass ) {
+		int cid = ID.state.getCID( Assert.nonNull( entityClass ).getCanonicalName() );
+		long iid = ID.state.nextIID();
 		return new ID<>( cid, iid );
 	}
+	
 	
 	
 	private final int cid;
@@ -69,31 +80,31 @@ public class ID<E extends Entity> {
 	
 	@Override
 	public String toString() {
-		return Integer.toHexString( this.cid ) + "-" + Long.toHexString( this.iid );
+		return Integer.toHexString( this.cid ) + ":" + Long.toHexString( this.iid );
 	}
 	
 	
 	
-//	private static class SomeEntity extends Entity {}
-//	private static class AnotherEntity extends Entity {}
-//	private static class ThirdEntity extends Entity {}
+	private static class SomeEntity implements Entity {}
+	private static class AnotherEntity implements Entity {}
+	private static class ThirdEntity implements Entity {}
 
 	public static void main( String[] args ) {
-//		App.get().msg( "CID: " + ID.info.nextCID );
-//		App.get().msg( "IID: " + ID.info.nextIID );
-//		App.get().msg( sog.core.Strings.toString( ID.info.classToCID ) );
+//		App.get().msg( "CID: " + ID.state.nextCID );
+//		App.get().msg( "IID: " + ID.state.nextIID );
+//		App.get().msg( sog.core.Strings.toString( ID.state.classToCID ) );
 		
-//		App.get().msg( ID.createID( SomeEntity.class  ) );
-//		App.get().msg( ID.createID( SomeEntity.class  ) );
-//		App.get().msg( ID.createID( AnotherEntity.class  ) );
-//		App.get().msg( ID.createID( SomeEntity.class  ) );
-//		App.get().msg( ID.createID( AnotherEntity.class  ) );
-//		App.get().msg( ID.createID( ThirdEntity.class  ) );
+		App.get().msg( ID.createID( SomeEntity.class  ) );
+		App.get().msg( ID.createID( SomeEntity.class  ) );
+		App.get().msg( ID.createID( AnotherEntity.class  ) );
+		App.get().msg( ID.createID( SomeEntity.class  ) );
+		App.get().msg( ID.createID( AnotherEntity.class  ) );
+		App.get().msg( ID.createID( ThirdEntity.class  ) );
 		
 //		App.get().msg( "ID: " + id.toString() );
-//		App.get().msg( "CID: " + ID.info.nextCID );
-//		App.get().msg( "IID: " + ID.info.nextIID );
-//		App.get().msg( sog.core.Strings.toString( ID.info.classToCID ) );
+//		App.get().msg( "CID: " + ID.state.nextCID );
+//		App.get().msg( "IID: " + ID.state.nextIID );
+//		App.get().msg( sog.core.Strings.toString( ID.state.classToCID ) );
 		
 //		int x = Integer.MAX_VALUE + 1;
 //		App.get().msg( "Max = " + Integer.toHexString( Integer.MAX_VALUE ) );

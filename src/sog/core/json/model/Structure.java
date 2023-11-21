@@ -21,5 +21,11 @@ package sog.core.json.model;
 
 /**
  * Marker interface for classes that represent a JSON Object.
+ * 
+ * Structure instances have annotated Member fields.
+ * The generic type of a member field must have a registered JSON representation 
+ * and cannot be an Entity
  */
-public interface Structure {}
+public interface Structure {
+	
+}

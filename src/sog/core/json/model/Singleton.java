@@ -21,6 +21,8 @@ package sog.core.json.model;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import sog.core.App;
 import sog.core.LocalDir;
@@ -30,11 +32,23 @@ import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 
 /**
- * 
+ * Singleton classes must either declare a no-arg constructor that initializes member values,
+ * or use initializers. This establishes the initial state, the first time the Singleton is
+ * created. When the JVM shuts down, the current state is preserved for the next execution.
  */
 @Test.Subject( "test." )
 public abstract class Singleton implements Structure {
+
 	
+	private static final Map<Class<?>, Singleton> instances = new HashMap<>();
+	
+	/**
+	 * Get the unique instance of the given Singleton class.
+	 * 
+	 * @param <S>
+	 * @param clazz
+	 * @return
+	 */
 	public static <S extends Singleton> S getInstance( Class<S> clazz ) {
 		LocalDir dir = new LocalDir().sub( "json" ).sub( "model" );
 		Arrays.stream( clazz.getCanonicalName().split( "\\." ) ).forEach( dir::sub );
@@ -70,7 +84,7 @@ public abstract class Singleton implements Structure {
 		try {
 			return Model.get().repForClass( Structure.class, clazz );
 		} catch ( ModelException ex ) {
-			throw new JsonRuntime( "Should not happen", ex );
+			throw new JsonRuntime( "Illegal Structure definition.", ex );
 		}
 	}
 	
@@ -91,15 +105,15 @@ public abstract class Singleton implements Structure {
 //		@Member private String myString = "hi";
 //	}
 //
-//	public static void main( String[] args ) {
-//		try {
+	public static void main( String[] args ) {
+		try {
 //			SomeSingleton ss = Singleton.getInstance( SomeSingleton.class );
 //			App.get().msg( "Int = " + ss.myInt + ", Str = " + ss.myString );
 //			ss.myInt++;
 //			ss.myString += " and hi";
-//		} catch ( Exception ex ) {
-//			ex.printStackTrace();
-//		}
-//	}
+		} catch ( Exception ex ) {
+			ex.printStackTrace();
+		}
+	}
 
 }

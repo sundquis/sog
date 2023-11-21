@@ -19,22 +19,46 @@
 
 package sog.core.json.model;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import sog.core.Fatal;
+import sog.core.Test;
 
 /**
- * Structure classes use this annotation to mark persistent member fields.
- * Unmarked fields are ignored.
- * The declared raw type of the member field must match a registered representation type.
+ * JSON Model Manager
+ * 
+ * TODO:
+ * Code generation get/set from Member
+ * "Compiler"?
+ * + Verify PKey instance
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.FIELD } )
-@Documented
-public @interface Member {
+@Test.Subject( "test." )
+public class JMM {
 	
-	int order() default 0;
+	private static JMM INSTANCE = null;
 	
+	public static JMM getManager() {
+		if ( JMM.INSTANCE == null ) {
+			synchronized ( JMM.class ) {
+				if ( JMM.INSTANCE == null ) {
+					JMM.INSTANCE = new JMM();
+				}
+			}
+		}
+		
+		return JMM.INSTANCE;
+	}
+	
+	
+	private JMM() {}
+	
+	public <E extends Entity> E findEntity( PKey<E> key ) {
+		Fatal.unimplemented( "" );
+		return null;
+	}
+	
+	public <E extends Entity> E getEntity( ID<E> id ) {
+		Fatal.unimplemented( "" );
+		return null;
+	}
+
+
 }

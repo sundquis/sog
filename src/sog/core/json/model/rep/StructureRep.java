@@ -24,6 +24,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.TreeMap;
 
 import sog.core.Test;
@@ -69,7 +71,9 @@ public class StructureRep<S extends Structure> implements ModelRep<S> {
 	
 	private final Map<String, MemberRep<?>> nameToMemberRep;
 	
-	public StructureRep( Class<S> clazz ) throws ModelException {
+	private SortedSet<MemberRep<?>> members = null;
+	
+	private StructureRep( Class<S> clazz ) throws ModelException {
 		this.structureClass = clazz;
 		
 		this.nameToMemberRep = new TreeMap<>();
@@ -77,7 +81,7 @@ public class StructureRep<S extends Structure> implements ModelRep<S> {
 		for ( Field field : fields ) {
 			MemberRep<?> mr = new MemberRep<>( field );
 			if ( mr.isEntity() ) {
-				throw new ModelException( clazz + " declares an Enitity Member: " + mr.getName() );
+				throw new ModelException( "Structure " + clazz + " declares an Enitity Member: " + mr.getName() );
 			}
 			if ( mr.isMember() ) {
 				mr.setRep();
@@ -120,6 +124,13 @@ public class StructureRep<S extends Structure> implements ModelRep<S> {
 		} catch ( Exception ex ) {
 			throw new ModelException( this.structureClass + " does not have an accessible no-arg constructor." );
 		}
+	}
+	
+	public SortedSet<MemberRep<?>> getMembers() {
+		if ( this.members == null ) {
+			this.members = new TreeSet<>( this.nameToMemberRep.values() );
+		}
+		return this.members;
 	}
 
 	@Override

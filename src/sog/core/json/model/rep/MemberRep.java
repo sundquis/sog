@@ -21,7 +21,7 @@ package sog.core.json.model.rep;
 
 import java.lang.reflect.Field;
 
-
+import sog.core.Fatal;
 import sog.core.Test;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
@@ -35,12 +35,14 @@ import sog.core.json.model.ModelRep;
  * 
  */
 @Test.Subject( "test." )
-public class MemberRep<T> {
+public class MemberRep<T> implements Comparable<MemberRep<T>> {
 
 
 	private final Field field;
 	
 	private ModelRep<T> rep = null;
+	
+	private int order = 0;
 	
 	public MemberRep( Field field ) {
 		this.field = field;
@@ -52,7 +54,13 @@ public class MemberRep<T> {
 	}
 	
 	public boolean isMember() {
-		return this.field.getDeclaredAnnotation( Member.class ) != null; 
+		Member member = this.field.getDeclaredAnnotation( Member.class );
+		if ( member == null ) {
+			return false;
+		} else {
+			this.order = member.order();
+			return true;
+		}
 	}
 	
 	@SuppressWarnings( "unchecked" )
@@ -62,6 +70,15 @@ public class MemberRep<T> {
 	
 	public String getName() {
 		return this.field.getName();
+	}
+
+	public Object getValue( Object instance ) {
+		try {
+			return this.field.get( instance );
+		} catch ( Exception ex ) {
+			Fatal.error( "Instance: " + instance + " does not declare field: " + this.field, ex );
+			return null;
+		}
 	}
 	
 	public void readAndSet( PrimitiveReader reader, Object instance ) throws ModelException {
@@ -89,6 +106,11 @@ public class MemberRep<T> {
 		} catch ( Exception ex ) {
 			throw new ModelException( "Error getting member value: " + this.field );
 		}
+	}
+
+	@Override
+	public int compareTo( MemberRep<T> other ) {
+		return this.order - other.order;
 	}
 	
 

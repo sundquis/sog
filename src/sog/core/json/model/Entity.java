@@ -20,8 +20,11 @@
 package sog.core.json.model;
 
 /**
- * Base class for Structure classes that are also persistent.
+ * Marker interface for Structure classes that are also persistent.
+ * Entity is persistent Structure
+ * 
+ * Entity instances can have references to Entity
  */
-public abstract class Entity implements Structure {
+public interface Entity extends Structure {
 	
 }
