@@ -19,10 +19,9 @@
 
 package sog.core.json.model;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 
-import sog.core.App;
 import sog.core.Assert;
 import sog.core.Test;
 
@@ -34,7 +33,7 @@ public class ID<E extends Entity> {
 
 	private final static class State extends Singleton {
 		
-		@Member private SortedMap<String, Integer> classToCID = new TreeMap<>();
+		@Member private Map<String, Integer> classToCID = new HashMap<>();
 		
 		@Member private Integer nextCID = 130_691_232;  // 42^5
 		
@@ -85,32 +84,19 @@ public class ID<E extends Entity> {
 	
 	
 	
-	private static class SomeEntity implements Entity {}
-	private static class AnotherEntity implements Entity {}
-	private static class ThirdEntity implements Entity {}
-
-	public static void main( String[] args ) {
-//		App.get().msg( "CID: " + ID.state.nextCID );
-//		App.get().msg( "IID: " + ID.state.nextIID );
-//		App.get().msg( sog.core.Strings.toString( ID.state.classToCID ) );
-		
-		App.get().msg( ID.createID( SomeEntity.class  ) );
-		App.get().msg( ID.createID( SomeEntity.class  ) );
-		App.get().msg( ID.createID( AnotherEntity.class  ) );
-		App.get().msg( ID.createID( SomeEntity.class  ) );
-		App.get().msg( ID.createID( AnotherEntity.class  ) );
-		App.get().msg( ID.createID( ThirdEntity.class  ) );
-		
-//		App.get().msg( "ID: " + id.toString() );
-//		App.get().msg( "CID: " + ID.state.nextCID );
-//		App.get().msg( "IID: " + ID.state.nextIID );
-//		App.get().msg( sog.core.Strings.toString( ID.state.classToCID ) );
-		
-//		int x = Integer.MAX_VALUE + 1;
-//		App.get().msg( "Max = " + Integer.toHexString( Integer.MAX_VALUE ) );
-//		App.get().msg( "Min = " + Integer.toHexString( Integer.MIN_VALUE ) );
-//		App.get().msg( "max + 1 = " + Integer.toHexString( x ) );
-		App.get().done();
-	}
+//	private static class SomeEntity implements Entity {}
+//	private static class AnotherEntity implements Entity {}
+//	private static class ThirdEntity implements Entity {}
+//
+//	public static void main( String[] args ) {
+//		sog.core.App.get().msg( ID.createID( SomeEntity.class  ) );
+//		sog.core.App.get().msg( ID.createID( SomeEntity.class  ) );
+//		sog.core.App.get().msg( ID.createID( AnotherEntity.class  ) );
+//		sog.core.App.get().msg( ID.createID( SomeEntity.class  ) );
+//		sog.core.App.get().msg( ID.createID( AnotherEntity.class  ) );
+//		sog.core.App.get().msg( ID.createID( ThirdEntity.class  ) );
+//
+//		sog.core.App.get().done();
+//	}
 
 }

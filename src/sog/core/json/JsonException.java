@@ -26,7 +26,7 @@ import sog.core.Test;
  */
 @Test.Skip( "Container" )
 @Test.Subject( "test." )
-public class JsonException extends Exception {
+public class JsonException extends RuntimeException {
 	
 	private static final long serialVersionUID = 5207115341201377011L;
 

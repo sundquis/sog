@@ -24,8 +24,8 @@ import java.util.Objects;
 import sog.core.Assert;
 import sog.core.Fatal;
 import sog.core.Test;
-import sog.core.json.model.rep.MemberRep;
-import sog.core.json.model.rep.StructureRep;
+import sog.core.json.model.representation.StructureMember;
+import sog.core.json.model.representation.StructureRepresentationProvider;
 
 /**
  * 
@@ -35,14 +35,14 @@ public abstract class PKey<E extends Entity> implements Structure, Comparable<PK
 	
 	private ID<E> myID = null;
 	
-	private StructureRep<PKey<E>> rep = null;
+	//private StructureRepresentationProvider<PKey<E>> rep = null;
 	
 	private int hashCode = 0;
 	
 	@SuppressWarnings( "unchecked" )
 	protected PKey() {
 		try {
-			this.rep = (StructureRep<PKey<E>>) StructureRep.forType( this.getClass() );
+			//this.rep = (StructureRepresentationProvider<PKey<E>>) StructureRepresentationProvider.forType( this.getClass() );
 		} catch ( ModelException ex ) {
 			Fatal.error( "No representation of PKey: " + this.getClass(), ex );
 		}
@@ -65,23 +65,23 @@ public abstract class PKey<E extends Entity> implements Structure, Comparable<PK
 	@Override
 	public int compareTo( PKey<E> other ) {
 		int result = 0;
-		for ( MemberRep<?> member : this.rep.getMembers() ) {
-			Object thisValue = member.getValue( this );
-			Object otherValue = member.getValue( other );
-			if ( thisValue instanceof Comparable c1 ) {
-				if ( otherValue instanceof Comparable c2 ) {
-					result = c1.compareTo( c2 );
-				} else {
-					Fatal.impossible( "Two values of the same field have the same type." );
-				}
-			} else {
-				result = this.hashCode() - other.hashCode();
-			}
-			
-			if ( result != 0 ) {
-				break;
-			}
-		}
+//		for ( StructureMember<?> member : this.rep.getMembers() ) {
+//			Object thisValue = member.getValue( this );
+//			Object otherValue = member.getValue( other );
+//			if ( thisValue instanceof Comparable c1 ) {
+//				if ( otherValue instanceof Comparable c2 ) {
+//					result = c1.compareTo( c2 );
+//				} else {
+//					Fatal.impossible( "Two values of the same field have the same type." );
+//				}
+//			} else {
+//				result = this.hashCode() - other.hashCode();
+//			}
+//			
+//			if ( result != 0 ) {
+//				break;
+//			}
+//		}
 		
 		return result;
 	}
@@ -99,7 +99,7 @@ public abstract class PKey<E extends Entity> implements Structure, Comparable<PK
 	@Override
 	public int hashCode() {
 		if ( this.hashCode == 0 ) {
-			this.hashCode = Objects.hash( this.rep.getMembers().stream().map( (mr) -> mr.getValue( this ) ).toArray() );
+			//this.hashCode = Objects.hash( this.rep.getMembers().stream().map( (mr) -> mr.getValue( this ) ).toArray() );
 		}
 		return this.hashCode;
 	}

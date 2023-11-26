@@ -38,7 +38,7 @@ public class ListRepTest extends Test.Container {
 	// TEST CASES:
 
     @Test.Impl( 
-    	member = "constructor: ListRep(Type[])", 
+    	member = "constructor: ListRepresentationProvider(Type[])", 
     	description = "Throws AssertionError for null array of component types" 
     )
     public void tm_03386BE1B( Test.Case tc ) {
@@ -46,7 +46,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "constructor: ListRep(Type[])", 
+    	member = "constructor: ListRepresentationProvider(Type[])", 
     	description = "Throws AssertionError if not exactly one component" 
     )
     public void tm_0C19C87D0( Test.Case tc ) {
@@ -54,7 +54,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: List ListRep.fromXML(XMLReader)", 
+    	member = "method: List ListRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws AssertionError for null reader" 
     )
     public void tm_08DD73C04( Test.Case tc ) {
@@ -62,7 +62,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: List ListRep.fromXML(XMLReader)", 
+    	member = "method: List ListRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws XMLRuntime for malformed content" 
     )
     public void tm_068483977( Test.Case tc ) {
@@ -70,7 +70,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: List ListRep.fromXML(XMLReader)", 
+    	member = "method: List ListRepresentationProvider.fromXML(XMLReader)", 
     	description = "Write followed by read produces the original instance" 
     )
     public void tm_006B6C61E( Test.Case tc ) {
@@ -78,7 +78,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String ListRep.getName()", 
+    	member = "method: String ListRepresentationProvider.getName()", 
     	description = "Result does not contain entity characters" 
     )
     public void tm_0EB14D0DD( Test.Case tc ) {
@@ -86,7 +86,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String ListRep.getName()", 
+    	member = "method: String ListRepresentationProvider.getName()", 
     	description = "Result is not empty" 
     )
     public void tm_091CB58A0( Test.Case tc ) {
@@ -94,7 +94,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void ListRep.toXML(List, XMLWriter)", 
+    	member = "method: void ListRepresentationProvider.toXML(List, XMLWriter)", 
     	description = "Read followed by write produces an equivalent representation" 
     )
     public void tm_0E509F02C( Test.Case tc ) {
@@ -102,7 +102,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void ListRep.toXML(List, XMLWriter)", 
+    	member = "method: void ListRepresentationProvider.toXML(List, XMLWriter)", 
     	description = "Throws AppRuntime if an IOException occurs" 
     )
     public void tm_0A9C37C97( Test.Case tc ) {
@@ -110,7 +110,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void ListRep.toXML(List, XMLWriter)", 
+    	member = "method: void ListRepresentationProvider.toXML(List, XMLWriter)", 
     	description = "Throws AssertionError for null element" 
     )
     public void tm_031865A14( Test.Case tc ) {
@@ -118,7 +118,7 @@ public class ListRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void ListRep.toXML(List, XMLWriter)", 
+    	member = "method: void ListRepresentationProvider.toXML(List, XMLWriter)", 
     	description = "Throws AssertionError for null writer" 
     )
     public void tm_0206CAAF1( Test.Case tc ) {
@@ -138,7 +138,7 @@ public class ListRepTest extends Test.Container {
 		
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
-		Test.evalPackage( ListRep.class )
+		Test.evalPackage( ListRepresentationProvider.class )
 			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )

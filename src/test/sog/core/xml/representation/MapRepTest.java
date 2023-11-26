@@ -38,7 +38,7 @@ public class MapRepTest extends Test.Container {
 	// TEST CASES:
 
     @Test.Impl( 
-    	member = "constructor: MapRep(Type[])", 
+    	member = "constructor: MapRepresentationProvider(Type[])", 
     	description = "Throws AssertionError for null array of component types" 
     )
     public void tm_03EDEC307( Test.Case tc ) {
@@ -46,7 +46,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "constructor: MapRep(Type[])", 
+    	member = "constructor: MapRepresentationProvider(Type[])", 
     	description = "Throws AssertionError if not exactly two components" 
     )
     public void tm_082C6E83F( Test.Case tc ) {
@@ -54,7 +54,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Map MapRep.fromXML(XMLReader)", 
+    	member = "method: Map MapRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws AssertionError for null reader" 
     )
     public void tm_0B5BDDCFC( Test.Case tc ) {
@@ -62,7 +62,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Map MapRep.fromXML(XMLReader)", 
+    	member = "method: Map MapRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws XMLRuntime for malformed content" 
     )
     public void tm_0310A7C6F( Test.Case tc ) {
@@ -70,7 +70,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: Map MapRep.fromXML(XMLReader)", 
+    	member = "method: Map MapRepresentationProvider.fromXML(XMLReader)", 
     	description = "Write followed by read produces the original instance" 
     )
     public void tm_0F1EC7716( Test.Case tc ) {
@@ -78,7 +78,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String MapRep.getName()", 
+    	member = "method: String MapRepresentationProvider.getName()", 
     	description = "Result does not contain entity characters" 
     )
     public void tm_0CCAACFD9( Test.Case tc ) {
@@ -86,7 +86,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String MapRep.getName()", 
+    	member = "method: String MapRepresentationProvider.getName()", 
     	description = "Result is not empty" 
     )
     public void tm_0258ABC9C( Test.Case tc ) {
@@ -94,7 +94,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void MapRep.toXML(Map, XMLWriter)", 
+    	member = "method: void MapRepresentationProvider.toXML(Map, XMLWriter)", 
     	description = "Read followed by write produces an equivalent representation" 
     )
     public void tm_00026C542( Test.Case tc ) {
@@ -102,7 +102,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void MapRep.toXML(Map, XMLWriter)", 
+    	member = "method: void MapRepresentationProvider.toXML(Map, XMLWriter)", 
     	description = "Throws AssertionError for null key" 
     )
     public void tm_084D1E7CD( Test.Case tc ) {
@@ -110,7 +110,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void MapRep.toXML(Map, XMLWriter)", 
+    	member = "method: void MapRepresentationProvider.toXML(Map, XMLWriter)", 
     	description = "Throws AssertionError for null map" 
     )
     public void tm_084EC238A( Test.Case tc ) {
@@ -118,7 +118,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void MapRep.toXML(Map, XMLWriter)", 
+    	member = "method: void MapRepresentationProvider.toXML(Map, XMLWriter)", 
     	description = "Throws AssertionError for null value" 
     )
     public void tm_0D676FD9F( Test.Case tc ) {
@@ -126,7 +126,7 @@ public class MapRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void MapRep.toXML(Map, XMLWriter)", 
+    	member = "method: void MapRepresentationProvider.toXML(Map, XMLWriter)", 
     	description = "Throws AssertionError for null writer" 
     )
     public void tm_0DE68569B( Test.Case tc ) {
@@ -147,7 +147,7 @@ public class MapRepTest extends Test.Container {
 		
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
-		Test.evalPackage( MapRep.class )
+		Test.evalPackage( MapRepresentationProvider.class )
 			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )

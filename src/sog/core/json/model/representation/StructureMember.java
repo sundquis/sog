@@ -17,55 +17,44 @@
  * Sundquist
  */
 
-package sog.core.json.model.rep;
+package sog.core.json.model.representation;
 
 import java.lang.reflect.Field;
 
-import sog.core.Fatal;
 import sog.core.Test;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 import sog.core.json.model.Entity;
 import sog.core.json.model.Member;
-import sog.core.json.model.Model;
 import sog.core.json.model.ModelException;
-import sog.core.json.model.ModelRep;
+import sog.core.json.model.Representation;
+import sog.core.json.model.Representations;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class MemberRep<T> implements Comparable<MemberRep<T>> {
-
+public class StructureMember<T> {
 
 	private final Field field;
 	
-	private ModelRep<T> rep = null;
+	private Representation<T> fieldRep = null;
 	
-	private int order = 0;
-	
-	public MemberRep( Field field ) {
+	@SuppressWarnings( "unchecked" )
+	public StructureMember( Field field ) {
+		if ( Entity.class.isAssignableFrom( field.getType() ) ) {
+			throw new ModelException( "Structure declares Entity member: " + field );
+		}
+		
 		this.field = field;
 		this.field.setAccessible( true );
-	}
-	
-	public boolean isEntity() {
-		return Entity.class.isAssignableFrom( this.field.getType() );
-	}
-	
-	public boolean isMember() {
-		Member member = this.field.getDeclaredAnnotation( Member.class );
-		if ( member == null ) {
-			return false;
-		} else {
-			this.order = member.order();
-			return true;
+		if ( this.field.getDeclaredAnnotation( Member.class ) != null ) {
+			this.fieldRep = (Representation<T>) Representations.get().forField( this.field );
 		}
 	}
 	
-	@SuppressWarnings( "unchecked" )
-	public void setRep() throws ModelException {
-		this.rep = (ModelRep<T>) Model.get().repForType( this.field.getGenericType() );
+	public boolean isMember() {
+		return this.fieldRep != null;
 	}
 	
 	public String getName() {
@@ -76,14 +65,13 @@ public class MemberRep<T> implements Comparable<MemberRep<T>> {
 		try {
 			return this.field.get( instance );
 		} catch ( Exception ex ) {
-			Fatal.error( "Instance: " + instance + " does not declare field: " + this.field, ex );
-			return null;
+			throw new ModelException( "Instance: " + instance + " does not declare field: " + this.field, ex );
 		}
 	}
 	
 	public void readAndSet( PrimitiveReader reader, Object instance ) throws ModelException {
 		try {
-			this.field.set( instance, this.rep.read( reader ) );
+			this.field.set( instance, this.fieldRep.read( reader ) );
 		} catch ( Exception ex ) {
 			throw new ModelException( "Error setting member: " + this.field );
 		}
@@ -92,7 +80,7 @@ public class MemberRep<T> implements Comparable<MemberRep<T>> {
 	@SuppressWarnings( "unchecked" )
 	public boolean write( boolean first, PrimitiveWriter writer, Object instance ) throws ModelException {
 		try {
-			Object value = this.field.get( instance );
+			T value = (T) this.field.get( instance );
 			if ( value == null ) {
 				return first;
 			}
@@ -101,17 +89,12 @@ public class MemberRep<T> implements Comparable<MemberRep<T>> {
 			}
 			writer.writeString( this.getName() );
 			writer.append( ':' );
-			this.rep.write( (T) value, writer );
+			this.fieldRep.write( value, writer );
 			return false;
 		} catch ( Exception ex ) {
 			throw new ModelException( "Error getting member value: " + this.field );
 		}
 	}
 
-	@Override
-	public int compareTo( MemberRep<T> other ) {
-		return this.order - other.order;
-	}
-	
 
 }

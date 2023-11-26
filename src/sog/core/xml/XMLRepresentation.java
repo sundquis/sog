@@ -39,7 +39,7 @@ import sog.core.xml.representation.StringRep;
 /**
  * To define a new representation:
  * 		+ Extend XMLRepresentation<>. Suggested location is in or under sog.core.xml.representation
- * 		+ Define the required constructor accepting an array of Type instances. See ListRep
+ * 		+ Define the required constructor accepting an array of Type instances. See ListRepresentationProvider
  * 		+ Implement the three abstract methods.
  * 		+ Add an entry to the TARGET_TO_CONS Map below.
  * 			The map key is the target type modeled by the representation.

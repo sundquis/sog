@@ -17,7 +17,7 @@
  * Sundquist
  */
 
-package sog.core.json.model.rep;
+package sog.core.json.model.representation;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -30,13 +30,13 @@ import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 import sog.core.json.model.Entity;
 import sog.core.json.model.ModelException;
-import sog.core.json.model.ModelRep;
+import sog.core.json.model.Representation;
 
 /**
  * 
  */
 @Test.Subject( "test." )
-public class EntityRep<E extends Entity> implements ModelRep<E> {
+public class EntityRep<E extends Entity> implements Representation<E> {
 	
 	/*
 	 * We only need one instance per concrete Structure class. Save instances here:

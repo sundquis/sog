@@ -22,15 +22,19 @@ package sog.core.json.model;
 import sog.core.Test;
 
 /**
- * 
+ * Indicates error with definition of model classes.
  */
 @Test.Subject( "test." )
-public class ModelException extends Exception {
+public class ModelException extends RuntimeException {
 	
 	private static final long serialVersionUID = 5084657946546956407L;
 
 	public ModelException( String msg ) {
 		super( msg );
+	}
+
+	public ModelException( Exception ex ) {
+		super( ex );
 	}
 
 	public ModelException( String msg, Exception ex ) {

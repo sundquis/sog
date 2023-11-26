@@ -22,7 +22,6 @@ package sog.core.json.model;
 import java.io.IOException;
 
 import sog.core.Test;
-import sog.core.json.JsonException;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 
@@ -30,10 +29,11 @@ import sog.core.json.PrimitiveWriter;
  * 
  */
 @Test.Subject( "test." )
-public interface ModelRep<T> {
+public interface Representation<T> {
 	
-	public T read( PrimitiveReader reader ) throws IOException, JsonException, ModelException;
 	
-	public void write( T t, PrimitiveWriter writer ) throws IOException, ModelException;
-
+	public T read( PrimitiveReader reader ) throws IOException;
+	
+	public void write( T element, PrimitiveWriter writer ) throws IOException;
+	
 }

@@ -19,32 +19,28 @@
 
 package sog.core.json.model;
 
+import java.lang.reflect.Type;
+
+import sog.core.Test;
 
 /**
- * Manages JSON representations for various types.
+ * Concrete implementations must provide an accessible no-arg constructor.
  */
-public class Model {
+@Test.Subject( "test." )
+public interface RepresentationProvider {
+	
+	public Class<?> getRawType();
 
-	private static Model INSTANCE;
-	
-	public static Model get() {
-		if ( Model.INSTANCE == null ) {
-			synchronized ( Model.class ) {
-				if ( Model.INSTANCE == null ) {
-					Model.INSTANCE = new Model();
-				}
-			}
-		}
-		return Model.INSTANCE;
-	}
-	
-	
-	/*
-	 * Assemble the mappings from class names to Representation.Builder instances
+	/**
+	 * Providers may cache and reuse representations, depending on the state required.
+	 * If the return has type Representation<E>, then the raw type of E must match getRawType()
+	 * and if E is generic its type parameters must match the supplied parameters.
+	 * 
+	 * FIXME: Is there a way to statically declare the type relationship?
+	 * 
+	 * @param params
+	 * @return
 	 */
-	private Model() {
-	}
-		
+	public Representation<?> getRepresentationFor( Type... params );
 
-	
 }

@@ -17,34 +17,34 @@
  * Sundquist
  */
 
-package sog.core.json.model;
+package sog.core.json.model.representation;
 
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import sog.core.Test;
 
 /**
- * Manages JSON representations for various types.
+ * 
  */
-public class Model {
-
-	private static Model INSTANCE;
+@Test.Subject( "test." )
+public class SortedMapRepresentationProvider extends MapRepresentationProvider {
 	
-	public static Model get() {
-		if ( Model.INSTANCE == null ) {
-			synchronized ( Model.class ) {
-				if ( Model.INSTANCE == null ) {
-					Model.INSTANCE = new Model();
-				}
-			}
-		}
-		return Model.INSTANCE;
+	public SortedMapRepresentationProvider() {
+		super();
+	}
+
+	@Override
+	public Class<?> getRawType() {
+		return SortedMap.class;
+	}
+
+	@Override
+	protected <K, V> Map<K, V> newMap() {
+		return new TreeMap<>();
 	}
 	
-	
-	/*
-	 * Assemble the mappings from class names to Representation.Builder instances
-	 */
-	private Model() {
-	}
-		
 
-	
+
 }

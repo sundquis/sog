@@ -27,7 +27,6 @@ import java.util.Map;
 import sog.core.App;
 import sog.core.LocalDir;
 import sog.core.Test;
-import sog.core.json.JsonRuntime;
 import sog.core.json.PrimitiveReader;
 import sog.core.json.PrimitiveWriter;
 
@@ -35,12 +34,18 @@ import sog.core.json.PrimitiveWriter;
  * Singleton classes must either declare a no-arg constructor that initializes member values,
  * or use initializers. This establishes the initial state, the first time the Singleton is
  * created. When the JVM shuts down, the current state is preserved for the next execution.
+ * 
+ * To get the persistent singleton instance use
+ *   SomeSingleton s = Singleton.getInstance( SomeSingleton.class );
  */
 @Test.Subject( "test." )
 public abstract class Singleton implements Structure {
 
-	
-	private static final Map<Class<?>, Singleton> instances = new HashMap<>();
+
+	/*
+	 * Instances cached by concrete Singleton type.
+	 */
+	private static final Map<Class<?>, Singleton> classToSingleton = new HashMap<>();
 	
 	/**
 	 * Get the unique instance of the given Singleton class.
@@ -49,22 +54,28 @@ public abstract class Singleton implements Structure {
 	 * @param clazz
 	 * @return
 	 */
-	public static <S extends Singleton> S getInstance( Class<S> clazz ) {
+	public synchronized static <S extends Singleton> S getInstance( Class<S> clazz ) {
+		@SuppressWarnings( "unchecked" )
+		S result = (S) Singleton.classToSingleton.get( clazz );
+		if ( result != null ) {
+			return result;
+		}
+		
 		LocalDir dir = new LocalDir().sub( "json" ).sub( "model" );
 		Arrays.stream( clazz.getCanonicalName().split( "\\." ) ).forEach( dir::sub );
 		final Path path = dir.getFile( "Instance", LocalDir.Type.JSON );
 		
 		@SuppressWarnings( "unchecked" )
-		final ModelRep<S> rep = (ModelRep<S>) Singleton.getRep( clazz );
+		final Representation<S> rep = (Representation<S>) Representations.get().forType( clazz );
 		
-		S result = null;
 		try (
 			PrimitiveReader in = path.toFile().exists() ? new PrimitiveReader( path ) : new PrimitiveReader( "{}" );
 		) {
 			result = rep.read( in );
 		} catch ( Exception ex ) {
-			throw new JsonRuntime( "Unable to initialize Singleton instance: " + clazz, ex );
+			throw new ModelException( "Unable to initialize Singleton instance: " + clazz, ex );
 		}
+		Singleton.classToSingleton.put( clazz, result );
 
 		final S value = result;
 		App.get().terminateOnShutdown( new App.OnShutdown() {
@@ -80,14 +91,6 @@ public abstract class Singleton implements Structure {
 		return result;
 	}
 	
-	private static ModelRep<?> getRep( Class<?> clazz ) {
-		try {
-			return Model.get().repForClass( Structure.class, clazz );
-		} catch ( ModelException ex ) {
-			throw new JsonRuntime( "Illegal Structure definition.", ex );
-		}
-	}
-	
 	protected Singleton() {
 		// Check if constructor called from factory
 		Boolean good = App.get().getLocation().filter( (s) -> s.startsWith( "sog.core.json.model." ) )
@@ -95,7 +98,7 @@ public abstract class Singleton implements Structure {
 			.filter( (s) -> s.contains( "in getInstance" ) )
 			.findAny().isPresent();
 		if ( !good ) {
-			throw new JsonRuntime( "Use Singleton.getInstance to construct Singleton instances" );
+			throw new ModelException( "Use Singleton.getInstance to construct Singleton instances" );
 		}
 	}
 
@@ -105,15 +108,18 @@ public abstract class Singleton implements Structure {
 //		@Member private String myString = "hi";
 //	}
 //
-	public static void main( String[] args ) {
-		try {
+//	public static void main( String[] args ) {
+//		try {
 //			SomeSingleton ss = Singleton.getInstance( SomeSingleton.class );
 //			App.get().msg( "Int = " + ss.myInt + ", Str = " + ss.myString );
 //			ss.myInt++;
 //			ss.myString += " and hi";
-		} catch ( Exception ex ) {
-			ex.printStackTrace();
-		}
-	}
+//			//SomeSingleton error = new SomeSingleton();
+//			SomeSingleton s2 = Singleton.getInstance( SomeSingleton.class );
+//			App.get().msg( "Same instance: " + (ss == s2) );
+//		} catch ( Exception ex ) {
+//			ex.printStackTrace();
+//		}
+//	}
 
 }

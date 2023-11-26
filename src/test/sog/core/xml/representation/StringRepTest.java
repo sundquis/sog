@@ -38,7 +38,7 @@ public class StringRepTest extends Test.Container {
 	// TEST CASES:
 
     @Test.Impl( 
-    	member = "constructor: StringRep(Type[])", 
+    	member = "constructor: StringRepresentationProvider(Type[])", 
     	description = "Array of component types is ignored" 
     )
     public void tm_049642861( Test.Case tc ) {
@@ -46,7 +46,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String StringRep.fromXML(XMLReader)", 
+    	member = "method: String StringRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws AssertionError for null reader" 
     )
     public void tm_03797C524( Test.Case tc ) {
@@ -54,7 +54,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String StringRep.fromXML(XMLReader)", 
+    	member = "method: String StringRepresentationProvider.fromXML(XMLReader)", 
     	description = "Throws XMLRuntime for malformed content" 
     )
     public void tm_0A40AFA97( Test.Case tc ) {
@@ -62,7 +62,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String StringRep.fromXML(XMLReader)", 
+    	member = "method: String StringRepresentationProvider.fromXML(XMLReader)", 
     	description = "Write followed by read produces the original instance" 
     )
     public void tm_02D810F3E( Test.Case tc ) {
@@ -70,7 +70,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String StringRep.getName()", 
+    	member = "method: String StringRepresentationProvider.getName()", 
     	description = "Result does not contain entity characters" 
     )
     public void tm_09C7384CA( Test.Case tc ) {
@@ -78,7 +78,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: String StringRep.getName()", 
+    	member = "method: String StringRepresentationProvider.getName()", 
     	description = "Result is not empty" 
     )
     public void tm_0C5E1BC4D( Test.Case tc ) {
@@ -86,7 +86,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void StringRep.toXML(String, XMLWriter)", 
+    	member = "method: void StringRepresentationProvider.toXML(String, XMLWriter)", 
     	description = "Read followed by write produces an equivalent representation" 
     )
     public void tm_0BA60B4C6( Test.Case tc ) {
@@ -94,7 +94,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void StringRep.toXML(String, XMLWriter)", 
+    	member = "method: void StringRepresentationProvider.toXML(String, XMLWriter)", 
     	description = "Throws AssertionError for null element" 
     )
     public void tm_093B28E2E( Test.Case tc ) {
@@ -102,7 +102,7 @@ public class StringRepTest extends Test.Container {
     }
     
     @Test.Impl( 
-    	member = "method: void StringRep.toXML(String, XMLWriter)", 
+    	member = "method: void StringRepresentationProvider.toXML(String, XMLWriter)", 
     	description = "Throws AssertionError for null writer" 
     )
     public void tm_0B83C8B97( Test.Case tc ) {
@@ -122,7 +122,7 @@ public class StringRepTest extends Test.Container {
 		
 		/* Toggle package results
 		sog.util.Concurrent.safeModeOff();
-		Test.evalPackage( StringRep.class )
+		Test.evalPackage( StringRepresentationProvider.class )
 			.concurrent( true )
 			.showDetails( false )
 			.showProgress( true )
