@@ -28,6 +28,7 @@
     <!-- Properties for the mciv Server -->
 	<class fullname="mciv.server.Server">
 		<property name="mciv.port" value="1104" />
+		<!-- TODO: Investigate static IP (EERO and/or US Internet) -->
 		<property name="mcvi.address" value="/174.141.192.202" />
 		<property name="mcvi.address.old" value="/23.88.147.138" />
 	</class>

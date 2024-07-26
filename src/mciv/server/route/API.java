@@ -70,7 +70,7 @@ public class API implements Comparable<API> {
 	/* The (key, value) pairs. */
 	private final List<Member> members;
 
-	/* When the value of a Model is another JSON Object API we add it to this list. */
+	/* When the value of a Member is another JSON Object API we add it to this list. */
 	private final List<API> objects;
 	
 	/* Used for formatting members. */
@@ -141,7 +141,7 @@ public class API implements Comparable<API> {
 	}
 
 	/**
-	 * Part of the fluent interface. The returned Model has mutators to assign the 
+	 * Part of the fluent interface. The returned Member has mutators to assign the 
 	 * type of the value.
 	 * 
 	 * @param key
